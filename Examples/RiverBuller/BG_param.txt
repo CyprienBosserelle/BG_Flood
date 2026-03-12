@@ -1,0 +1,39 @@
+# Topography/Bathymetry
+DEM = Westport_DEM_8m.nc?z;
+dx=40;
+
+# Adaptation:
+initlevel = 2;
+maxlevel = 2 ;
+minlevel = -3 ;
+Adaptation = Targetlevel,refin_mask.nc?z ;
+
+
+#Bottom friction
+frictionmodel=1;
+cf=z0_100423_rec3.asc; #cf=0.01;  #If using a uniform value
+
+
+# Timekeeping parameters
+endtime = 21600; 
+totaltime = 3600;
+
+
+#Outputs
+outputtimestep = 3600.0;
+outvars = zs,h,u,v,zb,hmax,Umax,hUmax,twet;
+outfile = Results_tuto_basicRun.nc;
+smallnc=0;
+
+TSnodesout=Offshore.txt,1482120,53814890;
+
+
+# Forcings
+river = river_discharge_TeKuha2.txt,1490249,1490427,5367640,5367805;
+rainfile=rain_forcing.txt;
+
+
+#Boundaries conditions
+left = tide_westport.txt,2; 
+right = tide_westport.txt,2;
+top = tide_westport.txt,2;

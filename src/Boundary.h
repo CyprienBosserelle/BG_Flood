@@ -27,7 +27,7 @@ template <class T> __global__ void maskbndGPUFluxbot(Param XParam, BlockP<T> XBl
 
 template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxP<T> XFlux);
 template <class T> void FlowbndFlux(Param XParam,double totaltime, BlockP<T> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxP<T> XFlux);
-
+template <class T> void FlowbndFluxML(Param XParam, double totaltime, BlockP<T> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxMLP<T> XFlux);
 
 template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, int type, float zsbnd, T taper, T* zs, T* h, T* un, T* ut, T* Fh, T* Fq, T* Ss);
 
@@ -42,6 +42,8 @@ template <class T> __device__ __host__ void noslipbndQ(T& F, T& G, T& S);
 template <class T> __device__ __host__ void ABS1D(T g, T sign, T zsbnd, T zsinside, T hinside, T utbnd,T unbnd, T& un, T& ut, T& zs, T& h);
 template <class T> __device__ __host__ void ABS1DQ(T g, T sign, T factime, T facrel, T zs, T zsbnd, T zsinside, T h, T& qmean, T& q, T& G, T& S);
 template <class T> __device__ __host__ void Dirichlet1D(T g, T sign, T zsbnd, T zsinside, T hinside,  T uninside, T& un, T& ut, T& zs, T& h);
+template <class T> __device__ __host__ void Dirichlet1Q(T g, T sign, T zsbnd, T zsinside, T hinside, T uninside, T& q);
+
 
 // End of global definition
 #endif

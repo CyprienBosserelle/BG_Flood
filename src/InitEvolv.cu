@@ -18,6 +18,21 @@
 
 #include "InitEvolv.h"
 
+#include "InitEvolv.h"
+
+/**
+ * @brief Initialize evolving variables for the simulation.
+ *
+ * Handles hotstart, coldstart, and warmstart initialization of water level, velocity, and bathymetry arrays.
+ * Applies offsets and boundary conditions as needed.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XForcing Forcing/boundary conditions
+ * @param XEv Evolving variables (output)
+ * @param zb Bathymetry array (input/output)
+ */
 template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> XForcing, EvolvingP<T> &XEv,T* &zb)
 {
 	//move this to a subroutine
@@ -30,7 +45,7 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> 
 		hotstartsucess = readhotstartfile(XParam, XBlock, XEv, zb);
 
 		//add offset if present
-		if (!std::isnan(XParam.zsoffset)) // apply specified zsoffset
+		if (T(XParam.zsoffset) != T(0.0)) // apply specified zsoffset
 		{
 			printf("\t\tadd offset to zs and hh... ");
 			//
@@ -100,11 +115,23 @@ template void initevolv<float>(Param XParam, BlockP<float> XBlock, Forcing<float
 template void initevolv<double>(Param XParam, BlockP< double > XBlock, Forcing<float> XForcing, EvolvingP< double > &XEv, double* &zb);
 
 
+/**
+ * @brief Cold start initialization of evolving variables.
+ *
+ * Sets initial water level, velocity, and bathymetry arrays for all blocks using specified zsinit and zsoffset.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param zb Bathymetry array
+ * @param XEv Evolving variables (output)
+ * @return Success flag (1 if successful)
+ */
 template <class T>
 int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 {
 	T zzini = std::isnan(XParam.zsinit)? T(0.0): T(XParam.zsinit);
-	T zzoffset = std::isnan(XParam.zsoffset) ? T(0.0) : T(XParam.zsoffset);
+	T zzoffset = T(XParam.zsoffset);
 	
 
 	
@@ -137,6 +164,18 @@ int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 	return coldstartsucess;
 }
 
+/**
+ * @brief Warm start initialization using boundary conditions and interpolation.
+ *
+ * Sets initial water level, velocity, and bathymetry arrays for all blocks using boundary segments and atmospheric pressure forcing.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XForcing Forcing/boundary conditions
+ * @param XBlock Block parameters
+ * @param zb Bathymetry array
+ * @param XEv Evolving variables (output)
+ */
 template <class T>
 void warmstart(Param XParam, Forcing<float> XForcing, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 {
@@ -237,6 +276,18 @@ void warmstart(Param XParam, Forcing<float> XForcing, BlockP<T> XBlock, T* zb, E
 }
 
 
+/**
+ * @brief Legacy warm start initialization using inverse distance to boundaries.
+ *
+ * Sets initial water level, velocity, and bathymetry arrays for all blocks using inverse distance interpolation from boundaries.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XForcing Forcing/boundary conditions
+ * @param XBlock Block parameters
+ * @param zb Bathymetry array
+ * @param XEv Evolving variables (output)
+ */
 template <class T>
 void warmstartold(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 {
@@ -456,6 +507,18 @@ void warmstartold(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb,
 }
 
 
+/**
+ * @brief Add offset to surface elevation (zs) and update water depth (h).
+ *
+ * Applies zsoffset to zs and updates h for all blocks where h > eps.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables (input/output)
+ * @param zb Bathymetry array
+ * @return Success flag (1 if successful)
+ */
 template <class T>
 int AddZSoffset(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv, T*zb)
 {
@@ -486,6 +549,64 @@ int AddZSoffset(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv, T*zb)
 }
 
 
+/**
+ * @brief Read BG_Flood hotstart file and extract block attributes.
+ *
+ * Opens NetCDF hotstart file, checks for BG_Flood attribute, and closes file.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param zb Bathymetry array
+ * @return Status code
+ */
+template <class T>
+int readhotstartfileBG(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
+{
+	int status;
+	int ncid;
+	//int dimids[NC_MAX_VAR_DIMS];   // dimension IDs 
+	int ib;
+	//double scalefac = 1.0;
+	//double offset = 0.0;
+
+	std::string zbname, zsname, hname, uname, vname, xname, yname;
+	// Open the file for read access
+	//netCDF::NcFile dataFile(XParam.hotstartfile, NcFile::read);
+
+	bool isBG_Flood = false;
+
+	int BG_vers = -999;
+
+	// read ncfile attribute and see if BG_flood global attribute exists.
+	//Open NC file
+	printf("Open file...");
+	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
+
+	status = nc_get_att_int(ncid, NC_GLOBAL, "BG_Flood", &BG_vers);
+
+	//isBG_Flood = BG_vers >= 0)
+	
+	status = nc_close(ncid);
+	
+	
+	
+}
+
+/**
+ * @brief Read hotstart file and initialize evolving variables and bathymetry.
+ *
+ * Reads NetCDF hotstart file, extracts variables, and fills arrays for all blocks.
+ * Handles missing variables and applies edge corrections.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables (output)
+ * @param zb Bathymetry array (output)
+ * @return Success flag (1 if successful, 0 if fallback to cold start)
+ */
 template <class T>
 int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 {
@@ -504,6 +625,14 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 	//Open NC file
 	printf("Open file...");
 	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
+
+
+	//bool isBG_Flood = false;
+
+	// read ncfile attribute and see if BG_flood global attribute exists.
+
+	//if it exist read each level separatly otherwise look for the following variables 
+
 	if (status != NC_NOERR) handle_ncerror(status);
 	zbname = checkncvarname(ncid, "zb", "z", "ZB", "Z", "zb_P0");
 	zsname = checkncvarname(ncid, "zs", "eta", "ZS", "ETA", "zs_P0");

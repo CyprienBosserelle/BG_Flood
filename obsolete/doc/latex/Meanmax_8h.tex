@@ -1,0 +1,117 @@
+\hypertarget{Meanmax_8h}{}\doxysection{src/\+Meanmax.h File Reference}
+\label{Meanmax_8h}\index{src/Meanmax.h@{src/Meanmax.h}}
+{\ttfamily \#include \char`\"{}General.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Param.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Arrays.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Forcing.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Mem\+Management.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Flow\+GPU.\+h\char`\"{}}\newline
+Include dependency graph for Meanmax.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Meanmax_8h_aeeb03efb686aa02b2b59670dca759abe}{Calcmeanmax}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&XLoop, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Meanmax_8h_af841746afbd4274a7a05732806c6d3e4}{resetmeanmax}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&XLoop, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Meanmax_8h_ab559dc1872b3d1473b2e814c9c615039}{Initmeanmax}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ XLoop, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel, \mbox{\hyperlink{structModel}{Model}}$<$ T $>$ XModel\+\_\+g)
+\item 
+{\footnotesize template$<$class T $>$ }\\void \mbox{\hyperlink{Meanmax_8h_accd5eac79d9ef8a8f734b3f6b66c9d5a}{resetval\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$\&var, T val)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Meanmax_8h_a71af63839547c74405fa056669df13aa}{addavg\+\_\+var\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$Varmean, T $\ast$Var)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Meanmax_8h_a3bd032aa2a9d26960af467539cbea00d}{divavg\+\_\+var\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T ntdiv, T $\ast$Varmean)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Meanmax_8h_abf541990cf93db98ad91cfdd8d862728}{add\+Uandh\+U\+\_\+\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$h, T $\ast$u, T $\ast$v, T $\ast$U, T $\ast$hU)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Meanmax_8h_af85cfb8b0f7b2ed5bb46814376d689c6}{max\+\_\+var\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$Varmax, T $\ast$Var)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Meanmax_8h_a84000c72a4326684436c52a682658990}{max\+\_\+\+Norm\+\_\+\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$Varmax, T $\ast$Var1, T $\ast$Var2)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Meanmax_8h_afd35c74296ce07bc4277636c01972a5d}{max\+\_\+h\+U\+\_\+\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$Varmax, T $\ast$Var1, T $\ast$Var2, T $\ast$Var3)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+global\+\_\+\+\_\+ void \mbox{\hyperlink{Meanmax_8h_a31ddbbb7c858d97a428bef9fba1dae90}{addwettime\+\_\+\+GPU}} (\mbox{\hyperlink{classParam}{Param}} XParam, \mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$ XBlock, T $\ast$wett, T $\ast$h, T thresold, T time)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Meanmax_8h_a71af63839547c74405fa056669df13aa}\label{Meanmax_8h_a71af63839547c74405fa056669df13aa}} 
+\index{Meanmax.h@{Meanmax.h}!addavg\_varGPU@{addavg\_varGPU}}
+\index{addavg\_varGPU@{addavg\_varGPU}!Meanmax.h@{Meanmax.h}}
+\doxysubsubsection{\texorpdfstring{addavg\_varGPU()}{addavg\_varGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void addavg\+\_\+var\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{Varmean,  }\item[{T $\ast$}]{Var }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Meanmax_8h_abf541990cf93db98ad91cfdd8d862728}\label{Meanmax_8h_abf541990cf93db98ad91cfdd8d862728}} 
+\index{Meanmax.h@{Meanmax.h}!addUandhU\_GPU@{addUandhU\_GPU}}
+\index{addUandhU\_GPU@{addUandhU\_GPU}!Meanmax.h@{Meanmax.h}}
+\doxysubsubsection{\texorpdfstring{addUandhU\_GPU()}{addUandhU\_GPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void add\+Uandh\+U\+\_\+\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{h,  }\item[{T $\ast$}]{u,  }\item[{T $\ast$}]{v,  }\item[{T $\ast$}]{U,  }\item[{T $\ast$}]{hU }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Meanmax_8h_a31ddbbb7c858d97a428bef9fba1dae90}\label{Meanmax_8h_a31ddbbb7c858d97a428bef9fba1dae90}} 
+\index{Meanmax.h@{Meanmax.h}!addwettime\_GPU@{addwettime\_GPU}}
+\index{addwettime\_GPU@{addwettime\_GPU}!Meanmax.h@{Meanmax.h}}
+\doxysubsubsection{\texorpdfstring{addwettime\_GPU()}{addwettime\_GPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void addwettime\+\_\+\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{wett,  }\item[{T $\ast$}]{h,  }\item[{T}]{thresold,  }\item[{T}]{time }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Meanmax_8h_aeeb03efb686aa02b2b59670dca759abe}\label{Meanmax_8h_aeeb03efb686aa02b2b59670dca759abe}} 
+\index{Meanmax.h@{Meanmax.h}!Calcmeanmax@{Calcmeanmax}}
+\index{Calcmeanmax@{Calcmeanmax}!Meanmax.h@{Meanmax.h}}
+\doxysubsubsection{\texorpdfstring{Calcmeanmax()}{Calcmeanmax()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Calcmeanmax (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Meanmax_8h_a3bd032aa2a9d26960af467539cbea00d}\label{Meanmax_8h_a3bd032aa2a9d26960af467539cbea00d}} 
+\index{Meanmax.h@{Meanmax.h}!divavg\_varGPU@{divavg\_varGPU}}
+\index{divavg\_varGPU@{divavg\_varGPU}!Meanmax.h@{Meanmax.h}}
+\doxysubsubsection{\texorpdfstring{divavg\_varGPU()}{divavg\_varGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void divavg\+\_\+var\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T}]{ntdiv,  }\item[{T $\ast$}]{Varmean }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Meanmax_8h_ab559dc1872b3d1473b2e814c9c615039}\label{Meanmax_8h_ab559dc1872b3d1473b2e814c9c615039}} 
+\index{Meanmax.h@{Meanmax.h}!Initmeanmax@{Initmeanmax}}
+\index{Initmeanmax@{Initmeanmax}!Meanmax.h@{Meanmax.h}}
+\doxysubsubsection{\texorpdfstring{Initmeanmax()}{Initmeanmax()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void Initmeanmax (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$}]{XLoop,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Meanmax_8h_afd35c74296ce07bc4277636c01972a5d}\label{Meanmax_8h_afd35c74296ce07bc4277636c01972a5d}} 
+\index{Meanmax.h@{Meanmax.h}!max\_hU\_GPU@{max\_hU\_GPU}}
+\index{max\_hU\_GPU@{max\_hU\_GPU}!Meanmax.h@{Meanmax.h}}
+\doxysubsubsection{\texorpdfstring{max\_hU\_GPU()}{max\_hU\_GPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void max\+\_\+h\+U\+\_\+\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{Varmax,  }\item[{T $\ast$}]{Var1,  }\item[{T $\ast$}]{Var2,  }\item[{T $\ast$}]{Var3 }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Meanmax_8h_a84000c72a4326684436c52a682658990}\label{Meanmax_8h_a84000c72a4326684436c52a682658990}} 
+\index{Meanmax.h@{Meanmax.h}!max\_Norm\_GPU@{max\_Norm\_GPU}}
+\index{max\_Norm\_GPU@{max\_Norm\_GPU}!Meanmax.h@{Meanmax.h}}
+\doxysubsubsection{\texorpdfstring{max\_Norm\_GPU()}{max\_Norm\_GPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void max\+\_\+\+Norm\+\_\+\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{Varmax,  }\item[{T $\ast$}]{Var1,  }\item[{T $\ast$}]{Var2 }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Meanmax_8h_af85cfb8b0f7b2ed5bb46814376d689c6}\label{Meanmax_8h_af85cfb8b0f7b2ed5bb46814376d689c6}} 
+\index{Meanmax.h@{Meanmax.h}!max\_varGPU@{max\_varGPU}}
+\index{max\_varGPU@{max\_varGPU}!Meanmax.h@{Meanmax.h}}
+\doxysubsubsection{\texorpdfstring{max\_varGPU()}{max\_varGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+global\+\_\+\+\_\+ void max\+\_\+var\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$}]{Varmax,  }\item[{T $\ast$}]{Var }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Meanmax_8h_af841746afbd4274a7a05732806c6d3e4}\label{Meanmax_8h_af841746afbd4274a7a05732806c6d3e4}} 
+\index{Meanmax.h@{Meanmax.h}!resetmeanmax@{resetmeanmax}}
+\index{resetmeanmax@{resetmeanmax}!Meanmax.h@{Meanmax.h}}
+\doxysubsubsection{\texorpdfstring{resetmeanmax()}{resetmeanmax()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void resetmeanmax (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structLoop}{Loop}}$<$ T $>$ \&}]{XLoop,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel,  }\item[{\mbox{\hyperlink{structModel}{Model}}$<$ T $>$}]{XModel\+\_\+g }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Meanmax_8h_accd5eac79d9ef8a8f734b3f6b66c9d5a}\label{Meanmax_8h_accd5eac79d9ef8a8f734b3f6b66c9d5a}} 
+\index{Meanmax.h@{Meanmax.h}!resetvalGPU@{resetvalGPU}}
+\index{resetvalGPU@{resetvalGPU}!Meanmax.h@{Meanmax.h}}
+\doxysubsubsection{\texorpdfstring{resetvalGPU()}{resetvalGPU()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+void resetval\+GPU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classParam}{Param}}}]{XParam,  }\item[{\mbox{\hyperlink{structBlockP}{BlockP}}$<$ T $>$}]{XBlock,  }\item[{T $\ast$\&}]{var,  }\item[{T}]{val }\end{DoxyParamCaption})}
+

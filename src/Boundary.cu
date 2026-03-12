@@ -1,6 +1,19 @@
 ﻿#include "Boundary.h"
 
 
+/**
+ * @brief Applies boundary conditions for flow variables on a given side of the domain.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XLoop Loop control structure
+ * @param XBlock Block data structure
+ * @param side Boundary parameter (side info)
+ * @param Atmp Dynamic forcing data
+ * @param XEv Evolving variables
+ *
+ * Handles boundary values for water level, velocity, and applies interpolation in time and space.
+ * Integrates any existing comments and logic.
+ */
 template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, BlockP<T> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<T> XEv)
 {
 	dim3 blockDim(XParam.blkwidth, 1, 1);
@@ -78,6 +91,20 @@ template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, BlockP<T> XBlock, 
 template void Flowbnd<float>(Param XParam, Loop<float>& XLoop, BlockP<float> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<float> XEv);
 template void Flowbnd<double>(Param XParam, Loop<double>& XLoop, BlockP<double> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<double> XEv);
 
+/**
+ * @brief Applies boundary conditions for flux variables on a given segment of the domain.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param totaltime Current simulation time
+ * @param XBlock Block data structure
+ * @param bndseg Boundary segment info
+ * @param Atmp Dynamic forcing data
+ * @param XEv Evolving variables
+ * @param XFlux Flux variables
+ *
+ * Handles boundary fluxes, applies tapers, and manages GPU/CPU execution for boundary segments.
+ * Integrates any existing comments and logic.
+ */
 template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxP<T> XFlux)
 {
 	dim3 blockDim(XParam.blkwidth, 1, 1);
@@ -93,6 +120,111 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 	}
 	// Warning this above is not ideal but sufficient for fail safe of testing if someone specifies initial conditions and no boundary for a type 3 they should be in trouble
 	T taper=T(1.0);
+	if (bndseg.on)
+	{
+		if (XParam.bndtaper > 0.0)
+		{
+			taper = min((totaltime - XParam.inittime) / XParam.bndtaper, 1.0);
+		}
+
+		if (bndseg.uniform)
+		{
+			int SLstepinbnd = 1;
+
+			double difft = bndseg.data[SLstepinbnd].time - totaltime;
+			while (difft < 0.0)
+			{
+				SLstepinbnd++;
+				difft = bndseg.data[SLstepinbnd].time - totaltime;
+			}
+
+			//itime = SLstepinbnd - 1.0 + (totaltime - bndseg.data[SLstepinbnd - 1].time) / (bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time);
+			zsbnd = interptime(bndseg.data[SLstepinbnd].wspeed, bndseg.data[SLstepinbnd - 1].wspeed, bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time, totaltime - bndseg.data[SLstepinbnd - 1].time);
+
+
+			
+		}
+		else
+		{
+			// Nothing. it is already done in update forcing
+		}
+		
+	}
+
+	if (bndseg.type != 1)
+	{
+		if (XParam.GPUDEVICE >= 0)
+		{
+			//if (bndseg.left.nblk > 0)
+			{
+				//Left
+				//template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, float zsbnd, T * zs, T * h, T * un, T * ut, T * Fh, T * Fq, T * Ss)
+				//bndFluxGPUSide <<< gridDimBBND, blockDim, 0 >>> (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), XEv.zs, XEv.h, un, ut, Fh, Fq, S);
+				bndFluxGPUSide <<< gridDimBBNDLeft, blockDim, 0 >>> (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
+			//if (bndseg.right.nblk > 0)
+			{
+				//Right
+				bndFluxGPUSide <<< gridDimBBNDRight, blockDim, 0 >>> (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
+			//if (bndseg.top.nblk > 0)
+			{
+				//top
+				bndFluxGPUSide <<< gridDimBBNDTop, blockDim, 0 >>> (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
+			//if (bndseg.bot.nblk > 0)
+			{
+				//bot
+				bndFluxGPUSide <<< gridDimBBNDBot, blockDim, 0 >>> (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
+		}
+		else
+		{
+			bndFluxGPUSideCPU(XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+			bndFluxGPUSideCPU(XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+			bndFluxGPUSideCPU(XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+			bndFluxGPUSideCPU(XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+
+
+		}
+	}
+}
+template void FlowbndFlux<float>(Param XParam,  double totaltime, BlockP<float> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<float> XEv, FluxP<float> XFlux);
+template void FlowbndFlux<double>(Param XParam, double totaltime, BlockP<double> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<double> XEv, FluxP<double> XFlux);
+
+/**
+ * @brief Applies boundary conditions for flux ML variables on a given segment of the domain.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param totaltime Current simulation time
+ * @param XBlock Block data structure
+ * @param bndseg Boundary segment info
+ * @param Atmp Dynamic forcing data
+ * @param XEv Evolving variables
+ * @param XFlux Machine learning flux variables
+ *
+ * Handles boundary fluxes for ML variables, applies tapers, and manages GPU/CPU execution for boundary segments.
+ * Integrates any existing comments and logic.
+ */
+template <class T> void FlowbndFluxML(Param XParam, double totaltime, BlockP<T> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxMLP<T> XFlux)
+{
+	dim3 blockDim(XParam.blkwidth, 1, 1);
+	dim3 gridDimBBNDLeft(bndseg.left.nblk, 1, 1);
+	dim3 gridDimBBNDRight(bndseg.right.nblk, 1, 1);
+	dim3 gridDimBBNDTop(bndseg.top.nblk, 1, 1);
+	dim3 gridDimBBNDBot(bndseg.bot.nblk, 1, 1);
+
+	double zsbnd = 0.0;
+	if (!std::isnan(XParam.zsinit)) // apply specified zsinit
+	{
+		zsbnd = XParam.zsinit;
+	}
+	// Warning this above is not ideal but sufficient for fail safe of testing if someone specifies initial conditions and no boundary for a type 3 they should be in trouble
+	T taper = T(1.0);
 	if (bndseg.on)
 	{
 		if (bndseg.uniform)
@@ -119,7 +251,7 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 		{
 			// Nothing. it is already done in update forcing
 		}
-		
+
 	}
 
 	if (bndseg.type != 1)
@@ -129,44 +261,56 @@ template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XB
 			//if (bndseg.left.nblk > 0)
 			{
 				//Left
-				//template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, float zsbnd, T * zs, T * h, T * un, T * ut, T * Fh, T * Fq, T * Ss)
-				//bndFluxGPUSide <<< gridDimBBND, blockDim, 0 >>> (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), XEv.zs, XEv.h, un, ut, Fh, Fq, S);
-				bndFluxGPUSide << < gridDimBBNDLeft, blockDim, 0 >> > (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+				bndFluxGPUSide << < gridDimBBNDLeft, blockDim, 0 >> > (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.hu, XFlux.hfu, XFlux.hau);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			//if (bndseg.right.nblk > 0)
 			{
 				//Right
-				bndFluxGPUSide << < gridDimBBNDRight, blockDim, 0 >> > (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+				bndFluxGPUSide << < gridDimBBNDRight, blockDim, 0 >> > (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.hu, XFlux.hfu, XFlux.hau);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			//if (bndseg.top.nblk > 0)
 			{
 				//top
-				bndFluxGPUSide << < gridDimBBNDTop, blockDim, 0 >> > (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+				bndFluxGPUSide << < gridDimBBNDTop, blockDim, 0 >> > (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.hv, XFlux.hfv, XFlux.hav);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			//if (bndseg.bot.nblk > 0)
 			{
 				//bot
-				bndFluxGPUSide << < gridDimBBNDBot, blockDim, 0 >> > (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+				bndFluxGPUSide << < gridDimBBNDBot, blockDim, 0 >> > (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.hv, XFlux.hfv, XFlux.hfv);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 		}
 		else
 		{
-			bndFluxGPUSideCPU(XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
-			bndFluxGPUSideCPU(XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
-			bndFluxGPUSideCPU(XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
-			bndFluxGPUSideCPU(XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+			//bndFluxGPUSideCPU(XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+			//bndFluxGPUSideCPU(XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+			//bndFluxGPUSideCPU(XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+			//bndFluxGPUSideCPU(XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
 
 
 		}
 	}
 }
-template void FlowbndFlux<float>(Param XParam,  double totaltime, BlockP<float> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<float> XEv, FluxP<float> XFlux);
-template void FlowbndFlux<double>(Param XParam, double totaltime, BlockP<double> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<double> XEv, FluxP<double> XFlux);
+template void FlowbndFluxML<float>(Param XParam, double totaltime, BlockP<float> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<float> XEv, FluxMLP<float> XFlux);
+template void FlowbndFluxML<double>(Param XParam, double totaltime, BlockP<double> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<double> XEv, FluxMLP<double> XFlux);
 
+/**
+ * @brief Applies legacy boundary conditions for flux variables on a given side of the domain.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param totaltime Current simulation time
+ * @param XBlock Block data structure
+ * @param side Boundary parameter (side info)
+ * @param Atmp Dynamic forcing data
+ * @param XEv Evolving variables
+ * @param XFlux Flux variables
+ *
+ * Handles boundary fluxes using older logic, applies tapers, and manages GPU/CPU execution for boundary sides.
+ * Integrates any existing comments and logic.
+ */
 template <class T> void FlowbndFluxold(Param XParam, double totaltime, BlockP<T> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxP<T> XFlux)
 {
 	dim3 blockDim(XParam.blkwidth, 1, 1);
@@ -219,7 +363,7 @@ template <class T> void FlowbndFluxold(Param XParam, double totaltime, BlockP<T>
 
 	if (XParam.GPUDEVICE >= 0)
 	{
-		//bndFluxGPU << < gridDimBBND, blockDim, 0 >> > (XParam, side, XBlock, Atmp, float(itime), XEv.zs, XEv.h, un, ut, Fh, Fq, S);
+		//bndFluxGPU <<< gridDimBBND, blockDim, 0 >>> (XParam, side, XBlock, Atmp, float(itime), XEv.zs, XEv.h, un, ut, Fh, Fq, S);
 		//CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else
@@ -230,6 +374,28 @@ template <class T> void FlowbndFluxold(Param XParam, double totaltime, BlockP<T>
 template void FlowbndFluxold<float>(Param XParam, double totaltime, BlockP<float> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<float> XEv, FluxP<float> XFlux);
 template void FlowbndFluxold<double>(Param XParam, double totaltime, BlockP<double> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<double> XEv, FluxP<double> XFlux);
 
+/**
+ * @brief CUDA kernel for applying boundary fluxes on a segment side (GPU version).
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param side Boundary segment side info
+ * @param XBlock Block data structure
+ * @param Atmp Dynamic forcing data
+ * @param Zsmap Dynamic forcing data for zs
+ * @param uniform Whether boundary is uniform
+ * @param type Boundary type
+ * @param zsbnd Boundary zs value
+ * @param taper Taper value for smoothing
+ * @param zs Array of zs values
+ * @param h Array of h values
+ * @param un Array of normal velocities
+ * @param ut Array of tangential velocities
+ * @param Fh Array for flux h
+ * @param Fq Array for flux q
+ * @param Ss Array for source terms
+ *
+ * Applies boundary conditions and fluxes for each thread/block on the GPU, handling tapers, Dirichlet, and ABS boundary types.
+ */
 template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, int type, float zsbnd, T taper, T* zs, T* h, T* un, T* ut, T* Fh, T* Fq, T* Ss)
 {
 	//
@@ -290,9 +456,9 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 	}
 
 	
-
 	
-
+	zsbnd = zsbnd + XParam.zsoffset;
+	
 
 	int inside = Inside(halowidth, blkmemwidth, side.isright, side.istop, ix, iy, ib);
 
@@ -332,6 +498,36 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 	T facrel =  T(1.0) - min(T(XParam.dt / XParam.bndrelaxtime), T(1.0));
 
 
+	T ybo = (T)XParam.yo + XBlock.yo[ib];
+
+	T yup = T(iy);
+	T ydwn = T(iy)-T(1.0);
+
+	if (iy == XParam.blkwidth - 1)
+	{
+		if (XBlock.level[XBlock.TopLeft[ib]] > XBlock.level[ib])
+		{
+			yup = iy + T(0.75);
+		}
+
+	}
+	if (iy == 0)
+	{
+		if (XBlock.level[XBlock.BotLeft[ib]] > XBlock.level[ib])
+		{
+			ydwn = iy - T(0.25);
+		}
+
+	}
+	/*
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy-1) : T(1.0);
+	T fmu = T(1.0);
+	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, ydwn) : T(1.0);
+	T fmup = T(1.0);
+	T fmvp = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, yup) : T(1.0);
+	T dmdt = (fmvp - fmv) / (cm * delta);
+	T sphcorr = side.istop == 1 ? hinside * hinside * XParam.g * 0.5 * dmdt : T(0.0);
+	*/
 
 
 	if (type == 0) // No Flux
@@ -341,7 +537,34 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 		
 		
 		noslipbndQ(F, G, S);//noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
-	
+
+		
+	}
+	else if (type == 2)
+	{
+		if (h[i] > XParam.eps || zsX > zsi)
+		{
+			//
+			Dirichlet1Q(T(XParam.g), sign, zsX, zsinside, hinside, uninside, F);
+		}
+		else
+		{
+			noslipbndQ(F, G, S);
+			qmean = T(0.0);
+		}
+	}
+	else if (type == 2)
+	{
+		if (h[i] > XParam.eps || zsX > zsi)
+		{
+			//
+			Dirichlet1Q(T(XParam.g), sign, zsX, zsinside, hinside, uninside, F);
+		}
+		else
+		{
+			noslipbndQ(F, G, S);
+			qmean = T(0.0);
+		}
 	}
 	else if (type == 3)
 	{
@@ -383,6 +606,28 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 }
 
 
+/**
+ * @brief CPU implementation for applying boundary fluxes on a segment side.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param side Boundary segment side info
+ * @param XBlock Block data structure
+ * @param Atmp Dynamic forcing data
+ * @param Zsmap Dynamic forcing data for zs
+ * @param uniform Whether boundary is uniform
+ * @param type Boundary type
+ * @param zsbnd Boundary zs value
+ * @param taper Taper value for smoothing
+ * @param zs Array of zs values
+ * @param h Array of h values
+ * @param un Array of normal velocities
+ * @param ut Array of tangential velocities
+ * @param Fh Array for flux h
+ * @param Fq Array for flux q
+ * @param Ss Array for source terms
+ *
+ * Applies boundary conditions and fluxes for each block/thread on the CPU, handling tapers, Dirichlet, and ABS boundary types.
+ */
 template <class T> void bndFluxGPUSideCPU(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, int type, float zsbnd, T taper, T* zs, T* h, T* un, T* ut, T* Fh, T* Fq, T* Ss)
 {
 	int halowidth = XParam.halowidth;
@@ -443,6 +688,9 @@ template <class T> void bndFluxGPUSideCPU(Param XParam, bndsegmentside side, Blo
 				zsbnd = interp2BUQ(XParam.xo + xx, XParam.yo + yy, Zsmap);
 			}
 
+			
+			zsbnd = zsbnd + XParam.zsoffset;
+			
 
 			int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 			int inside = Inside(halowidth, blkmemwidth, side.isright, side.istop, ix, iy, ib);
@@ -504,6 +752,21 @@ template <class T> void bndFluxGPUSideCPU(Param XParam, bndsegmentside side, Blo
 				}
 				side.qmean[iq] = qmean;
 			}
+			else if (type == 2)
+			{
+				if (h[i] > XParam.eps || zsX > zsi)
+				{
+					//ABS1DQ(T(XParam.g), sign, factime, facrel, zsi, zsX, zsinside, h[i], qmean, F, G, S);
+					//qmean = T(0.0);
+					Dirichlet1Q(T(XParam.g), sign, zsX, zsinside, hinside, uninside, F);
+				}
+				else
+				{
+					noslipbndQ(F, G, S);
+					qmean = T(0.0);
+				}
+				side.qmean[iq] = qmean;
+			}
 
 
 			// write the results
@@ -525,6 +788,21 @@ template <class T> void bndFluxGPUSideCPU(Param XParam, bndsegmentside side, Blo
 
 }
 
+/**
+ * @brief CUDA kernel for applying boundary conditions on a side (GPU version).
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param side Boundary parameter info
+ * @param XBlock Block data structure
+ * @param Atmp Dynamic forcing data
+ * @param itime Interpolated time for boundary data
+ * @param zs Array of zs values
+ * @param h Array of h values
+ * @param un Array of normal velocities
+ * @param ut Array of tangential velocities
+ *
+ * Applies boundary conditions for each thread/block on the GPU, using interpolated time and dynamic forcing data.
+ */
 template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T> XBlock, DynForcingP<float> Atmp, float itime, T* zs, T* h, T* un, T* ut)
 {
 	//
@@ -651,6 +929,24 @@ template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T>
 template __global__ void bndGPU<float>(Param XParam, bndparam side, BlockP<float> XBlock, DynForcingP<float> Atmp, float itime, float* zs, float* h, float* un, float* ut);
 template __global__ void bndGPU<double>(Param XParam, bndparam side, BlockP<double> XBlock, DynForcingP<float> Atmp, float itime, double* zs, double* h, double* un, double* ut);
 
+/**
+ * @brief CPU implementation for applying boundary conditions on a side.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param side Boundary parameter info
+ * @param XBlock Block data structure
+ * @param zsbndvec Vector of boundary zs values
+ * @param uubndvec Vector of boundary u values
+ * @param vvbndvec Vector of boundary v values
+ * @param Atmp Dynamic forcing data
+ * @param zs Array of zs values
+ * @param h Array of h values
+ * @param un Array of normal velocities
+ * @param ut Array of tangential velocities
+ *
+ * Applies boundary conditions for each block/thread on the CPU, using provided boundary vectors and dynamic forcing data. Handles no-slip, Dirichlet, ABS, and Neumann boundary types.
+ * Integrates any existing comments and logic.
+ */
 template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, DynForcingP<float> Atmp, T* zs, T* h, T* un, T* ut)
 {
 	//
@@ -803,6 +1099,17 @@ template __host__ void bndCPU<double>(Param XParam, bndparam side, BlockP<double
 
 // function to apply bnd at the boundary with masked blocked
 // here a wall is applied in the halo 
+/**
+ * @brief CPU implementation for applying masked blocks boundary conditions (halo walls).
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param Xev Evolving variables
+ * @param zb Array of mask values
+ *
+ * Applies wall boundary conditions in the halo region for masked blocks, updating velocities, zs, h, and mask values. Handles all four sides and corners.
+ * Integrates any existing comments and logic.
+ */
 template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T*zb)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -972,6 +1279,16 @@ template __host__ void maskbnd<float>(Param XParam, BlockP<float> XBlock, Evolvi
 template __host__ void maskbnd<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
 //For the GPU version we apply 4 separate global function in the hope to increase occupancy
+/**
+ * @brief CUDA kernel for applying masked boundary conditions (halo walls) on the left side.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param Xev Evolving variables
+ * @param zb Array of mask values
+ *
+ * Applies wall boundary conditions in the halo region for masked blocks on the left side.
+ */
 template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -1041,6 +1358,16 @@ template __global__ void maskbndGPUleft<float>(Param XParam, BlockP<float> XBloc
 template __global__ void maskbndGPUleft<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
 
+/**
+ * @brief CUDA kernel for applying masked flux boundary conditions on the left side.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param Xev Evolving variables
+ * @param Flux Flux variables
+ *
+ * Applies flux boundary conditions in the halo region for masked blocks on the left side.
+ */
 template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, FluxP<T> Flux)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -1116,6 +1443,16 @@ template __global__ void maskbndGPUFluxleft<float>(Param XParam, BlockP<float> X
 template __global__ void maskbndGPUFluxleft<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, FluxP<double> Flux);
 
 
+/**
+ * @brief CUDA kernel for applying masked boundary conditions (halo walls) on the top side.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param Xev Evolving variables
+ * @param zb Array of mask values
+ *
+ * Applies wall boundary conditions in the halo region for masked blocks on the top side.
+ */
 template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -1178,6 +1515,15 @@ template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock,
 template __global__ void maskbndGPUtop<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
 template __global__ void maskbndGPUtop<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
+/**
+ * @brief CUDA kernel for applying masked flux boundary conditions on the top side.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param Flux Flux variables
+ *
+ * Applies flux boundary conditions in the halo region for masked blocks on the top side.
+ */
 template <class T> __global__ void maskbndGPUFluxtop(Param XParam, BlockP<T> XBlock,  FluxP<T> Flux)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -1226,6 +1572,16 @@ template <class T> __global__ void maskbndGPUFluxtop(Param XParam, BlockP<T> XBl
 template __global__ void maskbndGPUFluxtop<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
 template __global__ void maskbndGPUFluxtop<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
 
+/**
+ * @brief CUDA kernel for applying masked boundary conditions (halo walls) on the right side.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param Xev Evolving variables
+ * @param zb Array of mask values
+ *
+ * Applies wall boundary conditions in the halo region for masked blocks on the right side.
+ */
 template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -1290,6 +1646,15 @@ template __global__ void maskbndGPUright<float>(Param XParam, BlockP<float> XBlo
 template __global__ void maskbndGPUright<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
 
+/**
+ * @brief CUDA kernel for applying masked flux boundary conditions on the right side.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param Flux Flux variables
+ *
+ * Applies flux boundary conditions in the halo region for masked blocks on the right side.
+ */
 template <class T> __global__ void maskbndGPUFluxright(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -1339,6 +1704,16 @@ template <class T> __global__ void maskbndGPUFluxright(Param XParam, BlockP<T> X
 template __global__ void maskbndGPUFluxright<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
 template __global__ void maskbndGPUFluxright<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
 
+/**
+ * @brief CUDA kernel for applying masked boundary conditions (halo walls) on the bottom side.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param Xev Evolving variables
+ * @param zb Array of mask values
+ *
+ * Applies wall boundary conditions in the halo region for masked blocks on the bottom side.
+ */
 template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -1403,6 +1778,15 @@ template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock,
 template __global__ void maskbndGPUbot<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
 template __global__ void maskbndGPUbot<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
 
+/**
+ * @brief CUDA kernel for applying masked flux boundary conditions on the bottom side.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param Flux Flux variables
+ *
+ * Applies flux boundary conditions in the halo region for masked blocks on the bottom side.
+ */
 template <class T> __global__ void maskbndGPUFluxbot(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
 {
 	unsigned int halowidth = XParam.halowidth;
@@ -1450,6 +1834,18 @@ template <class T> __global__ void maskbndGPUFluxbot(Param XParam, BlockP<T> XBl
 template __global__ void maskbndGPUFluxbot<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
 template __global__ void maskbndGPUFluxbot<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
 
+/**
+ * @brief Helper to decode mask side bitfield into booleans for each boundary/corner.
+ * @param side Bitfield encoding mask sides
+ * @param isleftbot Is left-bottom active
+ * @param islefttop Is left-top active
+ * @param istopleft Is top-left active
+ * @param istopright Is top-right active
+ * @param isrighttop Is right-top active
+ * @param isrightbot Is right-bottom active
+ * @param isbotright Is bottom-right active
+ * @param isbotleft Is bottom-left active
+ */
 __device__ __host__ void findmaskside(int side, bool &isleftbot, bool& islefttop, bool& istopleft, bool& istopright, bool& isrighttop, bool& isrightbot, bool& isbotright, bool& isbotleft)
 {
 	int lb = 0b10000000;
@@ -1475,6 +1871,18 @@ __device__ __host__ void findmaskside(int side, bool &isleftbot, bool& islefttop
 }
 
 
+/**
+ * @brief Device/host function to apply wall boundary in halo region.
+ * @tparam T Data type
+ * @param zsinside Inside zs value
+ * @param un Normal velocity (output)
+ * @param ut Tangential velocity (output)
+ * @param zs zs value (output)
+ * @param h h value (output)
+ * @param zb Mask value (output)
+ *
+ * Sets normal/tangential velocity and h to zero, copies zsinside to zs and zb.
+ */
 template <class T> __device__ __host__ void halowall(T zsinside, T& un, T& ut, T& zs, T& h,T&zb)
 {
 	// This function is used to make a wall on the halo to act as a wall
@@ -1488,6 +1896,18 @@ template <class T> __device__ __host__ void halowall(T zsinside, T& un, T& ut, T
 }
 
 
+/**
+ * @brief Device/host function to apply no-slip boundary condition.
+ * @tparam T Data type
+ * @param zsinside Inside zs value
+ * @param hinside Inside h value
+ * @param un Normal velocity (output)
+ * @param ut Tangential velocity (output)
+ * @param zs zs value (output)
+ * @param h h value (output)
+ *
+ * Sets normal velocity to zero, copies zsinside and hinside.
+ */
 template <class T> __device__ __host__ void noslipbnd(T zsinside,T hinside,T &un, T &ut,T &zs, T &h)
 {
 	// Basic no slip bnd hs no normal velocity and leaves tanegtial velocity alone (maybe needs a wall friction added to it?)
@@ -1499,16 +1919,42 @@ template <class T> __device__ __host__ void noslipbnd(T zsinside,T hinside,T &un
 
 }
 
+/**
+ * @brief Device/host function to apply no-slip boundary for flux variables.
+ * @tparam T Data type
+ * @param F Flux F (output)
+ * @param G Flux G (input)
+ * @param S Source term (output)
+ *
+ * Sets F to zero, S to G.
+ */
 template <class T> __device__ __host__ void noslipbndQ(T& F, T& G, T& S)
 {
 	// Basic no slip bnd hs no normal velocity and leaves tanegtial velocity alone (maybe needs a wall friction added to it?)
 	// 
 	F = T(0.0);
-	S = G;
+	//S = G;
 
 }
 
 
+/**
+ * @brief Device/host function for 1D absorbing boundary condition.
+ * @tparam T Data type
+ * @param g Gravity
+ * @param sign Side sign
+ * @param zsbnd Boundary zs value
+ * @param zsinside Inside zs value
+ * @param hinside Inside h value
+ * @param utbnd Tangential boundary velocity
+ * @param unbnd Normal boundary velocity
+ * @param un Normal velocity (output)
+ * @param ut Tangential velocity (output)
+ * @param zs zs value (output)
+ * @param h h value (output)
+ *
+ * Computes absorbing boundary for normal/tangential velocity and updates zs, h.
+ */
 template <class T> __device__ __host__ void ABS1D(T g, T sign, T zsbnd, T zsinside, T hinside, T utbnd,T unbnd, T& un, T& ut, T& zs, T& h)
 {
 	//Absorbing 1D boundary
@@ -1520,6 +1966,24 @@ template <class T> __device__ __host__ void ABS1D(T g, T sign, T zsbnd, T zsinsi
 	h = hinside;
 }
 
+/**
+ * @brief Device/host function for 1D absorbing boundary condition for flux variables.
+ * @tparam T Data type
+ * @param g Gravity
+ * @param sign Side sign
+ * @param factime Filter time factor
+ * @param facrel Relaxation time factor
+ * @param zs zs value
+ * @param zsbnd Boundary zs value
+ * @param zsinside Inside zs value
+ * @param h h value
+ * @param qmean Mean flux (output)
+ * @param q Flux q (output)
+ * @param G Flux G (output)
+ * @param S Source term (output)
+ *
+ * Computes absorbing boundary for flux variables and updates qmean, q, G, S.
+ */
 template <class T> __device__ __host__ void ABS1DQ(T g, T sign, T factime,T facrel,T zs, T zsbnd, T zsinside, T h, T& qmean, T& q, T& G, T& S)
 {
 	//Absorbing 1D boundary
@@ -1556,6 +2020,22 @@ template <class T> __device__ __host__ void ABS1DQ(T g, T sign, T factime,T facr
 
 }
 
+/**
+ * @brief Device/host function for 1D Dirichlet boundary condition.
+ * @tparam T Data type
+ * @param g Gravity
+ * @param sign Side sign
+ * @param zsbnd Boundary zs value
+ * @param zsinside Inside zs value
+ * @param hinside Inside h value
+ * @param uninside Inside normal velocity
+ * @param un Normal velocity (output)
+ * @param ut Tangential velocity (output)
+ * @param zs zs value (output)
+ * @param h h value (output)
+ *
+ * Computes Dirichlet boundary for normal/tangential velocity and updates zs, h.
+ */
 template <class T> __device__ __host__ void Dirichlet1D(T g, T sign, T zsbnd, T zsinside, T hinside,  T uninside, T& un, T& ut, T& zs, T& h)
 {
 	// Is this even the right formulation?.
@@ -1566,6 +2046,33 @@ template <class T> __device__ __host__ void Dirichlet1D(T g, T sign, T zsbnd, T 
 	zs = zsinside;
 	//ut[i] = ut[inside];
 	h = hinside;
+}
+
+/**
+ * @brief Device/host function for 1D Dirichlet boundary condition for flux variables.
+ * @tparam T Data type
+ * @param g Gravity
+ * @param sign Side sign
+ * @param zsbnd Boundary zs value
+ * @param zsinside Inside zs value
+ * @param hinside Inside h value
+ * @param uninside Inside normal velocity
+ * @param q Flux q (output)
+ *
+ * Computes Dirichlet boundary for flux variable q.
+ */
+template <class T> __device__ __host__ void Dirichlet1Q(T g, T sign, T zsbnd, T zsinside, T hinside, T uninside, T& q)
+{
+	// Is this even the right formulation?.
+	// I don't really like this formulation. while a bit less dissipative then abs1D with 0 unbnd (but worse if forcing uniside with 0) it is very reflective an not stable  
+	T zbinside = zsinside - hinside;
+	T un = sign * T(2.0) * (sqrt(g * max(hinside, T(0.0))) - sqrt(g * max(zsbnd - zbinside, T(0.0)))) + uninside;
+	T ut = T(0.0);
+	//zs = zsinside;
+	//ut[i] = ut[inside];
+	//h = hinside;
+
+	q = un * hinside;
 }
 
 
@@ -1706,6 +2213,17 @@ template <class T> __host__ void ABS1D(Param XParam, std::vector<double> zsbndve
 }
 */
 
+/**
+ * @brief Helper to compute the index of the inside cell for a boundary cell.
+ * @param halowidth Halo width
+ * @param blkmemwidth Block memory width
+ * @param isright Side info
+ * @param istop Top info
+ * @param ix x-index
+ * @param iy y-index
+ * @param ib Block index
+ * @return Index of the inside cell
+ */
 __host__ __device__ int Inside(int halowidth, int blkmemwidth, int isright, int istop,int ix,int iy, int ib)
 {
 	//int bnd, bnd_c;
@@ -1743,6 +2261,15 @@ __host__ __device__ int Inside(int halowidth, int blkmemwidth, int isright, int 
 }
 
 
+/**
+ * @brief Helper to check if a cell is at the boundary.
+ * @param isright Side info
+ * @param istop Top info
+ * @param blkwidth Block width
+ * @param ix x-index
+ * @param iy y-index
+ * @return True if cell is at the boundary, false otherwise
+ */
 __host__ __device__ bool isbnd(int isright, int istop, int blkwidth, int ix, int iy)
 {
 	int bnd, bnd_c;

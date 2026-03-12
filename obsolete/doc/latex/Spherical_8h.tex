@@ -1,0 +1,46 @@
+\hypertarget{Spherical_8h}{}\doxysection{src/\+Spherical.h File Reference}
+\label{Spherical_8h}\index{src/Spherical.h@{src/Spherical.h}}
+{\ttfamily \#include \char`\"{}General.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Param.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Arrays.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Forcing.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Mem\+Management.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Util\+\_\+\+CPU.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Kurganov.\+h\char`\"{}}\newline
+Include dependency graph for Spherical.\+h\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T \mbox{\hyperlink{Spherical_8h_ad0868522ecbe833e500779344c891b2a}{calc\+CM}} (T Radius, T delta, T yo, int iy)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T \mbox{\hyperlink{Spherical_8h_a666d2d611d7884e7376e09b68e7f62ee}{calc\+FM}} (T Radius, T delta, T yo, T iy)
+\item 
+{\footnotesize template$<$class T $>$ }\\\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T \mbox{\hyperlink{Spherical_8h_acaec182e726b1bca8a3fcea4870f8920}{spharea}} (T Radius, T lon, T lat, T dx)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{Spherical_8h_ad0868522ecbe833e500779344c891b2a}\label{Spherical_8h_ad0868522ecbe833e500779344c891b2a}} 
+\index{Spherical.h@{Spherical.h}!calcCM@{calcCM}}
+\index{calcCM@{calcCM}!Spherical.h@{Spherical.h}}
+\doxysubsubsection{\texorpdfstring{calcCM()}{calcCM()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T calc\+CM (\begin{DoxyParamCaption}\item[{T}]{Radius,  }\item[{T}]{delta,  }\item[{T}]{yo,  }\item[{int}]{iy }\end{DoxyParamCaption})}
+
+Scale factor for y face length (x face lengh scale is always 1 in spherical model assuming that lat long are entered) \mbox{\Hypertarget{Spherical_8h_a666d2d611d7884e7376e09b68e7f62ee}\label{Spherical_8h_a666d2d611d7884e7376e09b68e7f62ee}} 
+\index{Spherical.h@{Spherical.h}!calcFM@{calcFM}}
+\index{calcFM@{calcFM}!Spherical.h@{Spherical.h}}
+\doxysubsubsection{\texorpdfstring{calcFM()}{calcFM()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T calc\+FM (\begin{DoxyParamCaption}\item[{T}]{Radius,  }\item[{T}]{delta,  }\item[{T}]{yo,  }\item[{T}]{iy }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{Spherical_8h_acaec182e726b1bca8a3fcea4870f8920}\label{Spherical_8h_acaec182e726b1bca8a3fcea4870f8920}} 
+\index{Spherical.h@{Spherical.h}!spharea@{spharea}}
+\index{spharea@{spharea}!Spherical.h@{Spherical.h}}
+\doxysubsubsection{\texorpdfstring{spharea()}{spharea()}}
+{\footnotesize\ttfamily template$<$class T $>$ \\
+\+\_\+\+\_\+host\+\_\+\+\_\+ \+\_\+\+\_\+device\+\_\+\+\_\+ T spharea (\begin{DoxyParamCaption}\item[{T}]{Radius,  }\item[{T}]{lon,  }\item[{T}]{lat,  }\item[{T}]{dx }\end{DoxyParamCaption})}
+

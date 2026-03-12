@@ -22,6 +22,13 @@ UTCClock::time_point from_time_t(std::time_t tt) noexcept
 } // namespace
 */
 // Algorithm: http://howardhinnant.github.io/date_algorithms.html
+/**
+ * @brief Calculate the number of days from the epoch (1970-01-01) to a given date.
+ * Algorithm: http://howardhinnant.github.io/date_algorithms.html
+ * @param y Year
+ * @param m Month
+ * @param d Day
+ */
 int days_from_epoch(int y, int m, int d)
 {
 	y -= m <= 2;
@@ -31,7 +38,11 @@ int days_from_epoch(int y, int m, int d)
 	int doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;           // [0, 146096]
 	return era * 146097 + doe - 719468;
 }
-/* Converts a Unix timestamp (number of seconds since the beginning of 1970
+
+/**
+ * @brief Convert a Unix timestamp to a Gregorian civil date-time tuple.
+ * 
+ * Converts a Unix timestamp (number of seconds since the beginning of 1970
  * CE) to a Gregorian civil date-time tuple in GMT (UTC) time zone.
  *
  * This conforms to C89 (and C99...) and POSIX.
@@ -47,6 +58,10 @@ int days_from_epoch(int y, int m, int d)
  * overflow or underflow. The formula is: tm_sec + tm_min*60 + tm_hour*3600
  * + tm_yday*86400 + (tm_year-70)*31536000 + ((tm_year-69)/4)*86400 -
  * ((tm_year-1)/100)*86400 + ((tm_year+299)/400)*86400.
+ * 
+ * @param timep Pointer to the Unix timestamp
+ * @param tm Pointer to the struct tm to be filled
+ * @return Pointer to the filled struct tm 
  */
 struct tm* gmtime_r(const time_t* timep, struct tm* tm) {
 	const time_t ts = *timep;
@@ -117,6 +132,14 @@ struct tm* gmtime_r(const time_t* timep, struct tm* tm) {
 
 
 // It  does not modify broken-down time
+/**	
+ * @brief Convert a Gregorian civil date-time tuple to a Unix timestamp.
+ * Converts a Gregorian civil date-time tuple in GMT (UTC) time zone to a Unix timestamp
+ * 
+ * @note It does not modify broken-down time
+ * @param t Pointer to the struct tm to be converted
+ * @return The corresponding Unix timestamp
+ */
 long long timegm(struct tm const* t)
 {
 	int year = t->tm_year + 1900;
@@ -177,7 +200,13 @@ void UTCClock::toDate(const UTCClock::time_point &tp,
 }
 */
 
-
+/**
+ * @brief Convert a date string to a Unix timestamp.
+ * Converts a date string in the format "YYYY-MM-DDTHH:MM:SS" or "YYYY/MM/DD HH:MM:SS"
+ * to a Unix timestamp (number of seconds since the beginning of 1970 CE).
+ * @param date The date string to convert
+ * @return The corresponding Unix timestamp as long long
+ */
 long long date_string_to_time(std::string date)
 {
 	struct tm tm = { 0 }; // Important, initialize all members
@@ -196,13 +225,23 @@ long long date_string_to_time(std::string date)
 	{
 		ddd = split(datetime[0], '/');
 	}
+	// index for the year and mday
+	//by default we assume date is written as yyyy-mm-ddTHH:MM:SS
+	int indexyear = 0;
+	int indexmday = 2;
 
+	if (ddd[0].length() < 4 && ddd[2].length() == 4)//i.e. date is written as dd-mm-yyyy
+	{
+		int indexyear = 2;
+		int indexmday = 0;
+	}
+	// If you write date like an American (mm-dd-yyyy). it wont work and I can't help
 
-	tm.tm_year = std::stoi(ddd[0]);
+	tm.tm_year = std::stoi(ddd[indexyear]);
 
 	tm.tm_mon = std::stoi(ddd[1]);
 
-	tm.tm_mday = std::stoi(ddd[2]);
+	tm.tm_mday = std::stoi(ddd[indexmday]);
 
 	if (datetime.size() > 1)
 	{
@@ -248,6 +287,14 @@ long long date_string_to_time(std::string date)
 	return t1;
 }
 
+/**
+ * @brief Convert a date string to seconds from a reference date.
+ * Converts a date string in the format "YYYY-MM-DDTHH:MM:SS" or "YYYY/MM/DD HH:MM:SS"
+ * to seconds from the reference date.
+ * @param datetime The date string to convert
+ * @param refdate The reference date string
+ * @return The number of seconds from the reference date as double
+ */
 double date_string_to_s(std::string datetime, std::string refdate)
 {
 	//testime1(1);
@@ -256,21 +303,41 @@ double date_string_to_s(std::string datetime, std::string refdate)
 	//UTCTime ttime = date_string_to_time(datetime);
 	//UTCTime reftime = date_string_to_time(refdate);
 
-	long long ttime = date_string_to_time(datetime);
-	long long reftime = date_string_to_time(refdate);
+	double diff;
 
-	//double diff = difftime(ttime, reftime);
+	std::string::size_type n = datetime.find('T');
+	if (std::string::npos == n)
+	{
+		diff = std::stod(datetime);
+	}
+	else
+	{
 
-	//std::chrono::microseconds timeDiff = ttime - reftime;
+		long long ttime = date_string_to_time(datetime);
+		long long reftime = date_string_to_time(refdate);
 
-	//double diff = ((double) duration_cast<std::chrono::milliseconds>(ttime - reftime).count())/1000.0;
+		//double diff = difftime(ttime, reftime);
 
-	double diff = (double)(ttime - reftime);
+		//std::chrono::microseconds timeDiff = ttime - reftime;
+
+		//double diff = ((double) duration_cast<std::chrono::milliseconds>(ttime - reftime).count())/1000.0;
+
+		diff = (double)(ttime - reftime);
+	}
 
 	return diff;
 }
 
 // Read time string. If it is a valid datetime string return s from reftime otherwise return a foat of seconds 
+/**
+ * @brief Read a time string and convert it to seconds.
+ * Reads a time string and converts it to seconds.
+ * If the string is a valid datetime string
+ * it returns the seconds from the reference date, otherwise it returns a float of seconds.
+ * @param input The input time string
+ * @param refdate The reference date string
+ * @return The time in seconds as double
+ */
 double readinputtimetxt(std::string input, std::string & refdate)
 {
 	std::string date = trim(input, " ");
@@ -298,7 +365,11 @@ double readinputtimetxt(std::string input, std::string & refdate)
 	return timeinsec;
 }
 
-
+/**
+ * @brief Test time calculation functions.
+ * Test time calculation functions.
+ * @param hour The hour to test
+ */
 bool testime1(int hour)
 {
 	bool test = false;
@@ -348,6 +419,12 @@ bool testime1(int hour)
 
 	return test;
 }
+
+/**
+ * @brief Test time calculation functions for greater than comparison.
+ * Test time calculation functions for greater than comparison.
+ * @param hour The hour to test
+ */
 bool testime2(int hour)
 {
 	bool test = false;

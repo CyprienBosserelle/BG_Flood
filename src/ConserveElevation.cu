@@ -1,6 +1,17 @@
 ﻿#include "ConserveElevation.h"
 
 
+/**
+ * @brief Conserves elevation across all active blocks by applying elevation conservation on each block's boundaries.
+ *
+ * Iterates over all active blocks and applies conservation routines for left, right, top, and bottom boundaries.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block data structure
+ * @param XEv Evolving variables structure
+ * @param zb Bed elevation array
+ */
 template <class T> void conserveElevation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
 	int ib;
@@ -24,6 +35,17 @@ template <class T> void conserveElevation(Param XParam, BlockP<T> XBlock, Evolvi
 template void conserveElevation<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 template void conserveElevation<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 
+/**
+ * @brief Conserves elevation on the GPU for all active blocks using CUDA kernels.
+ *
+ * Launches CUDA kernels for left, right, top, and bottom boundaries, synchronizing after each.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block data structure
+ * @param XEv Evolving variables structure
+ * @param zb Bed elevation array
+ */
 template <class T> void conserveElevationGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
 	dim3 blockDimHaloLR(1, 16, 1);
@@ -31,19 +53,30 @@ template <class T> void conserveElevationGPU(Param XParam, BlockP<T> XBlock, Evo
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 
-	conserveElevationLeft << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	conserveElevationLeft <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	conserveElevationRight << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	conserveElevationRight <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	conserveElevationTop << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	conserveElevationTop <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	conserveElevationBot << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	conserveElevationBot <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 }
 template void conserveElevationGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 template void conserveElevationGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 
+/**
+ * @brief Performs wet/dry prolongation for all block boundaries.
+ *
+ * Applies prolongation logic to left, right, top, and bottom boundaries where block level is greater than neighbor.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block data structure
+ * @param XEv Evolving variables structure
+ * @param zb Bed elevation array
+ */
 template <class T> void WetDryProlongation(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
 	int ib, ibLB, ibTL, ibBL, ibRB,ibn;
@@ -171,6 +204,17 @@ template <class T> void WetDryProlongation(Param XParam, BlockP<T> XBlock, Evolv
 template void WetDryProlongation<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 template void WetDryProlongation<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 
+/**
+ * @brief Performs wet/dry restriction for all block boundaries.
+ *
+ * Applies restriction logic to left, right, top, and bottom boundaries where block level is less than neighbor.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block data structure
+ * @param XEv Evolving variables structure
+ * @param zb Bed elevation array
+ */
 template <class T> void WetDryRestriction(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
 	int ib, ibLB, ibTL, ibBL, ibRB, ibLT, ibRT, ibTR, ibBR, ibn;
@@ -321,6 +365,17 @@ template <class T> void WetDryRestriction(Param XParam, BlockP<T> XBlock, Evolvi
 template void WetDryRestriction<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 template void WetDryRestriction<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 
+/**
+ * @brief Performs wet/dry prolongation for all block boundaries on the GPU using CUDA kernels.
+ *
+ * Launches CUDA kernels for left, right, top, and bottom boundaries, synchronizing after each.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block data structure
+ * @param XEv Evolving variables structure
+ * @param zb Bed elevation array
+ */
 template <class T> void WetDryProlongationGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
 	dim3 blockDimHaloLR(1, 16, 1);
@@ -329,19 +384,30 @@ template <class T> void WetDryProlongationGPU(Param XParam, BlockP<T> XBlock, Ev
 
 	//WetDryProlongationGPUBot
 
-	WetDryProlongationGPULeft << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryProlongationGPULeft <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryProlongationGPURight << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryProlongationGPURight <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryProlongationGPUTop << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryProlongationGPUTop <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryProlongationGPUBot << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryProlongationGPUBot <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 }
 template void WetDryProlongationGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 template void WetDryProlongationGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 
+/**
+ * @brief Performs wet/dry restriction for all block boundaries on the GPU using CUDA kernels.
+ *
+ * Launches CUDA kernels for left, right, top, and bottom boundaries, synchronizing after each.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block data structure
+ * @param XEv Evolving variables structure
+ * @param zb Bed elevation array
+ */
 template <class T> void WetDryRestrictionGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
 	dim3 blockDimHaloLR(1, 16, 1);
@@ -350,19 +416,38 @@ template <class T> void WetDryRestrictionGPU(Param XParam, BlockP<T> XBlock, Evo
 
 	//WetDryProlongationGPUBot
 
-	WetDryRestrictionGPULeft << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryRestrictionGPULeft <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryRestrictionGPURight << <gridDim, blockDimHaloLR, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryRestrictionGPURight <<<gridDim, blockDimHaloLR, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryRestrictionGPUTop << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryRestrictionGPUTop <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	WetDryRestrictionGPUBot << <gridDim, blockDimHaloBT, 0 >> > (XParam, XBlock, XEv, zb);
+	WetDryRestrictionGPUBot <<<gridDim, blockDimHaloBT, 0 >>> (XParam, XBlock, XEv, zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 }
 template void WetDryRestrictionGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, double* zb);
 template void WetDryRestrictionGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, float* zb);
 
+/**
+ * @brief Prolongs elevation values from parent to child block halo cells, handling dry/wet logic.
+ *
+ * Copies elevation and water surface values from parent to child halo if any neighbor is dry.
+ *
+ * @tparam T Data type (float or double)
+ * @param halowidth Halo width
+ * @param blkmemwidth Block memory width
+ * @param eps Dry threshold
+ * @param ib Block index
+ * @param ibn Neighbor block index
+ * @param ihalo Halo i-index
+ * @param jhalo Halo j-index
+ * @param ip Parent i-index
+ * @param jp Parent j-index
+ * @param h Water depth array
+ * @param zs Water surface array
+ * @param zb Bed elevation array
+ */
 template <class T> __host__ __device__ void ProlongationElevation(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo,  int ip, int jp, T* h, T* zs, T* zb)
 {
 	int  halo;
@@ -397,6 +482,28 @@ template <class T> __host__ __device__ void ProlongationElevation(int halowidth,
 }
 
 
+/**
+ * @brief Reverts prolongation for elevation, adjusting bed elevation using gradients.
+ *
+ * Applies gradient-based correction to bed elevation in halo cells if any neighbor is dry.
+ *
+ * @tparam T Data type (float or double)
+ * @param halowidth Halo width
+ * @param blkmemwidth Block memory width
+ * @param eps Dry threshold
+ * @param ib Block index
+ * @param ibn Neighbor block index
+ * @param ihalo Halo i-index
+ * @param jhalo Halo j-index
+ * @param ip Parent i-index
+ * @param jp Parent j-index
+ * @param level Block refinement level
+ * @param dx Cell size
+ * @param h Water depth array
+ * @param zb Bed elevation array
+ * @param dzbdx Bed elevation gradient x
+ * @param dzbdy Bed elevation gradient y
+ */
 template <class T> __host__ __device__ void RevertProlongationElevation(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo, int ip, int jp, int level, T dx, T* h, T* zb, T* dzbdx, T* dzbdy)
 {
 	int  halo;
@@ -453,6 +560,25 @@ template <class T> __host__ __device__ void RevertProlongationElevation(int halo
 
 }
 
+/**
+ * @brief Prolongs gradient and water surface values from parent to child block halo cells, handling dry/wet logic.
+ *
+ * Sets gradients to zero in child halo if any neighbor is dry.
+ *
+ * @tparam T Data type (float or double)
+ * @param halowidth Halo width
+ * @param blkmemwidth Block memory width
+ * @param eps Dry threshold
+ * @param ib Block index
+ * @param ibn Neighbor block index
+ * @param ihalo Halo i-index
+ * @param jhalo Halo j-index
+ * @param ip Parent i-index
+ * @param jp Parent j-index
+ * @param h Water depth array
+ * @param dhdx Water depth gradient x
+ * @param dzsdx Water surface gradient x
+ */
 template <class T> __host__ __device__ void ProlongationElevationGH(int halowidth, int blkmemwidth, T eps, int ib, int ibn, int ihalo, int jhalo, int ip, int jp, T* h, T* dhdx, T* dzsdx)
 {
 	int halo;
@@ -482,6 +608,25 @@ template <class T> __host__ __device__ void ProlongationElevationGH(int halowidt
 
 }
 
+/**
+ * @brief Conserves elevation for a single halo cell using neighbor values.
+ *
+ * Computes wet/dry averages and updates water depth and surface for the halo cell.
+ *
+ * @tparam T Data type (float or double)
+ * @param halowidth Halo width
+ * @param blkmemwidth Block memory width
+ * @param eps Dry threshold
+ * @param ib Block index
+ * @param ibn Neighbor block index
+ * @param ihalo Halo i-index
+ * @param jhalo Halo j-index
+ * @param i Parent i-index
+ * @param j Parent j-index
+ * @param h Water depth array
+ * @param zs Water surface array
+ * @param zb Bed elevation array
+ */
 template <class T> __host__ __device__ void conserveElevation(int halowidth,int blkmemwidth,T eps, int ib, int ibn,int ihalo, int jhalo ,int i,int j, T* h, T* zs, T * zb)
 {
 	int ii, ir, it, itr;
@@ -603,6 +748,22 @@ template <class T> __host__ __device__ void conserveElevation(T zb, T& zswet, T&
 	zswet = hwet + zb;
 }
 
+/**
+ * @brief Conserves elevation gradients in halo cells for all active blocks.
+ *
+ * Applies gradient conservation routines for left, right, top, and bottom boundaries.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block data structure
+ * @param h Water depth array
+ * @param zs Water surface array
+ * @param zb Bed elevation array
+ * @param dhdx Water depth gradient x
+ * @param dzsdx Water surface gradient x
+ * @param dhdy Water depth gradient y
+ * @param dzsdy Water surface gradient y
+ */
 template <class T> void conserveElevationGradHalo(Param XParam, BlockP<T> XBlock, T* h, T* zs, T* zb, T* dhdx, T* dzsdx, T* dhdy, T* dzsdy)
 {
 	int ib;
@@ -860,9 +1021,9 @@ template <class T> __global__ void conserveElevationGHLeft(Param XParam, BlockP<
 	
 	
 	
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int LB = XBlock.LeftBot[ib];
@@ -992,9 +1153,9 @@ template <class T> __global__ void conserveElevationGHRight(Param XParam, BlockP
 	
 	
 	
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int RB = XBlock.RightBot[ib];
@@ -1125,10 +1286,10 @@ template <class T> __global__ void conserveElevationGHTop(Param XParam, BlockP<T
 {
 	
 	
-	unsigned int iy = blockDim.x - 1;
-	unsigned int ix = threadIdx.x;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = blockDim.x - 1;
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int TL = XBlock.TopLeft[ib];
@@ -1258,9 +1419,9 @@ template <class T> __global__ void conserveElevationGHBot(Param XParam, BlockP<T
 	
 	
 	
-	unsigned int ix = threadIdx.x;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int BL = XBlock.BotLeft[ib];
@@ -1384,12 +1545,12 @@ template <class T> void conserveElevationLeft(Param XParam,int ib, int ibLB, int
 
 template <class T> __global__ void conserveElevationLeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	
 	
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int LB = XBlock.LeftBot[ib];
@@ -1447,12 +1608,12 @@ template <class T> __global__ void conserveElevationLeft(Param XParam, BlockP<T>
 
 template <class T> __global__ void WetDryProlongationGPULeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 
 
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int LB = XBlock.LeftBot[ib];
@@ -1489,12 +1650,12 @@ template <class T> __global__ void WetDryProlongationGPULeft(Param XParam, Block
 
 template <class T> __global__ void WetDryRestrictionGPULeft(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 
 
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int LB = XBlock.LeftBot[ib];
@@ -1576,12 +1737,12 @@ template <class T> void conserveElevationRight(Param XParam, int ib, int ibRB, i
 
 template <class T> __global__ void conserveElevationRight(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
-	unsigned int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
 	
 	
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int RB = XBlock.RightBot[ib];
@@ -1773,12 +1934,12 @@ template <class T> void conserveElevationTop(Param XParam, int ib, int ibTL, int
 
 template <class T> __global__ void conserveElevationTop(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
-	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
 	
 	
-	unsigned int ix = threadIdx.x;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int TL = XBlock.TopLeft[ib];
@@ -1970,12 +2131,12 @@ template <class T> void conserveElevationBot(Param XParam, int ib, int ibBL, int
 
 template <class T> __global__ void conserveElevationBot(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, T* zb)
 {
-	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
 	
 	
-	unsigned int ix = threadIdx.x;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
+	int ix = threadIdx.x;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
 
 	int lev = XBlock.level[ib];
 	int BL = XBlock.BotLeft[ib];

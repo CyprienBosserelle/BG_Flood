@@ -24,7 +24,7 @@
 
 template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g);
 
-template <class T> bool GaussianHumptest(T zsnit, int gpu,bool compare);
+template <class T> bool GaussianHumptest(T zsnit, int gpu,bool compare,int engine);
 
 
 template <class T> void TestingOutput(Param XParam, Model<T> XModel);
@@ -36,16 +36,20 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit);
 bool Raintestinput(int gpu);
 template <class T> bool Rivertest(T zsnit, int gpu);
 template <class T> bool MassConserveSteepSlope(T zsnit, int gpu);
-template <class T> bool Raintest(T zsnit, int gpu, float alpha);
+template <class T> bool Raintest(T zsnit, int gpu, float alpha,int engine);
 template <class T> bool testboundaries(Param XParam, T maxslope);
 template <class T> bool ZoneOutputTest(int nzones, T zsinit);
 template <class T> bool Rainlossestest(T zsnit, int gpu, float alpha);
 template <class T> bool TestMultiBathyRough(int gpu, T ref, int secnario);
+
 template <class T> bool TestCulvert(int gpu, T ref, int scenario);
+template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario);
 
 bool TestCulvertInletControl(int gpu);
-
 bool TestCulvertOutletControl(int gpu);
+
+
+
 
 // End of global definition
 #endif

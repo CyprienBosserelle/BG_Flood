@@ -105,6 +105,13 @@ jobs:
       - name: running test 14, Test on AOI implementation aa wall bnb
         run: |
           sed -i 's/test = 13/test = 14/' BG_param.txt
-          ./BG_Flood  
+          ./BG_Flood   
+      - name: running test 15, Test on flexible time input
+        run: |
+          sed -i 's/test = 14/test = 15/' BG_param.txt
+          ./BG_Flood
+          ./BG_Flood BG_param_test15.txt
+       ##   var=$(ncdump -v h_P0 Test15_zoom2.nc)
+       ## if: echo ${{ ${#var} == 7 }}
 
      

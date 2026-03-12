@@ -24,33 +24,34 @@
 #include "Poly.h"
 
 
-/*! \fn int isLeft(T P0x, T P0y, T P1x, T P1y, T P2x, T P2y)
-*
-* \brief isLeft(): tests if a point is Left|On|Right of an infinite line.
-*
-* ## Description
-* a Point is defined by its coordinates {int x, y;}
-* ===================================================================
-*
-* isLeft(): tests if a point is Left|On|Right of an infinite line.
-*	Input:  three points P0, P1, and P2
-*	Return: >0 for P2 left of the line through P0 and P1
-*			=0 for P2  on the line
-*			<0 for P2  right of the line
-*	See: Algorithm 1 "Area of Triangles and Polygons"
-* 
-* ## Where does this come from:
-* Copyright 2000 softSurfer, 2012 Dan Sunday
-* ### Original Licence
-* This code may be freely used and modified for any purpose
-* providing that this copyright notice is included with it.
-* SoftSurfer makes no warranty for this code, and cannot be held
-* liable for any real or imagined damage resulting from its use.
-* Users of this code must verify correctness for their application.
-* Code modified to fit the use in DisperGPU
-*
-*/
-
+/**
+ * @brief Tests if a point is Left|On|Right of an infinite line.
+ *
+ * Returns >0 for P2 left of the line through P0 and P1,
+ *         =0 for P2 on the line,
+ *         <0 for P2 right of the line.
+ * See: Algorithm 1 "Area of Triangles and Polygons"
+ *
+ * ## Where does this come from:
+ * Copyright 2000 softSurfer, 2012 Dan Sunday
+ * ### Original Licence
+ * This code may be freely used and modified for any purpose
+ * providing that this copyright notice is included with it.
+ * SoftSurfer makes no warranty for this code, and cannot be held
+ * liable for any real or imagined damage resulting from its use.
+ * Users of this code must verify correctness for their application.
+ * Code modified to fit the use in DisperGPU
+ * 
+ * 
+ * @tparam T Coordinate type
+ * @param P0x X of first point
+ * @param P0y Y of first point
+ * @param P1x X of second point
+ * @param P1y Y of second point
+ * @param P2x X of test point
+ * @param P2y Y of test point
+ * @return Relative position value
+ */
 template <class T> T isLeft(T P0x, T P0y, T P1x, T P1y, T P2x, T P2y)
 {
 	return ((P1x - P0x) * (P2y - P0y)
@@ -58,27 +59,36 @@ template <class T> T isLeft(T P0x, T P0y, T P1x, T P1y, T P2x, T P2y)
 }
 //===================================================================
 
-/*! \fn int cn_PnPoly(T Px, T Py, F* Vx, F* Vy, int n)
-* \brief cn_PnPoly(): crossing number test for a point in a polygon
-*
-* ## Description
-* cn_PnPoly(): crossing number test for a point in a polygon
-*      Input:   P = a point,
-*               V[] = vertex points of a polygon V[n+1] with V[n]=V[0]
-*      Return:  0 = outside, 1 = inside
-*
-* ## Where does this come from:
-* Copyright 2000 softSurfer, 2012 Dan Sunday
-* ### Original Licence
-* This code may be freely used and modified for any purpose
-* providing that this copyright notice is included with it.
-* SoftSurfer makes no warranty for this code, and cannot be held
-* liable for any real or imagined damage resulting from its use.
-* Users of this code must verify correctness for their application.
-* Code modified to fit the use in DisperGPU
-*
-* This code is patterned after [Franklin, 2000]
-*/
+/**
+ * @brief Crossing number test for a point in a polygon.
+ *
+ * Determines if a point is inside a polygon using the crossing number algorithm.
+ * cn_PnPoly(): crossing number test for a point in a polygon
+ *      Input:   P = a point,
+ *               V[] = vertex points of a polygon V[n+1] with V[n]=V[0]
+ *      Return:  0 = outside, 1 = inside
+ * ## Where does this come from:
+ * Copyright 2000 softSurfer, 2012 Dan Sunday
+ * ### Original Licence
+ * This code may be freely used and modified for any purpose
+ * providing that this copyright notice is included with it.
+ * SoftSurfer makes no warranty for this code, and cannot be held
+ * liable for any real or imagined damage resulting from its use.
+ * Users of this code must verify correctness for their application.
+ * Code modified to fit the use in DisperGPU
+ *
+ * This code is patterned after [Franklin, 2000]
+ * 
+ * 
+ * @tparam T Point coordinate type
+ * @tparam F Vertex coordinate type
+ * @param Px X coordinate of point
+ * @param Py Y coordinate of point
+ * @param Vx Array of polygon vertex X coordinates
+ * @param Vy Array of polygon vertex Y coordinates
+ * @param n Number of vertices
+ * @return 1 if inside, 0 if outside
+ */
 template <class T, class F> int cn_PnPoly(T Px, T Py, F* Vx, F* Vy, int n)
 {
 	int    cn = 0;    // the  crossing number counter
@@ -226,9 +236,15 @@ Polygon CounterCWPoly(Polygon Poly)
 
 }
 
-/*! \fn Vertex VertAdd(Vertex A, Vertex B)
-* \brief Vertex Add.
-*/
+/**
+ * @brief Add two vertices.
+ *
+ * Returns the sum of two Vertex objects.
+ *
+ * @param A First vertex
+ * @param B Second vertex
+ * @return Sum vertex
+ */
 Vertex VertAdd(Vertex A, Vertex B)
 {
 	Vertex v;
@@ -238,9 +254,15 @@ Vertex VertAdd(Vertex A, Vertex B)
 	return v;
 }
 
-/*! \fn Vertex VertSub(Vertex A, Vertex B)
-* \brief Vertex Substract
-*/
+/**
+ * @brief Subtract two vertices.
+ *
+ * Returns the difference of two Vertex objects.
+ *
+ * @param A First vertex
+ * @param B Second vertex
+ * @return Difference vertex
+ */
 Vertex VertSub(Vertex A, Vertex B)
 {
 	Vertex v;
@@ -250,9 +272,15 @@ Vertex VertSub(Vertex A, Vertex B)
 	return v;
 }
 
-/*! \fn double dotprod(Vertex A, Vertex B)
-* \brief Vertex dot product
-*/
+/**
+ * @brief Compute dot product of two vertices.
+ *
+ * Calculates the dot product of two Vertex objects.
+ *
+ * @param A First vertex
+ * @param B Second vertex
+ * @return Dot product value
+ */
 double dotprod(Vertex A, Vertex B)
 {
 	double a = 0.0;
@@ -260,9 +288,15 @@ double dotprod(Vertex A, Vertex B)
 	return a;
 }
 
-/*! \fn double xprod(Vertex A, Vertex B)
-* \brief Vertex cross-product
-*/
+/**
+ * @brief Compute cross product of two vertices.
+ *
+ * Calculates the cross product of two Vertex objects.
+ *
+ * @param A First vertex
+ * @param B Second vertex
+ * @return Cross product value
+ */
 double xprod(Vertex A, Vertex B)
 {
 	double a = 0.0;
@@ -270,17 +304,20 @@ double xprod(Vertex A, Vertex B)
 	return a;
 }
 
-/*! \fn bool SegmentIntersect(Polygon P, Polygon Q)
-* \brief Intersection between segments
-* 
-* ## Description
-*  Check whether 2 polygon segment intersect. Polygon P and Q are only 2 vertex long each.
-* i.e. they represent a segment each.
-* 
-* ## Where does this come from:
-* https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
-* Best answer from Gareth Rees
-*/
+/**
+ * @brief Intersection between segments.
+ *
+ * Checks whether two polygon segments intersect. Polygon P and Q are only 2 vertex long each.
+ * i.e. they represent a segment each.
+ *
+ * ## Where does this come from:
+ * https://stackoverflow.com/questions/563198/how-do-you-detect-where-two-line-segments-intersect
+ * Best answer from Gareth Rees
+ * 
+ * @param P First segment as Polygon
+ * @param Q Second segment as Polygon
+ * @return True if segments intersect, false otherwise
+ */
 bool SegmentIntersect(Polygon P, Polygon Q)
 {
 	//
@@ -350,14 +387,16 @@ bool SegmentIntersect(Polygon P, Polygon Q)
 	return intersect;
 }
 
-/*! \fn bool PolygonIntersect(Polygon P, Polygon Q)
-* \brief Intersection between 2 polygons
-*
-* ## Description
-*  Check whether 2 polygons intersect. The function checks whether each segment of Polygon P intersect any segment of Poly Q.
-* if an intersect is detected theh loops are broken and true is returned.
-*
-*/
+/**
+ * @brief Intersection between two polygons.
+ *
+ * Checks whether two polygons intersect by testing all segment pairs. The function checks whether each segment of Polygon P intersect any segment of Poly Q.
+ * If an intersection is detected, returns true immediately.
+ *
+ * @param P First polygon
+ * @param Q Second polygon
+ * @return True if polygons intersect, false otherwise
+ */
 bool PolygonIntersect(Polygon P, Polygon Q)
 {
 	bool intersect=false;
@@ -388,16 +427,19 @@ bool PolygonIntersect(Polygon P, Polygon Q)
 
 }
 
-/*! \fn bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly)
-*
-* \brief check whether a block is inside or intersectin a polygon
-*
-* ## Description
-* Check whether a block is inside or intersectin a polygon
-* 
-* ## Usage blockinpoly( blockxo,  blockyo,  blockdx, blkwidth, Polygon)
-*
-*/
+/**
+ * @brief Check whether a block is inside or intersects a polygon.
+ *
+ * Determines if any corner of the block is inside the polygon or if the block intersects the polygon.
+ *
+ * @tparam T Coordinate type
+ * @param xo Block origin x
+ * @param yo Block origin y
+ * @param dx Block cell size
+ * @param blkwidth Block width
+ * @param Poly Polygon to test
+ * @return True if block is inside or intersects polygon, false otherwise
+ */
 template <class T> bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly)
 {
 	bool insidepoly = false;
@@ -464,12 +506,12 @@ template bool blockinpoly<float>(float xo, float yo, float dx, int blkwidth, Pol
 template bool blockinpoly<double>(double xo, double yo, double dx, int blkwidth, Polygon Poly);
 //template <class T> Poly<T> ReadPoly();
 
-/*! \fn bool test_wninpoly()
-*
-* \brief Test winding number inpoly function
-*
-*
-*/
+/**
+ * @brief Test winding number inpoly function.
+ *
+ * Tests the winding number function for a block polygon.
+ * @return True if test passes, false otherwise
+ */
 bool test_wninpoly()
 {
 	int in, out;
@@ -494,12 +536,12 @@ bool test_wninpoly()
 	return success;
 }
 
-/*! \fn bool test_SegmentIntersect()
-*
-* \brief Test segment intersect function
-*
-*
-*/
+/**
+ * @brief Test segment intersection function.
+ *
+ * Tests the segment intersection function for known cases.
+ * @return True if test passes, false otherwise
+ */
 bool test_SegmentIntersect()
 {
 	bool in, out, success;
@@ -532,12 +574,12 @@ bool test_SegmentIntersect()
 	return success;
 }
 
-/*! \fn bool test_intersectpoly()
-*
-* \brief Test polygon intersect function
-*
-*
-*/
+/**
+ * @brief Test polygon intersection function.
+ *
+ * Tests the polygon intersection function for known cases.
+ * @return True if test passes, false otherwise
+ */
 bool test_intersectpoly()
 {
 	bool success = false;

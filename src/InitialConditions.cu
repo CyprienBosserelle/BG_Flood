@@ -17,7 +17,18 @@
 
 
 #include "InitialConditions.h"
+#include "Input.h"
 
+/**
+ * @brief Initializes model parameters, bathymetry, friction, initial conditions, and output variables.
+ *
+ * Sets up the initial state of the simulation, including bathymetry, friction maps, evolving variables, river forcing, boundary blocks, active cells, and output arrays.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XForcing Forcing data (float)
+ * @param XModel Model data
+ */
 template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcing, Model<T> &XModel)
 {
 	//=====================================
@@ -102,18 +113,27 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 
 		// Initialise infiltration to IL where h is already wet
 		initinfiltration(XParam, XModel.blocks, XModel.evolv.h, XModel.il, XModel.hgw);
-
 	}
-
 
 	//=====================================
 	// Initialize output variables
 	initoutput(XParam, XModel);
 
+	// Initialise Output times' vector
+	initOutputTimes(XParam, XModel.OutputT, XModel.blocks);
 }
 template void InitialConditions<float>(Param &XParam, Forcing<float> &XForcing, Model<float> &XModel);
 template void InitialConditions<double>(Param &XParam, Forcing<float> &XForcing, Model<double> &XModel);
 
+/**
+ * @brief Initializes bathymetry gradient and halo on CPU.
+ *
+ * Computes gradients and refines bathymetry for the model blocks on the CPU.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XModel Model data
+ */
 template <class T> void InitzbgradientCPU(Param XParam, Model<T> XModel)
 {
 	
@@ -130,6 +150,15 @@ template <class T> void InitzbgradientCPU(Param XParam, Model<T> XModel)
 template void InitzbgradientCPU<double>(Param XParam, Model<double> XModel);
 template void InitzbgradientCPU<float>(Param XParam, Model<float> XModel);
 
+/**
+ * @brief Initializes bathymetry gradient and halo on GPU.
+ *
+ * Computes gradients and refines bathymetry for the model blocks using CUDA streams and kernels.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XModel Model data
+ */
 template <class T> void InitzbgradientGPU(Param XParam, Model<T> XModel)
 {
 	const int num_streams = 4;
@@ -146,14 +175,14 @@ template <class T> void InitzbgradientGPU(Param XParam, Model<T> XModel)
 
 	cudaStreamDestroy(streams[0]);
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	gradientHaloGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 
 	refine_linearGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	gradientHaloGPU(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
@@ -161,6 +190,15 @@ template <class T> void InitzbgradientGPU(Param XParam, Model<T> XModel)
 template void InitzbgradientGPU<double>(Param XParam, Model<double> XModel);
 template void InitzbgradientGPU<float>(Param XParam, Model<float> XModel);
 
+/**
+ * @brief Initializes output arrays and maps for the simulation.
+ *
+ * Sets up storage for evolving parameters, output zones, and output files.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XModel Model data
+ */
 template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 {
 	
@@ -200,6 +238,13 @@ template <class T> void initoutput(Param &XParam, Model<T> &XModel)
 
 }
 
+/**
+ * @brief Initializes time series output files for specified nodes.
+ *
+ * Creates and overwrites output files for each node in the time series output list.
+ *
+ * @param XParam Simulation parameters
+ */
 void InitTSOutput(Param XParam)
 {
 	for (int o = 0; o < XParam.TSnodesout.size(); o++)
@@ -218,7 +263,17 @@ void InitTSOutput(Param XParam)
 	}
 }
 
-template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, BndblockP & bnd)
+/**
+ * @brief Finds and assigns output nodes to blocks for time series output.
+ *
+ * Determines which block each output node belongs to and updates the boundary block structure.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param bnd Boundary block structure
+ */
+template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, BndblockP<T> & bnd)
 {
 	int ib;
 	T levdx,x,y,blkxmin,blkxmax,blkymin,blkymax,dxblk;
@@ -265,11 +320,21 @@ template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, Bndblock
 	
 
 }
-template void FindTSoutNodes<float>(Param& XParam, BlockP<float> XBlock, BndblockP& bnd);
-template void FindTSoutNodes<double>(Param& XParam, BlockP<double> XBlock, BndblockP& bnd);
+template void FindTSoutNodes<float>(Param& XParam, BlockP<float> XBlock, BndblockP<float>& bnd);
+template void FindTSoutNodes<double>(Param& XParam, BlockP<double> XBlock, BndblockP<double>& bnd);
 
 
 
+/**
+ * @brief Initializes river discharge areas and assigns river information to model blocks.
+ *
+ * Identifies grid cells affected by river discharge, calculates discharge areas, and sets up river-block relationships.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XForcing Forcing data (float)
+ * @param XModel Model data
+ */
 template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model<T> &XModel)
 {
 	//========================
@@ -338,7 +403,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 				XForcing.rivers[Rin].i = idis;
 				XForcing.rivers[Rin].j = jdis;
 				XForcing.rivers[Rin].block = blockdis;
-				XForcing.rivers[Rin].disarea = dischargeArea; // That is not valid for spherical grids
+				XForcing.rivers[Rin].disarea = dischargeArea; // That is valid for spherical grids
 			
 
 			
@@ -354,8 +419,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 			}
 		}
 
-
-
+		
 		//Now identify sort and unique blocks where rivers are being inserted
 		std::vector<int> activeRiverBlk;
 
@@ -378,6 +442,135 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		{
 			XModel.bndblk.river[b] = activeRiverBlk[b];
 		}
+
+		// Setup the river info
+
+		int nburmax = activeRiverBlk.size();
+		int nribmax = 0;
+		for (int b = 0; b < activeRiverBlk.size(); b++)
+		{
+			int bur = activeRiverBlk[b];
+			int nriverinblock = 0;
+			for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
+			{
+				std::vector<int> uniqblockforriver = XForcing.rivers[Rin].block;
+
+				std::sort(uniqblockforriver.begin(), uniqblockforriver.end());
+				uniqblockforriver.erase(std::unique(uniqblockforriver.begin(), uniqblockforriver.end()), uniqblockforriver.end());
+
+				for (int bir = 0; bir < uniqblockforriver.size(); bir++)
+				{
+					if (uniqblockforriver[bir] == bur)
+					{
+						nriverinblock = nriverinblock + 1;
+					}
+				}
+
+			}
+			nribmax = max(nribmax, nriverinblock);
+		}
+
+		// Allocate Qnow as pinned memory
+		AllocateMappedMemCPU(XForcing.rivers.size(), 1, XParam.GPUDEVICE,XModel.bndblk.Riverinfo.qnow);
+		AllocateCPU(nribmax, nburmax, XModel.bndblk.Riverinfo.xstart, XModel.bndblk.Riverinfo.xend, XModel.bndblk.Riverinfo.ystart, XModel.bndblk.Riverinfo.yend);
+		FillCPU(nribmax, nburmax, T(-1.0), XModel.bndblk.Riverinfo.xstart);
+		FillCPU(nribmax, nburmax, T(-1.0), XModel.bndblk.Riverinfo.xend);
+		FillCPU(nribmax, nburmax, T(-1.0), XModel.bndblk.Riverinfo.ystart);
+		FillCPU(nribmax, nburmax, T(-1.0), XModel.bndblk.Riverinfo.yend);
+
+
+
+		// Allocate XXbidir and Xridib
+		ReallocArray(nribmax, nburmax, XModel.bndblk.Riverinfo.Xbidir);
+		ReallocArray(nribmax, nburmax, XModel.bndblk.Riverinfo.Xridib);
+
+		// Fill them with a flag value 
+		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xbidir);
+		FillCPU(nribmax, nburmax, -1, XModel.bndblk.Riverinfo.Xridib);
+
+		//Xbidir is an array that stores block id where n rivers apply
+		//along the row of Xbidir block id is unique. meaning that a block id ith two river injection will appear on two seperate row of Xbidir
+		//The number of column (size of row 1) in xbidir is nburmax = length(uniq(blockwith river injected))
+		//
+
+		//Xridib is an array that stores River id that a river is injected for the corresponding block id in Xbidir
+
+
+		XModel.bndblk.Riverinfo.nribmax = nribmax;
+		XModel.bndblk.Riverinfo.nburmax = nburmax;
+
+		std::vector<RiverBlk> blocksalreadyin;
+		RiverBlk emptyvec;
+		for (int iblk = 0; iblk < nribmax; iblk++)
+		{
+
+			blocksalreadyin.push_back(emptyvec);
+			
+		}
+		
+		//(n, 10)
+		// 
+		std::vector<int> iriv(nribmax,0);
+		for (int Rin = 0; Rin < XForcing.rivers.size(); Rin++)
+		{
+			std::vector<int> uniqblockforriver = XForcing.rivers[Rin].block;
+
+			std::sort(uniqblockforriver.begin(), uniqblockforriver.end());
+			uniqblockforriver.erase(std::unique(uniqblockforriver.begin(), uniqblockforriver.end()), uniqblockforriver.end());
+
+			
+
+			for (int bir = 0; bir < uniqblockforriver.size(); bir++)
+			{
+
+				for (int iribm = 0; iribm < nribmax; iribm++)
+				{
+
+					if (std::find(blocksalreadyin[iribm].block.begin(), blocksalreadyin[iribm].block.end(), uniqblockforriver[bir]) != blocksalreadyin[iribm].block.end())
+					{
+						//block found already listed in that line;
+
+						continue;
+					}
+					else
+					{
+						//not found;
+						// write to the array
+						XModel.bndblk.Riverinfo.Xbidir[iriv[iribm] + iribm * nburmax] = uniqblockforriver[bir];
+						XModel.bndblk.Riverinfo.Xridib[iriv[iribm] + iribm * nburmax] = Rin;
+
+						iriv[iribm] = iriv[iribm] + 1;
+
+						// add it to the list 
+						blocksalreadyin[iribm].block.push_back(uniqblockforriver[bir]);
+
+						
+
+						break;
+					}
+				}
+					
+			}
+
+		}
+		for (int iribm = 0; iribm < nribmax; iribm++)
+		{
+			for (int ibur = 0; ibur < nburmax; ibur++)
+			{
+				int indx = ibur + iribm * nburmax;
+				int Rin = XModel.bndblk.Riverinfo.Xridib[indx];
+				if (Rin > -1)
+				{
+					XModel.bndblk.Riverinfo.xstart[indx] = XForcing.rivers[Rin].xstart;
+					XModel.bndblk.Riverinfo.xend[indx] = XForcing.rivers[Rin].xend;
+					XModel.bndblk.Riverinfo.ystart[indx] = XForcing.rivers[Rin].ystart;
+					XModel.bndblk.Riverinfo.yend[indx] = XForcing.rivers[Rin].yend;
+				}
+			}
+		}
+
+
+		
 		
 	}
 
@@ -542,6 +735,14 @@ template void InitCulverts<double>(Param XParam, Forcing<float>& XForcing, Model
 
 
 
+/**
+ * @brief Initializes output variable maps and metadata for the simulation.
+ *
+ * Sets up output variable names, units, and long names for all tracked quantities in the model.
+ *
+ * @tparam T Data type
+ * @param XModel Model data
+ */
 template<class T> void Initmaparray(Model<T>& XModel)
 {
 	//Main Parameters
@@ -557,7 +758,7 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.Outvarunits["u"] = "m s-1";
 
 	XModel.OutputVarMap["v"] = XModel.evolv.v;
-	XModel.Outvarlongname["v"] = "Velocity in y-direction";// meridional
+	XModel.Outvarlongname["v"] = "Water velocity in y-direction";// meridional
 	XModel.Outvarstdname["v"] = "v_velocity";
 	XModel.Outvarunits["v"] = "m s-1";
 
@@ -747,6 +948,56 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.Outvarstdname["Sv"] = "Topo_source_y_direction";
 	XModel.Outvarunits["Sv"] = "m2 s-1";
 
+	XModel.OutputVarMap["Fux"] = XModel.fluxml.Fux;
+	XModel.Outvarlongname["Fux"] = "Flux term Fu x-direction";
+	XModel.Outvarstdname["Fux"] = "Flux_term_Fu_x_direction";
+	XModel.Outvarunits["Fux"] = "m3 s-1";
+
+	XModel.OutputVarMap["Fuy"] = XModel.fluxml.Fuy;
+	XModel.Outvarlongname["Fuy"] = "Flux term Fu y-direction";
+	XModel.Outvarstdname["Fuy"] = "Flux_term_Fu_y_direction";
+	XModel.Outvarunits["Fuy"] = "m3 s-1";
+
+	XModel.OutputVarMap["Fvx"] = XModel.fluxml.Fvx;
+	XModel.Outvarlongname["Fvx"] = "Flux term Fv x-direction";
+	XModel.Outvarstdname["Fvx"] = "Flux_term_Fv_x_direction";
+	XModel.Outvarunits["Fvx"] = "m3 s-1";
+
+	XModel.OutputVarMap["Fvy"] = XModel.fluxml.Fvy;
+	XModel.Outvarlongname["Fvy"] = "Flux term Fv y-direction";
+	XModel.Outvarstdname["Fvy"] = "Flux_term_Fv_y_direction";
+	XModel.Outvarunits["Fvy"] = "m3 s-1";
+
+	XModel.OutputVarMap["hau"] = XModel.fluxml.hau;
+	XModel.Outvarlongname["hau"] = "Acceleration term hau x-direction";
+	XModel.Outvarstdname["hau"] = "Acceleration_term_hau_x_direction";
+	XModel.Outvarunits["hau"] = "m2 s-2";
+
+	XModel.OutputVarMap["hav"] = XModel.fluxml.hav;
+	XModel.Outvarlongname["hav"] = "Acceleration term hav y-direction";
+	XModel.Outvarstdname["hav"] = "Acceleration_term_hav_y_direction";
+	XModel.Outvarunits["hav"] = "m2 s-2";
+
+	XModel.OutputVarMap["hfu"] = XModel.fluxml.hfu;
+	XModel.Outvarlongname["hfu"] = "Flux term hfu x-direction";
+	XModel.Outvarstdname["hfu"] = "Flux_term_hfu_x_direction";
+	XModel.Outvarunits["hfu"] = "m3 s-1";
+
+	XModel.OutputVarMap["hfv"] = XModel.fluxml.hfv;
+	XModel.Outvarlongname["hfv"] = "Flux term hfv y-direction";
+	XModel.Outvarstdname["hfv"] = "Flux_term_hfv_y_direction";
+	XModel.Outvarunits["hfv"] = "m3 s-1";
+
+	XModel.OutputVarMap["hu"] = XModel.fluxml.hu;
+	XModel.Outvarlongname["hu"] = "Flux term hu x-direction";
+	XModel.Outvarstdname["hu"] = "Flux_term_hu_x_direction";
+	XModel.Outvarunits["hu"] = "m3 s-1";
+
+	XModel.OutputVarMap["hv"] = XModel.fluxml.hv;
+	XModel.Outvarlongname["hv"] = "Flux term hv y-direction";
+	XModel.Outvarstdname["hv"] = "Flux_term_hv_y_direction";
+	XModel.Outvarunits["hv"] = "m3 s-1";
+
 	//Advance
 	XModel.OutputVarMap["dh"] = XModel.adv.dh;
 	XModel.Outvarlongname["dh"] = "rate of change in water depth";
@@ -803,6 +1054,16 @@ template void Initmaparray<float>(Model<float>& XModel);
 template void Initmaparray<double>(Model<double>& XModel);
 
 
+/**
+ * @brief Finds and assigns blocks to output zones based on user-defined rectangular areas.
+ *
+ * Determines which blocks belong to each output zone, computes zone boundaries, and updates the block structure.
+ * Initialise all storage involving parameters of the outzone objects
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ */
 // Initialise all storage involving parameters of the outzone objects
 template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 {
@@ -966,6 +1227,15 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 template void Findoutzoneblks<float>(Param& XParam, BlockP<float>& XBlock);
 template void Findoutzoneblks<double>(Param& XParam, BlockP<double>& XBlock);
 
+/**
+ * @brief Initializes output zones for the simulation domain.
+ *
+ * Sets up output zones based on user input or defaults to the full domain if none specified.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ */
 template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock)
 {
 	//The domain full domain is defined as the output zone by default 
@@ -991,6 +1261,7 @@ template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock)
 		XzoneB.nblk = XParam.nblk;
 		XzoneB.maxlevel = XParam.maxlevel;
 		XzoneB.minlevel = XParam.minlevel;
+		XzoneB.OutputT = { XParam.totaltime, XParam.endtime };
 		AllocateCPU(XParam.nblk, 1, XzoneB.blk);
 		int I = 0;
 		for (int ib = 0; ib < XParam.nblk; ib++)
@@ -1012,24 +1283,34 @@ template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock)
 template void Initoutzone<float>(Param& XParam, BlockP<float>& XBlock);
 template void Initoutzone<double>(Param& XParam, BlockP<double>& XBlock);
 
-/*
-*  Initialise bnd blk assign block to their relevant segment allocate memory...
-* 1. Find all the boundary blocks(block with themselves as neighbours)
-*
-* 2. make an array to store which segemnt they belong to
-*
-* If any bnd segment was specified
-* 3. scan each block and find which (if any) segment they belong to
-*	 For each segment
-*		 Calculate bbox
-*		 if inbbox calc inpoly
-*		if inpoly overwrite assingned segment with new one
-*
-*
-* 4. Calculate nblk per segment & allocate (do for each segment)
-*
-* 5. fill segmnent and side arrays for each segments
-*/
+
+/**
+ * @brief Initializes boundary block assignments and segment information.
+ *
+ * Finds boundary blocks, assigns them to segments, and allocates arrays for segment sides and flow.
+ *
+ * *  Initialise bnd blk assign block to their relevant segment allocate memory...
+ * 1. Find all the boundary blocks(block with themselves as neighbours)
+ *
+ * 2. make an array to store which segment they belong to
+ *
+ * If any bnd segment was specified
+ * 3. scan each block and find which (if any) segment they belong to
+ *	 For each segment
+ *		 Calculate bbox
+ *		 if inbbox calc inpoly
+ *		if inpoly overwrite assingned segment with new one
+ *
+ *
+ * 4. Calculate nblk per segment & allocate (do for each segment)
+ *
+ * 5. fill segment and side arrays for each segments
+ * 
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XForcing Forcing data (float)
+ * @param XBlock Block parameters
+ */
 template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock)
 {
 	//if(XForcing.bndseg.size()>0)
@@ -1105,6 +1386,8 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 		}
 		XForcing.bndseg[s].nblk = segcount;
 
+		log("\nBoundary Segment " + std::to_string(s) + " : " + XForcing.bndseg[s].inputfile + " has " + std::to_string(segcount) + " blocks ");
+
 		XForcing.bndseg[s].left.nblk = leftcount;
 		XForcing.bndseg[s].right.nblk = rightcount;
 		XForcing.bndseg[s].top.nblk = topcount;
@@ -1170,6 +1453,16 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 
 }
 
+/**
+ * @brief Calculates the number of blocks on each boundary of the domain.
+ *
+ * Updates counts for left, right, top, and bottom boundaries and stores them in the forcing and parameter structures.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XForcing Forcing data (float)
+ * @param XBlock Block parameters
+ */
 template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock)
 {
 	//=====================================
@@ -1248,6 +1541,16 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 * Find which block on the model edge belongs to a "side boundary"
 * 
 */
+/**
+ * @brief Finds which blocks on the model edge belong to a side boundary.
+ *
+ * Populates arrays for blocks on each side boundary and updates the forcing structure.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XModel Model data
+ * @param XForcing Forcing data (float)
+ */
 template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float> &XForcing)
 {
 	//=====================================
@@ -1322,6 +1625,21 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 	* Find the block containing the border of a rectangular box (used for the defining the output zones)
 	* The indice of the blocks are returned through "cornerblk" from bottom left turning in the clockwise direction
 	*/
+/**
+ * @brief Finds the blocks containing the corners of a rectangular box (for output zone definition).
+ *
+ * Returns indices of blocks through "cornerblk" at the corners of the rectangle, starting from bottom left and turning clockwise.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param xo X start
+ * @param yo Y start
+ * @param xmax X end
+ * @param ymax Y end
+ * @param isEps Whether to use epsilon margin
+ * @param cornerblk Vector to store corner block indices
+ */
 template <class T> void RectCornerBlk(Param& XParam, BlockP<T>& XBlock, double xo, double yo, double xmax, double ymax, bool isEps, std::vector<int>& cornerblk)
 {
 
@@ -1374,6 +1692,17 @@ template <class T> void RectCornerBlk(Param& XParam, BlockP<T>& XBlock, double x
 
 }
 
+/**
+ * @brief Calculates active cells in the domain based on mask elevation and area of interest.
+ *
+ * Sets the active cell flag for each cell, removing rain from masked and boundary cells as needed.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XForcing Forcing data (float)
+ * @param zb Bathymetry array
+ */
 template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcing<float>& XForcing, T* zb)
 {
 	int ib,n,wn;
@@ -1464,6 +1793,16 @@ template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcin
 }
 
 
+/**
+ * @brief CUDA kernel to calculate active cells on the GPU based on mask elevation.
+ *
+ * Sets the active cell flag for each cell in the block using GPU parallelism.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param zb Bathymetry array
+ */
 template <class T> __global__ void calcactiveCellGPU(Param XParam, BlockP<T> XBlock, T *zb)
 {
 	unsigned int blkmemwidth = blockDim.x + XParam.halowidth * 2;
@@ -1485,8 +1824,19 @@ template <class T> __global__ void calcactiveCellGPU(Param XParam, BlockP<T> XBl
 	}
 }
 
-template <class T>
-void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T* initLoss ,T* hgw)
+/**
+ * @brief Initializes infiltration loss array for each cell.
+ *
+ * Sets initial infiltration loss to zero for wet cells.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param h Water depth array
+ * @param initLoss Initial loss array
+ * @param hgw Groundwater head array
+ */
+template <class T> void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T* initLoss ,T* hgw)
 {
 //Initialisation to 0 (cold or hot start)
 
@@ -1509,4 +1859,112 @@ void initinfiltration(Param XParam, BlockP<T> XBlock, T* h, T* initLoss ,T* hgw)
 			}
 		}
 	}
+}
+
+// Create a vector of times steps from the input structure Toutput
+/**
+ * @brief Creates a vector of output times from the input time structure.
+ *
+ * Combines independent values and time steps from the input structure.
+ *
+ * @param time_info Time output structure
+ * @return Vector of output times
+ */
+std::vector<double> GetTimeOutput(T_output time_info)
+{
+	//std::vector<double> time_vect;
+	//double time;
+	
+	//Add independant values
+	//if (!time_info.val.empty())
+	//{
+	//	time_vect = time_info.val;
+	//}
+	
+	//Add timesteps from the vector 
+	//time = time_info.init;
+	//while (time < time_info.end)
+	//{
+	//	time_vect.push_back(time);
+	//	time += time_info.tstep;
+	//}
+
+	//Add last timesteps from the vector definition
+	//time_vect.push_back(time_info.end);
+
+	return(time_info.val);
+}
+
+
+
+// Creation of a vector for times requiering a map output
+// Compilations of vectors and independent times from the general input
+// and the different zones outputs
+/**
+ * @brief Compiles and sorts output times for map outputs, including zone outputs.
+ *
+ * Combines times from the main output structure and all zone outputs, sorts and removes duplicates, and assigns to output arrays.
+ * 
+ * Creation of a vector for times requiering a map output 
+ * Compilations of vectors and independent times from the general input
+ * and the different zones outputs
+ * 
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param OutputT Output times vector
+ * @param XBlock Block parameters
+ */
+template <class T> void initOutputTimes(Param XParam, std::vector<double>& OutputT, BlockP<T>& XBlock)
+{
+	std::vector<double> times;
+	std::vector<double> times_partial;
+
+	times_partial = GetTimeOutput(XParam.Toutput);
+	//printf("Time partial:\n");
+	//for (int k = 0; k < times_partial.size(); k++)
+	//{
+	//	printf("%f, ", times_partial[k]);
+	//}
+	//printf("\n");
+
+	times.insert(times.end(), times_partial.begin(), times_partial.end());
+
+	// if zoneOutputs, add their contribution
+	if (XParam.outzone.size() > 0)
+	{
+		for (int ii = 0; ii < XParam.outzone.size(); ii++)
+		{
+			times_partial = GetTimeOutput(XParam.outzone[ii].Toutput);
+			
+			//Add to main vector
+			times.insert(times.end(), times_partial.begin(), times_partial.end());
+			//Sort and remove duplicate before saving in outZone struct
+			std::sort(times_partial.begin(), times_partial.end());
+			times_partial.erase(unique(times_partial.begin(), times_partial.end()), times_partial.end());
+			
+			XBlock.outZone[ii].OutputT = times_partial;
+		}
+	}
+	else //If not zoneoutput, output zone saved in zoneoutput structure
+	{
+		std::sort(times_partial.begin(), times_partial.end());
+		times_partial.erase(unique(times_partial.begin(), times_partial.end()), times_partial.end());
+		
+		XBlock.outZone[0].OutputT = times_partial;
+	}
+
+	// Sort the times for output
+	std::sort(times.begin(), times.end());
+	times.erase(unique(times.begin(), times.end()), times.end());
+	
+	printf("Output Times:\n");
+	for (int k = 0; k < times.size(); k++)
+	{
+		printf("%e, ", times[k]);
+	}
+	printf("\n");
+	
+	
+
+	OutputT = times;
 }

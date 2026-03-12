@@ -2,6 +2,9 @@
 #include "Util_CPU.h"
 #include "General.h"
 
+/**
+ * @brief Handle NetCDF errors.
+ */
 void handle_ncerror(int status) {
 
 
@@ -16,6 +19,14 @@ void handle_ncerror(int status) {
 	}
 }
 
+/**
+ * @brief Calculate grid dimensions based on level.
+ * Calculates the number of grid points in the x and y directions based on the specified level.
+ * @param XParam The parameter object containing grid settings.
+ * @param level The level for which to calculate grid dimensions.
+ * @param nx Reference to store the calculated number of grid points in the x direction.
+ * @param ny Reference to store the calculated number of grid points in the y direction.
+ */
 void Calcnxny(Param XParam, int level, int& nx, int& ny)
 {
 	double ddx = calcres(XParam.dx, level);
@@ -32,6 +43,15 @@ void Calcnxny(Param XParam, int level, int& nx, int& ny)
 	ny = ftoi(round((yymax - yymin) / ddx + 1.0));
 }
 
+/**
+ * @brief Calculate grid dimensions for a specific zone (output zones) based on level.
+ * Calculates the number of grid points in the x and y directions for a specified zone based on the given level.
+ * @param XParam The parameter object containing grid settings.
+ * @param level The level for which to calculate grid dimensions.
+ * @param nx Reference to store the calculated number of grid points in the x direction.
+ * @param ny Reference to store the calculated number of grid points in the y direction.
+ * @param Xzone The output zone object defining the area for which to calculate grid dimensions.
+ */
 void Calcnxnyzone(Param XParam, int level, int& nx, int& ny, outzoneB Xzone)
 {
 	double ddx = calcres(XParam.dx, level);
@@ -47,16 +67,24 @@ void Calcnxnyzone(Param XParam, int level, int& nx, int& ny, outzoneB Xzone)
 	ny = ftoi((yymax - yymin) / ddx);
 }
 
+/**
+ * @brief Calculate active blocks in a zone.
+ * Calculates the active blocks within a specified zone by comparing the active blocks with the blocks defined in the zone.
+ * @param XParam The parameter object containing grid settings.
+ * @param activeblk Pointer to an array of active block indices.
+ * @param Xzone The output zone object defining the area for which to calculate active blocks.
+ * @return A vector containing the indices of active blocks within the specified zone. Inactive blocks are marked with -1.
+ */
 std::vector<int> Calcactiveblockzone(Param XParam, int* activeblk, outzoneB Xzone)
 {
 	std::vector<int> actblkzone(Xzone.nblk, -1);
-	int * inactive, * inblock;
+	int* inactive, * inblock;
 
 	for (int ib = 0; ib < Xzone.nblk; ib++)
 	{
 		//printf("loop=%i \n", Xzone.blk[ib]);
-		inactive = std::find (activeblk, activeblk + XParam.nblk, Xzone.blk[ib]);
-		inblock = std::find (Xzone.blk, Xzone.blk + Xzone.nblk, Xzone.blk[ib]);
+		inactive = std::find(activeblk, activeblk + XParam.nblk, Xzone.blk[ib]);
+		inblock = std::find(Xzone.blk, Xzone.blk + Xzone.nblk, Xzone.blk[ib]);
 		//if ((inactive != activeblk + XParam.nblk) && (inblock != Xzone.blk + Xzone.nblk))
 		if (inactive != activeblk + XParam.nblk)
 		{
@@ -76,8 +104,18 @@ std::vector<int> Calcactiveblockzone(Param XParam, int* activeblk, outzoneB Xzon
 	return(actblkzone);
 }
 
+/**
+ * @brief Create a NetCDF file for BG-Flood output.
+ * Creates a NetCDF file for BG-Flood output based on the provided parameters and zone information.
+ * @param XParam The parameter object containing grid settings and model parameters.
+ * @param activeblk Pointer to an array of active block indices.
+ * @param level Pointer to an array of block levels.
+ * @param blockxo Pointer to an array of block x-coordinates.
+ * @param blockyo Pointer to an array of block y-coordinates.
+ * @param Xzone The output zone object defining the area and settings for the NetCDF file.
+ */
 template<class T>
-void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T * blockyo, outzoneB &Xzone)
+void creatncfileBUQ(Param& XParam, int* activeblk, int* level, T* blockxo, T* blockyo, outzoneB& Xzone)
 {
 
 	int status;
@@ -85,7 +123,9 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	//double dx = XParam.dx;
 	size_t nxx, nyy;
 	int ncid, xx_dim, yy_dim, time_dim, blockid_dim, nblk;
-	double * xval, *yval;
+	double* xval, * yval;
+
+	int BGFloodoutversion = 0;// integer to quickly identify the output as BG_flood or not
 
 	//const int minlevzone = XParam.minlevel;
 	//const int maxlevzone = XParam.maxlevel;
@@ -96,7 +136,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 
 
 	// create the netcdf dataset Xzone.outname.c_str()
-	status = nc_create(Xzone.outname.c_str(), NC_NOCLOBBER|NC_NETCDF4, &ncid);
+	status = nc_create(Xzone.outname.c_str(), NC_NOCLOBBER | NC_NETCDF4, &ncid);
 	if (status != NC_NOERR)
 	{
 		if (status == NC_EEXIST) // File already exist so automatically rename the output file 
@@ -118,7 +158,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 				}
 				newname = newname + "_" + std::to_string(fileinc) + "." + bathyext;
 				Xzone.outname = newname;
-				status = nc_create(Xzone.outname.c_str(), NC_NOCLOBBER|NC_NETCDF4, &ncid);
+				status = nc_create(Xzone.outname.c_str(), NC_NOCLOBBER | NC_NETCDF4, &ncid);
 				fileinc++;
 			}
 			//printf("New file name: %s  ", Xzone.outname.c_str());
@@ -134,14 +174,16 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 
 	// status could be a new error after renaming the file
 	if (status != NC_NOERR) handle_ncerror(status);
-	
+
 	double initdx = calcres(XParam.dx, XParam.initlevel);
 	double xmin, xmax, ymin, ymax;
 
-	xmin = Xzone.xo ;
-	xmax = Xzone.xmax ;
-	ymin = Xzone.yo ;
-	ymax = Xzone.ymax ;
+	xmin = Xzone.xo;
+	xmax = Xzone.xmax;
+	ymin = Xzone.yo;
+	ymax = Xzone.ymax;
+
+
 
 	// Define global attributes
 	status = nc_put_att_int(ncid, NC_GLOBAL, "maxlevel", NC_INT, 1, &Xzone.maxlevel);
@@ -163,17 +205,25 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	if (status != NC_NOERR) handle_ncerror(status);
 
 
+	status = nc_put_att_text(ncid, NC_GLOBAL, "Conventions", 14,"CF-1.11-draft");
+
+	// Define global attribute for identifying BG_Flood
+	status = nc_put_att_int(ncid, NC_GLOBAL, "BG_Flood", NC_INT, 1, &BGFloodoutversion);
+
+	if (status != NC_NOERR) handle_ncerror(status);
+
+
 	// Define time variable 
 	status = nc_def_dim(ncid, "time", NC_UNLIMITED, &time_dim);
 	if (status != NC_NOERR) handle_ncerror(status);
 
 	int time_id, xx_id, yy_id;
 	int tdim[] = { time_dim };
-	
+
 	//########################
 	//static size_t tst[] = { 0 };
 	size_t blkstart[] = { 0 }; // Xzone.blk[0]};
-	size_t blkcount[] = { (size_t) Xzone.nblk };
+	size_t blkcount[] = { (size_t)Xzone.nblk };
 	size_t xcount[] = { 0 };
 	size_t ycount[] = { 0 };
 	static size_t xstart[] = { 0 }; // start at first value
@@ -182,11 +232,11 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	if (status != NC_NOERR) handle_ncerror(status);
 
 	static char txtname[] = "time";
-	status = nc_put_att_text(ncid, time_id, "standard_name", strlen(txtname), txtname );
+	status = nc_put_att_text(ncid, time_id, "standard_name", strlen(txtname), txtname);
 	//status = nc_put_att_string(ncid, time_id, "standard_name", 1, "time");
 	//units = "days since 1990-1-1 0:0:0";
 
-	std::string timestr= "seconds since " + XParam.reftime;
+	std::string timestr = "seconds since " + XParam.reftime;
 	const char* timeunit = timestr.c_str();
 
 	status = nc_put_att_text(ncid, time_id, "units", strlen(timeunit), timeunit);
@@ -220,7 +270,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	{
 		crsname = "projected";
 		std::string proj = XParam.crs_ref;
-			//"+proj=tmerc +lat_0=0 +lon_0=173 +k=0.9996 +x_0=1600000 +y_0=10000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
+		//"+proj=tmerc +lat_0=0 +lon_0=173 +k=0.9996 +x_0=1600000 +y_0=10000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
 		status = nc_put_att_text(ncid, crsid, "grid_mapping_name", crsname.size(), crsname.c_str());
 		status = nc_put_att_text(ncid, crsid, "crs_wkt", proj.size(), proj.c_str());
 		status = nc_put_att_text(ncid, crsid, "spatial_ref", proj.size(), proj.c_str());
@@ -229,6 +279,13 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	}
 
 	if (status != NC_NOERR) handle_ncerror(status);
+
+	int bgfid;
+
+	// Model variable to store parameters
+	status = nc_def_var(ncid, "BGFlood", NC_INT, 0, tdim, &bgfid);
+	saveparam2netCDF(ncid, bgfid, XParam);
+
 
 	// Define dimensions and variables to store block id, status, level xo, yo
 
@@ -262,7 +319,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	// For each level Define xx yy 
 	for (int lev = Xzone.minlevel; lev <= Xzone.maxlevel; lev++)
 	{
-		
+
 		Calcnxnyzone(XParam, lev, nx, ny, Xzone);
 
 		//printf("lev=%d;  xxmin=%f; xxmax=%f; nx=%d\n", lev, xmin, xmax, nx);
@@ -275,7 +332,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		//Define dimensions: Name and length
 		std::string xxname, yyname, sign;
 
-		lev < 0?sign="N":sign = "P";
+		lev < 0 ? sign = "N" : sign = "P";
 
 
 		xxname = "xx_" + sign + std::to_string(abs(lev));
@@ -300,7 +357,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		if (status != NC_NOERR) handle_ncerror(status);
 
 
-		
+
 
 		status = nc_put_att_text(ncid, xx_id, "axis", xaxis.size(), xaxis.c_str());
 		status = nc_put_att_text(ncid, yy_id, "axis", yaxis.size(), yaxis.c_str());
@@ -320,7 +377,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	AllocateCPU(1, nblk, blkwidth);
 	AllocateCPU(1, nblk, blkid);
 
-	printf("blockId:\n");
+	//printf("blockId:\n");
 	for (int ib = 0; ib < nblk; ib++)
 	{
 		//int ibl = activeblk[Xzone.blk[ib]];
@@ -328,7 +385,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		blkwidth[ib] = (float)calcres(XParam.dx, level[ibl]);
 		blkid[ib] = ibl;
 	}
-	
+
 
 	status = nc_put_vara_int(ncid, blkid_id, blkstart, blkcount, blkid);
 	if (status != NC_NOERR) handle_ncerror(status);
@@ -347,7 +404,7 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 		ibl = activeblkzone[ib];
 		blkwidth[ib] = float(T(XParam.xo) + blockxo[ibl]);
 		blkid[ib] = level[ibl];
-		
+
 	}
 
 	status = nc_put_vara_float(ncid, blkxo_id, blkstart, blkcount, blkwidth);
@@ -363,104 +420,143 @@ void creatncfileBUQ(Param &XParam,int * activeblk, int * level, T * blockxo, T *
 	}
 
 	status = nc_put_vara_float(ncid, blkyo_id, blkstart, blkcount, blkwidth);
-	
+
 
 	free(blkid);
 	free(blkwidth);
 
 	if (status != NC_NOERR) handle_ncerror(status);
-	
+
 	std::string xxname, yyname, sign;
 
-for (int lev = Xzone.minlevel; lev <= Xzone.maxlevel; lev++)
-{
-	Calcnxnyzone(XParam, lev, nx, ny, Xzone);
-
-	// start at first value
-	//static size_t thstart[] = { 0 };
-	xcount[0] = nx;
-	ycount[0] = ny;
-	//Recreat the x, y
-	xval = (double*)malloc(nx * sizeof(double));
-	yval = (double*)malloc(ny * sizeof(double));
-
-	double ddx = calcres(XParam.dx, lev);
-	double dxp = calcres(XParam.dx, lev + 1);
-	double  xxmin,  yymin;
-	//doublle xxmax, yymax
-	//xxmax = Xzone.xmax - dxp;
-	//yymax = Xzone.ymax - dxp;
-
-	xxmin = Xzone.xo + dxp;
-	yymin = Xzone.yo + dxp;
-
-	for (int i = 0; i < nx; i++)
+	for (int lev = Xzone.minlevel; lev <= Xzone.maxlevel; lev++)
 	{
-		xval[i] = xxmin + double(i) * ddx;
+		Calcnxnyzone(XParam, lev, nx, ny, Xzone);
+
+		// start at first value
+		//static size_t thstart[] = { 0 };
+		xcount[0] = nx;
+		ycount[0] = ny;
+		//Recreat the x, y
+		xval = (double*)malloc(nx * sizeof(double));
+		yval = (double*)malloc(ny * sizeof(double));
+
+		double ddx = calcres(XParam.dx, lev);
+		double dxp = calcres(XParam.dx, lev + 1);
+		double  xxmin, yymin;
+		//doublle xxmax, yymax
+		//xxmax = Xzone.xmax - dxp;
+		//yymax = Xzone.ymax - dxp;
+
+		xxmin = Xzone.xo + dxp;
+		yymin = Xzone.yo + dxp;
+
+		for (int i = 0; i < nx; i++)
+		{
+			xval[i] = xxmin + double(i) * ddx;
+		}
+
+		for (int i = 0; i < ny; i++)
+		{
+			yval[i] = yymin + double(i) * ddx;
+		}
+
+
+		lev < 0 ? sign = "N" : sign = "P";
+
+
+		xxname = "xx_" + sign + std::to_string(abs(lev));
+		yyname = "yy_" + sign + std::to_string(abs(lev));
+
+		//printf("lev=%d; xxname=%s; yyname=%s;\n", lev, xxname.c_str(), yyname.c_str());
+
+		status = nc_inq_varid(ncid, xxname.c_str(), &xx_id);
+		if (status != NC_NOERR) handle_ncerror(status);
+		status = nc_inq_varid(ncid, yyname.c_str(), &yy_id);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		//Provide values for variables
+
+		status = nc_put_vara_double(ncid, xx_id, xstart, xcount, xval);
+		if (status != NC_NOERR) handle_ncerror(status);
+		status = nc_put_vara_double(ncid, yy_id, ystart, ycount, yval);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+
+
+		free(xval);
+		free(yval);
 	}
 
-	for (int i = 0; i < ny; i++)
-	{
-		yval[i] = yymin + double(i) * ddx;
-	}
-
-
-	lev < 0 ? sign = "N" : sign = "P";
-
-
-	xxname = "xx_" + sign + std::to_string(abs(lev));
-	yyname = "yy_" + sign + std::to_string(abs(lev));
-
-	//printf("lev=%d; xxname=%s; yyname=%s;\n", lev, xxname.c_str(), yyname.c_str());
-
-	status = nc_inq_varid(ncid, xxname.c_str(), &xx_id);
-	if (status != NC_NOERR) handle_ncerror(status);
-	status = nc_inq_varid(ncid, yyname.c_str(), &yy_id);
-	if (status != NC_NOERR) handle_ncerror(status);
-
-	//Provide values for variables
-
-	status = nc_put_vara_double(ncid, xx_id, xstart, xcount, xval);
-	if (status != NC_NOERR) handle_ncerror(status);
-	status = nc_put_vara_double(ncid, yy_id, ystart, ycount, yval);
+	//close and save new file
+	status = nc_close(ncid);
 	if (status != NC_NOERR) handle_ncerror(status);
 
 
 
-	free(xval);
-	free(yval);
-}
 
-//close and save new file
-status = nc_close(ncid);
-if (status != NC_NOERR) handle_ncerror(status);
-
-
-
-
-//return XParam;void
+	//return XParam;void
 }
 
 template void creatncfileBUQ<float>(Param& XParam, int* activeblk, int* level, float* blockxo, float* blockyo, outzoneB& Xzone);
 template void creatncfileBUQ<double>(Param& XParam, int* activeblk, int* level, double* blockxo, double* blockyo, outzoneB& Xzone);
 
-
+/**
+ * @brief Create NetCDF files for all output zones in a block.
+ * Creates NetCDF files for all output zones defined in the block using the provided parameters and block
+ * information.
+ * @param XParam The parameter object containing grid settings and model parameters.
+ * @param XBlock The block object containing block information and output zones.
+ */
 template<class T>
-void creatncfileBUQ(Param& XParam, BlockP<T> &XBlock)
+void creatncfileBUQ(Param& XParam, BlockP<T>& XBlock)
 {
 	for (int o = 0; o < XBlock.outZone.size(); o++)
 	{
 		creatncfileBUQ(XParam, XBlock.active, XBlock.level, XBlock.xo, XBlock.yo, XBlock.outZone[o]);
 	}
 }
-template void creatncfileBUQ<float>(Param &XParam, BlockP<float> &XBlock);
-template void creatncfileBUQ<double>(Param &XParam, BlockP<double> &XBlock);
+template void creatncfileBUQ<float>(Param& XParam, BlockP<float>& XBlock);
+template void creatncfileBUQ<double>(Param& XParam, BlockP<double>& XBlock);
 
+/**
+ * @brief Define a NetCDF variable for BG-Flood output.
+ * Defines a NetCDF variable for BG-Flood output based on the provided parameters, block information
+ * and zone information.
+ * @param XParam The parameter object containing grid settings and model parameters.
+ * @param activeblk Pointer to an array of active block indices.
+ * @param level Pointer to an array of block levels.
+ * @param blockxo Pointer to an array of block x-coordinates.
+ * @param blockyo Pointer to an array of block y-coordinates.
+ * @param varst The base name of the variable to be defined.
+ * @param vdim The number of dimensions of the variable (2 or 3).
+ * @param var Pointer to the array containing the variable data.
+ * @param Xzone The output zone object defining the area and settings for the NetCDF variable.
+ * @note This is an overloaded function that provides a simpler interface when longname, stdname, and unit are not needed.
+ */
 template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T* blockxo, T* blockyo, std::string varst, int vdim, T* var, outzoneB Xzone)
 {
-	defncvarBUQ(XParam, activeblk, level, blockxo, blockyo, varst, "", "","", vdim, var, Xzone);
+	defncvarBUQ(XParam, activeblk, level, blockxo, blockyo, varst, "", "", "", vdim, var, Xzone);
 }
 
+/**
+ * @brief Define a NetCDF variable for BG-Flood output with detailed attributes.
+ * Defines a NetCDF variable for BG-Flood output based on the provided parameters, block information
+ * and zone information, along with detailed attributes such as long name, standard name, and unit.
+ * @param XParam The parameter object containing grid settings and model parameters.
+ * @param activeblk Pointer to an array of active block indices.
+ * @param level Pointer to an array of block levels.
+ * @param blockxo Pointer to an array of block x-coordinates.
+ * @param blockyo Pointer to an array of block y-coordinates.
+ * @param varst The base name of the variable to be defined.
+ * @param longname The long name attribute for the variable.
+ * @param stdname The standard name attribute for the variable.
+ * @param unit The unit attribute for the variable.
+ * @param vdim The number of dimensions of the variable (2 or 3).
+ * @param var Pointer to the array containing the variable data.
+ * @param Xzone The output zone object defining the area and settings for the NetCDF variable.
+ * @note This is a templated function that can handle different data types for the variable (e.g., float, double).
+ */
 template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T* blockxo, T* blockyo, std::string varst, std::string longname, std::string stdname, std::string unit, int vdim, T* var, outzoneB Xzone)
 {
 
@@ -496,7 +592,7 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 	//count3D[0] = 1;
 	//count3D[1] = XParam.blkwidth;
 	//count3D[2] = XParam.blkwidth;
-	
+
 	//int minlevzone, maxlevzone;
 
 	std::string outfile = Xzone.outname;
@@ -526,15 +622,15 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 	status = nc_inq_unlimdim(ncid, &recid);//time
 	if (status != NC_NOERR) handle_ncerror(status);
 
-	varblk = (float *)malloc(XParam.blkwidth* XParam.blkwidth * sizeof(float));
+	varblk = (float*)malloc(XParam.blkwidth * XParam.blkwidth * sizeof(float));
 	if (smallnc > 0)
 	{
 
-		varblk_s = (short *)malloc(XParam.blkwidth * XParam.blkwidth * sizeof(short));
+		varblk_s = (short*)malloc(XParam.blkwidth * XParam.blkwidth * sizeof(short));
 	}
 
 
-	std::string xxname, yyname, varname,sign;
+	std::string xxname, yyname, varname, sign;
 
 	//generate a different variable name for each level and add attribute as necessary
 	for (lev = Xzone.minlevel; lev <= Xzone.maxlevel; lev++)
@@ -593,25 +689,25 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 
 			if (status != NC_NOERR) handle_ncerror(status);
 		}
-		
+
 
 		if (smallnc > 0)
 		{
-			
+
 			status = nc_put_att_float(ncid, var_id, "scale_factor", NC_FLOAT, 1, &scalefactor);
 			if (status != NC_NOERR) handle_ncerror(status);
 			status = nc_put_att_float(ncid, var_id, "add_offset", NC_FLOAT, 1, &addoffset);
 			if (status != NC_NOERR) handle_ncerror(status);
 		}
-		
+
 
 		status = nc_put_att_text(ncid, var_id, "standard_name", stdname.size(), stdname.c_str());
 		status = nc_put_att_text(ncid, var_id, "long_name", longname.size(), longname.c_str());
-		status = nc_put_att_text(ncid, var_id, "units", unit.size(),unit.c_str());
+		status = nc_put_att_text(ncid, var_id, "units", unit.size(), unit.c_str());
 
 		std::string crsstrname = "crs";
 		status = nc_put_att_text(ncid, var_id, "grid_mapping", crsstrname.size(), crsstrname.c_str());
-		
+
 
 		int shuffle = 1;
 		int deflate = 1;        // This switches compression on (1) or off (0).
@@ -632,7 +728,7 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 	//####################
 	for (ibl = 0; ibl < Xzone.nblk; ibl++)
 	{
-		
+
 		//bl = activeblk[Xzone.blk[ibl]];
 		bl = activeblkzone[ibl];
 		lev = level[bl];
@@ -642,14 +738,14 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 		double xxmin, yymin;
 		double initdx = calcres(XParam.dx, XParam.initlevel);
 
-		
+
 
 		//xxmax = Xzone.xmax - calcres(XParam.dx, lev) / 2.0;
 		//yymax = Xzone.ymax - calcres(XParam.dx, lev )/2.0;
 
-		
+
 		xxmin = Xzone.xo + calcres(XParam.dx, lev) / 2.0;
-		yymin = Xzone.yo + calcres(XParam.dx, lev )/2.0;
+		yymin = Xzone.yo + calcres(XParam.dx, lev) / 2.0;
 		//printf("xxmin=%f, yymin=%f, lev=$d \n", xxmin, yymin, lev);
 
 		//std::string xxname, yyname, sign;
@@ -660,7 +756,7 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 		xxname = "xx_" + sign + std::to_string(abs(lev));
 		yyname = "yy_" + sign + std::to_string(abs(lev));
 
-		varname = varst +  "_" + sign + std::to_string(abs(lev));
+		varname = varst + "_" + sign + std::to_string(abs(lev));
 		status = nc_inq_dimid(ncid, xxname.c_str(), &xid);
 		if (status != NC_NOERR) handle_ncerror(status);
 		status = nc_inq_dimid(ncid, yyname.c_str(), &yid);
@@ -706,8 +802,8 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 			//
 			start3D[1] = (size_t)round((XParam.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
 			start3D[2] = (size_t)round((XParam.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
-	
- 			if (smallnc > 0)
+
+			if (smallnc > 0)
 			{
 				status = nc_put_vara_short(ncid, var_id, start3D, count3D, varblk_s);
 				if (status != NC_NOERR) handle_ncerror(status);
@@ -718,7 +814,7 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 
 				if (status != NC_NOERR)
 				{
-					printf("\n ib=%d start=[%d,%d,%d]; initlevel=%d; initdx=%f; level=%d; xo=%f; yo=%f; blockxo[ib]=%f xxmin=%f blockyo[ib]=%f yymin=%f startfl=%f\n", bl, (int)start3D[0], (int)start3D[1], (int)start3D[2], XParam.initlevel,initdx,lev, Xzone.xo, Xzone.yo, blockxo[bl], xxmin, blockyo[bl], yymin, (blockyo[bl] - yymin) / calcres(XParam.dx, lev));
+					printf("\n ib=%d start=[%d,%d,%d]; initlevel=%d; initdx=%f; level=%d; xo=%f; yo=%f; blockxo[ib]=%f xxmin=%f blockyo[ib]=%f yymin=%f startfl=%f\n", bl, (int)start3D[0], (int)start3D[1], (int)start3D[2], XParam.initlevel, initdx, lev, Xzone.xo, Xzone.yo, blockxo[bl], xxmin, blockyo[bl], yymin, (blockyo[bl] - yymin) / calcres(XParam.dx, lev));
 					//printf("\n varblk[0]=%f varblk[255]=%f\n", varblk[0], varblk[255]);
 					handle_ncerror(status);
 				}
@@ -744,7 +840,24 @@ template <class T> void defncvarBUQ(Param XParam, int* activeblk, int* level, T*
 template void defncvarBUQ<float>(Param XParam, int* activeblk, int* level, float* blockxo, float* blockyo, std::string varst, int vdim, float* var, outzoneB Xzone);
 template void defncvarBUQ<double>(Param XParam, int* activeblk, int* level, double* blockxo, double* blockyo, std::string varst, int vdim, double* var, outzoneB Xzone);
 
-
+/**
+ * @brief Define a NetCDF variable for BG-Flood output with detailed attributes.
+ * Defines a NetCDF variable for BG-Flood output based on the provided parameters, block information
+ * and zone information, along with detailed attributes such as long name, standard name, and unit.
+ * @param XParam The parameter object containing grid settings and model parameters.
+ * @param activeblk Pointer to an array of active block indices.
+ * @param level Pointer to an array of block levels.
+ * @param blockxo Pointer to an array of block x-coordinates.
+ * @param blockyo Pointer to an array of block y-coordinates.
+ * @param varst The base name of the variable to be defined.
+ * @param longname The long name attribute for the variable.
+ * @param stdname The standard name attribute for the variable.
+ * @param unit The unit attribute for the variable.
+ * @param vdim The number of dimensions of the variable (2 or 3).
+ * @param var Pointer to the array containing the variable data.
+ * @param Xzone The output zone object defining the area and settings for the NetCDF variable.
+ * @note This is a templated function that can handle different data types for the variable (e.g., float, double).
+ */
 template <class T> void defncvarBUQlev(Param XParam, int* activeblk, int* level, T* blockxo, T* blockyo, std::string varst, std::string longname, std::string stdname, std::string unit, int vdim, T* var, outzoneB Xzone)
 {
 
@@ -1084,13 +1197,27 @@ template <class T> void defncvarBUQlev(Param XParam, int* activeblk, int* level,
 
 
 
-
-template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activeblk, int* level, T * blockxo, T *blockyo, std::string varst, T * var, outzoneB Xzone)
+/**
+ * @brief Write a time step of a NetCDF variable for BG-Flood output.
+ * Writes a time step of a NetCDF variable for BG-Flood output based on the provided
+ * parameters, block information, variable data, and zone information.
+ * @param XParam The parameter object containing grid settings and model parameters.
+ * @param vdim The number of dimensions of the variable (2 or 3).
+ * @param activeblk Pointer to an array of active block indices.
+ * @param level Pointer to an array of block levels.
+ * @param blockxo Pointer to an array of block x-coordinates.
+ * @param blockyo Pointer to an array of block y-coordinates.
+ * @param varst The base name of the variable to be written.
+ * @param var Pointer to the array containing the variable data.
+ * @param Xzone The output zone object defining the area and settings for the NetCDF variable.
+ * @note This is a templated function that can handle different data types for the variable (e.g., float, double).
+ */
+template <class T> void writencvarstepBUQ(Param XParam, int vdim, int* activeblk, int* level, T* blockxo, T* blockyo, std::string varst, T* var, outzoneB Xzone)
 {
 	int status, ncid, recid, var_id;
 	static size_t nrec;
-	short *varblk_s;
-	float * varblk;
+	short* varblk_s;
+	float* varblk;
 	//int nx, ny;
 	//int dimids[NC_MAX_VAR_DIMS];
 	//size_t  *ddim, *start, *count;
@@ -1118,11 +1245,11 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 
 	start3D[0] = nrec - 1;
 
-	varblk = (float *)malloc(XParam.blkwidth* XParam.blkwidth * sizeof(float));
+	varblk = (float*)malloc(XParam.blkwidth * XParam.blkwidth * sizeof(float));
 	if (smallnc > 0)
 	{
 
-		varblk_s = (short *)malloc(XParam.blkwidth * XParam.blkwidth * sizeof(short));
+		varblk_s = (short*)malloc(XParam.blkwidth * XParam.blkwidth * sizeof(short));
 	}
 
 
@@ -1139,15 +1266,15 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 		bl = activeblkzone[ibl];
 		lev = level[bl];
 		lev < 0 ? sign = "N" : sign = "P";
-		double  xxmin,  yymin;
+		double  xxmin, yymin;
 		//double xxmax, yymax;
 		double initdx = calcres(XParam.dx, XParam.initlevel);
 
-		
+
 		//xxmax = Xzone.xmax - calcres(XParam.dx, lev) / 2.0;
 		//yymax = Xzone.ymax - calcres(XParam.dx, lev) / 2.0;
 
-		
+
 		xxmin = Xzone.xo + calcres(XParam.dx, lev) / 2.0;
 		yymin = Xzone.yo + calcres(XParam.dx, lev) / 2.0;
 
@@ -1229,9 +1356,16 @@ template <class T> void writencvarstepBUQ(Param XParam, int vdim, int * activebl
 
 // Scope for compiler to know what function to compile
 
-template void writencvarstepBUQ<float>(Param XParam, int vdim, int * activeblk, int* level, float * blockxo, float *blockyo, std::string varst, float * var, outzoneB Xzone);
-template void writencvarstepBUQ<double>(Param XParam, int vdim, int * activeblk, int* level, double * blockxo, double *blockyo, std::string varst, double * var, outzoneB Xzone);
+template void writencvarstepBUQ<float>(Param XParam, int vdim, int* activeblk, int* level, float* blockxo, float* blockyo, std::string varst, float* var, outzoneB Xzone);
+template void writencvarstepBUQ<double>(Param XParam, int vdim, int* activeblk, int* level, double* blockxo, double* blockyo, std::string varst, double* var, outzoneB Xzone);
 
+/**
+ * @brief Write the current time step to a NetCDF file.
+ * Writes the current time step to a NetCDF file by updating the "time" variable
+ * with the provided total time value.
+ * @param outfile The name of the NetCDF output file.
+ * @param totaltime The total time value to be written to the "time" variable.
+ */
 extern "C" void writenctimestep(std::string outfile, double totaltime)
 {
 	int status, ncid, recid, time_id;
@@ -1254,7 +1388,23 @@ extern "C" void writenctimestep(std::string outfile, double totaltime)
 	if (status != NC_NOERR) handle_ncerror(status);
 }
 
-
+/**
+ * @brief Write a time step of a NetCDF variable for BG-Flood output.
+ * Writes a time step of a NetCDF variable for BG-Flood output based on the provided
+ * parameters, block information, variable data, and zone information.
+ * @param XParam The parameter object containing grid settings and model parameters.
+ * @param vdim The number of dimensions of the variable (2 or 3).
+ * @param activeblk Pointer to an array of active block indices.
+ * @param level Pointer to an array of block levels.
+ * @param blockxo Pointer to an array of block x-coordinates.
+ * @param blockyo Pointer to an array of block y-coordinates.
+ * @param varst The base name of the variable to be written.
+ * @param var Pointer to the array containing the variable data.
+ * @param Xzone The output zone object defining the area and settings for the NetCDF variable.
+ * @note This is a templated function that can handle different data types for the variable (e.g., float, double).
+ * This version handles variables defined for each level separately.
+ * @see writencvarstepBUQ for the version that does not separate by levels.
+ */
 template <class T> void writencvarstepBUQlev(Param XParam, int vdim, int* activeblk, int* level, T* blockxo, T* blockyo, std::string varst, T* var, outzoneB Xzone)
 {
 	int status, ncid, recid, var_id;
@@ -1337,7 +1487,7 @@ template <class T> void writencvarstepBUQlev(Param XParam, int vdim, int* active
 	//{
 		bl = activeblkzone[ibl];
 		lev = level[bl];
-		
+
 		double  xxmin, yymin;
 		int nxlev, nylev;
 		//double xxmax, yymax;
@@ -1353,11 +1503,11 @@ template <class T> void writencvarstepBUQlev(Param XParam, int vdim, int* active
 		xxmin = Xzone.xo + calcres(XParam.dx, lev) / 2.0;
 		yymin = Xzone.yo + calcres(XParam.dx, lev) / 2.0;
 
-		
+
 
 		jo = round((XParam.yo + blockyo[bl] - yymin) / calcres(XParam.dx, lev));
 		io = round((XParam.xo + blockxo[bl] - xxmin) / calcres(XParam.dx, lev));
-		
+
 
 		for (int j = 0; j < XParam.blkwidth; j++)
 		{
@@ -1398,11 +1548,11 @@ template <class T> void writencvarstepBUQlev(Param XParam, int vdim, int* active
 
 		if (vdim == 2)
 		{
-			
+
 
 			start2D[0] = 0; // (size_t)round((XParam.yo - yymin) / calcres(XParam.dx, levi));
 			start2D[1] = 0; // (size_t)round((XParam.xo - xxmin) / calcres(XParam.dx, levi));
-			
+
 			count2D[0] = (size_t)nylev;
 			count2D[1] = (size_t)nxlev;
 
@@ -1467,14 +1617,25 @@ template void writencvarstepBUQlev<double>(Param XParam, int vdim, int* activebl
 
 
 
-template <class T> void InitSave2Netcdf(Param &XParam, Model<T> &XModel)
+//Initialise netcdf files
+/**
+ * @brief Initialize NetCDF output files for the model.
+ * Initializes NetCDF output files for the model based on the provided parameters
+ * and model configuration. If output variables are specified in the parameters,
+ * it creates the necessary NetCDF files and defines the variables to be saved.
+ * @param XParam The parameter object containing grid settings and model parameters.
+ * @param XModel The model object containing block information and output variable mappings.
+ * @note This is a templated function that can handle different data types for the model (e.g., float, double).
+ * @see creatncfileBUQ for creating the NetCDF file and defining variables.
+ */
+template <class T> void InitSave2Netcdf(Param& XParam, Model<T>& XModel)
 {
 	if (!XParam.outvars.empty())
 	{
 		log("Create netCDF output file...");
 		creatncfileBUQ(XParam, XModel.blocks);
 		//creatncfileBUQ(XParam);
-		for (int o = 0; o < XModel.blocks.outZone.size(); o++)
+		/*for (int o = 0; o < XModel.blocks.outZone.size(); o++)
 		{
 			writenctimestep(XModel.blocks.outZone[o].outname, XParam.totaltime);
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
@@ -1491,42 +1652,127 @@ template <class T> void InitSave2Netcdf(Param &XParam, Model<T> &XModel)
 
 				}
 			}
+		}*/
+	}
+}
+template void InitSave2Netcdf<float>(Param& XParam, Model<float>& XModel);
+template void InitSave2Netcdf<double>(Param& XParam, Model<double>& XModel);
+
+//Save initialisation in maps outpout if require
+/*template <class T> void SaveInitialisation2Netcdf(Param& XParam, Model<T>& XModel)
+{
+	double NextZoneOutTime;
+
+	if (!XParam.outvars.empty())
+	{
+		for (int o = 0; o < XModel.blocks.outZone.size(); o++)
+		{
+			NextZoneOutTime = XModel.blocks.outZone[o].OutputT[XModel.blocks.outZone[o].index_next_OutputT];
+			if (XParam.totaltime == NextZoneOutTime)
+			{
+				log("Output to map: " + XModel.blocks.outZone[o].outname + ", Totaltime = " + std::to_string(XParam.totaltime) + " s; Initialisation");
+
+				writenctimestep(XModel.blocks.outZone[o].outname, XParam.totaltime);
+				for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+				{
+					std::string varstr = XParam.outvars[ivar];
+					defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varstr, XModel.Outvarlongname[varstr], XModel.Outvarstdname[varstr], XModel.Outvarunits[varstr], 3, XModel.OutputVarMap[varstr], XModel.blocks.outZone[o]);
+				}
+				XModel.blocks.outZone[o].index_next_OutputT++;
+			}
+
+
 		}
 	}
 }
-template void InitSave2Netcdf<float>(Param &XParam, Model<float> &XModel);
-template void InitSave2Netcdf<double>(Param &XParam, Model<double> &XModel);
+template void SaveInitialisation2Netcdf<float>(Param& XParam, Model<float>& XModel);
+template void SaveInitialisation2Netcdf<double>(Param& XParam, Model<double>& XModel);
+*/
 
-
-template <class T> void Save2Netcdf(Param XParam,Loop<T> XLoop, Model<T> XModel)
+/**
+ * @brief Save model output to NetCDF files at specified output times.
+ * Saves model output to NetCDF files at specified output times based on the provided parameters.
+ * It checks if the current output time matches the next scheduled output time for each output zone,
+ * and if so, writes the relevant variables to the corresponding NetCDF files.
+ * @param XParam The parameter object containing grid settings and model parameters.
+ * @param XLoop The loop object containing time-stepping information.
+ * @param XModel The model object containing block information and output variable mappings.
+ * @note This is a templated function that can handle different data types for the model (e.g., float, double).
+ * @see writenctimestep for writing the time step to the NetCDF file.
+ */
+template <class T> void Save2Netcdf(Param XParam, Loop<T> XLoop, Model<T>& XModel)
 {
+	double NextZoneOutTime;
+	double tiny = 0.0000001;
+
+	char buffer[256];
+	double meanTspeps = 0.0;
+	if (XLoop.indNextoutputtime > 0)
+	{
+		meanTspeps = (XModel.OutputT[XLoop.indNextoutputtime] - XModel.OutputT[XLoop.indNextoutputtime - T(1)]) / XLoop.nstepout;
+	}
+	sprintf(buffer, "%e", meanTspeps);
+	std::string str(buffer);
+	//std::string maps;
+
 	if (!XParam.outvars.empty())
 	{
-		//creatncfileBUQ(XParam);
 		for (int o = 0; o < XModel.blocks.outZone.size(); o++)
 		{
-			writenctimestep(XModel.blocks.outZone[o].outname, XLoop.totaltime);
-			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+			//printf("\n  (int(XModel.blocks.outZone[o].OutputT.size() - 1)) = %d\n", (int(XModel.blocks.outZone[o].OutputT.size() - 1)));
+			int indLoc = min(XModel.blocks.outZone[o].index_next_OutputT, (int(XModel.blocks.outZone[o].OutputT.size() - 1)));
+			NextZoneOutTime = XModel.blocks.outZone[o].OutputT[indLoc];
+			if (abs(XLoop.nextoutputtime - NextZoneOutTime) < tiny)
 			{
-				if (XParam.savebyblk)
+				log("Output to map: " + XModel.blocks.outZone[o].outname + ", Totaltime = " + std::to_string(XLoop.totaltime) + " s; Mean dt = " + str + " s");
+
+				writenctimestep(XModel.blocks.outZone[o].outname, XLoop.totaltime);
+				for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 				{
-					writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
+					if (XModel.blocks.outZone[o].index_next_OutputT == 0)//first time output
+					{
+						std::string varstr = XParam.outvars[ivar];
+						defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varstr, XModel.Outvarlongname[varstr], XModel.Outvarstdname[varstr], XModel.Outvarunits[varstr], 3, XModel.OutputVarMap[varstr], XModel.blocks.outZone[o]);
+					}
+					else
+					{
+						if (XParam.savebyblk)
+						{
+							writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
+						}
+						else
+						{
+							writencvarstepBUQlev(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
+						}
+					}
 				}
-				else
-				{
-					writencvarstepBUQlev(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
-				}
+				XModel.blocks.outZone[o].index_next_OutputT++;
 			}
 		}
 	}
+	//maps.erase(maps.size() - 2);
 }
-template void Save2Netcdf<float>(Param XParam, Loop<float> XLoop, Model<float> XModel);
-template void Save2Netcdf<double>(Param XParam, Loop<double> XLoop, Model<double> XModel);
+template void Save2Netcdf<float>(Param XParam, Loop<float> XLoop, Model<float>& XModel);
+template void Save2Netcdf<double>(Param XParam, Loop<double> XLoop, Model<double>& XModel);
 
 
 //The following functions are tools to create 2D or 3D netcdf files (for testing for example)
 
-//
+/**
+ * @brief Create a NetCDF file containing a 2D variable, for testing for example.
+ * Creates a NetCDF file containing a 2D variable with the specified dimensions and data.
+ * If the file already exists, it will be overwritten.
+ * @param filename The name of the NetCDF file to be created.
+ * 	
+ * @param nx The number of grid points in the x-direction.
+ * @param ny The number of grid points in the y-direction.
+ * @param xx Pointer to an array containing the x-coordinates of the grid points.
+ * @param yy Pointer to an array containing the y-coordinates of the grid points.
+ * @param var Pointer to an array containing the 2D variable data to be stored in
+ * the NetCDF file.
+ * @param varname The name of the variable to be stored in the NetCDF file.
+ * @note This function uses the NetCDF C library to create and write to the NetCDF file.
+ */
 extern "C" void create2dnc(char* filename, int nx, int ny, double* xx, double* yy, double* var, char* varname)
 {
 	int status;
@@ -1564,7 +1810,7 @@ extern "C" void create2dnc(char* filename, int nx, int ny, double* xx, double* y
 
 	static size_t xstart[] = { 0 }; // start at first value
 	static size_t xcount[] = { (size_t)nx };
-	
+
 	static size_t ystart[] = { 0 }; // start at first value
 	static size_t ycount[] = { (size_t)ny };
 
@@ -1581,6 +1827,22 @@ extern "C" void create2dnc(char* filename, int nx, int ny, double* xx, double* y
 }
 
 //Create a ncdf file containing a 3D variable (the file is overwritten if it was existing before)
+/**
+ * @brief Create a NetCDF file containing a 3D variable, for testing for example.	
+ * Creates a NetCDF file containing a 3D variable with the specified dimensions and data.
+ * If the file already exists, it will be overwritten.
+ * @param name The name of the NetCDF file to be created.
+ * @param nx The number of grid points in the x-direction.
+ * @param ny The number of grid points in the y-direction.
+ * @param nt The number of time steps.
+ * @param xx Pointer to an array containing the x-coordinates of the grid points.
+ * @param yy Pointer to an array containing the y-coordinates of the grid points.
+ * @param theta Pointer to an array containing the time values.
+ * @param var Pointer to an array containing the 3D variable data to be stored in
+ * the NetCDF file.
+ * @param varname The name of the variable to be stored in the NetCDF file.
+ * @note This function uses the NetCDF C library to create and write to the NetCDF file.
+ */
 extern "C" void create3dnc(char* name, int nx, int ny, int nt, double* xx, double* yy, double* theta, double* var, char* varname)
 {
 	int status;
@@ -1637,6 +1899,18 @@ extern "C" void create3dnc(char* name, int nx, int ny, int nt, double* xx, doubl
 
 }
 
+/**
+ * @brief Write a time step of a 3D variable to an existing NetCDF file, for testing for example.
+ * Writes a time step of a 3D variable to an existing NetCDF file by appending the provided
+ * variable data at the next available time index.
+ * @param nx The number of grid points in the x-direction.
+ * @param ny The number of grid points in the y-direction.
+ * @param nt The number of time steps.
+ * @param totaltime The total time value to be written to the "time" variable.
+ * @param var Pointer to an array containing the 3D variable data to be appended to
+ * the NetCDF file.
+ * @note This function assumes that the NetCDF file "3Dvar.nc" already exists and is open for writing.
+ */
 extern "C" void write3dvarnc(int nx, int ny, int nt, double totaltime, double* var)
 {
 	int status;
@@ -1671,6 +1945,17 @@ extern "C" void write3dvarnc(int nx, int ny, int nt, double totaltime, double* v
 
 }
 
+/**
+ * @brief Write a time step of a 2D variable to an existing NetCDF file, for testing for example.
+ * Writes a time step of a 2D variable to an existing NetCDF file by appending the provided
+ * variable data at the next available time index.
+ * @param nx The number of grid points in the x-direction.
+ * @param ny The number of grid points in the y-direction.	
+ * @param totaltime The total time value to be written to the "time" variable.
+ * @param var Pointer to an array containing the 2D variable data to be appended to
+ * the NetCDF file.
+ * @note This function assumes that the NetCDF file "3Dvar.nc" already exists and is open for writing.
+ */
 extern "C" void write2dvarnc(int nx, int ny, double totaltime, double* var)
 {
 	int status;

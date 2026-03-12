@@ -2,6 +2,18 @@
 
 
 
+/**
+ * @brief CUDA kernel for applying bottom friction to all active blocks.
+ *
+ * Updates velocity components using the specified friction model (default, smart, or Manning) for each cell in all blocks.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block data structure
+ * @param dt Time step
+ * @param cf Friction coefficient array
+ * @param XEvolv Evolving variables structure
+ */
 template <class T> __global__ void bottomfrictionGPU(Param XParam, BlockP<T> XBlock, T dt, T* cf,EvolvingP<T> XEvolv)
 {
 	// Shear stress equation:
@@ -62,6 +74,18 @@ template __global__ void bottomfrictionGPU<double>(Param XParam, BlockP<double> 
 
 
 
+/**
+ * @brief CPU routine for applying bottom friction to all active blocks.
+ *
+ * Updates velocity components using the specified friction model (default, smart, or Manning) for each cell in all blocks.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block data structure
+ * @param dt Time step
+ * @param cf Friction coefficient array
+ * @param XEvolv Evolving variables structure
+ */
 template <class T> __host__ void bottomfrictionCPU(Param XParam, BlockP<T> XBlock,T dt, T* cf, EvolvingP<T> XEvolv)
 {
 	T eps = T(XParam.eps);
@@ -125,12 +149,20 @@ template <class T> __host__ void bottomfrictionCPU(Param XParam, BlockP<T> XBloc
 template __host__ void bottomfrictionCPU<float>(Param XParam, BlockP<float> XBlock,float dt, float* cf, EvolvingP<float> XEvolv);
 template __host__ void bottomfrictionCPU<double>(Param XParam, BlockP<double> XBlock,double dt, double* cf, EvolvingP<double> XEvolv);
 
-/*!\fn void XiafrictionCPU(Param XParam, BlockP<T> XBlock, T dt, T* cf, EvolvingP<T> XEvolv)
-* apply bottom friction following the procedure from Xia and Lang 2018
-* https://doi.org/10.1016/j.advwatres.2018.05.004
-* 
-*
-*/
+/**
+ * @brief CPU routine for applying bottom friction following Xia & Lang (2018).
+ *
+ * Updates velocity components using the Xia & Lang friction model for each cell in all blocks, using both current and previous evolving variables.
+ * Reference: Xia and Lang (2018), https://doi.org/10.1016/j.advwatres.2018.05.004
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block data structure
+ * @param dt Time step
+ * @param cf Friction coefficient array
+ * @param XEvolv Current evolving variables structure
+ * @param XEvolv_o Previous evolving variables structure
+ */
 template <class T> __host__ void XiafrictionCPU(Param XParam, BlockP<T> XBlock, T dt, T* cf, EvolvingP<T> XEvolv, EvolvingP<T> XEvolv_o)
 {
 	T eps = T(XParam.eps);
@@ -195,6 +227,19 @@ template <class T> __host__ void XiafrictionCPU(Param XParam, BlockP<T> XBlock, 
 template __host__ void XiafrictionCPU<float>(Param XParam, BlockP<float> XBlock,float dt, float* cf, EvolvingP<float> XEvolv, EvolvingP<float> XEvolv_o);
 template __host__ void XiafrictionCPU<double>(Param XParam, BlockP<double> XBlock,double dt, double* cf, EvolvingP<double> XEvolv, EvolvingP<double> XEvolv_o);
 
+/**
+ * @brief CUDA kernel for applying Xia & Lang (2018) bottom friction to all active blocks.
+ *
+ * Updates velocity components using the Xia & Lang friction model for each cell in all blocks, using both current and previous evolving variables.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block data structure
+ * @param dt Time step
+ * @param cf Friction coefficient array
+ * @param XEvolv Current evolving variables structure
+ * @param XEvolv_o Previous evolving variables structure
+ */
 template <class T> __global__ void XiafrictionGPU(Param XParam, BlockP<T> XBlock, T dt, T* cf, EvolvingP<T> XEvolv, EvolvingP<T> XEvolv_o)
 {
 	// Shear stress equation:
@@ -259,6 +304,16 @@ template __global__ void XiafrictionGPU<float>(Param XParam, BlockP<float> XBloc
 template __global__ void XiafrictionGPU<double>(Param XParam, BlockP<double> XBlock, double dt, double* cf, EvolvingP<double> XEvolv, EvolvingP<double> XEvolv_o);
 
 
+/**
+ * @brief Smart friction model for roughness height.
+ *
+ * Computes friction coefficient using a log-law based on water depth and roughness height.
+ *
+ * @tparam T Data type (float or double)
+ * @param hi Water depth
+ * @param zo Roughness height
+ * @return Friction coefficient
+ */
 template <class T> __host__ __device__ T smartfriction(T hi,T zo)
 {
 	T cfi;
@@ -278,6 +333,17 @@ template <class T> __host__ __device__ T smartfriction(T hi,T zo)
 	return cfi;
 }
 
+/**
+ * @brief Manning friction model.
+ *
+ * Computes friction coefficient using Manning's equation based on gravity, water depth, and Manning's n.
+ *
+ * @tparam T Data type (float or double)
+ * @param g Gravity
+ * @param hi Water depth
+ * @param n Manning's n
+ * @return Friction coefficient
+ */
 template <class T> __host__ __device__ T manningfriction(T g, T hi, T n)
 {
 	T cfi= g * n * n / cbrt(hi);
@@ -285,14 +351,16 @@ template <class T> __host__ __device__ T manningfriction(T g, T hi, T n)
 }
 
 
-
-
-/*! \fn void TheresholdVelGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEvolv)
-*
-* \brief Function Used to prevent crazy velocity on the GPU
-*
-* The function wraps the main function for the GPU.
-*/
+/**
+ * @brief CUDA kernel for enforcing a velocity threshold.
+ * Function Used to prevent crazy velocity on the GPU.
+ * The function wraps the main function for the GPU.
+ * Updates velocity components to ensure they do not exceed a specified threshold.
+ * @param XParam Simulation parameters
+ * @param XBlock Block data structure
+ * @param XEvolv Evolving variables structure
+ *
+ */
 template <class T> __global__ void TheresholdVelGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEvolv)
 {
 	
@@ -330,12 +398,18 @@ template <class T> __global__ void TheresholdVelGPU(Param XParam, BlockP<T> XBlo
 template __global__ void TheresholdVelGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEvolv);
 template __global__ void TheresholdVelGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEvolv);
 
-/*! \fn void TheresholdVelCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEvolv)
-*
-* \brief Function Used to prevent crazy velocity on the CPU
-*
-* The function wraps teh main functio for the CPU.
-*/
+/**
+ * @brief CPU routine for enforcing a velocity threshold.
+ *
+ * Updates velocity components to ensure they do not exceed a specified threshold.
+ * Function Used to prevent crazy velocity on the CPU
+ * 
+ * @param XParam Simulation parameters
+ * @param XBlock Block data structure
+ * @param XEvolv Evolving variables structure
+ *
+ */
+
 template <class T> __host__ void TheresholdVelCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEvolv)
 {
 
@@ -379,12 +453,18 @@ template <class T> __host__ void TheresholdVelCPU(Param XParam, BlockP<T> XBlock
 template __host__ void TheresholdVelCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEvolv);
 template __host__ void TheresholdVelCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEvolv);
 
-/*! \fn bool ThresholdVelocity(T Threshold, T& u, T& v)
-* 
-* \brief Function Used to prevent crazy velocity
-* 
-* The function scale velocities so it doesn't exceeds a given threshold. 
-* Default threshold is/should be 16.0m/s
+/** 
+ * 
+ * @brief Function Used to prevent crazy velocity
+ * 
+ * The function scale velocities so it doesn't exceeds a given threshold. 
+ * Default threshold is/should be 16.0m/s
+ * 
+ * @param Threshold Velocity threshold
+ * @param u Velocity component in x direction
+ * @param v Velocity component in y direction
+ * @return true if velocity was above threshold and has been scaled down, false otherwise
+ * 
 */
 template <class T> __host__ __device__ bool ThresholdVelocity(T Threshold, T& u, T& v)
 {

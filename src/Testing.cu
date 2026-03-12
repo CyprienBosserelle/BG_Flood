@@ -4,33 +4,43 @@
 
 
 
-/*! \fn bool testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
-* Wrapping function for all the inbuilt test
-* This function is the entry point to other function below.
-*
-* Test 0 is a gausian hump propagating on a flat uniorm cartesian mesh (both GPU and CPU version tested)
-* Test 1 is vertical discharge on a flat uniorm cartesian mesh (GPU or CPU version)
-* Test 2 Gaussian wave on Cartesian grid (same as test 0): CPU vs GPU (GPU required)
-* Test 3 Test Reduction algorithm
-* Test 4 Boundary condition test
-* Test 5 Lake at rest test for Ardusse/kurganov reconstruction/scheme
-* Test 6 Mass conservation on a slope
-* Test 7 Mass conservation with rain fall on grid
-* Test 8 Rain Map forcing (comparison map and Time Serie and test case with slope and non-uniform rain map)
-* Test 9 Zoned output (test zoned outputs with adaptative grid)
-* Test 10 Initial Loss / Continuous Loss on a slope, under uniform rain
-* Test 11 Wet/dry Instability test with Conserve Elevation
-* Test 12 Calendar time to second conversion
-* Test 13 Multi bathy and roughness map input
-* Test 14 Test AOI bnds aswall to start with
-* Test 16 Test Culverts
 
-* Test 99 Run all the test with test number < 99.
+/**
+ * @brief Wrapping function for all the inbuilt test
+ * This function is the entry point to other function below.
+ * 
+ * Test 0 is a gausian hump propagating on a flat uniorm cartesian mesh (both GPU and CPU version tested)
+ * Test 1 is vertical discharge on a flat uniorm cartesian mesh (GPU or CPU version)
+ * Test 2 Gaussian wave on Cartesian grid (same as test 0): CPU vs GPU (GPU required)
+ * Test 3 Test Reduction algorithm
+ * Test 4 Boundary condition test
+ * Test 5 Lake at rest test for Ardusse/kurganov reconstruction/scheme
+ * Test 6 Mass conservation on a slope
+ * Test 7 Mass conservation with rain fall on grid
+ * Test 8 Rain Map forcing (comparison map and Time Serie and test case with slope and non-uniform rain map)
+ * Test 9 Zoned output (test zoned outputs with adaptative grid)
+ * Test 10 Initial Loss / Continuous Loss on a slope, under uniform rain
+ * Test 11 Wet/dry Instability test with Conserve Elevation
+ * Test 12 Calendar time to second conversion
+ * Test 13 Multi bathy and roughness map input
+ * Test 14 Test AOI bnds aswall to start with
+ * Test 15 Flexible times reading
+ * Test 16 Test Culverts
 
-The following test are not independant, they are tools to check or debug a personnal case
-* Test 998 Compare resuts between the CPU and GPU Flow functions (GPU required)
-* Test 999 Run the main loop and engine in debug mode
-*/
+ * Test 99 Run all the test with test number < 99.
+
+ The following test are not independant, they are tools to check or debug a personnal case
+ * Test 998 Compare resuts between the CPU and GPU Flow functions (GPU required)
+ * Test 999 Run the main loop and engine in debug mode
+ * 
+ * 
+ * @param XParam Simulation parameters
+ * @param XForcing Forcing data structure
+ * @param XModel Host model data structure
+ * @param XModel_g Device model data structure
+ * @return true if all the tests passed
+ */
+
 template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
 
@@ -56,20 +66,20 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\t ### Gaussian wave on Cartesian grid ###");
 			//set gpu is -1 for cpu test
 
-			bumptest = GaussianHumptest(0.1, -1, false);
+			bumptest = GaussianHumptest(0.1, -1, false,2);
 			result = bumptest ? "successful" : "failed";
-			log("\t\tCPU test: " + result);
+			log("\t\tCPU test: " + result + " for engine = 2");
 
 			// If original XParam tried to use GPU we try also
 			if (XParam.GPUDEVICE >= 0)
 			{
-				bumptestGPU = GaussianHumptest(0.1, XParam.GPUDEVICE, false);
+				bumptestGPU = GaussianHumptest(0.1, XParam.GPUDEVICE, false, XParam.engine);
 				result = bumptestGPU ? "successful" : "failed";
-				log("\t\tGPU test: " + result);
+				log("\t\tGPU test: " + result + " for engine = " + std::to_string(XParam.engine));
 
 				if (!bumptestGPU)
 				{
-					bumptestComp = GaussianHumptest(0.1, XParam.GPUDEVICE, true);
+					bumptestComp = GaussianHumptest(0.1, XParam.GPUDEVICE, true, XParam.engine);
 				}
 			}
 			isfailed = ((bumptest == true) && (bumptestGPU == true)) ? false : true;
@@ -84,7 +94,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\t\tCPU test: " + result);
 			isfailed = (!rivertest || isfailed) ? true : false;
 
-			log(" \t\t\t GPU device= " + XParam.GPUDEVICE);
+			log(" \t\t\t GPU device= " + std::to_string(XParam.GPUDEVICE));
 
 			if (XParam.GPUDEVICE >= 0)
 			{
@@ -94,7 +104,7 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 				isfailed = (!rivertest || isfailed) ? true : false;
 			}
 
-			rivertest=RiverVolumeAdapt(XParam, T(0.4));
+			rivertest = RiverVolumeAdapt(XParam, T(0.4));
 			result = rivertest ? "successful" : "failed";
 			log("\t\tRiver Volume Adapt: " + result);
 			isfailed = (!rivertest || isfailed) ? true : false;
@@ -106,7 +116,12 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			{
 				bool GPUvsCPUtest;
 				log("\t### Gaussian wave on Cartesian grid: CPU vs GPU ###");
-				GPUvsCPUtest = GaussianHumptest(0.1, XParam.GPUDEVICE, true);
+				if (XParam.engine == 5)
+				{
+					log("\t CPU vs GPU only woks for engine 1 and 2 switching to 1");
+					XParam.engine = 1;
+				}
+				GPUvsCPUtest = GaussianHumptest(0.1, XParam.GPUDEVICE, true, XParam.engine);
 				result = GPUvsCPUtest ? "successful" : "failed";
 				log("\t\tCPU vs GPU test: " + result);
 				isfailed = (!GPUvsCPUtest || isfailed) ? true : false;
@@ -176,11 +191,11 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\t### Homogeneous rain on grid Mass conservation test ###");
 			if (XParam.GPUDEVICE >= 0)
 			{
-				testrainGPU = Raintest(0.0, 0, 10);
+				testrainGPU = Raintest(0.0, 0, 10, XParam.engine);
 				result = testrainGPU ? "successful" : "failed";
 				log("\t\tHomogeneous rain on grid test GPU: " + result);
 			}
-			testrainCPU = Raintest(0.0, -1, 10);
+			testrainCPU = Raintest(0.0, -1, 10, XParam.engine);
 			result = testrainCPU ? "successful" : "failed";
 			log("\t\tHomogeneous rain on grid test CPU: " + result);
 			isfailed = (!testrainCPU || !testrainGPU || isfailed) ? true : false;
@@ -241,83 +256,100 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			result = testrainlossesCPU ? "successful" : "failed";
 			log("\n\n\t IL-CL Rain losses test CPU: " + result);
 			isfailed = (!testrainlossesCPU || !testrainlossesGPU || isfailed) ? true : false;
-    }
-    if (mytest == 11)
-	  {
+		}
+		if (mytest == 11)
+		{
 			bool instab;
 			log("\t### Wet/dry Instability test with Conserve Elevation ###");
-			instab=TestInstability(XParam, XModel, XModel_g);
+			instab = TestInstability(XParam, XModel, XModel_g);
 			result = instab ? "successful" : "failed";
 			log("\t\tWet/dry Instability test : " + result);
 		}
-	if (mytest == 12)
-	{
-		/* Test 12 is to test the calendar time to second conversion
-			This test will fail if the system or compiler does not suport long long 
-			 
-		*/
-		bool timetest;
-		timetest = testime1(1) && testime2(2);
-		result = timetest ? "successful" : "failed";
-		log("\t\tCalendar time test : " + result);
-	}
 
-	if (mytest == 13)
-	{
-		/* Test 13 is to test the input of different roughness maps (and different bathymetry at the same time)
-			Test1: 2 DEM and 2 roughness netcdf files are created and saved; then read.
-				The max / min values are check to see if the z/z0 maps are created as expected
-			Test2: A roughness file name is changed to have a number in first position. We check that the 
-				file is read and not the number taken as z0 value.
-			Test3: A roughness is entered as a value, test that it is implemented for the whole domain.
-			Test4 :  Test value input for initial loss / continuous loss
-		*/
-		bool RoughBathyresult, RoughInput, RoughtInputnumber, ILCLInputnumber;
-		log("\t### Different bathy and different roughness file inputs ###");
-		RoughBathyresult = TestMultiBathyRough(0, 0.0, 0);//&& TestRoughness(XParam, XModel, XModel_g);
-		result = RoughBathyresult ? "successful" : "failed";
-		log("\t\t ##### \n");
-		log("\t\t ##### Different Bathy and Roughness test : " + result + "\n");
-		RoughInput = TestMultiBathyRough(0, 0.0, 1);//&& TestRoughness(XParam, XModel, XModel_g);
-		result = RoughInput ? "successful" : "failed";
-		log("\t\t ##### \n");
-		log("\t\t ##### Roughness file name test : " + result + "\n");
-		RoughtInputnumber = TestMultiBathyRough(0, 0.0, 2);//&& TestRoughness(XParam, XModel, XModel_g);
-		result = RoughtInputnumber ? "successful" : "failed";
-		log("\t\t ##### \n");
-		log("\t\t ##### Roughness value input test : " + result + "\n");
-		log("\t\t ##### \n");
-		ILCLInputnumber = TestMultiBathyRough(0, 0.0, 3);//&& TestRoughness(XParam, XModel, XModel_g);
-		result = ILCLInputnumber ? "successful" : "failed";
-		log("\t\t ##### \n");
-		log("\t\t ##### Initial Loss / Continuous Loss value input test : " + result + "\n");
-		log("\t\t ##### \n");
-		isfailed = (!RoughBathyresult || !RoughInput || !RoughtInputnumber || !ILCLInputnumber || isfailed) ? true : false;
+		if (mytest == 12)
+		{
+			/* Test 12 is to test the calendar time to second conversion
+				This test will fail if the system or compiler does not suport long long
 
+			*/
+			bool timetest;
+			timetest = testime1(1) && testime2(2);
+			result = timetest ? "successful" : "failed";
+			log("\t\tCalendar time test : " + result);
+		}
 
-	}
-	if (mytest == 14)
-	{
-		/* Test 14  This test AOI bnds aswall to start with
+		if (mytest == 13)
+		{
+			/* Test 13 is to test the input of different roughness maps (and different bathymetry at the same time)
+				Test1: 2 DEM and 2 roughness netcdf files are created and saved; then read.
+					The max / min values are check to see if the z/z0 maps are created as expected
+				Test2: A roughness file name is changed to have a number in first position. We check that the
+					file is read and not the number taken as z0 value.
+				Test3: A roughness is entered as a value, test that it is implemented for the whole domain.
+				Test4 :  Test value input for initial loss / continuous loss
+			*/
+			bool RoughBathyresult, RoughInput, RoughtInputnumber, ILCLInputnumber;
+			log("\t### Different bathy and different roughness file inputs ###");
+			RoughBathyresult = TestMultiBathyRough(0, 0.0, 0);//&& TestRoughness(XParam, XModel, XModel_g);
+			result = RoughBathyresult ? "successful" : "failed";
+			log("\t\t ##### \n");
+			log("\t\t ##### Different Bathy and Roughness test : " + result + "\n");
+			RoughInput = TestMultiBathyRough(0, 0.0, 1);//&& TestRoughness(XParam, XModel, XModel_g);
+			result = RoughInput ? "successful" : "failed";
+			log("\t\t ##### \n");
+			log("\t\t ##### Roughness file name test : " + result + "\n");
+			RoughtInputnumber = TestMultiBathyRough(0, 0.0, 2);//&& TestRoughness(XParam, XModel, XModel_g);
+			result = RoughtInputnumber ? "successful" : "failed";
+			log("\t\t ##### \n");
+			log("\t\t ##### Roughness value input test : " + result + "\n");
+			log("\t\t ##### \n");
+			ILCLInputnumber = TestMultiBathyRough(0, 0.0, 3);//&& TestRoughness(XParam, XModel, XModel_g);
+			result = ILCLInputnumber ? "successful" : "failed";
+			log("\t\t ##### \n");
+			log("\t\t ##### Initial Loss / Continuous Loss value input test : " + result + "\n");
+			log("\t\t ##### \n");
+			isfailed = (!RoughBathyresult || !RoughInput || !RoughtInputnumber || !ILCLInputnumber || isfailed) ? true : false;
+		}
 
-		*/
-		bool wallbndleft, wallbndright, wallbndbot, wallbndtop;
-		log("\t###AOI bnd wall test ###");
-		wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, false);
-		wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, false);
-		wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, false);
-		wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, false);
-		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
-		log("\t\tBBox bnd wall test : " + result);
-		wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, true);
-		wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, true);
-		wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, true);
-		wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, true);
-		result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
-		log("\t\tAOI bnd wall test : " + result);
-	}
+		if (mytest == 14)
+		{
+			/* Test 14  This test AOI bnds aswall to start with
 
-	if (mytest == 16)
+			*/
+			bool wallbndleft, wallbndright, wallbndbot, wallbndtop;
+			log("\t###AOI bnd wall test ###");
+			wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, false);
+			wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, false);
+			wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, false);
+			wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, false);
+			result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
+			log("\t\tBBox bnd wall test : " + result);
+			wallbndleft = TestAIObnd(XParam, XModel, XModel_g, false, false, true);
+			wallbndright = TestAIObnd(XParam, XModel, XModel_g, false, true, true);
+			wallbndbot = TestAIObnd(XParam, XModel, XModel_g, true, false, true);
+			wallbndtop = TestAIObnd(XParam, XModel, XModel_g, true, true, true);
+			result = (wallbndleft & wallbndright & wallbndbot & wallbndtop) ? "successful" : "failed";
+			log("\t\tAOI bnd wall test : " + result);
+		}
+
+		if (mytest == 15)
+			/* Test 15 is to test the input of flexible times outputs (general and in zone_outputs)
+				Test1: Test of times in second/durations (for general and zone_outputs)
+					The data is read from paramfile and we test the reading and nc files created.
+			*/
+		{
+			bool FlexibleOutTime;
+			log("\t### Tests for flexible time outputs (general and zones outputs) ###");
+			FlexibleOutTime = TestFlexibleOutputTimes(0, 0.0, 0);
+			result = FlexibleOutTime ? "successful" : "failed";
+			log("\t\t ##### \n");
+			log("\t\t ##### Flexible output times reading test : " + result + "\n");
+			log("\t\t ##### \n");
+			isfailed = (!FlexibleOutTime || isfailed) ? true : false;
+
+		}
+
+  if (mytest == 16)
 	{
 		/* Test 16 is to test the different types of culverts
 			Test1: Culvert with pump (limited by pump/culvert discharge and water availability)
@@ -350,6 +382,19 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 
 	}
 
+	if (mytest == 993)
+	{
+		//pinned pageable Memory test
+		TestPinMem(XParam, XModel, XModel_g);
+	}
+
+	if (mytest == 900)
+	{
+		GaussianHumptest(0.1, XParam.GPUDEVICE, false, XParam.engine);
+	}
+
+	
+
 		if (mytest == 994)
 		{
 			Testzbinit(XParam, XForcing, XModel, XModel_g);
@@ -361,14 +406,13 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 		}
 		if (mytest == 996)
 		{
-			TestHaloSpeed(XParam,XModel,XModel_g);
+			TestHaloSpeed(XParam, XModel, XModel_g);
 		}
 		if (mytest == 997)
 		{
 			TestGradientSpeed(XParam, XModel, XModel_g);
-
 		}
-		
+
 		if (mytest == 998)
 		{
 			//
@@ -376,7 +420,6 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\t### CPU vs GPU Test ###");
 			testresults = CPUGPUtest(XParam, XModel, XModel_g);
 			isfailed = (!testresults || isfailed) ? true : false;
-
 			if (testresults)
 			{
 				exit(0);
@@ -399,15 +442,22 @@ template bool Testing<float>(Param XParam, Forcing<float> XForcing, Model<float>
 template bool Testing<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
 
 
-/*! \fn bool GaussianHumptest(T zsnit, int gpu, bool compare)
-*
-* This function tests the full hydrodynamics model and compares the results with pre-conmputed (Hard wired) values
-*	The function creates it own model setup and mesh independantly to what the user might want to do
-*	The setup consist of a centrally located gaussian hump radiating away
-*	The test stops at an arbitrary time to compare with 8 values extracted from a identical run in basilisk
-*	This function also compares the result of the GPU and CPU code (until they diverge)
-*/
-template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
+
+/**! \fn bool GaussianHumptest(T zsnit, int gpu, bool compare)
+ * @brief Gaussian hump propagation test
+ *
+ * This function tests the full hydrodynamics model and compares the results with pre-conmputed (Hard wired) values
+ *	The function creates it own model setup and mesh independantly to what the user might want to do
+ *	The setup consist of a centrally located gaussian hump radiating away
+ *	The test stops at an arbitrary time to compare with 8 values extracted from a identical run in basilisk
+ *	This function also compares the result of the GPU and CPU code (until they diverge)
+ * @param zsnit Initial water surface elevation at the centre of the domain
+ * @param gpu GPU device number to use (-1 for CPU only)
+ * @param compare If true, compare GPU and CPU results (GPU required)
+ * @return true if the test passed (results within 1e-6 of reference values)
+ */
+template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare, int engine)
+
 {
 	log("#####");
 	// this is a preplica of the tutorial case for Basilisk
@@ -416,18 +466,53 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	T x, y, delta;
 	T cc = T(0.05);// Match the 200 in chracteristic radius used in Basilisk  1/(2*cc^2)=200
 
+	
 
 	T a = T(1.0); //Gaussian wave amplitude
 
 	// Verification data
 	// This is a transect across iy=15:16:127 at ix=127 (or vice versa because the solution is symetrical)
 	// These values are based on single precision output from Netcdf file so are only accurate to 10-7 
-	//double ZsVerifKurganov[8] = { 0.100000000023, 0.100000063119, 0.100110376004, 0.195039970749, 0.136739044168, 0.0848024805994, 0.066275833049, 0.0637058445888 };
+	double ZsVerifKurganov[8] = { 0.100000000023, 0.100000063119, 0.100110376004, 0.195039970749, 0.136739044168, 0.0848024805994, 0.066275833049, 0.0637058445888 };
 	//double ZsVerification[8] = { 0.100000008904, 0.187920326216, 0.152329657390, 0.117710230042, 0.0828616638138, 0.0483274739972, 0.0321501737555, 0.0307609731288 };
+	//double ZsVerification[8] = { 0.100000008904, 0.187920326216, 0.152329657390, 0.117710230042, 0.0828616638138, 0.0483274739972, 0.0321501737555, 0.0307609731288 };
+	double ZsVerifML[8] = { 0.100000000067, 0.100000115531, 0.100133955622, 0.191131915213, 0.134547876957, 0.0854242010962, 0.066553872453, 0.0638724233535 };
 	double ZsVerifButtinger[8] = { 0.100000000023, 0.100000063119, 0.100093580546, 0.195088199869, 0.136767978925, 0.0850706353898, 0.0663028448129, 0.063727949607 };
 
 
+	double ZsVerif[8];
 
+	XParam.engine = engine;
+
+	if (XParam.engine >= 3 && XParam.engine <= 4)
+	{
+		XParam.engine = 2;
+	}
+	if (gpu == -1 && XParam.engine == 5 )
+	{
+		gpu = 0;// i.e. no CPU version for engine 5
+	}
+
+
+	if (XParam.engine == 1)
+	{
+		for (int i = 0; i < 8; i++) {
+			ZsVerif[i] = ZsVerifButtinger[i];
+		}
+	}
+	else if (XParam.engine == 2)
+	{
+		for (int i = 0; i < 8; i++) {
+			ZsVerif[i] = ZsVerifKurganov[i];
+		}
+	}
+	else if (XParam.engine == 5)
+	{
+		XParam.eps = 0.00001;
+		for (int i = 0; i < 8; i++) {
+			ZsVerif[i] = ZsVerifML[i];
+		}
+	}
 
 	// initialise domain and required resolution
 	XParam.dx = 1.0 / ((1 << 8));
@@ -460,16 +545,16 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	// Enforece GPU/CPU
 	XParam.GPUDEVICE = gpu;
 
-	std::string outvi[18] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "ho", "vo", "uo", "cf" };
+	/*std::string outvi[18] = { "zb","h","zs","u","v" };
 
 	std::vector<std::string> outv;
 
 	for (int nv = 0; nv < 18; nv++)
 	{
 		outv.push_back(outvi[nv]);
-	}
-
-	XParam.outvars = outv;
+	}*/
+	std::vector<std::string> outv = { "zb", "h", "zs", "u", "v" };
+	XParam.outvars = { "zb","h","zs","u","v" };
 
 	// create Model setup
 	Model<T> XModel;
@@ -583,7 +668,14 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 
 		if (XParam.GPUDEVICE >= 0)
 		{
-			FlowGPU(XParam, XLoop_g, XForcing, XModel_g);
+			if (XParam.engine == 5)
+			{
+				FlowMLGPU(XParam, XLoop_g, XForcing, XModel_g);
+			}
+			else
+			{
+				FlowGPU(XParam, XLoop_g, XForcing, XModel_g);
+			}
 			XLoop.dt = XLoop_g.dt;
 		}
 		else
@@ -635,7 +727,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 
 				// Theoretical size is 255x255
 				nbx = 256 / 16;
-				
+
 
 				ibx = ftoi(floor(ii / XParam.blkwidth));
 				iby = ftoi(floor(jj / XParam.blkwidth));
@@ -647,14 +739,14 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 
 				int n = memloc(XParam, ix, iy, ib);
 
-				diff = abs(T(XModel.evolv.zs[n]) - ZsVerifButtinger[iv]);
+				diff = abs(T(XModel.evolv.zs[n]) - ZsVerif[iv]);
 
 
 
 				if (diff > 1e-6)//Tolerance is 1e-6 or 1e-7/1e-8??
 				{
 
-					printf("ib=%d, ix=%d, iy=%d; simulated=%f; expected=%f; diff=%e\n", ib, ix, iy, XModel.evolv.zs[n], ZsVerifButtinger[iv], diff);
+					printf("ib=%d, ix=%d, iy=%d; simulated=%f; expected=%f; diff=%e\n", ib, ix, iy, XModel.evolv.zs[n], ZsVerif[iv], diff);
 					modelgood = false;
 					creatncfileBUQ(XParam, XModel.blocks);
 					defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "zs", 3, XModel.evolv.zs, XModel.blocks.outZone[0]);
@@ -673,16 +765,20 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	log("#####");
 	return modelgood;
 }
-template bool GaussianHumptest<float>(float zsnit, int gpu, bool compare);
-template bool GaussianHumptest<double>(double zsnit, int gpu, bool compare);
+template bool GaussianHumptest<float>(float zsnit, int gpu, bool compare, int engine);
+template bool GaussianHumptest<double>(double zsnit, int gpu, bool compare, int engine);
 
-/*! \fn bool Rivertest(T zsnit, int gpu)
-*
-* This function tests the mass conservation of the vertical injection (used for rivers)
-*	The function creates it own model setup and mesh independantly to what the user might want to do
-*	This starts with a initial water level (zsnit=0 is dry) and runs for 0.1s before comparing results
-*	with zsnit=0.1 that is approx 20 steps
-*/
+/** ! \fn bool Rivertest(T zsnit, int gpu)
+ * @brief River inflow mass conservation test
+ *
+ * This function tests the mass conservation of the vertical injection (used for rivers)
+ *	The function creates it own model setup and mesh independantly to what the user might want to do
+ *	This starts with a initial water level (zsnit=0 is dry) and runs for 0.1s before comparing results
+ *	with zsnit=0.1 that is approx 20 steps
+ * @param zsnit Initial water surface elevation at the centre of the domain
+ * @param gpu GPU device number to use (-1 for CPU only)
+ * @return true if the test is successful (mass is conserved within 0.1% of the theoretical value)
+ */
 template <class T> bool Rivertest(T zsnit, int gpu)
 {
 	log("#####");
@@ -721,12 +817,14 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 	// Enforece GPU/CPU
 	XParam.GPUDEVICE = gpu;
 
-	std::vector<std::string> outv = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dudx", "dvdx", "dzsdx", "twet", "hUmax", "Umean"};
+	std::vector<std::string> outv = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dudx", "dvdx", "dzsdx", "twet", "hUmax", "Umean" };
 	XParam.outvars = outv;
 
 	XParam.outmax = true;
 	XParam.outmean = true;
 	XParam.outtwet = true;
+
+	XParam.ForceMassConserve = true;
 
 	// create Model setup
 	Model<T> XModel;
@@ -852,7 +950,7 @@ template <class T> bool Rivertest(T zsnit, int gpu)
 		XLoop.totaltime = XLoop.totaltime + XLoop.dt;
 		//Save2Netcdf(XParam, XLoop, XModel);
 
-		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001) && XParam.outputtimestep > 0.0)
+		if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * T(0.00001))
 		{
 			if (XParam.GPUDEVICE >= 0)
 			{
@@ -909,13 +1007,17 @@ template bool Rivertest<double>(double zsnit, int gpu);
 
 
 
-/*! \fn bool MassConserveSteepSlope(T zsnit, int gpu)
-*
-* This function tests the mass conservation of the vertical injection (used for rivers)
-*	The function creates it own model setup and mesh independantly to what the user might want to do
-*	This starts with a initial water level (zsnit=0 is dry) and runs for 0.1s before comparing results
-*	with zsnit=0.1 that is approx 20 steps
-*/
+/**! \fn bool MassConserveSteepSlope(T zsnit, int gpu)
+ * @brief River inflow mass conservation test on steep slope
+ *
+ * This function tests the mass conservation of the vertical injection (used for rivers)
+ *	The function creates it own model setup and mesh independantly to what the user might want to do
+ *	This starts with a initial water level (zsnit=0 is dry) and runs for 0.1s before comparing results
+ *	with zsnit=0.1 that is approx 20 steps
+ * @param zsnit Initial water surface elevation at the centre of the domain
+ * @param gpu GPU device number to use (-1 for CPU only)
+ * @return true if the test passed (mass conservation within 5%)
+ */
 template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 {
 	log("#####");
@@ -952,6 +1054,7 @@ template <class T> bool MassConserveSteepSlope(T zsnit, int gpu)
 	XParam.frictionmodel = 1;
 
 	XParam.conserveElevation = false;
+	XParam.ForceMassConserve = true;
 
 	// Enforce GPU/CPU
 	XParam.GPUDEVICE = gpu;
@@ -1166,10 +1269,14 @@ template bool MassConserveSteepSlope<float>(float zsnit, int gpu);
 template bool MassConserveSteepSlope<double>(double zsnit, int gpu);
 
 
-/*! \fn T reductiontest(Param XParam, Model<T> XModel, Model<T> XModel_g)
-*
-*	Test the algorithm for reducing the global time step on the user grid layout
-*/
+/**! \fn T reductiontest(Param XParam, Model<T> XModel, Model<T> XModel_g)
+ * @brief Reduction test
+ *	Test the algorithm for reducing the global time step on the user grid layout
+ * @param XParam Model parameters
+ * @param XModel CPU model
+ * @param XModel_g GPU model
+ * @return true if test passed
+ */
 template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XModel_g)
 {
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
@@ -1226,13 +1333,13 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 	{
 		char buffer[256]; sprintf(buffer, "%e", abs(reducedt - mininput));
 		std::string str(buffer);
-		log("\t\t CPU test failed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedt)+ ";  error=" +str);
+		log("\t\t CPU test failed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedt) + ";  error=" + str);
 	}
 
 	if (XParam.GPUDEVICE >= 0)
 	{
 
-		reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XLoop.hugeposval, XModel_g.time.dtmax);
+		reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XLoop.hugeposval, XModel_g.time.dtmax);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.time.dtmax, XModel_g.time.dtmax);
@@ -1262,9 +1369,14 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 template bool reductiontest<float>(Param XParam, Model<float> XModel, Model<float> XModel_g);
 template bool reductiontest<double>(Param XParam, Model<double> XModel, Model<double> XModel_g);
 
-/*! \fn CPUGPUtest(Param XParam, Model<float> XModel, Model<float> XModel_g)
-*	Perform a series of test between the CPU and GPU Flow functions
-*	This test only occurs if a valid GPU is specified by user
+/**! \fn CPUGPUtest(Param XParam, Model<float> XModel, Model<float> XModel_g)
+ * @brief CPU vs GPU test
+ *	Perform a series of test between the CPU and GPU Flow functions
+ *	This test only occurs if a valid GPU is specified by user
+ * @param XParam Model parameters
+ * @param XModel CPU model
+ * @param XModel_g GPU model
+ * @return true if all tests passed
 */
 template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel_g)
 {
@@ -1287,7 +1399,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.v);
 
 
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.zb);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	// Create some usefull vectors
 	std::string evolvst[4] = { "h","zs","u","v" };
@@ -1343,15 +1455,15 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	//GPU gradients
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.h, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.zs, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.zs, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.u, XModel_g.grad.dudx, XModel_g.grad.dudy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.u, XModel_g.grad.dudx, XModel_g.grad.dudy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.v, XModel_g.grad.dvdx, XModel_g.grad.dvdy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.evolv.v, XModel_g.grad.dvdx, XModel_g.grad.dvdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	std::string gradst[8] = { "dhdx","dzsdx","dudx","dvdx","dhdy","dzsdy","dudy","dvdy" };
@@ -1396,14 +1508,14 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	updateKurgXCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 
 	//GPU part
-	updateKurgXGPU << < gridDim, blockDimKX, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.flux, XModel_g.time.dtmax, XModel_g.zb);
+	updateKurgXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.flux, XModel_g.time.dtmax, XModel_g.zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
 	// Y- direction
 	updateKurgYCPU(XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 
-	updateKurgYGPU << < gridDim, blockDimKY, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.flux, XModel_g.time.dtmax, XModel_g.zb);
+	updateKurgYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.grad, XModel_g.flux, XModel_g.time.dtmax, XModel_g.zb);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CompareCPUvsGPU(XParam, XModel, XModel_g, fluxVar, false);
@@ -1426,7 +1538,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 		advVar.push_back(advst[nv]);
 	}
 	updateEVCPU(XParam, XModel.blocks, XModel.evolv, XModel.flux, XModel.adv);
-	updateEVGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.flux, XModel_g.adv);
+	updateEVGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evolv, XModel_g.flux, XModel_g.adv);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CompareCPUvsGPU(XParam, XModel, XModel_g, advVar, false);
@@ -1442,7 +1554,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 		evoVar.push_back(evost[nv]);
 	}
 	AdvkernelCPU(XParam, XModel.blocks, T(0.0005), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
-	AdvkernelGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, T(0.0005), XModel_g.zb, XModel_g.evolv, XModel_g.adv, XModel_g.evolv_o);
+	AdvkernelGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(0.0005), XModel_g.zb, XModel_g.evolv, XModel_g.adv, XModel_g.evolv_o);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CompareCPUvsGPU(XParam, XModel, XModel_g, evoVar, false);
@@ -1452,7 +1564,7 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	bottomfrictionCPU(XParam, XModel.blocks, T(0.5), XModel.cf, XModel.evolv_o);
 
-	bottomfrictionGPU << < gridDim, blockDim, 0 >> > (XParam, XModel_g.blocks, T(0.5), XModel_g.cf, XModel_g.evolv_o);
+	bottomfrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(0.5), XModel_g.cf, XModel_g.evolv_o);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	CompareCPUvsGPU(XParam, XModel, XModel_g, evoVar, false);
@@ -1501,10 +1613,10 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 
 	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.u);
 	InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.evolv.v);
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.u);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.u);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.v);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.v);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	Forcing<float> XForcing;
@@ -1527,13 +1639,18 @@ template<class T> bool CPUGPUtest(Param XParam, Model<T> XModel, Model<T> XModel
 	return test;
 }
 
-/*! \fn T ValleyBathy(T x, T y, T slope, T center)
-* \brief	create V shape Valley basin
-*
-* This function creates a simple V shape Valley basin
-*
-*
-*/
+/**! \fn T ValleyBathy(T x, T y, T slope, T center)
+ * @brief create V shape Valley basin
+ *
+ * This function creates a simple V shape Valley basin
+ *
+ *
+ * @param x x coordinate
+ * @param y y coordinate
+ * @param slope slope of the valley sides
+ * @param center x coordinate of the valley center
+ * @return the depth of the basin at point (x,y)
+ */
 template <class T> T ValleyBathy(T x, T y, T slope, T center)
 {
 
@@ -1547,17 +1664,22 @@ template <class T> T ValleyBathy(T x, T y, T slope, T center)
 }
 
 
-/*! \fn T ThackerBathy(T x, T y, T L, T D)
-* \brief	create a parabolic bassin
-*
-* This function creates a parabolic bassin. The function returns a single value of the bassin
-*
-* Borrowed from Buttinger et al. 2019.
-*
-* ### Reference
-* Buttinger-Kreuzhuber, A., Horváth, Z., Noelle, S., Blöschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
-* structured grids over abrupt topography, Advances in water resources, 127, 89–108, 2019.
-*/
+/**! \fn T ThackerBathy(T x, T y, T L, T D)
+ * @brief	create a parabolic bassin
+ *
+ * This function creates a parabolic bassin. The function returns a single value of the bassin
+ *
+ * Borrowed from Buttinger et al. 2019.
+ *
+ * ### Reference
+ * Buttinger-Kreuzhuber, A., Horváth, Z., Noelle, S., Blöschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
+ * structured grids over abrupt topography, Advances in water resources, 127, 89–108, 2019.
+ * @param x x coordinate
+ * @param y y coordinate
+ * @param L characteristic length scale of the bassin
+ * @param D characteristic depth of the bassin
+ * @return the depth of the basin at point (x,y)
+ */
 template <class T> T ThackerBathy(T x, T y, T L, T D)
 {
 
@@ -1568,23 +1690,26 @@ template <class T> T ThackerBathy(T x, T y, T L, T D)
 	return bathy;
 }
 
-/*! \fn
-* \brief	Simulate the Lake-at-rest in a parabolic bassin
-* 
-* This function creates a parabolic bassin filled to a given level and run the modle for a while and checks that the velocities in the lake remain very small
-* thus verifying the well-balancedness of teh engine and the Lake-at-rest condition.
-*
-* Borrowed from Buttinger et al. 2019.
-*
-* ### Reference
-* Buttinger-Kreuzhuber, A., Horváth, Z., Noelle, S., Blöschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
-* structured grids over abrupt topography, Advances in water resources, 127, 89–108, 2019.
-*/
-template <class T> bool ThackerLakeAtRest(Param XParam,T zsinit)
+/**
+ * @brief	Simulate the Lake-at-rest in a parabolic bassin
+ *
+ * This function creates a parabolic bassin filled to a given level and run the modle for a while and checks that the velocities in the lake remain very small
+ * thus verifying the well-balancedness of teh engine and the Lake-at-rest condition.
+ *
+ * Borrowed from Buttinger et al. 2019.
+ *
+ * ### Reference
+ * Buttinger-Kreuzhuber, A., Horváth, Z., Noelle, S., Blöschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional
+ * structured grids over abrupt topography, Advances in water resources, 127, 89–108, 2019.
+ * @param XParam Model parameters
+ * @param zsinit initial water surface elevation
+ * @return true if test passed
+ */
+template <class T> bool ThackerLakeAtRest(Param XParam, T zsinit)
 {
 	bool test = true;
 	// Make a Parabolic bathy
-	
+
 	auto modeltype = XParam.doubleprecision < 1 ? float() : double();
 	Model<decltype(modeltype)> XModel; // For CPU pointers
 	Model<decltype(modeltype)> XModel_g; // For GPU pointers
@@ -1640,7 +1765,7 @@ template <class T> bool ThackerLakeAtRest(Param XParam,T zsinit)
 	XParam.zsinit = zsinit;
 	XParam.endtime = 1390.0;
 
-	XParam.outputtimestep = XParam.endtime; 
+	XParam.outputtimestep = XParam.endtime;
 
 	checkparamsanity(XParam, XForcing);
 
@@ -1650,7 +1775,7 @@ template <class T> bool ThackerLakeAtRest(Param XParam,T zsinit)
 
 	InitialAdaptation(XParam, XForcing, XModel);
 
-	
+
 	SetupGPU(XParam, XModel, XForcing, XModel_g);
 
 	MainLoop(XParam, XForcing, XModel, XModel_g);
@@ -1679,22 +1804,25 @@ template <class T> bool ThackerLakeAtRest(Param XParam,T zsinit)
 
 	return test;
 }
-template bool ThackerLakeAtRest<float>(Param XParam,float zsinit);
+template bool ThackerLakeAtRest<float>(Param XParam, float zsinit);
 template bool ThackerLakeAtRest<double>(Param XParam, double zsinit);
 
 
 
-/*! \fn bool RiverVolumeAdapt(Param XParam)
-* \brief	Wraping function for RiverVolumeAdapt(Param XParam, T slope, bool bottop, bool flip)
-*
-* The function calls it's child function with different adaptation set in XParam so needs to be rerun to account for the different scenarios:
-* * uniform level
-* * flow from coasrse to fine
-* * flow from fine to coarse
-*
-* and account for different flow direction
-* 
-*/
+/**! \fn bool RiverVolumeAdapt(Param XParam)
+ * @brief	Wraping function for RiverVolumeAdapt(Param XParam, T slope, bool bottop, bool flip)
+ *
+ * The function calls it's child function with different adaptation set in XParam so needs to be rerun to account for the different scenarios:
+ * * uniform level
+ * * flow from coarse to fine
+ * * flow from fine to coarse
+ *
+ * and account for different flow direction
+ * @param XParam Model parameters
+ * @param maxslope Maximum slope for adaptation
+ * @return true if all tests passed
+ *
+ */
 template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 {
 	//T maxslope = 0.45; // tthe mass conservation is better with smaller slopes 
@@ -1708,12 +1836,15 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 	XParam.minlevel = 1;
 	XParam.maxlevel = 1;
 	XParam.initlevel = 1;
+
+	XParam.ForceMassConserve = true;
 	
 	
 	UnitestA=RiverVolumeAdapt(XParam, maxslope, false, false);
 	UnitestB=RiverVolumeAdapt(XParam, maxslope, true, false);
 	UnitestC=RiverVolumeAdapt(XParam, maxslope, false, true);
 	UnitestD=RiverVolumeAdapt(XParam, maxslope, true, true);
+
 
 	if (UnitestA && UnitestB && UnitestC && UnitestD)
 	{
@@ -1723,7 +1854,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 	{
 		log("River Volume Conservation Test: Uniform mesh: Failed");
 		details = UnitestA ? "successful" : "failed";
-		log("\t Uniform mesh A :"+ details);
+		log("\t Uniform mesh A :" + details);
 		details = UnitestB ? "successful" : "failed";
 		log("\t Uniform mesh B :" + details);
 		details = UnitestC ? "successful" : "failed";
@@ -1797,24 +1928,29 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T maxslope)
 }
 
 
-/*! \fn bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, bool flip)
-* \brief	Simulate a river flowing in a steep valley
-* and heck the Volume conservation
-*
-* This function creates a dry steep valley topography to a given level and run the model for a while and checks that the Volume matches the theory.
-*
-* The function can test the water volume for 4 scenario each time:
-* * left to right: bottop=false & flip=true;
-* * right to left: bottop=false & flip=false;
-* * bottom to top: bottop=true & flip=true;
-* * top to bottom: bottop=true & flip=false;
-*
-* The function inherits the adaptation set in XParam so needs to be rerun to accnout for the different scenarios:
-* * uniform level
-* * flow from coasrse to fine
-* * flow from fine to coarse
-* This is done in the higher level wrapping function
-*/
+/**! \fn bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, bool flip)
+ * @brief	Simulate a river flowing in a steep valley
+ * and heck the Volume conservation
+ *
+ * This function creates a dry steep valley topography to a given level and run the model for a while and checks that the Volume matches the theory.
+ *
+ * The function can test the water volume for 4 scenario each time:
+ * * left to right: bottop=false & flip=true;
+ * * right to left: bottop=false & flip=false;
+ * * bottom to top: bottop=true & flip=true;
+ * * top to bottom: bottop=true & flip=false;
+ *
+ * The function inherits the adaptation set in XParam so needs to be rerun to account for the different scenarios:
+ * * uniform level
+ * * flow from coarse to fine
+ * * flow from fine to coarse
+ * This is done in the higher level wrapping function
+ * @param XParam Model parameters
+ * @param slope slope of the valley sides
+ * @param bottop if true the river flows bottom to top, if false left to right
+ * @param flip if true the river flows right to left or top to bottom, if false left to right or bottom to top
+ * @return true if test passed
+ */
 template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, bool flip)
 {
 	//bool test = true;
@@ -1843,11 +1979,11 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 		}
 	}
 
-	
+
 
 	// Overrule whatever is set in the river forcing
 	T Q = T(1.0);
-	
+
 	double upstream = !flip ? 24.0 : 8;
 	double riverx = !bottop ? upstream : center;
 	double rivery = !bottop ? center : upstream;
@@ -1880,7 +2016,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 
 	XParam.dx = XForcing.Bathy[0].dx;
 
-	XParam.zsinit = mintopo+0.5;// Had a small amount of water to avoid a huge first step that would surely break the setup
+	XParam.zsinit = mintopo + 0.5;// Had a small amount of water to avoid a huge first step that would surely break the setup
 	XParam.endtime = 20.0;
 
 	XParam.outputtimestep = XParam.endtime;
@@ -1912,7 +2048,7 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 
 
 	MainLoop(XParam, XForcing, XModel, XModel_g);
-	
+
 	T TheoryInput = Q * XParam.endtime;
 
 
@@ -1941,14 +2077,22 @@ template <class T> bool RiverVolumeAdapt(Param XParam, T slope, bool bottop, boo
 
 
 
-/*! \fn bool testboundaries(T maxslope)
-* \brief	Wraping function for Boundary(Param XParam, T slope, bool bottop, bool flip)
-*
-* This function test the 3 types of boundaries (0: Wall/1: Neumann/3: non-reflexive)
-* and on all orientations
-*
-*/
-template <class T> bool testboundaries(Param XParam,T maxslope)
+/**! \fn bool testboundaries(T maxslope)
+ * @brief	Wraping function for Boundary(Param XParam, T slope, bool bottop, bool flip)
+ *
+ * This function test the 3 types of boundaries (0: Wall/1: Neumann/3: non-reflexive)
+ * and on all orientations
+ *
+ * The function inherits the adaptation set in XParam so needs to be rerun to accnout for the different scenarios:
+ * * uniform level
+ * * flow from coasrse to fine
+ * * flow from fine to coarse
+ * This is done in the higher level wrapping function
+ * @param XParam Model parameters
+ * @param maxslope Maximum slope for adaptation
+ * @return true if all tests passed
+ */
+template <class T> bool testboundaries(Param XParam, T maxslope)
 {
 	//T maxslope = 0.45; // the mass conservation is better with smaller slopes 
 
@@ -1960,7 +2104,7 @@ template <class T> bool testboundaries(Param XParam,T maxslope)
 	std::string details;
 	int Bound_type;
 
-	
+
 	XParam.GPUDEVICE = 0;
 	maxslope = 0.0;
 	//Dir = 3;
@@ -2053,21 +2197,30 @@ template <class T> bool testboundaries(Param XParam,T maxslope)
 }
 
 
-/*! \fn bool RiverOnBoundary(T slope, bool bottop, bool flip)
-* \brief	Simulate a river flowing in a (steep) valley
-* and check the Volume conservation
-*
-* This function creates a half dry steep valley topography to a given level and run the model for a while and checks that the Volume matches the theory.
-* A wall is located in the center of the valley.
-*
-* The function can test the water volume for 4 scenario each time:
-* * flowing to the right: Dir=0;
-* * flowing to the left: Dir=1;
-* * flowing to the top: Dir=2;
-* * flowing to the bottom: Dir=3;
-*
-*/
-template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound_type)
+/**! \fn bool RiverOnBoundary(T slope, bool bottop, bool flip)
+ * @brief	Simulate a river flowing in a (steep) valley
+ * and check the Volume conservation
+ *
+ * This function creates a half dry steep valley topography to a given level and run the model for a while and checks that the Volume matches the theory.
+ * A wall is located in the center of the valley.
+ *
+ * The function can test the water volume for 4 scenario each time:
+ * * flowing to the right: Dir=0;
+ * * flowing to the left: Dir=1;
+ * * flowing to the top: Dir=2;
+ * * flowing to the bottom: Dir=3;
+ *
+ * The boundary condition can be:
+ * * Wall/reflective: Bound_type=0 or -1;
+ * * Neumann/gradient free: Bound_type=1;
+ * * Non-reflexive: Bound_type=3;
+ * @param XParam Model parameters
+ * @param slope slope of the valley sides
+ * @param Dir Direction of the flow
+ * @param Bound_type Type of boundary condition
+ * @return true if test passed
+ */
+template <class T> bool RiverOnBoundary(Param XParam, T slope, int Dir, int Bound_type)
 {
 	//bool test = true;
 	// Make a Parabolic bathy
@@ -2208,9 +2361,9 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	// Overrule whatever is set in the river forcing
 	T Q = T(1.0);
 
-	double riverx = (Dir == 0 | Dir == 2)? 6.0 : 25.0; //Dir=1 =>leftward
-	double rivery = (Dir == 2 | Dir == 1)? 6.0 : 25.0; //Dir=2 =>topward
-	
+	double riverx = (Dir == 0 | Dir == 2) ? 6.0 : 25.0; //Dir=1 =>leftward
+	double rivery = (Dir == 2 | Dir == 1) ? 6.0 : 25.0; //Dir=2 =>topward
+
 	//Create a temporary file with river fluxes
 	std::ofstream river_file(
 		"testriver.tmp", std::ios_base::out | std::ios_base::trunc);
@@ -2246,6 +2399,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 	XParam.mask = 999.0;
 	XParam.outishift = 0;
 	XParam.outjshift = 0;
+	XParam.ForceMassConserve = true;
 
 
 	XParam.outputtimestep = 10.0;// XParam.endtime;
@@ -2309,7 +2463,7 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 
 	printf("error : %f \n", error);
 	printf("Theory input : %f \n", TheoryInput);
-	printf("return : %f \n", (error/TheoryInput));
+	printf("return : %f \n", (error / TheoryInput));
 
 
 	return error / TheoryInput < 0.01;
@@ -2318,10 +2472,20 @@ template <class T> bool RiverOnBoundary(Param XParam,T slope, int Dir, int Bound
 
 
 
-/*! \fn bool LakeAtRest(Param XParam, Model<T> XModel)
-*	This function simulates the first predictive step and check whether the lake at rest is preserved
-*	otherwise it prints out to screen the cells (and neighbour) where the test fails
-*/
+/**! \fn bool LakeAtRest(Param XParam, Model<T> XModel)
+ * @brief	Test the lake at rest condition
+ * This function simulates the first predictive step and check whether the lake at rest is preserved
+ * otherwise it prints out to screen the cells (and neighbour) where the test fails
+ * 
+ * The function inherits the adaptation set in XParam so needs to be rerun to accnout for the different scenarios:
+ * * uniform level
+ * * flow from coasrse to fine
+ * * flow from fine to coarse
+ * This is done in the higher level wrapping function
+ * @param XParam Model parameters
+ * @param XModel Model variables
+ * @return true if test passed
+ */
 template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 {
 	T epsi = T(1e-5);
@@ -2339,7 +2503,7 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 
 	refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	gradientHalo(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
-	
+
 
 
 
@@ -2414,13 +2578,13 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 
 					printf("Fhu[i]=%f\n", XModel.flux.Fhu[i]);
 
-					printf("Fqux[i]=%f; Su[iright]=%f; Diff=%f \n",XModel.flux.Fqux[i], XModel.flux.Su[iright], (XModel.flux.Fqux[i] - XModel.flux.Su[iright]));
+					printf("Fqux[i]=%f; Su[iright]=%f; Diff=%f \n", XModel.flux.Fqux[i], XModel.flux.Su[iright], (XModel.flux.Fqux[i] - XModel.flux.Su[iright]));
 
-					printf(" At i: (ib=%d; ix=%d; iy=%d)\n", ib,ix,iy);
+					printf(" At i: (ib=%d; ix=%d; iy=%d)\n", ib, ix, iy);
 					testButtingerX(XParam, ib, ix, iy, XModel);
 
-					printf(" At iright: (ib=%d; ix=%d; iy=%d)\n", ib, ix+1, iy);
-					testButtingerX(XParam, ib, ix+1, iy, XModel);
+					printf(" At iright: (ib=%d; ix=%d; iy=%d)\n", ib, ix + 1, iy);
+					testButtingerX(XParam, ib, ix + 1, iy, XModel);
 
 				}
 
@@ -2461,13 +2625,18 @@ template <class T> bool LakeAtRest(Param XParam, Model<T> XModel)
 }
 
 
-/*! \fn  void testButtingerX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
-*
-* This function goes through the Buttinger scheme but instead of the normal output just prints all teh usefull values
-* This function is/was used in the lake-at-rest verification
-*
-* See also: void testkurganovX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
-*/
+/**! \fn  void testButtingerX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
+ * @brief	Test the Buttinger scheme in X direction
+ * This function goes through the Buttinger scheme but instead of the normal output just prints all teh usefull values
+ * This function is/was used in the lake-at-rest verification
+ *
+ * See also: void testkurganovX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
+ * @param XParam Model parameters
+ * @param ib Block index
+ * @param ix X index in the block
+ * @param iy Y index in the block
+ * @param XModel Model variables
+ */
 template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
 {
 	int RB, levRB, LBRB, LB, levLB, RBLB;
@@ -2492,7 +2661,7 @@ template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Mod
 	levLB = XModel.blocks.level[LB];
 	RBLB = XModel.blocks.RightBot[LB];
 
-	
+
 	T cm = T(1.0);
 	T fmu = T(1.0);
 
@@ -2572,7 +2741,7 @@ template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Mod
 		dt = hllc(g, delta, epsi, CFL, cm, fmu, hCNl, hCNr, ul, ur, fh, fu);
 		//hllc(T g, T delta, T epsi, T CFL, T cm, T fm, T hm, T hp, T um, T up, T & fh, T & fq)
 
-		
+
 
 		fv = (fh > 0. ? vl : vr) * fh;
 
@@ -2601,7 +2770,7 @@ template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Mod
 		sr = ga * (hCNl + hn) * (zn - zCN);
 
 
-		printf("dt=%f; etar=%f; etal=%f; zCN=%f; zi=%f; zn=%f; zA=%f, zr=%f, zl=%f\n",dt, etar,etal,zCN,zi,zn,zA, zr,zl);
+		printf("dt=%f; etar=%f; etal=%f; zCN=%f; zi=%f; zn=%f; zA=%f, zr=%f, zl=%f\n", dt, etar, etal, zCN, zi, zn, zA, zr, zl);
 
 
 		printf("hi=%f; hn=%f,fh=%f; fu=%f; sl=%f; sr=%f; hCNl=%f; hCNr=%f; hr=%f; hl=%f; zr=%f; zl=%f;\n", hi, hn, fh, fu, sl, sr, hCNl, hCNr, hr, hl, zr, zl);
@@ -2611,11 +2780,17 @@ template <class T> void testButtingerX(Param XParam, int ib, int ix, int iy, Mod
 }
 
 
-/*! \fn  void testkurganovX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
-*
-* This function goes through the Kurganov scheme but instead of the normal output just prints all teh usefull values
-* This function is/was used in the lake-at-rest verification
-*/
+/** ! \fn  void testkurganovX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
+ * @brief	Test the Kurganov scheme in X direction
+ * This function goes through the Kurganov scheme but instead of the normal output just prints all teh usefull values
+ * This function is/was used in the lake-at-rest verification
+ * See also: void testButtingerX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
+ * @param XParam Model parameters
+ * @param ib Block index
+ * @param ix X index in the block
+ * @param iy Y index in the block
+ * @param XModel Model variables
+ */
 template <class T> void testkurganovX(Param XParam, int ib, int ix, int iy, Model<T> XModel)
 {
 	int RB, levRB, LBRB, LB, levLB, RBLB;
@@ -2716,14 +2891,19 @@ template <class T> void testkurganovX(Param XParam, int ib, int ix, int iy, Mode
 
 }
 
-/*! \fn bool Raintest(T zsnit, int gpu, float alpha)
-*
-* This function tests the mass conservation of the spacial injection (used to model rain on grid)
-*	The function creates its own model setup and mesh independantly to what the user inputs.
-*	This starts with a initial water level (zsnit=0.0 is dry) and runs for 0.1s before comparing results
-*	with zsnit=0.1 that is approx 20 steps
-*/
-template <class T> bool Raintest(T zsnit, int gpu, float alpha)
+/**! \fn bool Raintest(T zsnit, int gpu, float alpha,int engineid)
+ * @brief	Test the rain input and mass conservation
+ * This function tests the mass conservation of the spacial injection (used to model rain on grid)
+ *	The function creates its own model setup and mesh independantly to what the user inputs.
+ *	This starts with a initial water level (zsnit=0.0 is dry) and runs for 0.1s before comparing results
+ *	with zsnit=0.1 that is approx 20 steps
+ * @param zsnit Initial water level
+ * @param gpu GPU device to use (or -1 for CPU)
+ * @param alpha Slope of the bathymetry in %
+ * @param engine Engine to use (0=non-hydrostatic, 1=hydrostatic)
+ * @return true if test passed
+ */
+template <class T> bool Raintest(T zsnit, int gpu, float alpha,int engine)
 {
 	log("#####");
 	Param XParam;
@@ -2735,6 +2915,8 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	XParam.yo = -0.5;
 	XParam.xmax = 0.5;
 	XParam.ymax = 0.5;
+
+	XParam.engine = engine;
 
 	//XParam.initlevel = 0;
 	//XParam.minlevel = 0;
@@ -2755,17 +2937,13 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 	//Specification of the test
 	//XParam.test = 7;
 	XParam.rainforcing = true;
+	XParam.ForceMassConserve = true;
 
 	// Enforce GPU/CPU
 	XParam.GPUDEVICE = gpu;
 	XParam.rainbnd = true;
 	//output vars
-	std::string outvi[16] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv" };
-	std::vector<std::string> outv;
-	for (int nv = 0; nv < 15; nv++)
-	{
-		outv.push_back(outvi[nv]);
-	}
+	std::vector<std::string> outv = { "zb","h","zs","u","v" };
 	XParam.outvars = outv;
 
 	// create Model setup
@@ -2851,7 +3029,7 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 
 	MainLoop(XParam, XForcing, XModel, XModel_g);
 
-	TheoryInput = Q/ T(1000.0) / T(3600.0) * XParam.endtime;
+	TheoryInput = Q / T(1000.0) / T(3600.0) * XParam.endtime;
 
 
 	T SimulatedVolume = T(0.0);
@@ -2873,22 +3051,24 @@ template <class T> bool Raintest(T zsnit, int gpu, float alpha)
 
 	T error = abs(SimulatedVolume - TheoryInput);
 
-	T modelgood= error / TheoryInput < 0.05;
+	T modelgood = error / TheoryInput < 0.05;
 
 	//log("#####");
 	return modelgood;
 }
 
 
-/*! \fn bool Raintestinput(int gpu)
-*
-* This function tests the different inputs for rain forcing.
-* This test is based on the paper Aureli2020, the 3 slopes test
-* with regional rain. The experiment has been presented in Iwagaki1955.
-* The first test compares a time varying rain input using a uniform time serie 
-* forcing and a time varying 2D field (with same value).
-* The second test check the 3D rain forcing (comparing it to expected values).
-*/
+/**! \fn bool Raintestinput(int gpu)
+ * @brief	Test the rain input options
+ * This function tests the different inputs for rain forcing.
+ * This test is based on the paper Aureli2020, the 3 slopes test
+ * with regional rain. The experiment has been presented in Iwagaki1955.
+ * The first test compares a time varying rain input using a uniform time serie
+ * forcing and a time varying 2D field (with same value).
+ * The second test check the 3D rain forcing (comparing it to expected values).
+ * @param gpu GPU device to use (or -1 for CPU)
+ * @return true if test passed
+ */
 bool Raintestinput(int gpu)
 {
 	//Results of the experiment of Aureli, interpolated to output values
@@ -2897,8 +3077,8 @@ bool Raintestinput(int gpu)
 	//int dim_flux;
 	std::vector<float> Flux1D, Flux3DUni, Flux3D, Flux_obs;
 	float diff, ref, error;
-	
-	
+
+
 	//Comparison between the 1D forcing and the 3D hommgeneous forcing
 	Flux1D = Raintestmap(gpu, 1, -0.03);
 	Flux3DUni = Raintestmap(gpu, 31, -0.03);
@@ -2946,11 +3126,15 @@ bool Raintestinput(int gpu)
 	return (modelgood1 * modelgood2);
 }
 
-/*! \fnstd::vector<float> Raintestmap(int gpu, int dimf, T zinit)
-*
-* This function return the flux at the bottom of the 3 part slope
-* for different types of rain forcings using the test case based on Iwagaki1955
-*/
+/**! \fnstd::vector<float> Raintestmap(int gpu, int dimf, T zinit)
+ * @brief	Test the rain input options and return the flux at the bottom of the slope
+ * This function return the flux at the bottom of the 3 part slope
+ * for different types of rain forcings using the test case based on Iwagaki1955.
+ * @param gpu GPU device to use (or -1 for CPU)
+ * @param dimf Dimension of the rain forcing (1=uniform, 3=2
+ * @param zinit Initial water level
+ * @return vector of flux at the bottom of the slope
+ */
 template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 {
 	log("#####");
@@ -2963,7 +3147,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	double* yRain;
 	double* tRain;
 	double* rainForcing;
-	
+
 
 	Param XParam;
 	T delta;
@@ -2972,7 +3156,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 	XParam.xo = 0;
 	XParam.yo = 0;
 	XParam.ymax = 0.196;
-	XParam.dx=(XParam.ymax - XParam.yo) / (1 << 1);
+	XParam.dx = (XParam.ymax - XParam.yo) / (1 << 1);
 	XParam.delta = XParam.dx;
 	double Xmax_exp = 28.0; //minimum Xmax position (adjust to have a "full blocks" config)
 	//Calculating xmax to have full blocs with at least a full block behaving as a reservoir
@@ -3116,7 +3300,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 				{
 					for (int i = 0; i < NX; i++)
 					{
-						if (tRain[k] < rainDuration+eps)
+						if (tRain[k] < rainDuration + eps)
 						{
 							if (xRain[i] < 8.0)
 							{
@@ -3176,10 +3360,10 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 		}
 		/*
 		//2D forcing (map without time variation is not working)
-		else if (dimf == 2)//dimf==2 for rain forcing 
+		else if (dimf == 2)//dimf==2 for rain forcing
 		{
 
-			//Create a non-uniform time-constant rain forcing 
+			//Create a non-uniform time-constant rain forcing
 			rainForcing = (double*)malloc(sizeof(double) * NY * NX);
 
 			//Create the rain forcing:
@@ -3222,7 +3406,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 		XForcing.Rain = readfileinfo("rainTemp.nc", XForcing.Rain);
 		XForcing.Rain.uniform = 0;
 		XForcing.Rain.varname = "myrainforcing";
-		
+
 
 		InitDynforcing(gpgpu, XParam, XForcing.Rain);
 
@@ -3312,7 +3496,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 			}
 
 			Save2Netcdf(XParam, XLoop, XModel);
-			
+
 
 			//Calculation of the flux at the bottom of the slope (x=24m)
 			ib = XModel.blocks.active[bl];
@@ -3323,7 +3507,7 @@ template <class T> std::vector<float> Raintestmap(int gpu, int dimf, T zinit)
 				int n = memloc(XParam, ixx, iy, ib);
 				finalFlux = finalFlux + XModel.evolv.h[n] * XModel.evolv.u[n] * delta;
 			}
-			finalFlux = finalFlux / float(XParam.ymax - XParam.yo)*100.0f*100.0f;
+			finalFlux = finalFlux / float(XParam.ymax - XParam.yo) * 100.0f * 100.0f;
 			Flux.push_back(finalFlux);
 			XLoop.nextoutputtime = XLoop.nextoutputtime + XParam.outputtimestep;
 			printf("\tTime = %f, Flux at bottom end of slope : %f \n", XLoop.totaltime, finalFlux);
@@ -3342,20 +3526,23 @@ template std::vector<float> Raintestmap<float>(int gpu, int dimf, float Zsinit);
 template std::vector<float> Raintestmap<double>(int gpu, int dimf, double Zsinit);
 
 
-/*! \fn bool testzoneOutDef = ZoneOutputTest(int nzones, T zsinit)
-*
-* This function test the zoned output for a basic configuration
-*/
+/**! \fn bool testzoneOutDef = ZoneOutputTest(int nzones, T zsinit)
+ * @brief	Test the zoned output
+ * This function test the zoned output for a basic configuration
+ * @param nzones Number of zones to test (1 or 3)
+ * @param zsinit Initial water level
+ * @return true if test passed
+ */
 template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 //template bool ZoneOutputTest<float>(int nzones, float zsinit);
 {
 	log("#####");
 
 	Param XParam;
-	Forcing<float> XForcing; 
+	Forcing<float> XForcing;
 
-	
-	if (nzones  == 3)
+
+	if (nzones == 3)
 	{
 		// read param file
 		//readforcing(XParam, XForcing);
@@ -3367,8 +3554,8 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 		zone.yend = 10;
 		XParam.outzone.push_back(zone);
 		zone.outname = "zoomed.nc";
-		zone.xstart =1;
-		zone.xend =2;
+		zone.xstart = 1;
+		zone.xend = 2;
 		zone.ystart = -2;
 		zone.yend = 2;
 		XParam.outzone.push_back(zone);
@@ -3433,7 +3620,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 
 	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
-	
+
 	float rs, x, y, r, hm;
 	rs = 20; //hill radio 
 	hm = 5; //hill top
@@ -3446,7 +3633,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 			r = sqrt(x * x + y * y);
 			if (r < rs)
 			{
-				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = hm*(1-r/rs);
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = hm * (1 - r / rs);
 			}
 			if (x < -4.7 | x > 4.7 | y < -4.7 | y > 4.7)
 			{
@@ -3457,7 +3644,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 
 	//Adaptation
 	XParam.AdaptCrit = "Targetlevel";
-	
+
 	StaticForcingP<int> Target;
 	XForcing.targetadapt.push_back(Target);
 
@@ -3542,7 +3729,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 	for (int o = 0; o < XModel.blocks.outZone.size(); o++)
 	{
 		std::ifstream fs(XModel.blocks.outZone[o].outname);
-		if (fs.fail()) 
+		if (fs.fail())
 		{
 			error++;
 		}
@@ -3557,7 +3744,7 @@ template <class T> bool ZoneOutputTest(int nzones, T zsinit)
 		}
 	}
 
-	bool modelgood = (1-abs(error)) < 0.05;
+	bool modelgood = (1 - abs(error)) < 0.05;
 
 	//log("#####");
 	return modelgood;
@@ -3567,13 +3754,17 @@ template bool ZoneOutputTest<double>(int nzones, double zsinit);
 
 
 
-/*! \fn bool Rainlossestest(T zsnit, int gpu, float alpha)
-*
-* This function tests the Initial Losses and Continuous Losses implementation a plain domain, under constant rain.
-*	The function creates its own model setup and mesh independantly to what the user inputs.
-*	This starts with a initial water level (zsinit=0.0 is dry) and runs for 1s comparing results
-*	every 0.1s (that is approx 20 steps)
-*/
+/**! \fn bool Rainlossestest(T zsnit, int gpu, float alpha)
+ * @brief	Test the Initial and Continuous losses implementation
+ * This function tests the Initial Losses and Continuous Losses implementation a plain domain, under constant rain.
+ *	The function creates its own model setup and mesh independantly to what the user inputs.
+ *	This starts with a initial water level (zsinit=0.0 is dry) and runs for 1s comparing results
+ *	every 0.1s (that is approx 20 steps)
+ * @param zsinit Initial water level
+ * @param gpu GPU device to use (or -1 for CPU)
+ * @param alpha Tolerance for the test (relative error)
+ * @return true if test passed
+ */
 template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 {
 	int NX = 21;
@@ -3582,7 +3773,7 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 	double* yLoss;
 	double* ilForcing;
 	double* clForcing;
-	
+
 	log("#####");
 	Param XParam;
 	T initVol, TheoryInput;
@@ -3645,7 +3836,7 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 
 	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
 
-	
+
 	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
 	{
 		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
@@ -3653,7 +3844,7 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = T(0.0);
 		}
 	}
-	
+
 
 	// Add wall boundary conditions
 	XForcing.right.type = 0;
@@ -3720,7 +3911,7 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 	}
 
 	XForcing.il = readfileinfo("ilrainlossTempt.nc", XForcing.il);
-    XForcing.il.varname = "initialloss";
+	XForcing.il.varname = "initialloss";
 	XForcing.cl = readfileinfo("clrainlossTempt.nc", XForcing.cl);
 	XForcing.cl.varname = "continuousloss";
 	readstaticforcing(XForcing.il);
@@ -3733,7 +3924,7 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 
 	//XParam.infiltration = false;
 
-    //// General code
+	//// General code
 	checkparamsanity(XParam, XForcing);
 	//printf("h: %f \n", XModel.evolv.h[10]);
 	InitMesh(XParam, XForcing, XModel);
@@ -3796,12 +3987,17 @@ template <class T> bool Rainlossestest(T zsinit, int gpu, float alpha)
 }
 
 
-/*! \fn void  TestGradientSpeed(Param XParam, Model<T> XModel, Model<T> XModel_g)
-* This function fill an array with random values (0 - 1)
-*
-* This function test the spped and accuracy of a new gradient function
-* gradient are only calculated for zb but assigned to different gradient variable for storage
-*/
+/**! \fn void  TestGradientSpeed(Param XParam, Model<T> XModel, Model<T> XModel_g)
+ * @brief	Test the speed of different gradient functions
+ * This function fill an array with random values (0 - 1)
+ *
+ * This function test the spped and accuracy of a new gradient function
+ * gradient are only calculated for zb but assigned to different gradient variable for storage
+ * @param XParam Model parameters
+ * @param XModel Model structure (CPU)
+ * @param XModel_g Model structure (GPU)
+ * @return 1 if test passed
+ */
 template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T> XModel_g)
 {
 	//
@@ -3810,7 +4006,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	dim3 gridDim(XParam.nblk, 1, 1);
 
 	// for flux reconstruction the loop overlap the right(or top for the y direction) halo
-	dim3 blockDimX2(XParam.blkwidth + XParam.halowidth*2, XParam.blkwidth + XParam.halowidth * 2, 1);
+	dim3 blockDimX2(XParam.blkwidth + XParam.halowidth * 2, XParam.blkwidth + XParam.halowidth * 2, 1);
 
 
 
@@ -3840,12 +4036,12 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	cudaEventCreate(&startA);
 
-	
+
 	cudaEventCreate(&stopA);
 
 	// Record the start event
 	cudaEventRecord(startA, NULL);
-	gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
@@ -3868,7 +4064,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	// Record the start event
 	cudaEventRecord(startB, NULL);
-	gradientSM << < gridDim, blockDim >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
+	gradientSM <<< gridDim, blockDim >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
@@ -3891,7 +4087,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	// Record the start event
 	cudaEventRecord(startC, NULL);
-	gradientSMC << < gridDim, blockDim >> > (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	gradientSMC <<< gridDim, blockDim >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
@@ -3907,7 +4103,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	cudaEventDestroy(stopC);
 
 
-	
+
 
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dudx, XModel_g.grad.dzbdx);
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dudy, XModel_g.grad.dzbdy);
@@ -3931,7 +4127,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	}
 
 	diffArray(XParam, XLoop, XModel.blocks, "SMdx", false, XModel.grad.dzbdx, XModel_g.grad.dzsdx, XModel.time.arrmax, XModel.grad.dzsdx);
-	
+
 
 	diffArray(XParam, XLoop, XModel.blocks, "SMBdx", false, XModel.grad.dzbdx, XModel_g.grad.dhdx, XModel.time.arrmax, XModel.grad.dhdx);
 
@@ -3949,7 +4145,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	maxdiffsmby = T(0.0);
 	T diffsm, diffsmb;
 
-	
+
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
@@ -3969,7 +4165,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 				maxdiffx = max(maxdiffx, diffsm);
 
 				diffsm = abs(XModel.grad.dzbdx[i] - XModel.grad.dzsdx[i]);
-				
+
 				maxdiffsmx = max(maxdiffsmx, diffsm);
 
 				diffsm = abs(XModel.grad.dzbdy[i] - XModel.grad.dzsdy[i]);
@@ -3979,14 +4175,14 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 				diffsm = abs(XModel.grad.dzbdx[i] - XModel.grad.dhdx[i]);
 				maxdiffsmbx = max(maxdiffsmbx, diffsm);
 
-				diffsm =  abs(XModel.grad.dzbdy[i] - XModel.grad.dhdy[i]);
+				diffsm = abs(XModel.grad.dzbdy[i] - XModel.grad.dhdy[i]);
 				maxdiffsmby = max(maxdiffsmby, diffsm);
 				//
 			}
 		}
 	}
 
-	
+
 	printf("max error : normx=%e, normy=%e, smx=%e, smy=%e,  smbx=%e, smby=%e in m\n", maxdiffx, maxdiffy, maxdiffsmx, maxdiffsmy, maxdiffsmbx, maxdiffsmby);
 
 
@@ -4043,16 +4239,20 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	CompareCPUvsGPU(XParam, XModel, XModel_g, { "dhdx","dhdy", "dzsdx","dzsdy","dudx","dudy","dvdx","dvdy" }, true);
 
 	printf("Runtime : old gradient=%f, new Gradient=%f in msec\n", msecTotalG, msecTotalGnew);
-	
+
 	return fastest;
 
 }
 
-/*! \fn bool testzoneOutDef = ZoneOutputTest(int nzones, T zsinit)
-*
-* This function test the spped and accuracy of a new gradient function
-* gradient are only calculated for zb but assigned to different gradient variable for storage
-*/
+/**! \fn bool TestHaloSpeed(Param XParam, Model<T> XModel, Model<T> XModel_g)
+ * @brief	Test the speed of different halo filling functions
+ * This function test the speed and accuracy of a new gradient function
+ * gradient are only calculated for zb but assigned to different gradient variable for storage
+ * @param XParam Model parameters
+ * @param XModel Model structure (CPU)
+ * @param XModel_g Model structure (GPU)
+ * @return true if test passed
+ */
 template <class T> bool TestHaloSpeed(Param XParam, Model<T> XModel, Model<T> XModel_g)
 {
 	Forcing<float> XForcing;
@@ -4105,7 +4305,7 @@ template <class T> bool TestHaloSpeed(Param XParam, Model<T> XModel, Model<T> XM
 
 	SetupGPU(XParam, XModel, XForcing, XModel_g);
 
-	
+
 
 
 	// Copy zs from CPU to GPU ... again
@@ -4136,6 +4336,18 @@ template <class T> bool TestHaloSpeed(Param XParam, Model<T> XModel, Model<T> XM
 	return true;
 }
 
+/**
+ * \fn int TestInstability(Param XParam, Model<T> XModel, Model<T> XModel_g)
+ * @brief	Test the stability of the model
+ * This function tests the stability of the model on a sloping domain with a small amount of water
+ * The function creates its own model setup and mesh independantly to what the user inputs.
+ * This starts with a initial water level (zsinit=0.0 is dry) and runs for 1s comparing results
+ * every 0.1s.
+ * @param XParam Model parameters
+ * @param XModel Model structure (CPU)
+ * @param XModel_g Model structure (GPU)
+ * @return 0 if test failed (i.e. unstable), 1 if test passed
+ */
 template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> XModel_g)
 {
 	Forcing<float> XForcing;
@@ -4221,7 +4433,7 @@ template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> X
 	// Run first full step (i.e. 2 half steps)
 
 	Loop<T> XLoop = InitLoop(XParam, XModel);
-	
+
 	//FlowCPU(XParam, XLoop, XForcing, XModel);
 	HalfStepCPU(XParam, XLoop, XForcing, XModel);
 
@@ -4267,11 +4479,16 @@ template <class T> int TestInstability(Param XParam, Model<T> XModel, Model<T> X
 
 
 //TestMultiBathyRough(int gpu, T ref, int scenario)
-/*! \fn 
+/**! \fn bool TestMultiBathyRough(int gpu, T ref, int scenario)
+ * @brief	Test the reading of multiple bathymetry and roughness files	
 *
 * This function creates bathy and roughtness files and tests their reading (and interpolation)
 * The objectif is particularly to test multi bathy/roughness inputs and value/file input.
 *
+* @param gpu GPU to use (-1 for CPU only)
+* @param ref Reference elevation for the bathymetry files
+* @param scenario Scenario to test (0: R1 in the middle of the domain, 1: R1 covering the whole domain)
+* @return true if test passed (i.e. the model runs without crashing and gives a reasonable result)
 */
 template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 {
@@ -4311,7 +4528,7 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 		}
 	}
 	create2dnc("Z0_map.nc", NX, NY, xz, yz, map, "z");
-	
+
 	//Creation of a smaller Bathy file
 
 	//xz = (double*)malloc(sizeof(double) * NX);
@@ -4448,7 +4665,7 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 	Readparamfile(XParam, XForcing, "BG_param_test13.txt"); // "BG_param_test13.txt");
 
 	//readforcing
-    readforcing(XParam, XForcing);
+	readforcing(XParam, XForcing);
 
 	checkparamsanity(XParam, XForcing);
 
@@ -4467,10 +4684,10 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 
 	//if XModel.cf[0]
 	//	XModel.zb
-	
-	T maxz = T(-1.0)*std::numeric_limits<float>::max();
+
+	T maxz = T(-1.0) * std::numeric_limits<float>::max();
 	T minz = std::numeric_limits<float>::max();
-	T maxr = T(-1.0)*std::numeric_limits<float>::max();
+	T maxr = T(-1.0) * std::numeric_limits<float>::max();
 	T minr = std::numeric_limits<float>::max();
 
 
@@ -4496,7 +4713,7 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 	bool result = false;
 	eps = 0.0000001;
 
-	if ((abs(maxz - Z1)<eps) && (abs(maxr - R1)<eps) && (abs(minz - Z0)<eps) && (abs(minr - R0)<eps))
+	if ((abs(maxz - Z1) < eps) && (abs(maxr - R1) < eps) && (abs(minz - Z0) < eps) && (abs(minr - R0) < eps))
 	{
 		result = true;
 	}
@@ -4541,7 +4758,127 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int scenario)
 			result = true;
 		}
 	}
+
+	return result;
+}
+
+
+
+//TestFlexibleOutputTimes(int gpu, T ref, int scenario)
+/** 
+ * @brief	Test the reading of flexible output times
+ *
+ * This function creates a case set-up with a param file, read it.
+ * It tests the reading and default values used for times outputs.
+ * It checks the vectors for time outputs.
+ * @param gpu GPU to use (-1 for CPU only)
+ * @param ref Reference elevation for the bathymetry files
+ * @param scenario Scenario to test (not used here but could be used to test different input cases)
+ * @return true if test passed (i.e. the model runs without crashing and gives a reasonable result)
+ */
+template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
+{
+	T Z0 = ref + 0.0;
+	T Z1 = ref + 2.0;
+	T eps;
+	int NX = 21;
+	int NY = 21;
+	double* xz;
+	double* yz;
+	double* map;
+	Param XParam;
+	Forcing<float> XForcing;
+	Model<float> XModel;
+	Model<float> XModel_g;
+	char* name_file_R1;
+
+
+	//Creation of a Bathy file
+
+	xz = (double*)malloc(sizeof(double) * NX);
+	yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = -1.0 + 0.1 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.1 * j; }
+
+	map = (double*)malloc(sizeof(double) * NY * NX);
+
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			map[j * NX + i] = Z0; //+ (yz[j] + 1) * 0.5;
+		}
+	}
+	create2dnc("Z0_map.nc", NX, NY, xz, yz, map, "z");
+
+
+	// Creation of BG_param_test13.txt file
+	std::ofstream param_file(
+		"BG_param_test15.txt", std::ios_base::out | std::ios_base::trunc);
+	//Add Bathymetries to the file
+	param_file << "bathy = Z0_map.nc?z ;" << std::endl;
+
+	//Add endtime and outputvar
+	param_file << "endtime = 11.0 ;" << std::endl;
+	param_file << "reftime = 2020-01-01T00:00:00 ;" << std::endl;
+	param_file << "outvars = zs,h,u,v,zb;" << std::endl;
+	param_file << "dx = 0.05;" << std::endl;
+	param_file << "zsinit = 0.1;" << std::endl;
+	param_file << "smallnc = 0;" << std::endl;
+	param_file << "doubleprecision = 1;" << std::endl;
+	param_file << "Toutput = 1|2|5, 2020-01-01T00:00:08,  9.5;" << std::endl;
+	param_file << "outzone = Test15_zoom1.nc,0.2,0.6,-0.2,0.2, 2020-01-01T00:00:02|0.008min|2020-01-01T00:00:03, 5.6,6.9;" << std::endl;
+	param_file << "outzone = Test15_zoom2.nc,0.2,0.6,-0.2,0.2, 8.1|0.7|, 5.6;" << std::endl;
+	param_file << "outzone = Test15_zoom3.nc,0.2,0.6,-0.2,0.2, |0.8|2;" << std::endl;
+	param_file << "outzone = Test15_zoom4.nc,0.2,0.6,-0.2,0.2, 8.2||9;" << std::endl; // Here the step in not given so assumed infinite
+	param_file << "outzone = Test15_zoom5.nc,0.2,0.6,-0.2,0.2;" << std::endl;
+	param_file.close();
+
+	//read param file
+	Readparamfile(XParam, XForcing, "BG_param_test15.txt"); // "BG_param_test13.txt");
+
+	//readforcing
+	readforcing(XParam, XForcing);
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	// Run first full step (i.e. 2 half steps)
+
+	//Loop<T> XLoop = InitLoop(XParam, XModel);
+	//MainLoop(XParam, XForcing, XModel, XModel_g);
+
+	//TEST 1: reading and default values check:
+	bool result = false;
+
+	if (XModel.OutputT.size()==20)
+	{
+		result = true;
+	}
+
+	/*
+	if (!XParam.Toutput.end == 11.0)
+		result = false;
+	if (!XParam.Toutput.val[1] == 9.5)
+		result = false;
 	
+	if (!XParam.outzone[2].Toutput.init == 0.0)
+		result = false;
+	if (!XParam.outzone[3].Toutput.tstep == 11.0)
+		result = false;
+	if (!XParam.outzone[4].Toutput.tstep == 1.0)
+		result = false;
+		*/
+
+	
+
 	return result;
 }
 
@@ -5171,9 +5508,22 @@ template <class T> bool TestCulvert(int gpu, T ref, int scenario)
 
 
 
+
+
+/**
+ * \fn void TestFirsthalfstep(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
+ * @brief	Test the first half step of the model	
+ * This function tests the first half step of the model on a sloping domain with a small amount of water
+ * The function creates its own model setup and mesh independantly to what the user inputs.
+ * This starts with a initial water level (zsinit=0.0 is dry) and runs for 1s comparing results
+ * every 0.1s.
+ * @param XParam Model parameters
+ * @param XModel Model structure (CPU)
+ * @param XModel_g Model structure (GPU)
+ */
 template <class T> void TestFirsthalfstep(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
-	
+
 	// Setup Model(s)
 
 	XParam.outvars = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "Su", "Sv","dhdx", "dhdy", "dzsdx", "dzsdy", "dzbdx", "dzbdy" };
@@ -5229,12 +5579,21 @@ template <class T> void TestFirsthalfstep(Param XParam, Forcing<float> XForcing,
 	bool test = false;
 
 	//test = true;
-	
+
 	InitSave2Netcdf(XParam, XModel);
 
 }
 
-
+/**
+ * @brief	Test the zbinit option of the model
+ * This function tests the zbinit option of the model on a sloping domain with a small amount of water
+ * The function creates its own model setup and mesh independantly to what the user inputs.	
+ * This starts with a initial water level (zsinit=0.0 is dry) and runs for 1s comparing results
+ * every 0.1s.
+ * @param XParam Model parameters
+ * @param XModel Model structure (CPU)
+ * @param XModel_g Model structure (GPU)
+ */
 template <class T> void Testzbinit(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
 
@@ -5256,14 +5615,14 @@ template <class T> void Testzbinit(Param XParam, Forcing<float> XForcing, Model<
 
 	Loop<T> XLoop = InitLoop(XParam, XModel);
 
-	
+
 	//FlowCPU(XParam, XLoop, XForcing, XModel);
 	//HalfStepCPU(XParam, XLoop, XForcing, XModel);
 	if (XParam.conserveElevation)
 	{
 		refine_linear(XParam, XModel.blocks, XModel.zb, XModel.grad.dzbdx, XModel.grad.dzbdy);
 	}
-	
+
 	//HalfStepGPU(XParam, XLoop, XForcing, XModel_g);
 
 	if (XParam.conserveElevation)
@@ -5302,12 +5661,24 @@ template <class T> void Testzbinit(Param XParam, Forcing<float> XForcing, Model<
 
 	//InitSave2Netcdf(XParam, XModel);
 
-	
+
 
 }
 
-
-template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel_g, bool bottop,bool flip, bool withaoi)
+/**
+ * @brief	Test the aoibnd option of the model
+ * This function tests the aoibnd option of the model on a valley domain with a small amount of water
+ * The function creates its own model setup and mesh independantly to what the user inputs.	
+ * This starts with a initial water level (zsinit=0.0 is dry) and runs for 20s.
+ * @param XParam Model parameters
+ * @param XModel Model structure (CPU)
+ * @param XModel_g Model structure (GPU)
+ * @param bottop true if the boundary condition to test is bottom/top, false for left/right
+ * @param flip true if the boundary condition to test is top or right, false for bottom or left
+ * @param withaoi true if the AOI is to be used, false otherwise
+ * @return 1 if the test passed (i.e. the model runs without crashing and gives a reasonable result), 0 otherwise
+ */
+template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel_g, bool bottop, bool flip, bool withaoi)
 {
 	Forcing<float> XForcing;
 
@@ -5343,16 +5714,16 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	XParam.aoibnd = 0;
 
 	XParam.outputtimestep = XParam.endtime;
-	
+
 	std::ofstream aoi_file(
 		"testaoi.tmp", std::ios_base::out | std::ios_base::trunc);
 	aoi_file << "5.0 3.0" << std::endl;
 	aoi_file << "27.0 3.0" << std::endl;
-	aoi_file << "27.0 27.0"<< std::endl;
+	aoi_file << "27.0 27.0" << std::endl;
 	aoi_file << "5.0 27.0" << std::endl;
 	aoi_file << "5.0 3.0" << std::endl;
 	aoi_file.close(); //destructor implicitly does it
-	
+
 	/*
 	std::ofstream aoi_file(
 		"testaoi.tmp", std::ios_base::out | std::ios_base::trunc);
@@ -5364,7 +5735,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	aoi_file.close(); //destructor implicitly does it
 	*/
 	if (withaoi)
-	{	
+	{
 		XForcing.AOI.file = "testaoi.tmp";
 		XForcing.AOI.active = true;
 		XForcing.AOI.poly = readPolygon(XForcing.AOI.file);
@@ -5397,7 +5768,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	XParam.Adapt_arg1 = "";
 	XParam.Adapt_arg2 = "";
 	XParam.Adapt_arg3 = "";
-	
+
 	StaticForcingP<int> targetlevel;
 	XForcing.targetadapt.push_back(targetlevel);
 
@@ -5437,7 +5808,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	thisriver.xstart = 10;
 	thisriver.xend = 12;
 	thisriver.ystart = 10;
-	thisriver.yend =12;
+	thisriver.yend = 12;
 
 	XForcing.rivers.push_back(thisriver);
 
@@ -5475,7 +5846,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	MainLoop(XParam, XForcing, XModel, XModel_g);
 
 	T TheoryInput = Q * XParam.endtime;
-	
+
 
 	T SimulatedVolume = T(0.0);
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -5488,7 +5859,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 			{
 				int i = memloc(XParam, ix, iy, ib);
 				SimulatedVolume = SimulatedVolume + XModel.evolv.h[i] * delta * delta;
-				
+
 			}
 		}
 	}
@@ -5499,13 +5870,124 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 
 	int modelgood = error / TheoryInput < 0.001;
 
-	printf("\nSim Vol = %f, theory=%f, Error = %f, (%f %%) \n", SimulatedVolume, TheoryInput, error, (error / TheoryInput)*100);
+	printf("\nSim Vol = %f, theory=%f, Error = %f, (%f %%) \n", SimulatedVolume, TheoryInput, error, (error / TheoryInput) * 100);
 
 	//log("#####");
 	return modelgood;
 }
 
+/**
+ * @brief	A simple kernel to add an offset to a vector
+ * This is used to test the pin memory allocation and transfer between CPU and GPU
+ * @param nx Number of elements in the vector
+ * @param offset Offset to add
+ * @param z Vector to modify (input and output)
+ * @tparam T Data type of the vector (float or double)
+ */
+template <class T> __global__ void vectoroffsetGPU(int nx, T offset, T* z)
+{
+	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
+	if (idx < nx)
+	{
+		z[idx] = z[idx] + offset;
+	}
+}
+
+/**
+ * @brief	Test the pin memory allocation and transfer between CPU and GPU
+ * This function allocates a pinned memory array on the CPU, fills it with values,
+ * transfers it to the GPU, modifies it there, and transfers it back to the CPU.
+ * It then checks that the values have been correctly modified.
+ * @param XParam Model parameters (only GPUDEVICE is used)
+ * @param XModel Model structure (CPU)
+ * @param XModel_g Model structure (GPU)
+ * @return 1 if the test passed (i.e. the values are as expected), 0 otherwise
+ */
+template <class T> int TestPinMem(Param XParam, Model<T> XModel, Model<T> XModel_g)
+{
+	T* zf, *zf_g, * zf_recov;
+	
+
+	int nx = 32;
+	int ny = 1;
+
+	int nelem = nx * ny;
+
+
+	AllocateMappedMemCPU(nx, ny, XParam.GPUDEVICE, zf);
+	
+
+	AllocateCPU(nx, ny, zf_recov);
+
+	for (int i = 0; i < nx; i++)
+	{
+		for (int j = 0; j < ny; j++)
+		{
+			zf[i + j * nx] = i + j * nx +T(0.25);
+			
+		}
+	}
+
+	T checkrem = T(0.0);
+
+	if (XParam.GPUDEVICE >= 0)
+	{
+		AllocateMappedMemGPU(nx, ny, XParam.GPUDEVICE, zf_g, zf);
+
+
+
+		dim3 block(16);
+		dim3 grid((unsigned int)ceil(nelem / (float)block.x));
+
+		vectoroffsetGPU <<<grid, block >>> (nelem, T(1.0), zf_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		CUDA_CHECK(cudaMemcpy(zf_recov, zf_g, nx * ny * sizeof(T), cudaMemcpyDeviceToHost));
+
+
+		
+
+		for (int i = 0; i < nx; i++)
+		{
+			for (int j = 0; j < ny; j++)
+			{
+
+				checkrem = checkrem + abs(zf[i + j * nx] - zf_recov[i + j * nx]);
+			}
+		}
+	}
+	int modelgood = checkrem < 1.e-6f;
+
+	if (checkrem > 1.e-6f)
+	{
+		printf("\n Test Failed error = %e \n", checkrem);
+		return modelgood;
+	}
+	else
+	{
+		printf("\n Test Success error = %e \n", checkrem);
+	}
+
+
+
+	return modelgood;
+}
+template int TestPinMem<float>(Param XParam, Model<float> XModel, Model<float> XModel_g);
+template int TestPinMem<double>(Param XParam, Model<double> XModel, Model<double> XModel_g);
+
+
+
+/**
+ * @brief	Creates a valley bathymetry
+ * This function creates a valley bathymetry with a given slope and center
+ * It also adds a wall around the domain to avoid boundary effects
+ * @param XParam Model parameters (only used to set the mesh size)
+ * @param slope Slope of the valley
+ * @param bottop true if the valley is oriented in the y direction (i.e. bottom/top boundaries), false if in the x direction (i.e. left/right boundaries)
+ * @param flip true if the valley is oriented towards top or right, false if towards bottom or left
+ * @return A Forcing structure containing the bathymetry
+ */
 template <class T> Forcing<float> MakValleyBathy(Param XParam, T slope, bool bottop, bool flip)
 {
 	//
@@ -5622,11 +6104,13 @@ template <class T> Forcing<float> MakValleyBathy(Param XParam, T slope, bool bot
 }
 
 
-/*! \fn void alloc_init2Darray(float** arr, int NX, int NY)
-* This function allocates and fills a 2D array with zero values
-*
-*
-*/
+/**! \fn void alloc_init2Darray(float** arr, int NX, int NY)
+ * @brief Allocates and initializes a 2D array
+ * This function allocates and fills a 2D array with zero values
+ * @param arr Pointer to the 2D array
+ * @param NX Number of rows
+ * @param NY Number of columns
+ */
 void alloc_init2Darray(float** arr, int NX, int NY)
 {
 	int i, j;
@@ -5648,11 +6132,15 @@ void alloc_init2Darray(float** arr, int NX, int NY)
 	}
 }
 
-/*! \fn void init3Darray(float*** arr, int rows, int cols, int depths)
-* This function fill a 3D array with zero values 
-*
-*
-*/
+/**! \fn void init3Darray(float*** arr, int rows, int cols, int depths)
+ * @brief Initializes a 3D array
+ * This function fill a 3D array with zero values
+ * @param arr Pointer to the 3D array
+ * @param rows Number of rows
+ * @param cols Number of columns
+ * @param depths Number of depths
+ *
+ */
 void init3Darray(float*** arr, int rows, int cols, int depths)
 {
 	int i, j, k;
@@ -5666,11 +6154,14 @@ void init3Darray(float*** arr, int rows, int cols, int depths)
 	}
 }
 
-/*! \fn void fillrandom(Param XParam, BlockP<T> XBlock, T* z)
-* This function fill an array with random values (0 - 1)
-*
-* 
-*/
+/**! \fn void fillrandom(Param XParam, BlockP<T> XBlock, T* z)
+ * @brief Fill an array with random values
+ * This function fill an array with random values (0 - 1)
+ * @param XParam Model parameters (only nblk and blkwidth are used)
+ * @param XBlock Block parameters (only active are used)
+ * @param z Array to fill
+ *
+ */
 template <class T> void fillrandom(Param XParam, BlockP<T> XBlock, T* z)
 {
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -5691,11 +6182,17 @@ template <class T> void fillrandom(Param XParam, BlockP<T> XBlock, T* z)
 template void fillrandom<float>(Param XParam, BlockP<float> XBlock, float* z);
 template void fillrandom<double>(Param XParam, BlockP<double> XBlock, double* z);
 
-/*! \fn void fillgauss(Param XParam, BlockP<T> XBlock, T amp, T* z)
-* This function fill an array with a gaussian bump
-* 
-* borrowed/adapted from Basilisk test (?)
-*/
+/**! \fn void fillgauss(Param XParam, BlockP<T> XBlock, T amp, T* z)
+ * @brief Fill an array with a gaussian bump
+ * This function fill an array with a gaussian bump
+ *
+ * borrowed/adapted from Basilisk test (?)
+ * @param XParam Model parameters (only nblk, blkwidth, xo, yo, xmax, ymax and dx are used)
+ * @param XBlock Block parameters (only active, level, xo and yo are used)
+ * @param amp Amplitude of the gaussian bump
+ * @param z Array to fill
+ * 
+ */
 template <class T> void fillgauss(Param XParam, BlockP<T> XBlock, T amp, T* z)
 {
 	T delta, x, y;
@@ -5729,10 +6226,13 @@ template <class T> void fillgauss(Param XParam, BlockP<T> XBlock, T amp, T* z)
 template void fillgauss<float>(Param XParam, BlockP<float> XBlock, float amp, float* z);
 template void fillgauss<double>(Param XParam, BlockP<double> XBlock, double amp, double* z);
 
-/*! \fn TestingOutput(Param XParam, Model<T> XModel)
-*
-*	OUTDATED?
-*/
+/**! \fn TestingOutput(Param XParam, Model<T> XModel)
+ * @brief OUTDATED ?Test the output functions of the model
+ *	OUTDATED?
+ * This function tests the output functions of the model by running a simple simulation and writing the output to a netcdf file
+ * @param XParam Model parameters
+ * @param XModel Model structure (CPU)
+ */
 template <class T>
 void TestingOutput(Param XParam, Model<T> XModel)
 {
@@ -5815,13 +6315,17 @@ void TestingOutput(Param XParam, Model<T> XModel)
 template void TestingOutput<float>(Param XParam, Model<float> XModel);
 template void TestingOutput<double>(Param XParam, Model<double> XModel);
 
-/*! \fn void copyID2var(Param XParam, BlockP<T> XBlock, T* z)
-* This function copies block info to an output variable
-* This function is somewhat useful when checking bugs in the mesh refinement or coarsening
-* one needs to provide a pointer(z) allocated on the CPU to store the clockinfo
-* This fonction only works on CPU
-*
-*/
+/**! \fn void copyID2var(Param XParam, BlockP<T> XBlock, T* z)
+ * @brief Copies block ID to an output variable
+ * This function copies block info to an output variable
+ * This function is somewhat useful when checking bugs in the mesh refinement or coarsening
+ * one needs to provide a pointer(z) allocated on the CPU to store the clockinfo
+ * This fonction only works on CPU
+ *
+ * @param XParam Model parameters (only nblk, blkwidth, xo, yo, xmax, ymax and dx are used)
+ * @param XBlock Block parameters (only active is used)
+ * @param z Array to fill
+ */
 template <class T> void copyID2var(Param XParam, BlockP<T> XBlock, T* z)
 {
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -5843,13 +6347,18 @@ template void copyID2var<float>(Param XParam, BlockP<float> XBlock, float* z);
 template void copyID2var<double>(Param XParam, BlockP<double> XBlock, double* z);
 
 
-/*! \fn void copyBlockinfo2var(Param XParam, BlockP<T> XBlock, int* blkinfo, T* z)
-* This function copies blick info to an output variable
-* This function is somewhat useful when checking bugs in the mesh refinement or coarsening
-* one needs to provide a pointer(z) allocated on the CPU to store the clockinfo
-* This fonction only works on CPU
-*
-*/
+/**! \fn void copyBlockinfo2var(Param XParam, BlockP<T> XBlock, int* blkinfo, T* z)
+ * @brief Copies block info to an output variable
+ * This function copies block info to an output variable
+ * This function is somewhat useful when checking bugs in the mesh refinement or coarsening
+ * one needs to provide a pointer(z) allocated on the CPU to store the clockinfo
+ * This fonction only works on CPU
+ *
+ * @param XParam Model parameters (only nblk, blkwidth, xo, yo, xmax, ymax and dx are used)
+ * @param XBlock Block parameters (only active is used)
+ * @param blkinfo Block information array (CPU)
+ * @param z Array to fill
+ */
 template <class T> void copyBlockinfo2var(Param XParam, BlockP<T> XBlock, int* blkinfo, T* z)
 {
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -5871,12 +6380,16 @@ template void copyBlockinfo2var<float>(Param XParam, BlockP<float> XBlock, int* 
 template void copyBlockinfo2var<double>(Param XParam, BlockP<double> XBlock, int* blkinfo, double* z);
 
 
-/*! \fn void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> XModel_g, std::vector<std::string> varlist, bool checkhalo)
-* This function compares the Valiables in a CPU model and a GPU models
-* This function is quite useful when checking both are identical enough
-* one needs to provide a list (vector<string>) of variable to check
-* 
-*/
+/**! \fn void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> XModel_g, std::vector<std::string> varlist, bool checkhalo)
+ * @brief Compares the Variables in a CPU model and a GPU models
+ * This function is quite useful when checking both are identical enough
+ * one needs to provide a list (vector<string>) of variable to check
+ * @param XParam Model parameters
+ * @param XModel Model structure (CPU)
+ * @param XModel_g Model structure (GPU)
+ * @param varlist List of variable names to check (as in OutputVarMap)
+ * @param checkhalo true if halo cells should be checked, false otherwise
+ */
 template <class T> void CompareCPUvsGPU(Param XParam, Model<T> XModel, Model<T> XModel_g, std::vector<std::string> varlist, bool checkhalo)
 {
 	Loop<T> XLoop;
@@ -5943,10 +6456,16 @@ template void CompareCPUvsGPU<float>(Param XParam, Model<float> XModel, Model<fl
 template void CompareCPUvsGPU<double>(Param XParam, Model<double> XModel, Model<double> XModel_g, std::vector<std::string> varlist, bool checkhalo);
 
 
-/*! \fn void diffdh(Param XParam, BlockP<T> XBlock, T* input, T* output, T* shuffle)
-* This function Calculates The difference in left and right flux terms.
-* This function is quite useful when checking for Lake-at-Rest states
-* This function requires a preallocated output and a shuffle (right side term) CPU pointers to save the result of teh calculation
+/**! \fn void diffdh(Param XParam, BlockP<T> XBlock, T* input, T* output, T* shuffle)
+ * @brief Calculate The difference between adjacent cells in an array
+ * This function Calculates The difference in left and right flux terms.
+ * This function is quite useful when checking for Lake-at-Rest states
+ * This function requires a preallocated output and a shuffle (right side term) CPU pointers to save the result of teh calculation
+ * @param XParam Model parameters (only nblk and blkwidth are used)
+ * @param XBlock Block parameters (only active are used)
+ * @param input Input array
+ * @param output Output array (difference)
+ * @param shuffle Output array (right side term)
 */
 template <class T> void diffdh(Param XParam, BlockP<T> XBlock, T* input, T* output, T* shuffle)
 {
@@ -5973,11 +6492,17 @@ template <class T> void diffdh(Param XParam, BlockP<T> XBlock, T* input, T* outp
 	}
 }
 
-/*! \fn void diffSource(Param XParam, BlockP<T> XBlock, T* Fqux, T* Su, T* output)
-* This function Calculate The source term of the equation. 
-* This function is quite useful when checking for Lake-at-Rest states
-* This function requires an outputCPU pointers to save the result of teh calculation
-*/
+/**! \fn void diffSource(Param XParam, BlockP<T> XBlock, T* Fqux, T* Su, T* output)
+ * @brief Calculate The source term of the equation
+ * This function Calculate The source term of the equation.
+ * This function is quite useful when checking for Lake-at-Rest states
+ * This function requires an outputCPU pointers to save the result of the calculation
+ * @param XParam Model parameters (only nblk and blkwidth are used)
+ * @param XBlock Block parameters (only active are used)
+ * @param Fqux Input array
+ * @param Su Input array
+ * @param output Output array (source term)
+ */
 template <class T> void diffSource(Param XParam, BlockP<T> XBlock, T* Fqux, T* Su, T* output)
 {
 	int iright, itop;
@@ -6003,11 +6528,19 @@ template <class T> void diffSource(Param XParam, BlockP<T> XBlock, T* Fqux, T* S
 	}
 }
 
-/*! \fn void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, std::string varname, bool checkhalo, T* cpu, T* gpu, T* dummy, T* out)
-* Calculate and output the difference between a CPU and a GPU array
-* This function is quite usefull to spot inconsistencies between the GPU and CPU algorithmes.
-* This function requires two (dummy and an output) CPU pointers to transition the GPU data on the CU RAM for comparison and saving to the disk
-*/
+/**! \fn void diffArray(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, std::string varname, bool checkhalo, T* cpu, T* gpu, T* dummy, T* out)
+ * @brief Calculate and output the difference between a CPU and a GPU array
+ * This function is quite useful to spot inconsistencies between the GPU and CPU algorithms.
+ * This function requires two (dummy and an output) CPU pointers to transition the GPU data on the CU RAM for comparison and saving to the disk
+ * @param XParam Model parameters (only nblk and blkwidth are used)
+ * @param XBlock Block parameters (only active are used)
+ * @param varname Name of the variable to check (used for logging and output file naming)
+ * @param checkhalo true if halo cells should be checked, false otherwise
+ * @param cpu CPU array
+ * @param gpu GPU array
+ * @param dummy Temporary CPU array to copy the GPU data
+ * @param out Output array (difference)
+ */
 template <class T> void diffArray(Param XParam, BlockP<T> XBlock, std::string varname, bool checkhalo, T* cpu, T* gpu, T* dummy, T* out)
 {
 	T diff, maxdiff, rmsdiff;

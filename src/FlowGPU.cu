@@ -1,5 +1,16 @@
 #include "FlowGPU.h"
 
+/**
+ * @brief Main GPU flow solver for the flood model.
+ *
+ * Executes predictor and corrector steps, applies atmospheric, wind, and river forcing, updates advection and friction terms, and manages halo and gradient reconstruction for all blocks using CUDA kernels and streams.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XLoop Loop control and time stepping
+ * @param XForcing Forcing data (atmospheric, wind, river, rain)
+ * @param XModel Model data structure
+ */
 template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
 {
 
@@ -24,7 +35,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	if (XParam.atmpforcing)
 	{
 		//Update atm press forcing
-		AddPatmforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.Atmp, XModel);
+		AddPatmforcingGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XForcing.Atmp, XModel);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		//Fill atmp halo
@@ -34,24 +45,27 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 		CUDA_CHECK(cudaDeviceSynchronize());
 		cudaStreamDestroy(atmpstreams[0]);
 
-		//Calc dpdx and dpdy
+		if (XParam.engine < 5)
+		{
 
-		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+			//Calc dpdx and dpdy
 
-		
-		CUDA_CHECK(cudaDeviceSynchronize());
-		gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
-		//
-			
-
-		refine_linearGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
-
-		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
-		CUDA_CHECK(cudaDeviceSynchronize());
-
-		gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+			gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
 
 
+			CUDA_CHECK(cudaDeviceSynchronize());
+			gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+			//
+
+
+			refine_linearGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+
+			gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+			CUDA_CHECK(cudaDeviceSynchronize());
+
+			gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+
+		}
 	}
 
 		
@@ -84,15 +98,15 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	if (XParam.engine == 1)
 	{
 		// X- direction
-		UpdateButtingerXGPU << < gridDim, blockDimKX, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		UpdateButtingerXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 		//updateKurgXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 		// //AddSlopeSourceXGPU <<< gridDim, blockDimKX, 0, XLoop.streams[0] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 		CUDA_CHECK(cudaDeviceSynchronize());
 		// Y- direction
-		UpdateButtingerYGPU << < gridDim, blockDimKY, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		UpdateButtingerYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 		//updateKurgYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 		// //AddSlopeSourceYGPU <<< gridDim, blockDimKY, 0, XLoop.streams[1] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
-		// //updateKurgY << < XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >> > (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
+		// //updateKurgY <<< XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >>> (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
 
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
@@ -105,20 +119,20 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 		// Y- direction
 		updateKurgYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 		// //AddSlopeSourceYGPU <<< gridDim, blockDimKY, 0, XLoop.streams[1] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
-		// //updateKurgY << < XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >> > (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
+		// //updateKurgY <<< XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >>> (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
 
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else if (XParam.engine == 3)
 	{
 		// 
-		updateKurgXATMGPU << < gridDim, blockDimKX, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdx);
+		updateKurgXATMGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdx);
 		// //AddSlopeSourceXGPU <<< gridDim, blockDimKX, 0, XLoop.streams[0] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 		CUDA_CHECK(cudaDeviceSynchronize());
 		// Y- direction
-		updateKurgYATMGPU << < gridDim, blockDimKY, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdy);
+		updateKurgYATMGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdy);
 		// //AddSlopeSourceYGPU <<< gridDim, blockDimKY, 0, XLoop.streams[1] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
-		// //updateKurgY << < XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >> > (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
+		// //updateKurgY <<< XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >>> (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
 
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
@@ -193,12 +207,12 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	if (XParam.engine == 1)
 	{
 		// X- direction
-		UpdateButtingerXGPU << < gridDim, blockDimKX, 0 >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		UpdateButtingerXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 		//updateKurgXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 		// //AddSlopeSourceXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
 		CUDA_CHECK(cudaDeviceSynchronize());
 		// Y- direction
-		UpdateButtingerYGPU << < gridDim, blockDimKY, 0 >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		UpdateButtingerYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 		//updateKurgYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 		// //AddSlopeSourceYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.zb);
 		CUDA_CHECK(cudaDeviceSynchronize());
@@ -218,11 +232,11 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	{
 		//
 		//
-		updateKurgXATMGPU << < gridDim, blockDimKX, 0 >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdx);
+		updateKurgXATMGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdx);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		// Y- direction
-		updateKurgYATMGPU << < gridDim, blockDimKY, 0 >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdy);
+		updateKurgYATMGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdy);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	//============================================
@@ -285,19 +299,19 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	if (!XForcing.Rain.inputfile.empty())
 	{
-		AddrainforcingImplicitGPU << < gridDim, blockDim, 0 >> > (XParam,XLoop, XModel.blocks, XForcing.Rain, XModel.evolv);
+		AddrainforcingImplicitGPU <<< gridDim, blockDim, 0 >>> (XParam,XLoop, XModel.blocks, XForcing.Rain, XModel.evolv);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 
 	if (XParam.infiltration)
 	{
-		AddinfiltrationImplicitGPU << < gridDim, blockDim, 0 >> > (XParam, XLoop, XModel.blocks, XModel.il, XModel.cl, XModel.evolv, XModel.hgw);
+		AddinfiltrationImplicitGPU <<< gridDim, blockDim, 0 >>> (XParam, XLoop, XModel.blocks, XModel.il, XModel.cl, XModel.evolv, XModel.hgw);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 
 	if (XParam.VelThreshold > 0.0)
 	{
-		TheresholdVelGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv);
+		TheresholdVelGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 
@@ -317,6 +331,17 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 template void FlowGPU<float>(Param XParam, Loop<float>& XLoop, Forcing<float> XForcing, Model<float> XModel);
 template void FlowGPU<double>(Param XParam, Loop<double>& XLoop, Forcing<float> XForcing, Model<double> XModel);
 
+/**
+ * @brief Debugging GPU flow step for the flood model.
+ *
+ * Runs a simplified flow step for debugging the main engine, including forcing, advection, friction, and halo/gradient reconstruction using CUDA kernels and streams.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XLoop Loop control and time stepping
+ * @param XForcing Forcing data (atmospheric, wind, river, rain)
+ * @param XModel Model data structure
+ */
 template <class T> void HalfStepGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
 {
 	//============================================
@@ -340,7 +365,7 @@ template <class T> void HalfStepGPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 	if (XParam.atmpforcing)
 	{
 		//Update atm press forcing
-		AddPatmforcingGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XForcing.Atmp, XModel);
+		AddPatmforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.Atmp, XModel);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		//Fill atmp halo
@@ -351,7 +376,7 @@ template <class T> void HalfStepGPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 		cudaStreamDestroy(atmpstreams[0]);
 
 		//Calc dpdx and dpdy
-		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+		gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
 		CUDA_CHECK(cudaDeviceSynchronize());
 		gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
 		//
@@ -359,7 +384,7 @@ template <class T> void HalfStepGPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 
 		refine_linearGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
 
-		gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+		gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
@@ -379,7 +404,7 @@ template <class T> void HalfStepGPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 
 	//============================================
 	// Reset DTmax
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XLoop.hugeposval, XModel.time.dtmax);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel.blocks.active, XLoop.hugeposval, XModel.time.dtmax);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//============================================
@@ -397,41 +422,41 @@ template <class T> void HalfStepGPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 	if (XParam.engine == 1)
 	{
 		// X- direction
-		UpdateButtingerXGPU << < gridDim, blockDimKX, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		UpdateButtingerXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 		//updateKurgXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 		// //AddSlopeSourceXGPU <<< gridDim, blockDimKX, 0, XLoop.streams[0] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 		CUDA_CHECK(cudaDeviceSynchronize());
 		// Y- direction
-		UpdateButtingerYGPU << < gridDim, blockDimKY, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		UpdateButtingerYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 		//updateKurgYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 		// //AddSlopeSourceYGPU <<< gridDim, blockDimKY, 0, XLoop.streams[1] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
-		// //updateKurgY << < XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >> > (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
+		// //updateKurgY <<< XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >>> (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
 
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else if (XParam.engine == 2)
 	{
 		// X- direction
-		updateKurgXGPU << < gridDim, blockDimKX, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		updateKurgXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 		// //AddSlopeSourceXGPU <<< gridDim, blockDimKX, 0, XLoop.streams[0] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 		CUDA_CHECK(cudaDeviceSynchronize());
 		// Y- direction
-		updateKurgYGPU << < gridDim, blockDimKY, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
+		updateKurgYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb);
 		// //AddSlopeSourceYGPU <<< gridDim, blockDimKY, 0, XLoop.streams[1] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
-		// //updateKurgY << < XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >> > (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
+		// //updateKurgY <<< XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >>> (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
 
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else if (XParam.engine == 3)
 	{
 		// 
-		updateKurgXATMGPU << < gridDim, blockDimKX, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdx);
+		updateKurgXATMGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdx);
 		// //AddSlopeSourceXGPU <<< gridDim, blockDimKX, 0, XLoop.streams[0] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
 		CUDA_CHECK(cudaDeviceSynchronize());
 		// Y- direction
-		updateKurgYATMGPU << < gridDim, blockDimKY, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdy);
+		updateKurgYATMGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax, XModel.zb, XModel.Patm, XModel.datmpdy);
 		// //AddSlopeSourceYGPU <<< gridDim, blockDimKY, 0, XLoop.streams[1] >>> (XParam, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.zb);
-		// //updateKurgY << < XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >> > (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
+		// //updateKurgY <<< XLoop.gridDim, XLoop.blockDim, 0, XLoop.streams[0] >>> (XParam, XLoop.epsilon, XModel.blocks, XModel.evolv, XModel.grad, XModel.flux, XModel.time.dtmax);
 
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
@@ -449,7 +474,7 @@ template <class T> void HalfStepGPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 
 	//============================================
 	// Update advection terms (dh dhu dhv) 
-	updateEVGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.flux, XModel.adv);
+	updateEVGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv, XModel.flux, XModel.adv);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//============================================
@@ -460,7 +485,7 @@ template <class T> void HalfStepGPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 	//}
 	if (!XForcing.UWind.inputfile.empty())//&& !XForcing.UWind.inputfile.empty()
 	{
-		AddwindforcingGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
+		AddwindforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	if (XForcing.rivers.size() > 0)
@@ -475,13 +500,13 @@ template <class T> void HalfStepGPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 
 	//============================================
 	//Update evolving variable by 1/2 time step
-	AdvkernelGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.time.dt * T(0.5), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
+	AdvkernelGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt * T(0.5), XModel.zb, XModel.evolv, XModel.adv, XModel.evolv_o);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//============================================
 	// Add bottom friction
 
-	bottomfrictionGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);
+	bottomfrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);
 	//XiafrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv, XModel.evolv_o);
 
 
@@ -489,18 +514,18 @@ template <class T> void HalfStepGPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 
 	//============================================
 	//Copy updated evolving variable back
-	cleanupGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv_o, XModel.evolv);
+	cleanupGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv_o, XModel.evolv);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	if (!XForcing.Rain.inputfile.empty())
 	{
-		AddrainforcingImplicitGPU << < gridDim, blockDim, 0 >> > (XParam, XLoop, XModel.blocks, XForcing.Rain, XModel.evolv);
+		AddrainforcingImplicitGPU <<< gridDim, blockDim, 0 >>> (XParam, XLoop, XModel.blocks, XForcing.Rain, XModel.evolv);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 
 	if (XParam.VelThreshold > 0.0)
 	{
-		TheresholdVelGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv);
+		TheresholdVelGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.evolv);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 
@@ -521,6 +546,17 @@ template void HalfStepGPU<float>(Param XParam, Loop<float>& XLoop, Forcing<float
 template void HalfStepGPU<double>(Param XParam, Loop<double>& XLoop, Forcing<float> XForcing, Model<double> XModel);
 
 
+/**
+ * @brief CUDA kernel to reset a variable array for all active blocks.
+ *
+ * Sets all values in the variable array to the specified reset value for each block and cell.
+ *
+ * @tparam T Data type (float or double)
+ * @param halowidth Halo width
+ * @param active Array of active block indices
+ * @param resetval Value to set
+ * @param Var Variable array to reset
+ */
 template <class T> __global__ void reset_var(int halowidth, int* active, T resetval, T* Var)
 {
 
