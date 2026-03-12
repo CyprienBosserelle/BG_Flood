@@ -4747,7 +4747,7 @@ bool TestCulvertOutletControl(int gpu)
 
 			if (i < 100)
 			{
-				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.609600f;
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.0;
 			}
 			else if (i < 106)
 			{
@@ -4823,7 +4823,7 @@ bool TestCulvertOutletControl(int gpu)
 
 	bndsegment bnd;
 
-	bnd.type = 2;
+	bnd.type = 3;
 	bnd.inputfile = "bnd_Steadylevell.tmp";
 	bnd.on = true;
 	bnd.polyfile = "right";
@@ -4865,9 +4865,13 @@ bool TestCulvertOutletControl(int gpu)
 	bool result = false;
 	float eps = 0.1;
 	// IL is expected here to be value when dry and 0 where wet at the begining of the computation
-	if ((abs(headwater - tailwater - 0.66) < eps))
+	if ((abs(headwater - 2.13) < eps))
 	{
 		result = true;
+	}
+	else
+	{
+		printf("\nFailed Outlet control\n HW = %f; TW = %f\n", headwater, tailwater);
 	}
 
 
