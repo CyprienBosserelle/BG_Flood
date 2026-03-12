@@ -169,10 +169,18 @@ template <class T> __host__ void AddRiverForcing(Param XParam, Loop<T> XLoop, st
 	{
 		for (int irib = 0; irib < XModel.bndblk.Riverinfo.nribmax; irib++)
 		{
-			//InjectRiverGPU <<<gridDimRiver, blockDim, 0 >>> (XParam, XRivers[Rin], qnow, XModel.bndblk.river, XModel.blocks, XModel.adv);
-			//CUDA_CHECK(cudaDeviceSynchronize());
-			InjectManyRiversGPU <<<gridDimRiver, blockDim, 0 >>> (XParam, irib, XModel.bndblk.Riverinfo, XModel.blocks, XModel.adv);
-			CUDA_CHECK(cudaDeviceSynchronize());
+			if (XParam.engine != 5)
+			{
+				//InjectRiverGPU <<<gridDimRiver, blockDim, 0 >>> (XParam, XRivers[Rin], qnow, XModel.bndblk.river, XModel.blocks, XModel.adv);
+				//CUDA_CHECK(cudaDeviceSynchronize());
+				InjectManyRiversGPU <<<gridDimRiver, blockDim, 0 >>> (XParam, irib, XModel.bndblk.Riverinfo, XModel.blocks, XModel.adv);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
+			else
+			{
+				InjectManyRiversImplicitGPU << <gridDimRiver, blockDim, 0 >> > (XParam, T(XLoop.dt), irib, XModel.bndblk.Riverinfo, XModel.blocks, XModel.evolv);
+				CUDA_CHECK(cudaDeviceSynchronize());
+			}
 		}
 		
 	}
@@ -293,6 +301,61 @@ template <class T> __global__ void InjectManyRiversGPU(Param XParam,int irib, Ri
 		if (OBBdetect(xl, xr, yb, yt, rxst, rxnd, ryst, rynd))
 		{
 			XAdv.dh[i] += qnow; //was / T(XRiver.disarea) but this is done upstream now to be consistent with GPU Many river ops 
+
+		}
+
+
+	}
+
+}
+
+template <class T> __global__ void InjectManyRiversImplicitGPU(Param XParam, T dt, int irib, RiverInfo<T> XRin, BlockP<T> XBlock, EvolvingP<T> XEv)
+{
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.x + halowidth * 2;
+
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+
+	int indx = ibl + irib * XRin.nburmax;
+
+	int ib, rid, i;
+
+	T xllo, yllo, xl, yb, xr, yt, levdx;
+	T rxst, ryst, rxnd, rynd;
+
+	ib = XRin.Xbidir[indx];
+	if (ib > -1)
+	{
+
+		i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+		rid = XRin.Xridib[indx];
+
+		levdx = calcres(T(XParam.dx), XBlock.level[ib]);
+
+		xllo = T(XParam.xo + XBlock.xo[ib]);
+		yllo = T(XParam.yo + XBlock.yo[ib]);
+
+
+		xl = xllo + ix * levdx - T(0.5) * levdx;
+		yb = yllo + iy * levdx - T(0.5) * levdx;
+
+		xr = xllo + ix * levdx + T(0.5) * levdx;
+		yt = yllo + iy * levdx + T(0.5) * levdx;
+
+		rxst = XRin.xstart[indx];
+		ryst = XRin.ystart[indx];
+		rxnd = XRin.xend[indx];
+		rynd = XRin.yend[indx];
+
+
+		T qnow = XRin.qnow_g[rid]; // here we use qnow_g because qnow is a CPU pointer
+		if (OBBdetect(xl, xr, yb, yt, rxst, rxnd, ryst, rynd))
+		{
+			//XAdv.dh[i] += qnow; //was / T(XRiver.disarea) but this is done upstream now to be consistent with GPU Many river ops
+			// 
+			XEv.h[i] += qnow * dt;
 
 		}
 

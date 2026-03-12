@@ -40,4 +40,8 @@ template <class T> __global__ void InjectRiverGPU(Param XParam, River XRiver, T 
 template <class T> __global__ void AddDeformGPU(Param XParam, BlockP<T> XBlock, deformmap<float> defmap, EvolvingP<T> XEv, T scale, T* zb);
 
 
+template <class T> __global__ void InjectManyRiversGPU(Param XParam, int irib, RiverInfo<T> XRin, BlockP<T> XBlock, AdvanceP<T> XAdv);
+template <class T> __global__ void InjectManyRiversImplicitGPU(Param XParam, T dt, int irib, RiverInfo<T> XRin, BlockP<T> XBlock, EvolvingP<T> XEv);
+
+
 #endif
