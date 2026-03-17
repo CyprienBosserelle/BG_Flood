@@ -1,0 +1,3408 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="Gradients_8h" kind="file" language="C++">
+    <compoundname>Gradients.h</compoundname>
+    <includes refid="General_8h" local="yes">General.h</includes>
+    <includes refid="Param_8h" local="yes">Param.h</includes>
+    <includes refid="Arrays_8h" local="yes">Arrays.h</includes>
+    <includes refid="Forcing_8h" local="yes">Forcing.h</includes>
+    <includes refid="Util__CPU_8h" local="yes">Util_CPU.h</includes>
+    <includes refid="Setup__GPU_8h" local="yes">Setup_GPU.h</includes>
+    <includes refid="MemManagement_8h" local="yes">MemManagement.h</includes>
+    <includes refid="Halo_8h" local="yes">Halo.h</includes>
+    <includedby refid="FlowCPU_8h" local="yes">src/FlowCPU.h</includedby>
+    <includedby refid="FlowGPU_8h" local="yes">src/FlowGPU.h</includedby>
+    <includedby refid="Gradients_8cu" local="yes">src/Gradients.cu</includedby>
+    <includedby refid="InitialConditions_8h" local="yes">src/InitialConditions.h</includedby>
+    <incdepgraph>
+      <node id="24">
+        <label>Arrays.h</label>
+        <link refid="Arrays_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="34">
+        <label>Boundary.h</label>
+        <link refid="Boundary_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+      </node>
+      <node id="45">
+        <label>ConserveElevation.h</label>
+        <link refid="ConserveElevation_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>Forcing.h</label>
+        <link refid="Forcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>General.h</label>
+        <link refid="General_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/Gradients.h</label>
+        <link refid="Gradients_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>GridManip.h</label>
+        <link refid="GridManip_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="29">
+        <label>Halo.h</label>
+        <link refid="Halo_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+      </node>
+      <node id="37">
+        <label>InitEvolv.h</label>
+        <link refid="InitEvolv_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+      </node>
+      <node id="36">
+        <label>InitialConditions.h</label>
+        <link refid="InitialConditions_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>Input.h</label>
+        <link refid="Input_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="44">
+        <label>Kurganov.h</label>
+        <link refid="Kurganov_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>MemManagement.h</label>
+        <link refid="MemManagement_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>Mesh.h</label>
+        <link refid="Mesh_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>Param.h</label>
+        <link refid="Param_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="33">
+        <label>Poly.h</label>
+        <link refid="Poly_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="41">
+        <label>ReadForcing.h</label>
+        <link refid="ReadForcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+      </node>
+      <node id="39">
+        <label>ReadInput.h</label>
+        <link refid="ReadInput_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+      </node>
+      <node id="38">
+        <label>Read_netcdf.h</label>
+        <link refid="Read__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>Setup_GPU.h</label>
+        <link refid="Setup__GPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+      </node>
+      <node id="43">
+        <label>Spherical.h</label>
+        <link refid="Spherical_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="35">
+        <label>Updateforcing.h</label>
+        <link refid="Updateforcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>Util_CPU.h</label>
+        <link refid="Util__CPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="42">
+        <label>Write_netcdf.h</label>
+        <link refid="Write__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>Write_txtlog.h</label>
+        <link refid="Write__txtlog_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="40">
+        <label>utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>algorithm</label>
+      </node>
+      <node id="9">
+        <label>chrono</label>
+      </node>
+      <node id="8">
+        <label>cmath</label>
+      </node>
+      <node id="10">
+        <label>ctime</label>
+      </node>
+      <node id="3">
+        <label>cuda_runtime.h</label>
+      </node>
+      <node id="4">
+        <label>device_launch_parameters.h</label>
+      </node>
+      <node id="18">
+        <label>fstream</label>
+      </node>
+      <node id="17">
+        <label>iomanip</label>
+      </node>
+      <node id="16">
+        <label>iostream</label>
+      </node>
+      <node id="20">
+        <label>limits</label>
+      </node>
+      <node id="13">
+        <label>map</label>
+      </node>
+      <node id="7">
+        <label>math.h</label>
+      </node>
+      <node id="14">
+        <label>netcdf.h</label>
+      </node>
+      <node id="19">
+        <label>sstream</label>
+      </node>
+      <node id="5">
+        <label>stdio.h</label>
+      </node>
+      <node id="6">
+        <label>stdlib.h</label>
+      </node>
+      <node id="11">
+        <label>string</label>
+      </node>
+      <node id="21">
+        <label>thread</label>
+      </node>
+      <node id="12">
+        <label>vector</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="16">
+        <label>src/AdaptCriteria.h</label>
+        <link refid="AdaptCriteria_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="6">
+        <label>src/Adaptation.h</label>
+        <link refid="Adaptation_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="13">
+        <label>src/Advection.h</label>
+        <link refid="Advection_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>src/BG_Flood.h</label>
+        <link refid="BG__Flood_8h_source"/>
+      </node>
+      <node id="14">
+        <label>src/Boundary.h</label>
+        <link refid="Boundary_8h_source"/>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="17">
+        <label>src/ConserveElevation.h</label>
+        <link refid="ConserveElevation_8h_source"/>
+        <childnode refid="15" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>src/FlowCPU.h</label>
+        <link refid="FlowCPU_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="7">
+        <label>src/FlowGPU.h</label>
+        <link refid="FlowGPU_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>src/FlowMLGPU.h</label>
+        <link refid="FlowMLGPU_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="18">
+        <label>src/Friction.h</label>
+        <link refid="Friction_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/Gradients.h</label>
+        <link refid="Gradients_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="19">
+        <label>src/GridManip.h</label>
+        <link refid="GridManip_8h_source"/>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>src/Halo.h</label>
+        <link refid="Halo_8h_source"/>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+      </node>
+      <node id="20">
+        <label>src/InitEvolv.h</label>
+        <link refid="InitEvolv_8h_source"/>
+        <childnode refid="10" relation="include">
+        </childnode>
+      </node>
+      <node id="10">
+        <label>src/InitialConditions.h</label>
+        <link refid="InitialConditions_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="29">
+        <label>src/Kurganov.h</label>
+        <link refid="Kurganov_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>src/Mainloop.h</label>
+        <link refid="Mainloop_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>src/Meanmax.h</label>
+        <link refid="Meanmax_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="12">
+        <label>src/MemManagement.h</label>
+        <link refid="MemManagement_8h_source"/>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>src/Mesh.cu</label>
+        <link refid="Mesh_8cu"/>
+      </node>
+      <node id="21">
+        <label>src/Mesh.h</label>
+        <link refid="Mesh_8h_source"/>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>src/Multilayer.h</label>
+        <link refid="Multilayer_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>src/Poly.h</label>
+        <link refid="Poly_8h_source"/>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>src/ReadForcing.h</label>
+        <link refid="ReadForcing_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>src/ReadInput.h</label>
+        <link refid="ReadInput_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>src/Read_netcdf.h</label>
+        <link refid="Read__netcdf_8h_source"/>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="33">
+        <label>src/Reimann.h</label>
+        <link refid="Reimann_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="11">
+        <label>src/Setup_GPU.h</label>
+        <link refid="Setup__GPU_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="1" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>src/Spherical.h</label>
+        <link refid="Spherical_8h_source"/>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>src/Testing.h</label>
+        <link refid="Testing_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>src/Updateforcing.h</label>
+        <link refid="Updateforcing_8h_source"/>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>src/Write_netcdf.h</label>
+        <link refid="Write__netcdf_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>src/utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="Gradients_8h_1a7967ede28d1cd668fcb23acde55ff39c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void gradientCPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, EvolvingP&lt; T &gt; XEv, GradientsP&lt; T &gt; XGrad, T *zb)</argsstring>
+        <name>gradientCPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type><ref refid="structGradientsP" kindref="compound">GradientsP</ref>&lt; T &gt;</type>
+          <declname>XGrad</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>CPU function to compute gradients for all evolving parameters, handle halo regions, and apply wet-dry fixes. Calculates spatial derivatives for height, surface elevation, and velocity components. Also manages halo regions and applies wet-dry fixes if necessary. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving parameters (height, surface elevation, velocities) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XGrad</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Gradient storage for the evolving parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Bathymetry array </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="14" column="18" bodyfile="src/Gradients.cu" bodystart="971" bodyend="1054" declfile="src/Gradients.h" declline="14" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1a0c7974442e46cbd7b6b79601238c171b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void gradientC</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, T *a, T *dadx, T *dady)</argsstring>
+        <name>gradientC</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dadx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dady</declname>
+        </param>
+        <briefdescription>
+<para>CPU function for calculating gradients using the minmod limiter. Computes spatial derivatives in x and y directions for a given variable. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Input variable array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dadx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output gradient in x </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dady</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output gradient in y </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="15" column="18" bodyfile="src/Gradients.cu" bodystart="921" bodyend="957" declfile="src/Gradients.h" declline="15" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1ace865c08d4d7671dec06b28afede9cd8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void gradientHalo</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, T *a, T *dadx, T *dady)</argsstring>
+        <name>gradientHalo</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dadx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dady</declname>
+        </param>
+        <briefdescription>
+<para>CPU function to compute gradients at the halo boundaries of all active blocks. This function iterates over all active blocks and computes the gradients at their halo boundaries using finite difference approximations. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array containing the variable for which gradients are to be computed </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dadx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed x-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dady</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed y-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This function calls specific functions to handle each of the four halo boundaries (left, right, bottom, top) for each block. It ensures that gradients are accurately computed at the edges of the computational domain, which is crucial for maintaining solution accuracy and stability. The function assumes that the input arrays are properly allocated and sized according to the simulation parameters. The gradient computations are performed using central differences where possible, and one-sided differences at the boundaries. The function is templated to support different data types (e.g., float, double). </para>
+</simplesect>
+<simplesect kind="see"><para>gradientHaloLeft, gradientHaloRight, gradientHaloBot, gradientHaloTop </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="16" column="18" bodyfile="src/Gradients.cu" bodystart="2584" bodyend="2605" declfile="src/Gradients.h" declline="16" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1a7f2beb9e797cc636e9de13e498fbd417" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void gradientGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, EvolvingP&lt; T &gt; XEv, GradientsP&lt; T &gt; XGrad, T *zb)</argsstring>
+        <name>gradientGPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type><ref refid="structGradientsP" kindref="compound">GradientsP</ref>&lt; T &gt;</type>
+          <declname>XGrad</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>Entry point for gradient of evolving variables calculation on the GPU. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Calculates gradients of evolving variables using CUDA kernels and synchronizes device operations. Handles halo filling and elevation conservation if required.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving variables </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XGrad</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Gradient variables </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Bed elevation array</para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+Wrapping function to calculate gradien of evolving variables on GPU This function is the entry point to the gradient functions on the GPU </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="19" column="18" bodyfile="src/Gradients.cu" bodystart="21" bodyend="196" declfile="src/Gradients.h" declline="19" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1a2db5efcf678989f6a5ba98b90e105c6a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void gradientGPUnew</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, EvolvingP&lt; T &gt; XEv, GradientsP&lt; T &gt; XGrad, T *zb)</argsstring>
+        <name>gradientGPUnew</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type><ref refid="structGradientsP" kindref="compound">GradientsP</ref>&lt; T &gt;</type>
+          <declname>XGrad</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>Alternative GPU gradient calculation using shared memory kernels and CUDA streams. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Uses gradientSMC kernels and handles halo filling, elevation conservation, and wet/dry prolongation.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving variables </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XGrad</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Gradient variables </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Bed elevation array </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="20" column="18" bodyfile="src/Gradients.cu" bodystart="212" bodyend="405" declfile="src/Gradients.h" declline="20" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1aa82a51988edcdf18dc9bd1904d2c0011" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void gradient</definition>
+        <argsstring>(int halowidth, int *active, int *level, T theta, T dx, T *a, T *dadx, T *dady)</argsstring>
+        <name>gradient</name>
+        <param>
+          <type>int</type>
+          <declname>halowidth</declname>
+        </param>
+        <param>
+          <type>int *</type>
+          <declname>active</declname>
+        </param>
+        <param>
+          <type>int *</type>
+          <declname>level</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>theta</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>dx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dadx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dady</declname>
+        </param>
+        <briefdescription>
+<para>Device kernel for calculating gradients for an evolving parameter using the minmod limiter. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Computes spatial derivatives in x and y directions for a given variable.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>halowidth</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Width of halo region </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>active</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Active block indices </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>level</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block refinement levels </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>theta</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Limiter parameter </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Grid spacing </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Input variable array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dadx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output gradient in x </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dady</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output gradient in y </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="21" column="29" bodyfile="src/Gradients.cu" bodystart="425" bodyend="472" declfile="src/Gradients.h" declline="21" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1a05d6a4a718eb7b36a5eca8b647547cd5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void gradientSM</definition>
+        <argsstring>(int halowidth, int *active, int *level, T theta, T dx, T *a, T *dadx, T *dady)</argsstring>
+        <name>gradientSM</name>
+        <param>
+          <type>int</type>
+          <declname>halowidth</declname>
+        </param>
+        <param>
+          <type>int *</type>
+          <declname>active</declname>
+        </param>
+        <param>
+          <type>int *</type>
+          <declname>level</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>theta</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>dx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dadx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dady</declname>
+        </param>
+        <briefdescription>
+<para>Deprecated shared memory device kernel for gradient calculation. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Uses shared memory for stencil operations; slower than the standard kernel.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>halowidth</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Width of halo region </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>active</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Active block indices </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>level</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block refinement levels </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>theta</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Limiter parameter </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Grid spacing </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Input variable array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dadx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output gradient in x </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dady</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output gradient in y </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="22" column="29" bodyfile="src/Gradients.cu" bodystart="493" bodyend="568" declfile="src/Gradients.h" declline="22" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1a266623c018aceee689a33a07775e3511" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void gradientSMB</definition>
+        <argsstring>(int halowidth, int *active, int *level, T theta, T dx, T *a, T *dadx, T *dady)</argsstring>
+        <name>gradientSMB</name>
+        <param>
+          <type>int</type>
+          <declname>halowidth</declname>
+        </param>
+        <param>
+          <type>int *</type>
+          <declname>active</declname>
+        </param>
+        <param>
+          <type>int *</type>
+          <declname>level</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>theta</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>dx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dadx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dady</declname>
+        </param>
+        <briefdescription>
+<para>Shared memory device kernel for gradient calculation (variant B). </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Uses a fixed shared memory tile for stencil operations; only computes gradients for interior points.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>halowidth</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Width of halo region </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>active</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Active block indices </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>level</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block refinement levels </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>theta</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Limiter parameter </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Grid spacing </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Input variable array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dadx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output gradient in x </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dady</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output gradient in y </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="23" column="29" bodyfile="src/Gradients.cu" bodystart="589" bodyend="640" declfile="src/Gradients.h" declline="23" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1a7617abb8f56283a3d59c3fd1ab77bcf8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void gradientSMC</definition>
+        <argsstring>(int halowidth, int *active, int *level, T theta, T dx, T *a, T *dadx, T *dady)</argsstring>
+        <name>gradientSMC</name>
+        <param>
+          <type>int</type>
+          <declname>halowidth</declname>
+        </param>
+        <param>
+          <type>int *</type>
+          <declname>active</declname>
+        </param>
+        <param>
+          <type>int *</type>
+          <declname>level</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>theta</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>dx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dadx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dady</declname>
+        </param>
+        <briefdescription>
+<para>Shared memory device kernel for gradient calculation (variant C). </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Uses a flat shared memory array for stencil operations; computes gradients for all points.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>halowidth</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Width of halo region </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>active</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Active block indices </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>level</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block refinement levels </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>theta</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Limiter parameter </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Grid spacing </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Input variable array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dadx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output gradient in x </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dady</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output gradient in y </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="24" column="29" bodyfile="src/Gradients.cu" bodystart="659" bodyend="751" declfile="src/Gradients.h" declline="24" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1a046d584e94545ba2b3745dfdd93fa563" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void gradientedgeX</definition>
+        <argsstring>(int halowidth, int *active, int *level, T theta, T dx, T *a, T *dadx)</argsstring>
+        <name>gradientedgeX</name>
+        <param>
+          <type>int</type>
+          <declname>halowidth</declname>
+        </param>
+        <param>
+          <type>int *</type>
+          <declname>active</declname>
+        </param>
+        <param>
+          <type>int *</type>
+          <declname>level</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>theta</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>dx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dadx</declname>
+        </param>
+        <briefdescription>
+<para>Device kernel for calculating gradients for an evolving parameter using the minmod limiter only at a fixed column (i.e. fixed ix). </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Computes x-derivative for a specific column using the minmod limiter.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>halowidth</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Width of halo region </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>active</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Active block indices </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>level</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block refinement levels </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>theta</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Limiter parameter </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Grid spacing </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Input variable array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dadx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output gradient in x </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="25" column="29" bodyfile="src/Gradients.cu" bodystart="771" bodyend="829" declfile="src/Gradients.h" declline="25" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1a8bca137115303b2d6d368e2a5fd06f68" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void gradientedgeY</definition>
+        <argsstring>(int halowidth, int *active, int *level, T theta, T dx, T *a, T *dady)</argsstring>
+        <name>gradientedgeY</name>
+        <param>
+          <type>int</type>
+          <declname>halowidth</declname>
+        </param>
+        <param>
+          <type>int *</type>
+          <declname>active</declname>
+        </param>
+        <param>
+          <type>int *</type>
+          <declname>level</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>theta</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>dx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dady</declname>
+        </param>
+        <briefdescription>
+<para>Device kernel for calculating gradients for an evolving parameter using the minmod limiter only at a fixed row (i.e. fixed iy). </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Computes y-derivative for a specific row using the minmod limiter.</para>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>halowidth</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Width of halo region </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>active</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Active block indices </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>level</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block refinement levels </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>theta</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Limiter parameter </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Grid spacing </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Input variable array </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dady</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Output gradient in y </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="26" column="29" bodyfile="src/Gradients.cu" bodystart="849" bodyend="906" declfile="src/Gradients.h" declline="26" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1a723f58c6d0e2c05a1aacabe22a3469a1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>void</type>
+        <definition>void gradientHaloGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, T *a, T *dadx, T *dady)</argsstring>
+        <name>gradientHaloGPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dadx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dady</declname>
+        </param>
+        <briefdescription>
+<para>GPU function to compute gradients at the halo boundaries of all active blocks. This function launches CUDA kernels to compute the gradients at the halo boundaries of all active blocks using parallel processing. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array containing the variable for which gradients are to be computed </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dadx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed x-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dady</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed y-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This function sets up the CUDA grid and block dimensions and launches specific kernels to handle each of the four halo boundaries (left, right, bottom, top) for all active blocks. It ensures that gradients are accurately computed at the edges of the computational domain, which is crucial for maintaining solution accuracy and stability. The function assumes that the input arrays are properly allocated and sized according to the simulation parameters. The gradient computations are performed using central differences where possible, and one-sided differences at the boundaries. The function is templated to support different data types (e.g., float, double). </para>
+</simplesect>
+<simplesect kind="see"><para>gradientHaloLeftGPU, gradientHaloRightGPU, gradientHaloBotGPU, gradientHaloTopGPU </para>
+</simplesect>
+<simplesect kind="see"><para>gradientHaloLeft, gradientHaloRight, gradientHaloBot, gradientHaloTop </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="27" column="18" bodyfile="src/Gradients.cu" bodystart="2624" bodyend="2644" declfile="src/Gradients.h" declline="27" declcolumn="18"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1a6ae01f915306c5e879362b72ab606a12" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void WetsloperesetXGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, EvolvingP&lt; T &gt; XEv, GradientsP&lt; T &gt; XGrad, T *zb)</argsstring>
+        <name>WetsloperesetXGPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type><ref refid="structGradientsP" kindref="compound">GradientsP</ref>&lt; T &gt;</type>
+          <declname>XGrad</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>Device kernel to apply wet slope limiters to gradients of surface elevation in the x-direction. Adjusts x-derivative gradients to prevent non-physical slopes in wet-dry transition zones. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving parameters (height, surface elevation, velocities) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XGrad</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Gradient storage for the evolving parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Bathymetry array </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="29" column="29" bodyfile="src/Gradients.cu" bodystart="1141" bodyend="1178" declfile="src/Gradients.h" declline="29" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1a4ea8993cfb8a689cb422ff0be9705082" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void WetsloperesetYGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, EvolvingP&lt; T &gt; XEv, GradientsP&lt; T &gt; XGrad, T *zb)</argsstring>
+        <name>WetsloperesetYGPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type><ref refid="structGradientsP" kindref="compound">GradientsP</ref>&lt; T &gt;</type>
+          <declname>XGrad</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>Device kernel to apply wet slope limiters to gradients of surface elevation in the y-direction. Adjusts y-derivative gradients to prevent non-physical slopes in wet-dry transition zones. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving parameters (height, surface elevation, velocities) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XGrad</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Gradient storage for the evolving parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Bathymetry array </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="30" column="29" bodyfile="src/Gradients.cu" bodystart="1190" bodyend="1227" declfile="src/Gradients.h" declline="30" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1aab8d8daad2d438b36040377b418ed165" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void WetsloperesetHaloLeftGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, EvolvingP&lt; T &gt; XEv, GradientsP&lt; T &gt; XGrad, T *zb)</argsstring>
+        <name>WetsloperesetHaloLeftGPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type><ref refid="structGradientsP" kindref="compound">GradientsP</ref>&lt; T &gt;</type>
+          <declname>XGrad</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>Device kernel to apply wet slope limiters to gradients of surface elevation at the left halo boundary. Adjusts x-derivative gradients to prevent non-physical slopes in wet-dry transition zones. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving parameters (height, surface elevation, velocities) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XGrad</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Gradient storage for the evolving parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Bathymetry array </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This kernel specifically handles the left halo boundary, where special care is needed due to the absence of neighboring blocks on that side. The logic accounts for various configurations of neighboring blocks to correctly compute the left surface elevation needed for the wet slope limiter. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="32" column="29" bodyfile="src/Gradients.cu" bodystart="1241" bodyend="1386" declfile="src/Gradients.h" declline="32" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1ac34df08b1165f2b4ec98734903c010ef" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void WetsloperesetHaloRightGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, EvolvingP&lt; T &gt; XEv, GradientsP&lt; T &gt; XGrad, T *zb)</argsstring>
+        <name>WetsloperesetHaloRightGPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type><ref refid="structGradientsP" kindref="compound">GradientsP</ref>&lt; T &gt;</type>
+          <declname>XGrad</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>Device kernel to apply wet slope limiters to gradients of surface elevation at the right halo boundary. Adjusts x-derivative gradients to prevent non-physical slopes in wet-dry transition zones. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving parameters (height, surface elevation, velocities) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XGrad</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Gradient storage for the evolving parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Bathymetry array </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This kernel specifically handles the right halo boundary, where special care is needed due to the absence of neighboring blocks on that side. The logic accounts for various configurations of neighboring blocks to correctly compute the right surface elevation needed for the wet slope limiter. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="33" column="29" bodyfile="src/Gradients.cu" bodystart="1567" bodyend="1719" declfile="src/Gradients.h" declline="33" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1aa401976be4b1145820238f5affa6b003" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void WetsloperesetHaloBotGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, EvolvingP&lt; T &gt; XEv, GradientsP&lt; T &gt; XGrad, T *zb)</argsstring>
+        <name>WetsloperesetHaloBotGPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type><ref refid="structGradientsP" kindref="compound">GradientsP</ref>&lt; T &gt;</type>
+          <declname>XGrad</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>GPU kernel to reset the wet slope limiter at the bottom halo boundary. Adjusts y-derivative gradients to prevent non-physical slopes in wet-dry transition zones. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving parameters (height, surface elevation, velocities) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XGrad</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Gradient storage for the evolving parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Bathymetry array </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This kernel specifically handles the bottom halo boundary, where special care is needed due to the absence of neighboring blocks on that side. The logic accounts for various configurations of neighboring blocks to correctly compute the bottom surface elevation needed for the wet slope limiter. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="34" column="29" bodyfile="src/Gradients.cu" bodystart="1908" bodyend="2057" declfile="src/Gradients.h" declline="34" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1a3929e8eea743f07ca888804c9b58fc74" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void WetsloperesetHaloTopGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, EvolvingP&lt; T &gt; XEv, GradientsP&lt; T &gt; XGrad, T *zb)</argsstring>
+        <name>WetsloperesetHaloTopGPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type><ref refid="structGradientsP" kindref="compound">GradientsP</ref>&lt; T &gt;</type>
+          <declname>XGrad</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>GPU kernel to reset the wet slope limiter at the top halo boundary. Adjusts y-derivative gradients to prevent non-physical slopes in wet-dry transition zones. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type (float or double) </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Evolving parameters (height, surface elevation, velocities) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XGrad</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Gradient storage for the evolving parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Bathymetry array </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This kernel specifically handles the top halo boundary, where special care is needed due to the absence of neighboring blocks on that side. The logic accounts for various configurations of neighboring blocks to correctly compute the top surface elevation needed for the wet slope limiter. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="35" column="29" bodyfile="src/Gradients.cu" bodystart="2245" bodyend="2395" declfile="src/Gradients.h" declline="35" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1a1ba99b42df344924b15644366879a908" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void gradientHaloLeftGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, T *a, T *dadx, T *dady)</argsstring>
+        <name>gradientHaloLeftGPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dadx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dady</declname>
+        </param>
+        <briefdescription>
+<para>GPU kernel to compute the gradient at the left halo boundary of blocks. This kernel calculates the x and y derivatives at the left edge of each block using finite difference approximations, taking into account the presence of neighboring blocks and their levels. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array containing the variable for which gradients are to be computed </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dadx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed x-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dady</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed y-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This kernel handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="38" column="29" bodyfile="src/Gradients.cu" bodystart="3295" bodyend="3430" declfile="src/Gradients.h" declline="38" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1a0683993ce23fd434f18ed081861f2f4e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void gradientHaloRightGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, T *a, T *dadx, T *dady)</argsstring>
+        <name>gradientHaloRightGPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dadx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dady</declname>
+        </param>
+        <briefdescription>
+<para>GPU kernel to compute the gradient at the right halo boundary of blocks. This kernel calculates the x and y derivatives at the right edge of each block using finite difference approximations, taking into account the presence of neighboring blocks and their levels. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array containing the variable for which gradients are to be computed </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dadx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed x-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dady</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed y-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This kernel handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="39" column="29" bodyfile="src/Gradients.cu" bodystart="3595" bodyend="3730" declfile="src/Gradients.h" declline="39" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1ab6a1fa866c793d6d480dce63d1093cc1" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void gradientHaloTopGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, T *a, T *dadx, T *dady)</argsstring>
+        <name>gradientHaloTopGPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dadx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dady</declname>
+        </param>
+        <briefdescription>
+<para>GPU kernel to compute the gradient at the top halo boundary of blocks. This kernel calculates the x and y derivatives at the top edge of each block using finite difference approximations, taking into account the presence of neighboring blocks and their levels. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array containing the variable for which gradients are to be computed </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dadx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed x-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dady</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed y-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This kernel handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="40" column="29" bodyfile="src/Gradients.cu" bodystart="4203" bodyend="4344" declfile="src/Gradients.h" declline="40" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1ac38cf6d668a6dcb8842f3f899e211856" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void gradientHaloBotGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, T *a, T *dadx, T *dady)</argsstring>
+        <name>gradientHaloBotGPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dadx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dady</declname>
+        </param>
+        <briefdescription>
+<para>GPU kernel to compute the gradient at the bottom halo boundary of blocks. This kernel calculates the x and y derivatives at the bottom edge of each block using finite difference approximations, taking into account the presence of neighboring blocks and their levels. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array containing the variable for which gradients are to be computed </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dadx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed x-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dady</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed y-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This kernel handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="41" column="29" bodyfile="src/Gradients.cu" bodystart="3893" bodyend="4034" declfile="src/Gradients.h" declline="41" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1a1146d278c18b9361212a1ed2bcedbf0c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void gradientHaloLeftGPUnew</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, T *a, T *dadx, T *dady)</argsstring>
+        <name>gradientHaloLeftGPUnew</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dadx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dady</declname>
+        </param>
+        <briefdescription>
+<para>GPU kernel to compute the gradient at the left halo boundary of blocks. This kernel calculates the x and y derivatives at the left edge of each block using finite difference approximations, taking into account the presence of neighboring blocks and their levels. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array containing the variable for which gradients are to be computed </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dadx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed x-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dady</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed y-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This kernel handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="43" column="29" bodyfile="src/Gradients.cu" bodystart="3443" bodyend="3582" declfile="src/Gradients.h" declline="43" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1aced9e7fa188d827a0603b5b652d16b93" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void gradientHaloRightGPUnew</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, T *a, T *dadx, T *dady)</argsstring>
+        <name>gradientHaloRightGPUnew</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dadx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dady</declname>
+        </param>
+        <briefdescription>
+<para>GPU kernel to compute the gradient at the right halo boundary of blocks. This kernel calculates the x and y derivatives at the right edge of each block using finite difference approximations, taking into account the presence of neighboring blocks and their levels. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array containing the variable for which gradients are to be computed </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dadx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed x-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dady</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed y-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This kernel handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="44" column="29" bodyfile="src/Gradients.cu" bodystart="3743" bodyend="3880" declfile="src/Gradients.h" declline="44" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1af240b026ec1496b35b8d28042abbd34a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void gradientHaloTopGPUnew</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, T *a, T *dadx, T *dady)</argsstring>
+        <name>gradientHaloTopGPUnew</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dadx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dady</declname>
+        </param>
+        <briefdescription>
+<para>GPU kernel to compute the gradient at the top halo boundary of blocks. This kernel calculates the x and y derivatives at the top edge of each block using finite difference approximations, taking into account the presence of neighboring blocks and their levels. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array containing the variable for which gradients are to be computed </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dadx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed x-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dady</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed y-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This kernel handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="45" column="29" bodyfile="src/Gradients.cu" bodystart="4357" bodyend="4502" declfile="src/Gradients.h" declline="45" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Gradients_8h_1a6ad537d3b5fec89bc00c43011c3e9f49" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void gradientHaloBotGPUnew</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt;XBlock, T *a, T *dadx, T *dady)</argsstring>
+        <name>gradientHaloBotGPUnew</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dadx</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dady</declname>
+        </param>
+        <briefdescription>
+<para>GPU kernel to compute the gradient at the bottom halo boundary of blocks. This kernel calculates the x and y derivatives at the bottom edge of each block using finite difference approximations, taking into account the presence of neighboring blocks and their levels. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>a</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array containing the variable for which gradients are to be computed </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dadx</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed x-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dady</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the computed y-derivative gradients </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This kernel handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Gradients.h" line="46" column="29" bodyfile="src/Gradients.cu" bodystart="4047" bodyend="4190" declfile="src/Gradients.h" declline="46" declcolumn="29"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#ifndef<sp/>GRADIENTS_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>GRADIENTS_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;General.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Param.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Arrays.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Forcing.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Util_CPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Setup_GPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;MemManagement.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Halo.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="comment">//<sp/>CPU<sp/>specific<sp/>functions</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientCPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/><ref refid="structGradientsP" kindref="compound">GradientsP&lt;T&gt;</ref><sp/>XGrad,<sp/>T*<sp/>zb);</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientC(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/>T*<sp/>a,<sp/>T*<sp/>dadx,<sp/>T*<sp/>dady);</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientHalo(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/>T*<sp/>a,<sp/>T*<sp/>dadx,<sp/>T*<sp/>dady);</highlight></codeline>
+<codeline lineno="17"><highlight class="normal"></highlight></codeline>
+<codeline lineno="18"><highlight class="normal"></highlight><highlight class="comment">//<sp/>GPU<sp/>specific<sp/>functions</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="19"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientGPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/><ref refid="structGradientsP" kindref="compound">GradientsP&lt;T&gt;</ref><sp/>XGrad,<sp/>T*<sp/>zb);</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientGPUnew(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/><ref refid="structGradientsP" kindref="compound">GradientsP&lt;T&gt;</ref><sp/>XGrad,<sp/>T*<sp/>zb);</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradient(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>halowidth,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>active,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>level,<sp/>T<sp/>theta,<sp/>T<sp/>dx,<sp/>T*<sp/>a,<sp/>T*<sp/>dadx,<sp/>T*<sp/>dady);</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientSM(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>halowidth,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>active,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>level,<sp/>T<sp/>theta,<sp/>T<sp/>dx,<sp/>T*<sp/>a,<sp/>T*<sp/>dadx,<sp/>T*<sp/>dady);</highlight></codeline>
+<codeline lineno="23"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientSMB(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>halowidth,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>active,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>level,<sp/>T<sp/>theta,<sp/>T<sp/>dx,<sp/>T*<sp/>a,<sp/>T*<sp/>dadx,<sp/>T*<sp/>dady);</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientSMC(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>halowidth,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>active,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>level,<sp/>T<sp/>theta,<sp/>T<sp/>dx,<sp/>T*<sp/>a,<sp/>T*<sp/>dadx,<sp/>T*<sp/>dady);</highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientedgeX(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>halowidth,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>active,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>level,<sp/>T<sp/>theta,<sp/>T<sp/>dx,<sp/>T*<sp/>a,<sp/>T*<sp/>dadx);</highlight></codeline>
+<codeline lineno="26"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientedgeY(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>halowidth,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>active,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal">*<sp/>level,<sp/>T<sp/>theta,<sp/>T<sp/>dx,<sp/>T*<sp/>a,<sp/>T*<sp/>dady);</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientHaloGPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/>T*<sp/>a,<sp/>T*<sp/>dadx,<sp/>T*<sp/>dady);</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"></highlight></codeline>
+<codeline lineno="29"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>WetsloperesetXGPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/><ref refid="structGradientsP" kindref="compound">GradientsP&lt;T&gt;</ref><sp/>XGrad,<sp/>T*<sp/>zb);</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>WetsloperesetYGPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/><ref refid="structGradientsP" kindref="compound">GradientsP&lt;T&gt;</ref><sp/>XGrad,<sp/>T*<sp/>zb);</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"></highlight></codeline>
+<codeline lineno="32"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>WetsloperesetHaloLeftGPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/><ref refid="structGradientsP" kindref="compound">GradientsP&lt;T&gt;</ref><sp/>XGrad,<sp/>T*<sp/>zb);</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>WetsloperesetHaloRightGPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/><ref refid="structGradientsP" kindref="compound">GradientsP&lt;T&gt;</ref><sp/>XGrad,<sp/>T*<sp/>zb);</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>WetsloperesetHaloBotGPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/><ref refid="structGradientsP" kindref="compound">GradientsP&lt;T&gt;</ref><sp/>XGrad,<sp/>T*<sp/>zb);</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>WetsloperesetHaloTopGPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/><ref refid="structGradientsP" kindref="compound">GradientsP&lt;T&gt;</ref><sp/>XGrad,<sp/>T*<sp/>zb);</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight></codeline>
+<codeline lineno="37"><highlight class="normal"></highlight></codeline>
+<codeline lineno="38"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientHaloLeftGPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/>T*<sp/>a,<sp/>T*<sp/>dadx,<sp/>T*<sp/>dady);</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientHaloRightGPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/>T*<sp/>a,<sp/>T*<sp/>dadx,<sp/>T*<sp/>dady);</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientHaloTopGPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/>T*<sp/>a,<sp/>T*<sp/>dadx,<sp/>T*<sp/>dady);</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientHaloBotGPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/>T*<sp/>a,<sp/>T*<sp/>dadx,<sp/>T*<sp/>dady);</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"></highlight></codeline>
+<codeline lineno="43"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientHaloLeftGPUnew(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/>T*<sp/>a,<sp/>T*<sp/>dadx,<sp/>T*<sp/>dady);</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientHaloRightGPUnew(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/>T*<sp/>a,<sp/>T*<sp/>dadx,<sp/>T*<sp/>dady);</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientHaloTopGPUnew(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/>T*<sp/>a,<sp/>T*<sp/>dadx,<sp/>T*<sp/>dady);</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>gradientHaloBotGPUnew(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref>XBlock,<sp/>T*<sp/>a,<sp/>T*<sp/>dadx,<sp/>T*<sp/>dady);</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"></highlight><highlight class="comment">//<sp/>End<sp/>of<sp/>global<sp/>definition</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="48"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="src/Gradients.h"/>
+  </compounddef>
+</doxygen>

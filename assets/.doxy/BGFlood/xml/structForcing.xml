@@ -1,0 +1,321 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structForcing" kind="struct" language="C++" prot="public">
+    <compoundname>Forcing</compoundname>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structForcing_1ab6d1d8beb917bf5b4277875145e5a6b6" prot="public" static="no" mutable="no">
+        <type><ref refid="structDynForcingP" kindref="compound">DynForcingP</ref>&lt; T &gt;</type>
+        <definition>DynForcingP&lt;T&gt; Forcing&lt; T &gt;::UWind</definition>
+        <argsstring></argsstring>
+        <name>UWind</name>
+        <qualifiedname>Forcing::UWind</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="158" column="13" bodyfile="src/Forcing.h" bodystart="158" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structForcing_1a274cf9569c58a68a2657327fb22bda12" prot="public" static="no" mutable="no">
+        <type><ref refid="structDynForcingP" kindref="compound">DynForcingP</ref>&lt; T &gt;</type>
+        <definition>DynForcingP&lt;T&gt; Forcing&lt; T &gt;::VWind</definition>
+        <argsstring></argsstring>
+        <name>VWind</name>
+        <qualifiedname>Forcing::VWind</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="159" column="13" bodyfile="src/Forcing.h" bodystart="159" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structForcing_1a3fec8f8f86faeda6a455ec60b88e8d42" prot="public" static="no" mutable="no">
+        <type><ref refid="structDynForcingP" kindref="compound">DynForcingP</ref>&lt; T &gt;</type>
+        <definition>DynForcingP&lt;T&gt; Forcing&lt; T &gt;::Rain</definition>
+        <argsstring></argsstring>
+        <name>Rain</name>
+        <qualifiedname>Forcing::Rain</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="170" column="13" bodyfile="src/Forcing.h" bodystart="170" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structForcing_1a46d192e153e4002ff84aa88c2e688b8e" prot="public" static="no" mutable="no">
+        <type><ref refid="structDynForcingP" kindref="compound">DynForcingP</ref>&lt; T &gt;</type>
+        <definition>DynForcingP&lt;T&gt; Forcing&lt; T &gt;::Atmp</definition>
+        <argsstring></argsstring>
+        <name>Atmp</name>
+        <qualifiedname>Forcing::Atmp</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="179" column="13" bodyfile="src/Forcing.h" bodystart="179" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structForcing_1a5fb5925c5f5854abfddc7c1690c66ec6" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; <ref refid="structStaticForcingP" kindref="compound">StaticForcingP</ref>&lt; T &gt; &gt;</type>
+        <definition>std::vector&lt;StaticForcingP&lt;T&gt; &gt; Forcing&lt; T &gt;::Bathy</definition>
+        <argsstring></argsstring>
+        <name>Bathy</name>
+        <qualifiedname>Forcing::Bathy</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="186" column="13" bodyfile="src/Forcing.h" bodystart="186" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structForcing_1a1866c0b0c2966be3680928c95258d0c7" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; <ref refid="structStaticForcingP" kindref="compound">StaticForcingP</ref>&lt; T &gt; &gt;</type>
+        <definition>std::vector&lt;StaticForcingP&lt;T&gt; &gt; Forcing&lt; T &gt;::cf</definition>
+        <argsstring></argsstring>
+        <name>cf</name>
+        <qualifiedname>Forcing::cf</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="200" column="13" bodyfile="src/Forcing.h" bodystart="200" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structForcing_1ac789c086dfbcbcd834218142e5e05358" prot="public" static="no" mutable="no">
+        <type><ref refid="structStaticForcingP" kindref="compound">StaticForcingP</ref>&lt; T &gt;</type>
+        <definition>StaticForcingP&lt;T&gt; Forcing&lt; T &gt;::il</definition>
+        <argsstring></argsstring>
+        <name>il</name>
+        <qualifiedname>Forcing::il</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="208" column="16" bodyfile="src/Forcing.h" bodystart="208" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structForcing_1a2ac1eceddb749d551b2075d12e880ea0" prot="public" static="no" mutable="no">
+        <type><ref refid="structStaticForcingP" kindref="compound">StaticForcingP</ref>&lt; T &gt;</type>
+        <definition>StaticForcingP&lt;T&gt; Forcing&lt; T &gt;::cl</definition>
+        <argsstring></argsstring>
+        <name>cl</name>
+        <qualifiedname>Forcing::cl</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="214" column="16" bodyfile="src/Forcing.h" bodystart="214" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structForcing_1aab418f0e8c0a7c3085a0987834d79c7b" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; <ref refid="structStaticForcingP" kindref="compound">StaticForcingP</ref>&lt; int &gt; &gt;</type>
+        <definition>std::vector&lt;StaticForcingP&lt;int&gt; &gt; Forcing&lt; T &gt;::targetadapt</definition>
+        <argsstring></argsstring>
+        <name>targetadapt</name>
+        <qualifiedname>Forcing::targetadapt</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="220" column="13" bodyfile="src/Forcing.h" bodystart="220" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structForcing_1a3d0c1369fb1764b69c88e37335b33828" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; <ref refid="classdeformmap" kindref="compound">deformmap</ref>&lt; T &gt; &gt;</type>
+        <definition>std::vector&lt;deformmap&lt;T&gt; &gt; Forcing&lt; T &gt;::deform</definition>
+        <argsstring></argsstring>
+        <name>deform</name>
+        <qualifiedname>Forcing::deform</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="222" column="13" bodyfile="src/Forcing.h" bodystart="222" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structForcing_1ac8f0a8c6b7ea6cb5a960674658801203" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; <ref refid="classRiver" kindref="compound">River</ref> &gt;</type>
+        <definition>std::vector&lt;River&gt; Forcing&lt; T &gt;::rivers</definition>
+        <argsstring></argsstring>
+        <name>rivers</name>
+        <qualifiedname>Forcing::rivers</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="231" column="13" bodyfile="src/Forcing.h" bodystart="231" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structForcing_1a9842a51eaf67a8b2bc960f1c25306a19" prot="public" static="no" mutable="no">
+        <type><ref refid="classbndparam" kindref="compound">bndparam</ref></type>
+        <definition>bndparam Forcing&lt; T &gt;::left</definition>
+        <argsstring></argsstring>
+        <name>left</name>
+        <qualifiedname>Forcing::left</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="240" column="10" bodyfile="src/Forcing.h" bodystart="240" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structForcing_1ab69b88c42783bfd47d0f252eaf1de75a" prot="public" static="no" mutable="no">
+        <type><ref refid="classbndparam" kindref="compound">bndparam</ref></type>
+        <definition>bndparam Forcing&lt; T &gt;::right</definition>
+        <argsstring></argsstring>
+        <name>right</name>
+        <qualifiedname>Forcing::right</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="248" column="10" bodyfile="src/Forcing.h" bodystart="248" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structForcing_1ae2dfc19dc54edd381f5fdddf3db505ae" prot="public" static="no" mutable="no">
+        <type><ref refid="classbndparam" kindref="compound">bndparam</ref></type>
+        <definition>bndparam Forcing&lt; T &gt;::top</definition>
+        <argsstring></argsstring>
+        <name>top</name>
+        <qualifiedname>Forcing::top</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="255" column="10" bodyfile="src/Forcing.h" bodystart="255" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structForcing_1aec7216137e8548c5a5a003fafd9e53d1" prot="public" static="no" mutable="no">
+        <type><ref refid="classbndparam" kindref="compound">bndparam</ref></type>
+        <definition>bndparam Forcing&lt; T &gt;::bot</definition>
+        <argsstring></argsstring>
+        <name>bot</name>
+        <qualifiedname>Forcing::bot</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="262" column="10" bodyfile="src/Forcing.h" bodystart="262" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structForcing_1a56600af8854241b4c3d9154d0f145257" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; <ref refid="classbndsegment" kindref="compound">bndsegment</ref> &gt;</type>
+        <definition>std::vector&lt;bndsegment&gt; Forcing&lt; T &gt;::bndseg</definition>
+        <argsstring></argsstring>
+        <name>bndseg</name>
+        <qualifiedname>Forcing::bndseg</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="270" column="13" bodyfile="src/Forcing.h" bodystart="270" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structForcing_1a3f7143436d458714b4bd6edbf33085b4" prot="public" static="no" mutable="no">
+        <type><ref refid="classAOIinfo" kindref="compound">AOIinfo</ref></type>
+        <definition>AOIinfo Forcing&lt; T &gt;::AOI</definition>
+        <argsstring></argsstring>
+        <name>AOI</name>
+        <qualifiedname>Forcing::AOI</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="276" column="9" bodyfile="src/Forcing.h" bodystart="276" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="5">
+        <label>AOIinfo</label>
+        <link refid="classAOIinfo"/>
+        <childnode refid="6" relation="usage">
+          <edgelabel>poly</edgelabel>
+        </childnode>
+      </node>
+      <node id="1">
+        <label>Forcing&lt; T &gt;</label>
+        <link refid="structForcing"/>
+        <childnode refid="2" relation="usage">
+          <edgelabel>bot</edgelabel>
+          <edgelabel>left</edgelabel>
+          <edgelabel>right</edgelabel>
+          <edgelabel>top</edgelabel>
+        </childnode>
+        <childnode refid="5" relation="usage">
+          <edgelabel>AOI</edgelabel>
+        </childnode>
+      </node>
+      <node id="6">
+        <label>Polygon</label>
+        <link refid="classPolygon"/>
+      </node>
+      <node id="4">
+        <label>TexSetP</label>
+        <link refid="structTexSetP"/>
+      </node>
+      <node id="3">
+        <label>bndTexP</label>
+        <link refid="structbndTexP"/>
+        <childnode refid="4" relation="usage">
+          <edgelabel>Uvel</edgelabel>
+          <edgelabel>Vvel</edgelabel>
+          <edgelabel>WLS</edgelabel>
+        </childnode>
+      </node>
+      <node id="2">
+        <label>bndparam</label>
+        <link refid="classbndparam"/>
+        <childnode refid="3" relation="usage">
+          <edgelabel>GPU</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="src/Forcing.h" line="156" column="1" bodyfile="src/Forcing.h" bodystart="157" bodyend="283"/>
+    <listofallmembers>
+      <member refid="structForcing_1a3f7143436d458714b4bd6edbf33085b4" prot="public" virt="non-virtual"><scope>Forcing</scope><name>AOI</name></member>
+      <member refid="structForcing_1a46d192e153e4002ff84aa88c2e688b8e" prot="public" virt="non-virtual"><scope>Forcing</scope><name>Atmp</name></member>
+      <member refid="structForcing_1a5fb5925c5f5854abfddc7c1690c66ec6" prot="public" virt="non-virtual"><scope>Forcing</scope><name>Bathy</name></member>
+      <member refid="structForcing_1a56600af8854241b4c3d9154d0f145257" prot="public" virt="non-virtual"><scope>Forcing</scope><name>bndseg</name></member>
+      <member refid="structForcing_1aec7216137e8548c5a5a003fafd9e53d1" prot="public" virt="non-virtual"><scope>Forcing</scope><name>bot</name></member>
+      <member refid="structForcing_1a1866c0b0c2966be3680928c95258d0c7" prot="public" virt="non-virtual"><scope>Forcing</scope><name>cf</name></member>
+      <member refid="structForcing_1a2ac1eceddb749d551b2075d12e880ea0" prot="public" virt="non-virtual"><scope>Forcing</scope><name>cl</name></member>
+      <member refid="structForcing_1a3d0c1369fb1764b69c88e37335b33828" prot="public" virt="non-virtual"><scope>Forcing</scope><name>deform</name></member>
+      <member refid="structForcing_1ac789c086dfbcbcd834218142e5e05358" prot="public" virt="non-virtual"><scope>Forcing</scope><name>il</name></member>
+      <member refid="structForcing_1a9842a51eaf67a8b2bc960f1c25306a19" prot="public" virt="non-virtual"><scope>Forcing</scope><name>left</name></member>
+      <member refid="structForcing_1a3fec8f8f86faeda6a455ec60b88e8d42" prot="public" virt="non-virtual"><scope>Forcing</scope><name>Rain</name></member>
+      <member refid="structForcing_1ab69b88c42783bfd47d0f252eaf1de75a" prot="public" virt="non-virtual"><scope>Forcing</scope><name>right</name></member>
+      <member refid="structForcing_1ac8f0a8c6b7ea6cb5a960674658801203" prot="public" virt="non-virtual"><scope>Forcing</scope><name>rivers</name></member>
+      <member refid="structForcing_1aab418f0e8c0a7c3085a0987834d79c7b" prot="public" virt="non-virtual"><scope>Forcing</scope><name>targetadapt</name></member>
+      <member refid="structForcing_1ae2dfc19dc54edd381f5fdddf3db505ae" prot="public" virt="non-virtual"><scope>Forcing</scope><name>top</name></member>
+      <member refid="structForcing_1ab6d1d8beb917bf5b4277875145e5a6b6" prot="public" virt="non-virtual"><scope>Forcing</scope><name>UWind</name></member>
+      <member refid="structForcing_1a274cf9569c58a68a2657327fb22bda12" prot="public" virt="non-virtual"><scope>Forcing</scope><name>VWind</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
