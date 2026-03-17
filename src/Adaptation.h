@@ -13,6 +13,7 @@
 #include "InitialConditions.h"
 #include "Testing.h"
 
+
 template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model<T>& XModel);
 template <class T> void InitialAdaptation(Param& XParam, Forcing<float> &XForcing, Model<T>& XModel);
 template <class T> bool refinesanitycheck(Param XParam, BlockP<T> XBlock, bool*& refine, bool*& coarsen);
@@ -28,6 +29,9 @@ template <class T> int AddBlocks(int nnewblk, Param& XParam, Model<T>& XModel);
 template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, EvolvingP<T> XEvo, EvolvingP<T>& XEv);
 template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, EvolvingP<T> XEvo, EvolvingP<T>& XEv);
 template <class T> void Adaptationcleanup(Param& XParam, BlockP<T>& XBlock, AdaptP& XAdapt);
+
+
+template <class T> bool checkneighbourdistance(double dx, int ib, int levelib, T blocko, int neighbourib, int levelneighbour, T neighbourblocko, bool rightortop );
 
 // End of global definition
 #endif

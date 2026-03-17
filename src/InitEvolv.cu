@@ -18,6 +18,21 @@
 
 #include "InitEvolv.h"
 
+#include "InitEvolv.h"
+
+/**
+ * @brief Initialize evolving variables for the simulation.
+ *
+ * Handles hotstart, coldstart, and warmstart initialization of water level, velocity, and bathymetry arrays.
+ * Applies offsets and boundary conditions as needed.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XForcing Forcing/boundary conditions
+ * @param XEv Evolving variables (output)
+ * @param zb Bathymetry array (input/output)
+ */
 template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> XForcing, EvolvingP<T> &XEv,T* &zb)
 {
 	//move this to a subroutine
@@ -30,7 +45,7 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> 
 		hotstartsucess = readhotstartfile(XParam, XBlock, XEv, zb);
 
 		//add offset if present
-		if (!std::isnan(XParam.zsoffset)) // apply specified zsoffset
+		if (T(XParam.zsoffset) != T(0.0)) // apply specified zsoffset
 		{
 			printf("\t\tadd offset to zs and hh... ");
 			//
@@ -61,8 +76,18 @@ template <class T> void initevolv(Param XParam, BlockP<T> XBlock,Forcing<float> 
 		//!leftWLbnd.empty()
 
 		//case 0 (i.e. zsinint not specified by user and no boundaries were specified)
+		bool bndison = false;
+		for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+		{
+			if (XForcing.bndseg[iseg].on)
+			{
+				bndison = true;
+			}
+		}
+
+
 		
-		if (std::isnan(XParam.zsinit) && (!XParam.leftbnd && !XParam.rightbnd && !XParam.topbnd && !XParam.botbnd)) //zsinit is default
+		if (std::isnan(XParam.zsinit) && (!bndison)) //zsinit is default
 		{
 			XParam.zsinit = 0.0; // better default value than nan
 		}
@@ -90,11 +115,23 @@ template void initevolv<float>(Param XParam, BlockP<float> XBlock, Forcing<float
 template void initevolv<double>(Param XParam, BlockP< double > XBlock, Forcing<float> XForcing, EvolvingP< double > &XEv, double* &zb);
 
 
+/**
+ * @brief Cold start initialization of evolving variables.
+ *
+ * Sets initial water level, velocity, and bathymetry arrays for all blocks using specified zsinit and zsoffset.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param zb Bathymetry array
+ * @param XEv Evolving variables (output)
+ * @return Success flag (1 if successful)
+ */
 template <class T>
 int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 {
 	T zzini = std::isnan(XParam.zsinit)? T(0.0): T(XParam.zsinit);
-	T zzoffset = std::isnan(XParam.zsoffset) ? T(0.0) : T(XParam.zsoffset);
+	T zzoffset = T(XParam.zsoffset);
 	
 
 	
@@ -124,15 +161,138 @@ int coldstart(Param XParam, BlockP<T> XBlock, T* zb, EvolvingP<T> & XEv)
 	}
 	
 	coldstartsucess = 1;
-	return coldstartsucess = 1;
+	return coldstartsucess;
+}
+
+/**
+ * @brief Warm start initialization using boundary conditions and interpolation.
+ *
+ * Sets initial water level, velocity, and bathymetry arrays for all blocks using boundary segments and atmospheric pressure forcing.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XForcing Forcing/boundary conditions
+ * @param XBlock Block parameters
+ * @param zb Bathymetry array
+ * @param XEv Evolving variables (output)
+ */
+template <class T>
+void warmstart(Param XParam, Forcing<float> XForcing, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
+{
+	int nuni=0;
+	int ndyn=0;
+
+	T zsbnduni=T(0.0);
+	T zsbnd;
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		if (XForcing.bndseg[iseg].on)
+		{
+			if (XForcing.bndseg[iseg].uniform)
+			{
+				nuni++;
+
+				int SLstepinbnd = 1;
+
+				double difft = XForcing.bndseg[iseg].data[SLstepinbnd].time - XParam.totaltime;
+				while (difft < 0.0)
+				{
+					SLstepinbnd++;
+					difft = XForcing.bndseg[iseg].data[SLstepinbnd].time - XParam.totaltime;
+				}
+
+				//itime = SLstepinbnd - 1.0 + (totaltime - bndseg.data[SLstepinbnd - 1].time) / (bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time);
+				zsbnduni = zsbnduni + interptime(XForcing.bndseg[iseg].data[SLstepinbnd].wspeed, XForcing.bndseg[iseg].data[SLstepinbnd - 1].wspeed, XForcing.bndseg[iseg].data[SLstepinbnd].time - XForcing.bndseg[iseg].data[SLstepinbnd - 1].time, XParam.totaltime - XForcing.bndseg[iseg].data[SLstepinbnd - 1].time);
+
+			}
+			else
+			{
+				ndyn++;
+				Forcingthisstep(XParam, XParam.totaltime, XForcing.bndseg[iseg].WLmap);
+			}
+		}
+	}
+	if (nuni > 0)
+	{
+		zsbnduni = zsbnduni / nuni;
+	}
+
+	int ib;
+	double xi, yi;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				int n = (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
+
+				double levdx = calcres(XParam.dx, XBlock.level[ib]);
+				xi = XParam.xo + XBlock.xo[ib] + i * levdx;
+				yi = XParam.yo + XBlock.yo[ib] + j * levdx;
+
+				zsbnd = zsbnduni;
+
+				if (ndyn > 0)
+				{
+					zsbnd = zsbnduni * nuni;
+					
+					for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+					{
+						if (XForcing.bndseg[iseg].on && !XForcing.bndseg[iseg].uniform)
+						{
+							//
+							zsbnd = zsbnd + float(interp2BUQ(xi, yi, XForcing.bndseg[iseg].WLmap));
+						}
+					}
+
+					zsbnd = zsbnd / (nuni + ndyn);
+				}
+
+				if (XParam.atmpforcing)
+				{
+					float atmpi;
+
+					if (XForcing.Atmp.uniform)
+					{
+						atmpi = float(XForcing.Atmp.nowvalue);
+					}
+					else
+					{
+						atmpi = float(interp2BUQ(xi, yi, XForcing.Atmp));
+					}
+					zsbnd = zsbnd - (atmpi - (T)XParam.Paref) * (T)XParam.Pa2m;
+				}
+
+				XEv.zs[n] = utils::max(zsbnd, zb[n]);
+				XEv.h[n] = utils::max(XEv.zs[n] - zb[n], T(0.0));
+				XEv.u[n] = T(0.0);
+				XEv.v[n] = T(0.0);
+			}
+		}
+	}
+
 }
 
 
+/**
+ * @brief Legacy warm start initialization using inverse distance to boundaries.
+ *
+ * Sets initial water level, velocity, and bathymetry arrays for all blocks using inverse distance interpolation from boundaries.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XForcing Forcing/boundary conditions
+ * @param XBlock Block parameters
+ * @param zb Bathymetry array
+ * @param XEv Evolving variables (output)
+ */
 template <class T>
-void warmstart(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
+void warmstartold(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, EvolvingP<T>& XEv)
 {
-	// This function read water level boundary if they have nbeen setup and calculate thedistance to the boundary 
-	// toward the end the water level value is calculated as an inverse distnace to the available boundaries.
+	// This function read water level boundary if they have been setup and calculate the distance to the boundary 
+	// toward the end the water level value is calculated as an inverse distance to the available boundaries.
 	// While this may look convoluted its working quite simply.
 	// look for each boundary side and calculate the closest water level value and the distance to that value
 
@@ -317,9 +477,22 @@ void warmstart(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, Ev
 				}
 
 
-				zsbnd = ((zsleft / distleft) * lefthere + (zsright / distright) * righthere + (zstop / disttop) * tophere + (zsbot / distbot) * bothere) / ((1.0 / distleft) * lefthere + (1.0 / distright) * righthere + (1.0 / disttop) * tophere + (1.0 / distbot) * bothere);
+				zsbnd = T(((zsleft / distleft) * lefthere + (zsright / distright) * righthere + (zstop / disttop) * tophere + (zsbot / distbot) * bothere) / ((1.0 / distleft) * lefthere + (1.0 / distright) * righthere + (1.0 / disttop) * tophere + (1.0 / distbot) * bothere));
 
+				if (XParam.atmpforcing)
+				{
+					float atmpi;
 
+					if (XForcing.Atmp.uniform)
+					{
+						atmpi = float(XForcing.Atmp.nowvalue);
+					}
+					else
+					{
+						atmpi = float(interp2BUQ(xi, yi, XForcing.Atmp));
+					}
+					zsbnd = zsbnd - (atmpi- (T)XParam.Paref) * (T)XParam.Pa2m;
+				}
 
 				XEv.zs[n] = utils::max(zsbnd, zb[n]);
 				XEv.h[n] = utils::max(XEv.zs[n] - zb[n], T(0.0));
@@ -334,6 +507,18 @@ void warmstart(Param XParam,Forcing<float> XForcing, BlockP<T> XBlock, T* zb, Ev
 }
 
 
+/**
+ * @brief Add offset to surface elevation (zs) and update water depth (h).
+ *
+ * Applies zsoffset to zs and updates h for all blocks where h > eps.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables (input/output)
+ * @param zb Bathymetry array
+ * @return Success flag (1 if successful)
+ */
 template <class T>
 int AddZSoffset(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv, T*zb)
 {
@@ -364,15 +549,73 @@ int AddZSoffset(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv, T*zb)
 }
 
 
+/**
+ * @brief Read BG_Flood hotstart file and extract block attributes.
+ *
+ * Opens NetCDF hotstart file, checks for BG_Flood attribute, and closes file.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param zb Bathymetry array
+ * @return Status code
+ */
+template <class T>
+int readhotstartfileBG(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
+{
+	int status;
+	int ncid;
+	//int dimids[NC_MAX_VAR_DIMS];   // dimension IDs 
+	int ib;
+	//double scalefac = 1.0;
+	//double offset = 0.0;
+
+	std::string zbname, zsname, hname, uname, vname, xname, yname;
+	// Open the file for read access
+	//netCDF::NcFile dataFile(XParam.hotstartfile, NcFile::read);
+
+	bool isBG_Flood = false;
+
+	int BG_vers = -999;
+
+	// read ncfile attribute and see if BG_flood global attribute exists.
+	//Open NC file
+	printf("Open file...");
+	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
+
+	status = nc_get_att_int(ncid, NC_GLOBAL, "BG_Flood", &BG_vers);
+
+	//isBG_Flood = BG_vers >= 0)
+	
+	status = nc_close(ncid);
+	
+	
+	
+}
+
+/**
+ * @brief Read hotstart file and initialize evolving variables and bathymetry.
+ *
+ * Reads NetCDF hotstart file, extracts variables, and fills arrays for all blocks.
+ * Handles missing variables and applies edge corrections.
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables (output)
+ * @param zb Bathymetry array (output)
+ * @return Success flag (1 if successful, 0 if fallback to cold start)
+ */
 template <class T>
 int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 {
 	int status;
-	int ncid, varid, ndims;
+	int ncid;
 	//int dimids[NC_MAX_VAR_DIMS];   // dimension IDs 
 	int ib;
-	double scalefac = 1.0;
-	double offset = 0.0;
+	//double scalefac = 1.0;
+	//double offset = 0.0;
 	
 	std::string zbname, zsname, hname, uname, vname, xname, yname;
 	// Open the file for read access
@@ -382,12 +625,20 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 	//Open NC file
 	printf("Open file...");
 	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
+
+
+	//bool isBG_Flood = false;
+
+	// read ncfile attribute and see if BG_flood global attribute exists.
+
+	//if it exist read each level separatly otherwise look for the following variables 
+
 	if (status != NC_NOERR) handle_ncerror(status);
-	zbname = checkncvarname(ncid, "zb", "z", "ZB", "Z");
-	zsname = checkncvarname(ncid, "zs", "eta", "ZS", "ETA");
-	hname = checkncvarname(ncid, "h", "hh", "hhh", "hhhh");
-	uname = checkncvarname(ncid, "u", "uu", "uvel", "UVEL");
-	vname = checkncvarname(ncid, "v", "vv", "vvel", "VVEL");
+	zbname = checkncvarname(ncid, "zb", "z", "ZB", "Z", "zb_P0");
+	zsname = checkncvarname(ncid, "zs", "eta", "ZS", "ETA", "zs_P0");
+	hname = checkncvarname(ncid, "h", "hh", "hhh", "hhhh", "h_P0");
+	uname = checkncvarname(ncid, "u", "uu", "uvel", "UVEL", "u_P0");
+	vname = checkncvarname(ncid, "v", "vv", "vvel", "VVEL", "v_P0");
 
 	//by default we assume that the x axis is called "xx" but that is not sure "x" shoudl be accepted and so does "lon" for spherical grid
 	// The folowing section figure out which one is in the file and if none exits with the netcdf error
@@ -425,7 +676,7 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 
 
 	}
-	// second check if zs or hh are in teh file
+	// second check if zs or hh are in the file
 
 
 	//zs Section

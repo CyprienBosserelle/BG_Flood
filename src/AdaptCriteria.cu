@@ -3,19 +3,32 @@
 
 #include "AdaptCriteria.h"
 
+// Adaptation criteria functions
 
+/**
+ * @brief Selects and applies the adaptation criteria for mesh refinement/coarsening.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XForcing Forcing data
+ * @param XModel Model structure
+ * @return Success flag (0 or 1)
+ *
+ * This function chooses the adaptation method ("Threshold", "Inrange", "Targetlevel") based on XParam.AdaptCrit,
+ * and applies it to the mesh using the corresponding criteria function. It sets the refine/coarsen flags for each block
+ * according to the selected method and arguments. For "Targetlevel", it loops over all target adaptation maps.
+ */
 template <class T> int AdaptCriteria(Param XParam, Forcing<float> XForcing, Model<T> XModel)
 {
 	int success = 0;
-	if (XParam.AdatpCrit.compare("Threshold") == 0)
+	if (XParam.AdaptCrit.compare("Threshold") == 0)
 	{
 		success = Thresholdcriteria(XParam, T(std::stod(XParam.Adapt_arg1)), XModel.OutputVarMap[XParam.Adapt_arg2], XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
 	}
-	if (XParam.AdatpCrit.compare("Inrange") == 0)
+	if (XParam.AdaptCrit.compare("Inrange") == 0)
 	{
 		success = inrangecriteria(XParam, T(std::stod(XParam.Adapt_arg1)), T(std::stod(XParam.Adapt_arg2)), XModel.OutputVarMap[XParam.Adapt_arg3], XModel.blocks, XModel.adapt.refine, XModel.adapt.coarsen);
 	}
-	if (XParam.AdatpCrit.compare("Targetlevel") == 0)
+	if (XParam.AdaptCrit.compare("Targetlevel") == 0)
 	{
 		for (int ig = 0; ig < XForcing.targetadapt.size(); ig++)
 		{
@@ -27,14 +40,25 @@ template <class T> int AdaptCriteria(Param XParam, Forcing<float> XForcing, Mode
 template int AdaptCriteria<float>(Param XParam, Forcing<float> XForcing, Model<float> XModel);
 template int AdaptCriteria<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel);
 
-
-/*! \fn int Thresholdcriteria(Param XParam,T threshold, T* z, BlockP<T> XBlock,  bool*& refine, bool*& coarsen)
-* Threshold criteria is a general form of wet dry criteria
-* Simple wet/.dry refining criteria.
-* if the block is wet -> refine is true
-* if the block is dry -> coarsen is true
-* beware the refinement sanity check is meant to be done after running this function
-*/
+/**
+ * @brief Applies threshold-based adaptation criteria for mesh refinement/coarsening.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param threshold Threshold value for adaptation
+ * @param z Array of variable values (e.g., water depth)
+ * @param XBlock Block data structure
+ * @param refine Array of refinement flags
+ * @param coarsen Array of coarsening flags
+ * @return Success flag (0 or 1)
+ *
+ * Refines blocks where any cell value exceeds the threshold, coarsens otherwise.
+ *
+ * Threshold criteria is a general form of wet dry criteria.
+ * Simple wet/dry refining criteria.
+ * If the block is wet -> refine is true.
+ * If the block is dry -> coarsen is true.
+ * @warning the refinement sanity check is meant to be done after running this function.
+ */
 template <class T> int Thresholdcriteria(Param XParam,T threshold, T* z, BlockP<T> XBlock, bool* refine, bool* coarsen)
 {
 	// Threshold criteria is a general form of wet dry criteria where esp is the threshold and h is the parameter tested
@@ -82,12 +106,25 @@ template <class T> int Thresholdcriteria(Param XParam,T threshold, T* z, BlockP<
 template  int Thresholdcriteria<float>(Param XParam, float threshold, float* z, BlockP<float> XBlock, bool* refine, bool* coarsen);
 template  int Thresholdcriteria<double>(Param XParam, double threshold, double* z, BlockP<double> XBlock, bool* refine, bool* coarsen);
 
-/*! \fn int inrangecriteria(Param XParam, T zmin, T zmax, T* z, BlockP<T> XBlock, bool*& refine, bool*& coarsen)
-* Simple in-range refining criteria.
-* if any value of z (could be any variable) is zmin <= z <= zmax the block will try to refine
-* otherwise, the block will try to coarsen
-* beware the refinement sanity check is meant to be done after running this function
-*/
+/**
+ * @brief Applies in-range adaptation criteria for mesh refinement/coarsening.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param zmin Minimum value for refinement
+ * @param zmax Maximum value for refinement
+ * @param z Array of variable values
+ * @param XBlock Block data structure
+ * @param refine Array of refinement flags
+ * @param coarsen Array of coarsening flags
+ * @return Success flag (0 or 1)
+ *
+ * Refines blocks where any cell value is within [zmin, zmax], coarsens otherwise.
+ *
+ * Simple in-range refining criteria.
+ * If any value of z (could be any variable) is zmin <= z <= zmax the block will try to refine.
+ * Otherwise, the block will try to coarsen.
+ * @warning the refinement sanity check is meant to be done after running this function.
+ */
 template<class T>
 int inrangecriteria(Param XParam, T zmin, T zmax, T* z, BlockP<T> XBlock, bool* refine, bool* coarsen)
 {
@@ -127,8 +164,18 @@ int inrangecriteria(Param XParam, T zmin, T zmax, T* z, BlockP<T> XBlock, bool* 
 template int inrangecriteria<float>(Param XParam, float zmin, float zmax, float* z, BlockP<float> XBlock, bool* refine, bool* coarsen);
 template int inrangecriteria<double>(Param XParam, double zmin, double zmax, double* z, BlockP<double> XBlock, bool* refine, bool* coarsen);
 
-/*! \fn 
-*/
+/**
+ * @brief Applies target level adaptation criteria for mesh refinement/coarsening.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param targetlevelmap Map of target levels for adaptation
+ * @param XBlock Block data structure
+ * @param refine Array of refinement flags
+ * @param coarsen Array of coarsening flags
+ * @return Success flag (0 or 1)
+ *
+ * Refines blocks where target level is greater than current, coarsens if equal or lower.
+ */
 template<class T>
 int targetlevelcriteria(Param XParam, StaticForcingP<int> targetlevelmap, BlockP<T> XBlock, bool* refine, bool* coarsen)
 {
@@ -141,7 +188,7 @@ int targetlevelcriteria(Param XParam, StaticForcingP<int> targetlevelmap, BlockP
 	{
 		int ib = XBlock.active[ibl];
 
-		delta = calcres(XParam.dx, XBlock.level[ib]);
+		delta = T(calcres(XParam.dx, XBlock.level[ib]));
 
 		uplevel = false;
 		samelevel = false;
@@ -155,8 +202,8 @@ int targetlevelcriteria(Param XParam, StaticForcingP<int> targetlevelmap, BlockP
 			{
 				//
 				int n = memloc(XParam, ix, iy, ib);
-				x = XParam.xo + XBlock.xo[ib] + T(ix) * delta;
-				y = XParam.yo + XBlock.yo[ib] + T(iy) * delta;
+				x = T(XParam.xo) + XBlock.xo[ib] + T(ix) * delta;
+				y = T(XParam.yo) + XBlock.yo[ib] + T(iy) * delta;
 
 				targetlevel = int(round(interp2BUQ(x, y, targetlevelmap)));
 

@@ -1,3 +1,10 @@
+/**
+ * @file Mesh.cu
+ * @brief Mesh initialization and management routines for BG_Flood GPU model.
+ *
+ * Contains functions for block-based mesh setup, memory allocation, block adaptation,
+ * and block neighbor initialization.
+ */
 //////////////////////////////////////////////////////////////////////////////////
 //                                                                              //
 //Copyright (C) 2018 Bosserelle                                                 //
@@ -18,6 +25,15 @@
 
 #include "Mesh.h"
 
+/**
+ * @brief Calculates the initial number of blocks for the mesh.
+ * @param XParam Model parameters (resolution, block size, etc.)
+ * @param XForcing Forcing data (bathymetry, AOI polygon, etc.)
+ * @return Number of blocks to allocate for the mesh.
+ *
+ * This function divides the domain into uniform blocks, checks masking and AOI,
+ * and counts blocks that are active for computation.
+ */
 int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 {
 
@@ -31,22 +47,29 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 	int nmask = 0;
 	//int mloc = 0;
 
+	bool insidepoly = false;
+
 	double levdx = calcres(XParam.dx, XParam.initlevel);
 
-	int maxnbx = ceil(XParam.nx / (double)XParam.blkwidth);
-	int maxnby = ceil(XParam.ny / (double)XParam.blkwidth);
+	int maxnbx = ftoi(ceil(XParam.nx / (double)XParam.blkwidth));
+	int maxnby = ftoi(ceil(XParam.ny / (double)XParam.blkwidth));
 
 	for (int nblky = 0; nblky < maxnby; nblky++)
 	{
 		for (int nblkx = 0; nblkx < maxnbx; nblkx++)
 		{
+			insidepoly = true;
+			if (XForcing.AOI.active)
+			{
+				insidepoly = blockinpoly(XParam.xo + nblkx * XParam.blkwidth * levdx, XParam.yo + nblky * XParam.blkwidth * levdx, levdx, XParam.blkwidth, XForcing.AOI.poly);
+			}
 			nmask = 0;
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
 				for (int j = 0; j < XParam.blkwidth; j++)
 				{
-					double x = XParam.xo + (double(i) + XParam.blkwidth * nblkx) * levdx + 0.5 * levdx;
-					double y = XParam.yo + (double(j) + XParam.blkwidth * nblky) * levdx + 0.5 * levdx;
+					double x = XParam.xo + (double(i) + (double)XParam.blkwidth * (double)nblkx) * levdx + 0.5 * levdx;
+					double y = XParam.yo + (double(j) + (double)XParam.blkwidth * (double)nblky) * levdx + 0.5 * levdx;
 
 					//if (x >= XForcing.Bathy.xo && x <= XForcing.Bathy.xmax && y >= XForcing.Bathy.yo && y <= XForcing.Bathy.ymax)
 					{
@@ -89,7 +112,7 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 
 				}
 			}
-			if (nmask < (XParam.blkwidth* XParam.blkwidth))
+			if ((nmask < (XParam.blkwidth* XParam.blkwidth)) && insidepoly)
 				nblk++;
 		}
 	}
@@ -97,6 +120,15 @@ int CalcInitnblk(Param XParam, Forcing<float> XForcing)
 	return nblk;
 }
 
+/**
+ * @brief Initializes the mesh and allocates memory for blocks.
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XForcing Forcing data
+ * @param XModel Model structure to hold mesh and block data
+ *
+ * Allocates memory, initializes block info, adaptation info, and boundary masks.
+ */
 template <class T>
 void InitMesh(Param &XParam, Forcing<float> & XForcing, Model<T> &XModel)
 {
@@ -106,7 +138,7 @@ void InitMesh(Param &XParam, Forcing<float> & XForcing, Model<T> &XModel)
 	log("\nInitializing mesh");
 	int nblk;
 
-	nblk= CalcInitnblk(XParam, XForcing);
+	nblk = CalcInitnblk(XParam, XForcing);
 		
 	XParam.nblk = nblk;
 	// allocate a few extra blocks for adaptation
@@ -117,6 +149,7 @@ void InitMesh(Param &XParam, Forcing<float> & XForcing, Model<T> &XModel)
 	//==============================
 	// Allocate CPU memory for the whole model
 	AllocateCPU(XParam.nblkmem, XParam.blksize, XParam, XModel);
+
 
 	//==============================
 	// Initialise blockinfo info
@@ -143,6 +176,13 @@ void InitMesh(Param &XParam, Forcing<float> & XForcing, Model<T> &XModel)
 template void InitMesh<float>(Param &XParam, Forcing<float>& XForcing, Model<float> &XModel);
 template void InitMesh<double>(Param &XParam, Forcing<float>& XForcing, Model<double> &XModel);
 
+/**
+ * @brief Initializes block information (active status, level, coordinates, neighbors).
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XForcing Forcing data
+ * @param XBlock Block data structure
+ */
 template <class T> void InitBlockInfo(Param &XParam, Forcing<float> &XForcing, BlockP<T>& XBlock)
 {
 	//============================
@@ -170,6 +210,13 @@ template <class T> void InitBlockInfo(Param &XParam, Forcing<float> &XForcing, B
 
 }
 
+/**
+ * @brief Initializes block adaptation arrays for mesh refinement/coarsening.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param XAdap Adaptation data structure
+ */
 template <class T> void InitBlockadapt(Param &XParam, BlockP<T> XBlock, AdaptP& XAdap)
 {
 		InitBlkBUQ(XParam, XBlock, XParam.initlevel, XAdap.newlevel);
@@ -196,6 +243,17 @@ template void InitBlockadapt<double>(Param &XParam, BlockP<double> XBlock, Adapt
 
 
 
+/**
+ * @brief Initializes block coordinates and active status for the mesh.
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XForcing Forcing data
+ * @param XBlock Block data structure
+ *
+ * Sets block coordinates and marks active blocks based on mask and AOI polygon.
+ * Loops over all blocks, checks if each block is inside the area of interest (AOI),
+ * and if the mask threshold is met, sets the block as active and stores its coordinates.
+ */
 template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, BlockP<T> &XBlock)
 {
 
@@ -204,21 +262,29 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 	int blkid = 0;
 	double levdx = calcres(XParam.dx, XParam.initlevel);
 
+	bool insidepoly = true;
 	
-	int maxnbx = ceil(XParam.nx / (double)XParam.blkwidth);
-	int maxnby = ceil(XParam.ny / (double)XParam.blkwidth);
+	int maxnbx = ftoi(ceil(XParam.nx / (double)XParam.blkwidth));
+	int maxnby = ftoi(ceil(XParam.ny / (double)XParam.blkwidth));
 
 	for (int nblky = 0; nblky < maxnby; nblky++)
 	{
 		for (int nblkx = 0; nblkx < maxnbx; nblkx++)
 		{
+			insidepoly = true;
+			if (XForcing.AOI.active)
+			{
+				insidepoly = blockinpoly(XParam.xo + nblkx * XParam.blkwidth * levdx, XParam.yo + nblky * XParam.blkwidth * levdx, levdx, XParam.blkwidth, XForcing.AOI.poly);
+			}
 			nmask = 0;
 			for (int i = 0; i < XParam.blkwidth; i++)
 			{
 				for (int j = 0; j < XParam.blkwidth; j++)
 				{
-					double x = XParam.xo + (double(i) + XParam.blkwidth * nblkx)*levdx + 0.5 * levdx;
-					double y = XParam.yo + (double(j) + XParam.blkwidth * nblky)*levdx + 0.5 * levdx;
+					double x = XParam.xo + (double(i) + (T)XParam.blkwidth * (T)nblkx)*levdx + 0.5 * levdx;
+					double y = XParam.yo + (double(j) + (T)XParam.blkwidth * (T)nblky)*levdx + 0.5 * levdx;
+
+					int n = memloc(XParam, i, j, blkid);
 
 					//x = max(min(x, XParam.Bathymetry.xmax), XParam.Bathymetry.xo);
 					//y = max(min(y, XParam.Bathymetry.ymax), XParam.Bathymetry.yo);
@@ -254,17 +320,20 @@ template <class T> void InitBlockxoyo(Param XParam, Forcing<float> XForcing, Blo
 						//printf("q = %f\t q11=%f\t, q12=%f\t, q21=%f\t, q22=%f\t, x1=%f\t, x2=%f\t, y1=%f\t, y2=%f\t, x=%f\t, y=%f\t\n", q, q11, q12, q21, q22, x1, x2, y1, y2, x, y);
 						//printf("mloc: %i\n", mloc);
 						if (q >= XParam.mask)
+						{
 							nmask++;
+
+						}
 					}
 					
 
 				}
 			}
-			if (nmask < (XParam.blkwidth * XParam.blkwidth))
+			if ((nmask < (XParam.blkwidth * XParam.blkwidth)) && insidepoly)
 			{
 				//
-				XBlock.xo[blkid] = nblkx * ((T)XParam.blkwidth) * levdx + 0.5 * levdx;
-				XBlock.yo[blkid] = nblky * ((T)XParam.blkwidth) * levdx + 0.5 * levdx;
+				XBlock.xo[blkid] = nblkx * ((T)XParam.blkwidth) * (T)levdx + T(0.5) * (T)levdx;
+				XBlock.yo[blkid] = nblky * ((T)XParam.blkwidth) * (T)levdx + T(0.5) * (T)levdx;
 				XBlock.active[blkid] = blkid;
 				//printf("blkxo=%f\tblkyo=%f\n", blockxo_d[blkid], blockyo_d[blkid]);
 				blkid++;
@@ -280,6 +349,15 @@ template void InitBlockxoyo<float>(Param XParam, Forcing<float> XForcing, BlockP
 template void InitBlockxoyo<double>(Param XParam, Forcing<float> XForcing, BlockP<double> & XBlockP);
 
 template <class T> void InitBlockneighbours(Param &XParam,Forcing<float> &XForcing,  BlockP<T>& XBlock)
+/**
+ * @brief Initializes neighbor relationships for each block in a uniform mesh.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XForcing Forcing data
+ * @param XBlock Block data structure
+ *
+ * Sets up neighbor indices for each block (left, right, top, bottom, corners).
+ */
 {
 	// This function will only work if the blocks are uniform
 	// A separate function is used for adaptivity
@@ -288,22 +366,25 @@ template <class T> void InitBlockneighbours(Param &XParam,Forcing<float> &XForci
 	//====================================
 	// First setp up neighbours
 
-	T levdx = calcres(XParam.dx, XParam.initlevel);
+	double levdx = calcres(XParam.dx, XParam.initlevel);
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 
 		int bl = XBlock.active[ibl];
-		T espdist = std::numeric_limits<T>::epsilon() * (T)10.0; // i.e. distances are calculated within 10x theoretical machine precision
+		//T espdist = std::numeric_limits<T>::epsilon() * (T)100.0; // i.e. distances are calculated within 100x theoretical machine precision
+		// This too theoretical error definition has been modified to allow more flexibility
+		T espdist = (T)levdx/3;
+		
 
-		leftxo = XBlock.xo[bl] - ((T)XParam.blkwidth) * levdx;
+		leftxo = XBlock.xo[bl] - ((T)XParam.blkwidth) * (T)levdx;
 
 		leftyo = XBlock.yo[bl];
-		rightxo = XBlock.xo[bl] + ((T)XParam.blkwidth) * levdx;
+		rightxo = XBlock.xo[bl] + ((T)XParam.blkwidth) * (T)levdx;
 		rightyo = XBlock.yo[bl];
 		topxo = XBlock.xo[bl];
-		topyo = XBlock.yo[bl] + ((T)XParam.blkwidth) * levdx;
+		topyo = XBlock.yo[bl] + ((T)XParam.blkwidth) * (T)levdx;
 		botxo = XBlock.xo[bl];
-		botyo = XBlock.yo[bl] - ((T)XParam.blkwidth) * levdx;
+		botyo = XBlock.yo[bl] - ((T)XParam.blkwidth) * (T)levdx;
 
 		// by default neighbour block refer to itself. i.e. if the neighbour block is itself then there are no neighbour
 		XBlock.LeftBot[bl] = bl;
@@ -320,7 +401,6 @@ template <class T> void InitBlockneighbours(Param &XParam,Forcing<float> &XForci
 		{
 			//
 			int blb = XBlock.active[iblb];
-
 			if (abs(XBlock.xo[blb] - leftxo) < espdist && abs(XBlock.yo[blb] - leftyo) < espdist)
 			{
 				XBlock.LeftBot[bl] = blb;
@@ -356,26 +436,33 @@ template void InitBlockneighbours<double>(Param &XParam, Forcing<float>& XForcin
 
 
 
+/**
+ * @brief Calculates the number of blocks with masked neighbors (for boundary handling).
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @return Number of blocks with masked neighbors.
+ */
 template <class T> int CalcMaskblk(Param XParam, BlockP<T> XBlock)
 {
 	int nmask = 0;
 	bool neighbourmask = false;
-	T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
-	T initlevdx = calcres(XParam.dx, XParam.initlevel);
+	T leftxo, rightxo, topyo,  botyo;
+	T initlevdx = calcres((T)XParam.dx, XParam.initlevel);
 
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XBlock.active[ibl];
-		T levdx = calcres(XParam.dx, XBlock.level[ib]);
+		T levdx = calcres((T)XParam.dx, XBlock.level[ib]);
 
 		leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
 
-		leftyo = XBlock.yo[ib];
+		//leftyo = XBlock.yo[ib];
 		rightxo = XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
-		rightyo = XBlock.yo[ib];
-		topxo = XBlock.xo[ib];
+		//rightyo = XBlock.yo[ib];
+		//topxo = XBlock.xo[ib];
 		topyo = XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
-		botxo = XBlock.xo[ib];
+		//botxo = XBlock.xo[ib];
 		botyo = XBlock.yo[ib];
 
 		neighbourmask = false;
@@ -410,6 +497,14 @@ template int CalcMaskblk<double>(Param XParam, BlockP<double> XBlock);
 
 
 
+/**
+ * @brief Identifies and stores blocks with masked sides for boundary processing.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ *
+ * Populates mask arrays for blocks with masked sides for later boundary condition handling.
+ */
 template <class T> void FindMaskblk(Param XParam, BlockP<T> &XBlock)
 {
 
@@ -418,7 +513,7 @@ template <class T> void FindMaskblk(Param XParam, BlockP<T> &XBlock)
 	{
 		int nmask = 0;
 		bool neighbourmask = false;
-		T leftxo, leftyo, rightxo, rightyo, topxo, topyo, botxo, botyo;
+		T leftxo, rightxo,  topyo, botyo;
 
 		// Reallocate array if necessary
 		ReallocArray(XBlock.mask.nblk, 1, XBlock.mask.side);
@@ -428,16 +523,16 @@ template <class T> void FindMaskblk(Param XParam, BlockP<T> &XBlock)
 		for (int ibl = 0; ibl < XParam.nblk; ibl++)
 		{
 			int ib = XBlock.active[ibl];
-			T levdx = calcres(XParam.dx, XBlock.level[ib]);
+			T levdx = calcres((T)XParam.dx, XBlock.level[ib]);
 
 			leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
 
-			leftyo = XBlock.yo[ib];
+			//leftyo = XBlock.yo[ib];
 			rightxo = XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
-			rightyo = XBlock.yo[ib];
-			topxo = XBlock.xo[ib];
+			//rightyo = XBlock.yo[ib];
+			//topxo = XBlock.xo[ib];
 			topyo = XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
-			botxo = XBlock.xo[ib];
+			//botxo = XBlock.xo[ib];
 			botyo = XBlock.yo[ib];
 
 			neighbourmask = false;

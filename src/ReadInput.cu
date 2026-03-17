@@ -30,19 +30,36 @@
 * template DynForcingP<float> readfileinfo<DynForcingP<float>>(std::string input, DynForcingP<float> outinfo);
 * template deformmap<float> readfileinfo<deformmap<float>>(std::string input, deformmap<float> outinfo);
 */
-template <class T> T readfileinfo(std::string input,T outinfo)
+/**
+ * @brief Parse a parameter string and update the parameter structure.
+ * Parses a line from the parameter file and updates the given parameter structure.
+ * Convert file name into name and extension. 
+ * This is used for various input classes
+ * template inputmap readfileinfo<inputmap>(std::string input, inputmap outinfo);
+ * template forcingmap readfileinfo<forcingmap>(std::string input, forcingmap outinfo);
+ * template StaticForcingP<float> readfileinfo<StaticForcingP<float>>(std::string input, StaticForcingP<float> outinfo);
+ * template DynForcingP<float> readfileinfo<DynForcingP<float>>(std::string input, DynForcingP<float> outinfo);
+ * template deformmap<float> readfileinfo<deformmap<float>>(std::string input, deformmap<float> outinfo);
+ *
+ * @param line Input line from parameter file
+ * @param param Parameter structure to update
+ * @return Updated parameter structure
+ */
+template <class T> T readfileinfo(std::string input, T outinfo)
 {
 	// Outinfo is based on an inputmap (or it's sub classes)
-	
+
 	//filename include the file extension
 
 	std::vector<std::string> extvec = split(input, '.');
 
 	//outinfo.inputfile = extvec.front();
 
-	std::vector<std::string> nameelements;
+	std::vector<std::string> nameelements, filename;
 	//
 	nameelements = split(extvec.back(), '?');
+
+	filename = split(input, '?');
 	if (nameelements.size() > 1)
 	{
 		//variable name for bathy is not given so it is assumed to be zb
@@ -53,11 +70,12 @@ template <class T> T readfileinfo(std::string input,T outinfo)
 	else
 	{
 		outinfo.extension = extvec.back();
+		outinfo.varname = "z";
 	}
 
 	//Reconstruct filename with extension but without varname
-	outinfo.inputfile = extvec.front() + "." + outinfo.extension;
-
+	//outinfo.inputfile = extvec.front() + "." + outinfo.extension;
+	outinfo.inputfile = filename.front();
 
 	return outinfo;
 }
@@ -75,11 +93,20 @@ template deformmap<float> readfileinfo<deformmap<float>>(std::string input, defo
 * Open the BG_param.txt file and read the parameters
 * save the parameter in the Param class and or Forcing class.
 */
-void Readparamfile(Param &XParam, Forcing<float> & XForcing)
+/**
+ * @brief Read and parse the parameter file.
+ * Opens the specified parameter file (default: BG_param.txt file), reads its contents, and updates the provided
+ * parameter structures: Param class (XParam) and Forcing class (XForcing).
+ * @param XParam Reference to the parameter structure to be updated
+ * @param XForcing Reference to the forcing structure to be updated
+ * @param Paramfile Name of the parameter file to read
+ */
+void Readparamfile(Param& XParam, Forcing<float>& XForcing, std::string Paramfile)
 {
 	//
-	log("\nReading BG_param.txt ...");
-	std::ifstream fs("BG_param.txt");
+	log("\nReading parameter file: " + Paramfile + " ...");
+	//std::ifstream fs("BG_param.txt");
+	std::ifstream fs(Paramfile);
 
 	if (fs.fail()) {
 		//std::cerr << "BG_param.txt file could not be opened" << std::endl;
@@ -110,7 +137,7 @@ void Readparamfile(Param &XParam, Forcing<float> & XForcing)
 
 
 	}
-	
+
 }
 
 
@@ -118,9 +145,20 @@ void Readparamfile(Param &XParam, Forcing<float> & XForcing)
 
 
 /*! \fn Param readparamstr(std::string line, Param param)
-* Read BG_param.txt line and convert parameter to the righ parameter in teh class
-* retrun an updated Param class 
+* Read BG_param.txt line and convert parameter to the righ parameter in the class
+* return an updated Param class
 */
+/**
+ * @brief Parse a parameter string and update the parameter structure.
+ *
+ * Parses a line from the parameter file and updates the given parameter structure.
+ * Read BG_param.txt line and convert parameter to the right parameter in the class
+ * Return an updated Param class
+ *
+ * @param line Input line from parameter file
+ * @param param Parameter structure to update
+ * @return Updated parameter structure
+ */
 Param readparamstr(std::string line, Param param)
 {
 
@@ -131,7 +169,6 @@ Param readparamstr(std::string line, Param param)
 	// General parameters
 	//
 
-
 	parameterstr = "test";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -139,7 +176,7 @@ Param readparamstr(std::string line, Param param)
 		param.test = std::stoi(parametervalue);
 	}
 
-	paramvec = { "gpudevice","GPUDEVICE" };
+	paramvec = { "GPUDEVICE","gpu" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
@@ -151,6 +188,29 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.doubleprecision = std::stoi(parametervalue);
+	}
+
+	parameterstr = "engine";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> buttingerstr = { "b","butt","buttinger","1" };
+		std::size_t found;
+		bool foo = false;
+		for (int ii = 0; ii < buttingerstr.size(); ii++)
+		{
+			found = case_insensitive_compare(parametervalue, buttingerstr[ii]);// it needs to strictly compare
+			if (found == 0)
+			{
+				param.engine = 1;
+				foo = true;
+			}
+
+		}
+		if (!foo)
+		{
+			param.engine = 5;
+		}
 	}
 	///////////////////////////////////////////////////////
 	// Adaptation
@@ -176,20 +236,26 @@ Param readparamstr(std::string line, Param param)
 		param.initlevel = std::stoi(parametervalue);
 	}
 
-	parameterstr = "conserveelevation";
+	paramvec = { "adaptmaxiteration","maxiterationadapt" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.adaptmaxiteration = std::stoi(parametervalue);
+	}
+
+	parameterstr = "conserveElevation";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		param.conserveElevation = readparambool(parametervalue, param.conserveElevation);
+	}
 
-		if (parametervalue.compare("true") == 0 || parametervalue.compare("True") == 0)
-		{
-			param.conserveElevation = true;
-		}
-		else if (parametervalue.compare("false") == 0 || parametervalue.compare("False") == 0)
-		{
-			param.conserveElevation = false;
-		}
+	paramvec = { "wetdryfix","reminstab","fixinstab" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
 
+		param.wetdryfix = readparambool(parametervalue, param.wetdryfix);
 
 	}
 
@@ -210,16 +276,46 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.eps = std::stod(parametervalue);
 	}
-	
-	parameterstr = "cf";
-	parametervalue = findparameter(parameterstr, line);
+
+	paramvec = { "cf","roughness","cfmap" };
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		param.cf = std::stod(parametervalue);
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha) == false) //(std::isdigit(parametervalue[0]) == true)
+		{
+			param.cf = std::stod(parametervalue);
+		}
 	}
 
-	
-	
+	paramvec = { "il","Rain_il","initialloss" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha) == false) //(std::isdigit(parametervalue[0]) == true)
+		{
+			param.il = std::stod(parametervalue);
+			param.infiltration = true;
+		}
+	}
+
+	paramvec = { "cl","Rain_cl","continuousloss" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha) == false) //(std::isdigit(parametervalue[0]) == true)
+		{
+			param.cl = std::stod(parametervalue);
+			param.infiltration = true;
+		}
+	}
+
+	paramvec = { "VelThreshold","vthresh","vmax","velmax" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.VelThreshold = std::stod(parametervalue);
+	}
+
 	parameterstr = "Cd";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -259,6 +355,45 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
+	parameterstr = "dtmin";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.dtmin = std::stod(parametervalue);
+
+	}
+	parameterstr = "bndtaper";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.bndtaper = std::stod(parametervalue);
+
+	}
+
+	parameterstr = "bndrelaxtime";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.bndrelaxtime = std::stod(parametervalue);
+
+	}
+	parameterstr = "bndfiltertime";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.bndfiltertime = std::stod(parametervalue);
+
+	}
+
+
+	paramvec = { "aoibnd","remainderbnd","remainbndtype","aoibndtype" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.aoibnd = std::stoi(parametervalue);
+	}
+
+
 	parameterstr = "CFL";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -274,54 +409,77 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
-	paramvec = { "outputtimestep","outtimestep" };
+	paramvec = { "outputtimestep","outtimestep","outputstep" };
 	parametervalue = findparameter(paramvec, line);
-	//parameterstr = "outputtimestep";
-	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.outputtimestep = std::stod(parametervalue);
 
 	}
-	/*parameterstr = "outtimestep";
-	parametervalue = findparameter(parameterstr, line);
+
+	paramvec = { "endtime", "stoptime", "end", "stop","end_time","stop_time" };
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		param.outputtimestep = std::stod(parametervalue);
-
-	}*/
-
-	parameterstr = "endtime";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.endtime = std::stod(parametervalue);
+		param.endtime = readinputtimetxt(parametervalue, param.reftime);
 
 	}
-	parameterstr = "totaltime";
+
+	paramvec = { "totaltime","inittime","starttime", "start_time", "init_time", "start", "init" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		//param.totaltime = std::stod(parametervalue);
+		param.totaltime = readinputtimetxt(parametervalue, param.reftime);
+
+	}
+
+	paramvec = { "ForceMassConserve", "MassConservation", "MassCon","forcemassconservation","forcevolumeconservation","Volumeconservation","VolumeCon", "ForceVolConserve" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		//param.totaltime = std::stod(parametervalue);
+		param.totaltime = readinputtimetxt(parametervalue, param.reftime);
+		param.ForceMassConserve = readparambool(parametervalue, param.ForceMassConserve);
+
+	}
+
+
+	parameterstr = "dtinit";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.totaltime = std::stod(parametervalue);
+		param.dtinit = std::stod(parametervalue);
+
+	}
+
+	paramvec = { "reftime","referencetime","timeref" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (param.reftime.empty())
+		{
+			param.reftime = parametervalue;
+		}
 
 	}
 
 	///////////////////////////////////////////////////////
 	// Input and output files
 	//
-	
+
 	parameterstr = "outfile";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.outfile = parametervalue;
-		
+
 	}
 
-	
+
 	// Below is a bit more complex than usual because more than 1 node can be outputed as a timeseries
-	parameterstr = "TSOutput";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "TSnodesout","TSOutput" };
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
 		TSoutnode node;
@@ -338,12 +496,12 @@ Param readparamstr(std::string line, Param param)
 		{
 			std::cerr << "Node input failed there should be 3 arguments (comma separated) when inputing a outout node: TSOutput = filename, xvalue, yvalue; see log file for details" << std::endl;
 
-			log("Node input failed there should be 3 arguments (comma separated) when inputing a outout node: TSOutput = filename, xvalue, yvalue; see log file for details. Input was: "+ parametervalue);
-			
+			log("Node input failed there should be 3 arguments (comma separated) when inputing a outout node: TSOutput = filename, xvalue, yvalue; see log file for details. Input was: " + parametervalue);
+
 		}
-		
+
 	}
-	
+
 
 
 	//outvars
@@ -356,11 +514,15 @@ Param readparamstr(std::string line, Param param)
 		{
 			//Verify that the variable name makes sense?
 			//Need to add more here
-			std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hmax", "zsmax", "umax", "vmax" ,"vort","dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf"};
+
+
+			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","hmean","zsmean","umean","vmean","hUmean","Umean","hmax","zsmax","umax","vmax","hUmax","Umax","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw","hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy" };
+
+
 			std::string vvar = trim(vars[nv], " ");
 			for (int isup = 0; isup < SupportedVarNames.size(); isup++)
 			{
-				
+
 				//std::cout << "..." << vvar << "..." << std::endl;
 				if (vvar.compare(SupportedVarNames[isup]) == 0)
 				{
@@ -374,31 +536,100 @@ Param readparamstr(std::string line, Param param)
 			param.outmean = (vvar.compare("zsmean") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("umean") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("vmean") == 0) ? true : param.outmean;
+			param.outmean = (vvar.compare("Umean") == 0) ? true : param.outmean;
+			param.outmean = (vvar.compare("hUmean") == 0) ? true : param.outmean;
 
 			param.outmax = (vvar.compare("hmax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("zsmax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("umax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("vmax") == 0) ? true : param.outmax;
+			param.outmax = (vvar.compare("Umax") == 0) ? true : param.outmax;
+			param.outmax = (vvar.compare("hUmax") == 0) ? true : param.outmax;
 
-			param.outvort = (vvar.compare("vort") == 0) ? true : param.outvort;
+			param.outtwet = (vvar.compare("twet") == 0) ? true : param.outtwet;
+
+			//param.outvort = (vvar.compare("vort") == 0) ? true : param.outvort;
+			//param.outU = (vvar.compare("U") == 0) ? true : param.outU;
 		}
-		
 
-		
+
+
 	}
 
-	
 
+	// Same as for TSnodesout, the same key word can be used for different zones Output
+	parameterstr = "outzone";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		outzoneP zone;
+		std::vector<std::string> zoneitems = split(parametervalue, ',');
+		if (zoneitems.size() >= 5)
+		{
+			zone.outname = zoneitems[0];
+			zone.xstart = std::stod(zoneitems[1]);
+			zone.xend = std::stod(zoneitems[2]);
+			zone.ystart = std::stod(zoneitems[3]);
+			zone.yend = std::stod(zoneitems[4]);
+		}
+		if (zoneitems.size() > 5)
+		{
+			// concatenate 5,6,.... together
+			std::string constr;
+
+			for (int ist = 5; ist < zoneitems.size(); ist++)
+			{
+				constr = constr + zoneitems[ist];
+				if (ist < (zoneitems.size() - 1))
+				{
+					constr = constr + ",";
+				}
+
+			}
+			zone.Toutput.inputstr = ReadToutSTR(constr);
+			
+			
+		}
+		else if (zoneitems.size() == 5)//No time input in the zone area
+		{
+			zone.Toutput.inputstr = ReadToutSTR(""); // Thats needs to move to sanity check
+		}
+		else
+		{
+			std::cerr << "Zone input failed there should be at least 5 arguments (comma separated) when inputing a outout zone: outzone = filename, xstart, xend, ystart, yend; see log file for details" << std::endl;
+			log("Node input failed there should be at least 5 arguments (comma separated) when inputing a outout zone: outzone = filename, xstart, xend, ystart, yend; see log file for details (with possibly some time inputs after). Input was: " + parametervalue);
+		}
+		param.outzone.push_back(zone);
+	}
 
 	parameterstr = "resetmax";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		param.resetmax = std::stoi(parametervalue);
+		if (std::stoi(parametervalue) == 1)
+		{
+			param.resetmax = true;
+		}
 	}
 
+	// WARNING FOR DEBUGGING PURPOSE ONLY
+	// For debugging one can shift the output by 1 or -1 in the i and j direction.
+	// this will save the value in the halo to the output file allowing debugging of values there.
+	parameterstr = "outishift";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.outishift = std::stoi(parametervalue);
+	}
+	parameterstr = "outjshift";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.outjshift = std::stoi(parametervalue);
+	}
 
-	
+	////////////////////////////////////////////////////////////////
+
 
 	parameterstr = "nx";
 	parametervalue = findparameter(parameterstr, line);
@@ -430,33 +661,17 @@ Param readparamstr(std::string line, Param param)
 
 	paramvec = { "xo","xmin" };
 	parametervalue = findparameter(paramvec, line);
-	//parameterstr = "xo";
-	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.xo = std::stod(parametervalue);
 	}
-	/*parameterstr = "xmin";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.xo = std::stod(parametervalue);
-	}*/
 
 	paramvec = { "yo","ymin" };
 	parametervalue = findparameter(paramvec, line);
-	//parameterstr = "yo";
-	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.yo = std::stod(parametervalue);
 	}
-	/*parameterstr = "ymin";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.yo = std::stod(parametervalue);
-	}*/
 
 	parameterstr = "xmax";
 	parametervalue = findparameter(parameterstr, line);
@@ -477,7 +692,7 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.g = std::stod(parametervalue);
-		
+
 	}
 
 	parameterstr = "rho";
@@ -551,21 +766,12 @@ Param readparamstr(std::string line, Param param)
 	}
 #endif
 
-	paramvec = { "initzs","zsinit" };
+	paramvec = { "zsinit", "initzs" };
 	parametervalue = findparameter(paramvec, line);
-	//parameterstr = "initzs";
-	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.zsinit = std::stod(parametervalue);
 	}
-	/*
-	parameterstr = "zsinit";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		param.zsinit = std::stod(parametervalue);
-	}*/
 
 	parameterstr = "zsoffset";
 	parametervalue = findparameter(parameterstr, line);
@@ -573,28 +779,36 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.zsoffset = std::stod(parametervalue);
 	}
+	paramvec = { "rainbnd", "rainonbnd" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.rainbnd = readparambool(parametervalue, param.rainbnd);
+
+	}
+
 
 	parameterstr = "hotstartfile";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.hotstartfile = parametervalue;
-		
+
 	}
-	
+
 	parameterstr = "hotstep";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.hotstep = std::stoi(parametervalue);
 	}
-	
 
-	parameterstr = "spherical";
-	parametervalue = findparameter(parameterstr, line);
+
+	paramvec = { "spherical", "geo" };
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		param.spherical = std::stoi(parametervalue);
+		param.spherical = readparambool(parametervalue, param.spherical);
 	}
 
 	parameterstr = "Radius";
@@ -610,7 +824,7 @@ Param readparamstr(std::string line, Param param)
 	{
 		param.frictionmodel = std::stoi(parametervalue);
 	}
-	
+
 	parameterstr = "Adaptation";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -619,7 +833,7 @@ Param readparamstr(std::string line, Param param)
 
 		if (!adaptpar.empty())
 		{
-			param.AdatpCrit = adaptpar[0];
+			param.AdaptCrit = adaptpar[0];
 			if (adaptpar.size() > 1)
 				param.Adapt_arg1 = adaptpar[1];
 			if (adaptpar.size() > 2)
@@ -633,6 +847,28 @@ Param readparamstr(std::string line, Param param)
 		}
 	}
 
+	paramvec = { "crs_ref", "crs", "spatialref", "spatial_ref", "wtk", "crsinfo","crs_info" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.crs_ref = parametervalue;
+	}
+
+	//Read Flexible Toutput variable
+	parameterstr = "Toutput";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		param.Toutput.inputstr = ReadToutSTR(parametervalue);
+	}
+
+	paramvec = { "savebyblk", "writebyblk","saveperblk", "writeperblk","savebyblock", "writebyblock","saveperblock", "writeperblock" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.savebyblk = readparambool(parametervalue, param.savebyblk);
+	}
+
 	return param;
 }
 
@@ -642,15 +878,24 @@ Param readparamstr(std::string line, Param param)
 * Read BG_param.txt line and convert parameter to the righ parameter in the class
 * return an updated Param class
 */
+/**
+ * @brief Parse a parameter string and update the forcing structure.
+ * Parses a line from the parameter file and updates the given forcing structure.
+ * Read BG_param.txt line and convert parameter to the right parameter in the class	
+ * Return an updated Forcing class
+ * 
+ * @param line Input line from parameter file
+ * @param forcing Forcing structure to update
+ * @return Updated forcing structure
+ */
 template <class T>
 Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 {
 	std::string parameterstr, parametervalue;
+	std::vector<std::string> paramvec;
 
-	std::vector<std::string> paramvec = { "bathy","bathyfile","bathymetry","depfile","depthfile","topofile","topo"};
+	paramvec = { "Bathy","bathyfile","bathymetry","depfile","depthfile","topofile","topo","DEM" };
 	parametervalue = findparameter(paramvec, line);
-	//parameterstr = "bathy";
-	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		StaticForcingP<float> infobathy;
@@ -658,268 +903,62 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		//std::cerr << "Bathymetry file found!" << std::endl;
 	}
 
-	/*parameterstr = "bathyfile";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		StaticForcingP<float> infobathy;
-		forcing.Bathy.push_back(readfileinfo(parametervalue, infobathy));
-		//forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
-		//std::cerr << "Bathymetry file found!" << std::endl;
-	}
 
-	parameterstr = "bathymetry";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		StaticForcingP<float> infobathy;
-		forcing.Bathy.push_back(readfileinfo(parametervalue, infobathy));
-		//forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
-		//std::cerr << "Bathymetry file found!" << std::endl;
-	}
 
-	//
-	parameterstr = "depfile";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "AOI","aoipoly" };
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		StaticForcingP<float> infobathy;
-		forcing.Bathy.push_back(readfileinfo(parametervalue, infobathy));
-		//forcing.Bathy = readfileinfo(parametervalue, forcing.Bathy);
-	}*/
+		forcing.AOI.file = parametervalue;
+		forcing.AOI.active = true;
+	}
 
 
 	// Boundaries
-	
-	paramvec = { "leftbndfile","leftbnd","left"};
+
+	paramvec = { "left","leftbndfile","leftbnd" };
 	parametervalue = findparameter(paramvec, line);
-	//parameterstr = "leftbndfile";// or left or leftbnd
-	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		std::vector<std::string> items = split(parametervalue, ',');
-		if (items.size() == 1)
-		{
-			forcing.left.type = std::stoi(items[0]);
-			
-		}
-		else if (items.size() >= 2)
-		{
-			forcing.left.type = std::stoi(items[1]);
-			forcing.left.inputfile = items[0];
-			forcing.left.on = true;
-		}
-				
-	}
-	/*
-	parameterstr = "leftbnd";// or left or leftbnd
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		std::vector<std::string> items = split(parametervalue, ',');
-		if (items.size() == 1)
-		{
-			forcing.left.type = std::stoi(items[0]);
+		//forcing.left = readbndline(parametervalue);
+		forcing.bndseg.push_back(readbndlineside(parametervalue, "left"));
 
-		}
-		else if (items.size() >= 2)
-		{
-			forcing.left.type = std::stoi(items[1]);
-			forcing.left.inputfile = items[0];
-			forcing.left.on = true;
-		}
+
 
 	}
-	parameterstr = "left";// or left or leftbnd
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		std::vector<std::string> items = split(parametervalue, ',');
-		if (items.size() == 1)
-		{
-			forcing.left.type = std::stoi(items[0]);
 
-		}
-		else if (items.size() >= 2)
-		{
-			forcing.left.type = std::stoi(items[1]);
-			forcing.left.inputfile = items[0];
-			forcing.left.on = true;
-		}
-
-	}
-	*/
-	
-	paramvec = { "rightbndfile","rightbnd","right"};
+	paramvec = { "right","rightbndfile","rightbnd" };
 	parametervalue = findparameter(paramvec, line);
-	//parameterstr = "rightbndfile";// or left or leftbnd
-	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		std::vector<std::string> items = split(parametervalue, ',');
-		if (items.size() == 1)
-		{
-			forcing.right.type = std::stoi(items[0]);
-
-		}
-		else if (items.size() >= 2)
-		{
-			forcing.right.type = std::stoi(items[1]);
-			forcing.right.inputfile = items[0];
-			forcing.right.on = true;
-		}
+		//forcing.right = readbndline(parametervalue);
+		forcing.bndseg.push_back(readbndlineside(parametervalue, "right"));
 
 	}
-	/*parameterstr = "rightbnd";// or left or leftbnd
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		std::vector<std::string> items = split(parametervalue, ',');
-		if (items.size() == 1)
-		{
-			forcing.right.type = std::stoi(items[0]);
 
-		}
-		else if (items.size() >= 2)
-		{
-			forcing.right.type = std::stoi(items[1]);
-			forcing.right.inputfile = items[0];
-			forcing.right.on = true;
-		}
-
-	}
-	parameterstr = "right";// or left or leftbnd
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		std::vector<std::string> items = split(parametervalue, ',');
-		if (items.size() == 1)
-		{
-			forcing.right.type = std::stoi(items[0]);
-
-		}
-		else if (items.size() >= 2)
-		{
-			forcing.right.type = std::stoi(items[1]);
-			forcing.right.inputfile = items[0];
-			forcing.right.on = true;
-		}
-
-	}*/
-
-	paramvec = { "topbndfile","topbnd","top" };
+	paramvec = { "top","topbndfile","topbnd" };
 	parametervalue = findparameter(paramvec, line);
-	//parameterstr = "topbndfile";// or left or leftbnd
-	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		std::vector<std::string> items = split(parametervalue, ',');
-		if (items.size() == 1)
-		{
-			forcing.top.type = std::stoi(items[0]);
-
-		}
-		else if (items.size() >= 2)
-		{
-			forcing.top.type = std::stoi(items[1]);
-			forcing.top.inputfile = items[0];
-			forcing.top.on = true;
-		}
-
+		//forcing.top = readbndline(parametervalue);
+		forcing.bndseg.push_back(readbndlineside(parametervalue, "top"));
 	}
-	/*parameterstr = "top";// or left or leftbnd
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		std::vector<std::string> items = split(parametervalue, ',');
-		if (items.size() == 1)
-		{
-			forcing.top.type = std::stoi(items[0]);
 
-		}
-		else if (items.size() >= 2)
-		{
-			forcing.top.type = std::stoi(items[1]);
-			forcing.top.inputfile = items[0];
-			forcing.top.on = true;
-		}
-
-	}
-	parameterstr = "topbnd";// or left or leftbnd
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		std::vector<std::string> items = split(parametervalue, ',');
-		if (items.size() == 1)
-		{
-			forcing.top.type = std::stoi(items[0]);
-
-		}
-		else if (items.size() >= 2)
-		{
-			forcing.top.type = std::stoi(items[1]);
-			forcing.top.inputfile = items[0];
-			forcing.top.on = true;
-		}
-
-	}*/
-
-	paramvec = { "botbndfile","botbnd","bot","bottom"};
+	paramvec = { "bot","botbndfile","botbnd","bottom" };
 	parametervalue = findparameter(paramvec, line);
-	//parameterstr = "botbndfile";// or left or leftbnd
-	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-		std::vector<std::string> items = split(parametervalue, ',');
-		if (items.size() == 1)
-		{
-			forcing.bot.type = std::stoi(items[0]);
-
-		}
-		else if (items.size() >= 2)
-		{
-			forcing.bot.type = std::stoi(items[1]);
-			forcing.bot.inputfile = items[0];
-			forcing.bot.on = true;
-		}
-
+		//forcing.bot = readbndline(parametervalue);
+		forcing.bndseg.push_back(readbndlineside(parametervalue, "bot"));
 	}
-	/*parameterstr = "botbnd";// or left or leftbnd
-	parametervalue = findparameter(parameterstr, line);
+
+	paramvec = { "bnd","bndseg" };
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		std::vector<std::string> items = split(parametervalue, ',');
-		if (items.size() == 1)
-		{
-			forcing.bot.type = std::stoi(items[0]);
-
-		}
-		else if (items.size() >= 2)
-		{
-			forcing.bot.type = std::stoi(items[1]);
-			forcing.bot.inputfile = items[0];
-			forcing.bot.on = true;
-		}
-
+		//forcing.bot = readbndline(parametervalue);
+		forcing.bndseg.push_back(readbndline(parametervalue));
 	}
-	parameterstr = "bot";// or left or leftbnd
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		std::vector<std::string> items = split(parametervalue, ',');
-		if (items.size() == 1)
-		{
-			forcing.bot.type = std::stoi(items[0]);
-
-		}
-		else if (items.size() >= 2)
-		{
-			forcing.bot.type = std::stoi(items[1]);
-			forcing.bot.inputfile = items[0];
-			forcing.bot.on = true;
-		}
-
-	}*/
 
 
 	//Tsunami deformation input files
@@ -948,9 +987,37 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 
 	}
 
-	//River
-	parameterstr = "river";
+	//Tsunami deformation input files
+	parameterstr = "cavity";
 	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+
+		deformmap<float> thisdeform;
+
+		thisdeform.iscavity = true;
+		std::vector<std::string> items = split(parametervalue, ',');
+		//Need sanity check here
+		thisdeform = readfileinfo(items[0], thisdeform);
+		//thisdeform.inputfile = items[0];
+		if (items.size() > 1)
+		{
+			thisdeform.startime = std::stod(items[1]);
+
+		}
+		if (items.size() > 2)
+		{
+			thisdeform.duration = std::stod(items[2]);
+
+		}
+
+		forcing.deform.push_back(thisdeform);
+
+	}
+
+	//River
+	paramvec = { "rivers","river" };
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
 		std::vector<std::string> vars = split(parametervalue, ',');
@@ -975,29 +1042,50 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		}
 	}
 
-	// Mapped friction
-	paramvec = { "cfmap","roughnessmap"};
+	// friction coefficient (mapped or constant)
+	// if it is a constant no-need to do anything below but if it is a file it overwrites any other value
+	paramvec = { "cf","roughness","cfmap" };
 	parametervalue = findparameter(paramvec, line);
-	//parameterstr = "cfmap";
-	//parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
-
-		forcing.cf = readfileinfo(parametervalue, forcing.cf);
-
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha)) //(std::isdigit(parametervalue[0]) == false)
+		{
+			//forcing.cf = readfileinfo(parametervalue, forcing.cf);
+			StaticForcingP<float> infoRoughness;
+			forcing.cf.push_back(readfileinfo(parametervalue, infoRoughness));
+		}
 	}
-	/*parameterstr = "roughnessmap";
-	parametervalue = findparameter(parameterstr, line);
+
+
+	//if (!parametervalue.empty())
+	//{
+	//
+		//std::cerr << "Bathymetry file found!" << std::endl;
+	//}
+
+	// Rain losses, initial and continuous loss
+	paramvec = { "il","Rain_il","initialloss" };
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-
-		forcing.cf = readfileinfo(parametervalue, forcing.cf);
-
-	}*/
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha)) //(std::isdigit(parametervalue[0]) == false)
+		{
+			forcing.il = readfileinfo(parametervalue, forcing.il);
+		}
+	}
+	paramvec = { "cl","Rain_cl","continuousloss" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha)) //(std::isdigit(parametervalue[0]) == false)
+		{
+			forcing.cl = readfileinfo(parametervalue, forcing.cl);
+		}
+	}
 
 	// wind forcing
-	parameterstr = "windfiles";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "Wind","windfiles" }; //## forcing.Wind
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
 
@@ -1006,17 +1094,17 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		{
 			// If 2 parameters (files) are given then 1st file is U wind and second is V wind.
 			// This is for variable winds no rotation of the data is performed
-			
+
 			forcing.UWind = readfileinfo(trim(vars[0], " "), forcing.UWind);
 			forcing.VWind = readfileinfo(trim(vars[1], " "), forcing.VWind);
 		}
 		else if (vars.size() == 1)
 		{
 			// if 1 parameter(file) is given then a 3 column file is expected showing time windspeed and direction
-			// wind direction is rotated (later) to the grid direction (via grdalfa)
+			// wind direction is rotated (later) to the grid direction (via grdalpha)
 			forcing.UWind = readfileinfo(parametervalue, forcing.UWind);
 			forcing.UWind.uniform = 1;
-			
+
 			//apply the same for Vwind? seem unecessary but need to be careful later in the code
 		}
 		else
@@ -1031,23 +1119,24 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	}
 
 	// atmospheric pressure forcing
-	parameterstr = "atmpfile";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "Atmp","atmpfile" };
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
 		// needs to be a netcdf file 
 		forcing.Atmp = readfileinfo(parametervalue, forcing.Atmp);
+
 	}
 
 	// rain forcing
-	parameterstr = "rainfile";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = { "Rain","rainfile" };
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
 		// netcdf file == Variable spatially
 		// txt file (other than .nc) == spatially cst (txt file with 2 col time and mmm/h )
 		forcing.Rain = readfileinfo(parametervalue, forcing.Rain);
-		
+
 		//set the expected type of input
 
 		if (forcing.Rain.extension.compare("nc") == 0)
@@ -1059,8 +1148,6 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 			forcing.Rain.uniform = 1;
 		}
 
-
-
 	}
 
 	parameterstr = "Adaptation";
@@ -1071,7 +1158,8 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		// special case for 'Targetlevel' adaptation
 		if (!adaptpar.empty())
 		{
-			if (adaptpar[0].compare("Targetlevel") == 0)
+			//if (adaptpar[0].compare("Targetlevel") == 0)
+			if (case_insensitive_compare(adaptpar[0], std::string("Targetlevel")) == 0)
 			{
 				for (int ng = 1; ng < adaptpar.size(); ng++)
 				{
@@ -1087,11 +1175,16 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 }
 
 
-/*! \fn void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
-* Check the Sanity of both Param and Forcing class
-* If required some parameter are infered 
-*/
-void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
+
+/**
+ * @brief Check and adjust the sanity of model parameters and forcing data.
+ * This function checks the sanity of the model parameters and forcing data.
+ * It adjusts parameters as needed, ensuring they are within acceptable ranges
+ * and consistent with each other.
+ * @param XParam Reference to the model parameters structure to be checked and adjusted.
+ * @param XForcing Reference to the forcing data structure to be checked and adjusted.
+ */
+void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 {
 	Param DefaultParams;
 
@@ -1100,6 +1193,15 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	// Sanity check for model levels
 	int minlev = XParam.minlevel;
 	int maxlev = XParam.maxlevel;
+
+	if (minlev == -99999)
+	{
+		minlev = XParam.initlevel;
+	}
+	if (maxlev == -99999)
+	{
+		maxlev = XParam.initlevel;
+	}
 
 	XParam.maxlevel = utils::max(maxlev, minlev);
 	XParam.minlevel = utils::min(maxlev, minlev);
@@ -1116,6 +1218,12 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	XParam.blksize = utils::sq(XParam.blkmemwidth);
 
 	///////////////////////////////////////////
+	// zsoffset
+	///////////////////////////////////////////
+
+	XParam.zsoffset = std::isnan(XParam.zsoffset) ? 0.0 : XParam.zsoffset;
+
+	///////////////////////////////////////////
 	//  Read Bathy Information
 	///////////////////////////////////////////
 
@@ -1127,21 +1235,21 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	//inputmap Bathymetry;
 	//Bathymetry.inputfile = XForcing.Bathy.inputfile;
 	//XForcing.Bathy = readforcinghead(XForcing.Bathy);
-	
+
 
 
 	if (std::isnan(XParam.xo))
-		XParam.xo = XForcing.Bathy[0].xo-(0.5* XForcing.Bathy[0].dx);
+		XParam.xo = XForcing.Bathy[0].xo - (0.5 * XForcing.Bathy[0].dx);
 	if (std::isnan(XParam.xmax))
 		XParam.xmax = XForcing.Bathy[0].xmax + (0.5 * XForcing.Bathy[0].dx);
-	if(std::isnan(XParam.yo))
+	if (std::isnan(XParam.yo))
 		XParam.yo = XForcing.Bathy[0].yo - (0.5 * XForcing.Bathy[0].dx);
 	if (std::isnan(XParam.ymax))
 		XParam.ymax = XForcing.Bathy[0].ymax + (0.5 * XForcing.Bathy[0].dx);
 
 	if (std::isnan(XParam.dx))
 		XParam.dx = XForcing.Bathy[0].dx;
-	
+
 	if (std::isnan(XParam.grdalpha))
 		XParam.grdalpha = XForcing.Bathy[0].grdalpha; // here the default bathy grdalpha is 0.0 as defined by inputmap/Bathymetry class
 
@@ -1161,8 +1269,11 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	//printf("levdx=%f;1 << XParam.initlevel=%f\n", levdx, calcres(1.0, XParam.initlevel));
 
 	// First estimate nx and ny
-	XParam.nx = (XParam.xmax - XParam.xo) / (levdx);
-	XParam.ny = (XParam.ymax - XParam.yo) / (levdx); //+1?
+	XParam.nx = ftoi((XParam.xmax - XParam.xo) / (levdx));
+	XParam.ny = ftoi((XParam.ymax - XParam.yo) / (levdx)); //+1?
+	//if desire size in one direction is under the bathy resolution or dx requested
+	if (XParam.nx == 0) { XParam.nx = 1; }
+	if (XParam.ny == 0) { XParam.ny = 1; }
 
 
 	// Adjust xmax and ymax so that nx and ny are a factor of XParam.blkwidth [16]
@@ -1170,33 +1281,95 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	XParam.ymax = XParam.yo + (ceil(XParam.ny / ((double)XParam.blkwidth)) * ((double)XParam.blkwidth)) * levdx;
 
 	// Update nx and ny 
-	XParam.nx = (XParam.xmax - XParam.xo) / (levdx);
-	XParam.ny = (XParam.ymax - XParam.yo) / (levdx); //+1?
+	XParam.nx = ftoi((XParam.xmax - XParam.xo) / (levdx));
+	XParam.ny = ftoi((XParam.ymax - XParam.yo) / (levdx)); //+1?
 
 	log("\nAdjusted model domain (xo/xmax/yo/ymax): ");
-	log("\t" + std::to_string(XParam.xo) + "/" + std::to_string(XParam.xmax) + "/" + std::to_string(XParam.yo) + "/" + std::to_string(XParam.ymax) );
-	log("\t Initial resolution (level " + std::to_string(XParam.initlevel) + ") = " + std::to_string(levdx) );
+	log("\t" + std::to_string(XParam.xo) + "/" + std::to_string(XParam.xmax) + "/" + std::to_string(XParam.yo) + "/" + std::to_string(XParam.ymax));
+	log("\t Initial resolution (level " + std::to_string(XParam.initlevel) + ") = " + std::to_string(levdx));
 
-	if (XParam.spherical < 1)
+	if (XParam.spherical == false)
 	{
 		XParam.delta = XParam.dx;
-		XParam.grdalpha = XParam.grdalpha*pi / 180.0; // grid rotation
+		XParam.grdalpha = XParam.grdalpha * pi / 180.0; // grid rotation
 
 	}
 	else
 	{
 		//Geo grid
-		XParam.delta = XParam.dx * XParam.Radius*pi / 180.0;
+
+		XParam.delta = XParam.dx * XParam.Radius * pi / 180.0;
+		//XParam.engine = 2;
+
 		//printf("Using spherical coordinate; delta=%f rad\n", XParam.delta);
 		log("Using spherical coordinate; delta=" + std::to_string(XParam.delta));
 		if (XParam.grdalpha != 0.0)
 		{
 			//printf("grid rotation in spherical coordinate is not supported yet. grdalpha=%f rad\n", XParam.grdalpha);
-			log("grid rotation in spherical coordinate is not supported yet. grdalpha=" + std::to_string(XParam.grdalpha*180.0 / pi));
+			log("grid rotation in spherical coordinate is not supported yet. grdalpha=" + std::to_string(XParam.grdalpha * 180.0 / pi));
 		}
 	}
 
+	// Read/setup bdn segment polygon. Note this can't be part of the "readforcing" step because xmin, xmax ymin ymax are not known then
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+
+		XForcing.bndseg[iseg].poly= readbndpolysegment(XForcing.bndseg[iseg], XParam);
+		//if (XForcing.bndseg[iseg].type == 2)
+		//{
+		//	XForcing.bndseg[iseg].type = 3;
+		//}
+
+
+		XForcing.bndseg[iseg].left.isright = -1;
+		XForcing.bndseg[iseg].left.istop = 0;
+
+		XForcing.bndseg[iseg].right.isright = 1;
+		XForcing.bndseg[iseg].right.istop = 0;
+
+		XForcing.bndseg[iseg].top.isright = 0;
+		XForcing.bndseg[iseg].top.istop = 1;
+
+		XForcing.bndseg[iseg].bot.isright = 0;
+		XForcing.bndseg[iseg].bot.istop = -1;
+	}
+
+	bndsegment remainderblk;
+
+	remainderblk.left.isright = -1;
+	remainderblk.left.istop = 0;
+
+	remainderblk.right.isright = 1;
+	remainderblk.right.istop = 0;
+
+	remainderblk.top.isright = 0;
+	remainderblk.top.istop = 1;
+
+	remainderblk.bot.isright = 0;
+	remainderblk.bot.istop = -1;
+	remainderblk.type = XParam.aoibnd;
+
+	XForcing.bndseg.push_back(remainderblk);
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].left.blk);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].right.blk);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].top.blk);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].bot.blk);
+
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].left.qmean);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].right.qmean);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].top.qmean);
+		AllocateCPU(1, 1, XForcing.bndseg[iseg].bot.qmean);
+	}
+
+
+
+
+
 	//setup extra infor about boundaries
+	// This is not needed anymore
 	XForcing.left.side = 3;
 	XForcing.left.isright = -1;
 	XForcing.left.istop = 0;
@@ -1214,17 +1387,33 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	XForcing.bot.istop = -1;
 
 
+	//
+
+	XForcing.Atmp.clampedge = float(XParam.Paref);
+
+	if (!XForcing.Atmp.inputfile.empty())
+	{
+		XParam.atmpforcing = true;
+		XParam.engine = 3;
+	}
+
+
 	// Make sure the nriver in param (used for preallocation of memory) and number of rivers in XForcing are consistent
-	XParam.nrivers = XForcing.rivers.size();
+	XParam.nrivers = int(XForcing.rivers.size());
 
-
+	// Engine checks
+	if (XParam.engine == 5)
+	{
+		XParam.CFL = utils::max(XParam.CFL, 0.25);
+		//XParam.eps = 0.0000000001;
+	}
 
 	// Check whether endtime was specified by the user
 	//No; i.e. endtimne =0.0
 	//so the following conditions are useless
-	
-	
-	
+
+
+
 	if (abs(XParam.endtime - DefaultParams.endtime) <= tiny)
 	{
 		//No; i.e. endtimne =0.0
@@ -1232,33 +1421,87 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 	}
 
 	XParam.endtime = setendtime(XParam, XForcing);
-	
-		
-	
-	
-	
 
 
+	// Assign a value for reftime if not yet set. 
+	//It is needed in the Netcdf file generation
+	if (XParam.reftime.empty())
+	{
+		XParam.reftime = "2000-01-01T00:00:00";
+	}
 
+	XParam.inittime = XParam.totaltime;
+
+	log("Reference time: " + XParam.reftime);
+	log("Model Initial time: " + std::to_string(XParam.totaltime) + " ; " );
+
+	log("Model end time: " + std::to_string(XParam.endtime));
 
 	// Check that outputtimestep is not zero, so at least the first and final time step are saved
 	// If only the model stepup is needed than just run with endtime=0.0
+	/*
+	// No longer needed
 	if (abs(XParam.outputtimestep - DefaultParams.outputtimestep) <= tiny)
 	{
 		XParam.outputtimestep = XParam.endtime;
 		//otherwise there is really no point running the model
 	}
+	if (XParam.outputtimestep > XParam.endtime)
+	{
+		XParam.outputtimestep = XParam.endtime;
+		//otherwise, no final output
+	}
+	*/
+	//Initialisation of the main time output vector
+	//Initialise default values for Toutput (output times for map outputs)
+	InitialiseToutput(XParam.Toutput, XParam);
+	if (XParam.Toutput.val.empty())
+	{
+		if (abs(XParam.outputtimestep - DefaultParams.outputtimestep) <= tiny)
+		{
+			XParam.Toutput.val.push_back(XParam.totaltime);
+			XParam.Toutput.val.push_back(XParam.endtime);
+		}
+		else
+		{
+			int nstep = (XParam.endtime - XParam.totaltime) / XParam.outputtimestep + 1;
 
+			for (int k = 0; k < nstep; k++)
+			{
+				XParam.Toutput.val.push_back(std::min(XParam.totaltime + XParam.outputtimestep * k, XParam.endtime));
+			}
+
+		}
+	}
+	else
+	{
+
+		XParam.Toutput.val.push_back(XParam.totaltime);
+		XParam.Toutput.val.push_back(XParam.endtime);
+	}
 	
+
+	// Initialisation of the time output vector for the zones outputs
+	if (XParam.outzone.size() > 0)
+	{
+		for (int ii = 0; ii < XParam.outzone.size(); ii++)
+		{
+			{
+				InitialiseToutput(XParam.outzone[ii].Toutput, XParam);
+			}
+		}
+	}
+
+
 
 	if (XParam.outvars.empty() && XParam.outputtimestep > 0.0)
 	{
 		//a nc file was specified but no output variable were specified
-		std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h" }; 
+		std::vector<std::string> SupportedVarNames = { "zb", "zs", "u", "v", "h" };
 		for (int isup = 0; isup < SupportedVarNames.size(); isup++)
 		{
 			XParam.outvars.push_back(SupportedVarNames[isup]);
-				
+
 		}
 
 	}
@@ -1283,7 +1526,7 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 
 		if (XParam.GPUDEVICE >= 0)
 		{
-			
+
 			log("Using Device: " + std::string(prop.name));
 		}
 		else
@@ -1296,30 +1539,110 @@ void checkparamsanity(Param & XParam, Forcing<float> & XForcing)
 
 	if (XParam.minlevel != XParam.maxlevel)
 	{
-		if (XParam.AdatpCrit.empty())
+		if (XParam.AdaptCrit.empty())
 		{
-			XParam.AdatpCrit = "Threshold";
+			XParam.AdaptCrit = "Threshold";
 			XParam.Adapt_arg1 = "0.0";
 			XParam.Adapt_arg2 = "h";
 		}
 	}
+
+	//Check that we have both initial loss and continuous loss if one is given
+	if (!XForcing.il.inputfile.empty())
+	{
+		if (XForcing.cl.inputfile.empty())
+		{
+			log("Error: File identified for initial loss but no data entered for continuous loss.\n Please, enter a ");
+		}
+	}
+	if (!XForcing.cl.inputfile.empty())
+	{
+		if (XForcing.il.inputfile.empty())
+		{
+			log("Error: File identified for continuous loss but no data entered for initial loss");
+		}
+	}
+
+	//Check that the Initial Loss/ Continuing Loss model is used if il, cl or hgw output are asked by user.
+	if (!XParam.infiltration) // (XForcing.il.inputfile.empty() && XForcing.cl.inputfile.empty() && (XParam.il == 0.0) && (XParam.cl == 0.0))
+	{
+		std::vector<std::string> namestr = { "il","cl","hgw" };
+		for (int ii = 0; ii < namestr.size(); ii++)
+		{
+			std::vector<std::string>::iterator itr = std::find(XParam.outvars.begin(), XParam.outvars.end(), namestr[ii]);
+			if (itr != XParam.outvars.end())
+			{
+				log("The output variable associated to the ILCL model \"" + namestr[ii] + "\" is requested but the model is not used. The variable is removed from the outputs.");
+				XParam.outvars.erase(itr);
+			}
+		}
+	}
+
+	//Check that the atmospheric forcing is used if datmpdx, datmpdy output are asked by user.
+	if (XForcing.Atmp.inputfile.empty())
+	{
+		std::vector<std::string> namestr = { "datmpdx", "datmpdy" };
+		for (int ii = 0; ii < namestr.size(); ii++)
+		{
+			std::vector<std::string>::iterator itr = std::find(XParam.outvars.begin(), XParam.outvars.end(), namestr[ii]);
+			if (itr != XParam.outvars.end())
+			{
+				log("The output variable associated to the atmosheric forcing \"" + namestr[ii] + "\" is requested but the model is not used. The variable is removed from the outputs.");
+				XParam.outvars.erase(itr);
+			}
+		}
+
+	}
+
+}
+
+//Initialise default values for Toutput (output times for map outputs)
+/**
+ * @brief Initialise the Toutput structure with output times.
+ * This function reads the output times from a specified input string
+ * and ensures that the times are within the simulation time range.
+ * If no valid times are provided, it defaults to using the total time and end time.
+ * @param Toutput_loc Reference to the T_output structure to be initialised.
+ * @param XParam The Param structure containing simulation parameters.
+ */
+void InitialiseToutput(T_output& Toutput_loc, Param XParam)
+{
+	
+	Toutput_loc.val = ReadToutput(Toutput_loc.inputstr, XParam);
+	// Make sure Toutput is not empty and that all values are >= totaltime and <= endtime
+	if (Toutput_loc.val.empty())
+	{
+		for (int i = 0; i < XParam.Toutput.val.size(); i++)
+		{
+			Toutput_loc.val.push_back(std::min(std::max(XParam.totaltime, XParam.Toutput.val[i]), XParam.endtime));
+		}
+	}
+	
+	// This may seem redundant but the uniq function used in the initial condition should clean out duplicate
+	
+
 	
 }
 
-/*! \fn double setendtime(Param XParam,Forcing<float> XForcing)
-* Calculate/modify endtime based on maximum time in forcing 
-*
-*/
-double setendtime(Param XParam,Forcing<float> XForcing)
+
+/**
+ * @brief Adjust the simulation "endtime" based on maximum time in forcings.
+ * This function checks the end times of boundary forcing data and adjusts
+ * the simulation end time if any boundary forcing ends before the specified end time.
+ * A warning is logged if the end time is reduced.
+ * @param XParam The Param structure containing simulation parameters, including the initial end time.
+ * @param XForcing The Forcing structure containing boundary forcing data.
+ */
+double setendtime(Param XParam, Forcing<float> XForcing)
 {
-	//endtime cannot be bigger thn the smallest time set in a boundary
+	//endtime cannot be bigger than the smallest time set in a boundary
 	SLTS tempSLTS;
 	double endtime = XParam.endtime;
 	if (XForcing.left.on)
 	{
-		tempSLTS =XForcing.left.data.back();
-		endtime = utils::min( endtime, tempSLTS.time);
-		
+		tempSLTS = XForcing.left.data.back();
+		endtime = utils::min(endtime, tempSLTS.time);
+
 	}
 	if (XForcing.right.on)
 	{
@@ -1337,29 +1660,45 @@ double setendtime(Param XParam,Forcing<float> XForcing)
 		endtime = utils::min(endtime, tempSLTS.time);
 	}
 
+	if (endtime < XParam.endtime)
+	{
+		log("\nWARNING: Boundary definition too short, endtime of the simulation reduced to : " + std::to_string(endtime));
+	}
+
 	return endtime;
 }
 
-/*! \fn std::string findparameter(std::string parameterstr, std::string line)
-* separate parameter from value
-*
-*/
+
+/**
+ * @brief Find and extract the value of a specified parameter from a configuration line.
+ * This function searches for a specified parameter in a given line of text,
+ * and extracts its associated value if found. It handles comments and whitespace appropriately.
+ * @param parameterstr The parameter name to search for.
+ * @param line The line of text to search within.
+ * @return The extracted parameter value as a string, or an empty string if the parameter is not found.
+ */
 std::string findparameter(std::vector<std::string> parameterstr, std::string line)
 {
 	std::size_t found;
+
 	std::string parameternumber,left,right;
-	std::vector<std::string> splittedstr;
+	std::vector<std::string> splittedstr, splittedstrnohash;
 	
-	// first look fo an equal sign
+
+	// first look for an equal sign
 	// No equal sign mean not a valid line so skip
-	splittedstr=split(line, '=' );
-	if (splittedstr.size()>1)
+	splittedstr = split(line, '=');
+	if (splittedstr.size() > 1)
 	{
-		left = trim(splittedstr[0]," ");
+		left = trim(splittedstr[0], " ");
 		right = splittedstr[1]; // if there are more than one equal sign in the line the second one is ignored
+		for (int ieq = 2; ieq < splittedstr.size(); ieq++)
+		{
+			right = right + "=" + splittedstr[ieq];
+		}
 		for (int ii = 0; ii < parameterstr.size(); ii++)
 		{
-			found = left.compare(parameterstr[ii]);// it needs to strictly compare
+			found = case_insensitive_compare(left, parameterstr[ii]);// it needs to strictly compare
 			if (found == 0)
 				break;
 		}
@@ -1367,7 +1706,12 @@ std::string findparameter(std::vector<std::string> parameterstr, std::string lin
 		{
 			//std::cout <<"found LonMin at : "<< found << std::endl;
 			//Numberstart = found + parameterstr.length();
-			splittedstr = split(right, ';');
+
+			
+			splittedstrnohash = split(right, '#');
+			
+			splittedstr = split(splittedstrnohash[0], ';');
+
 			if (splittedstr.size() >= 1)
 			{
 				parameternumber = splittedstr[0];
@@ -1377,9 +1721,17 @@ std::string findparameter(std::vector<std::string> parameterstr, std::string lin
 		}
 	}
 	return trim(parameternumber, " ");
+	//return parameternumber;
 }
 
-
+/**
+ * @brief Find and extract the value of a specified parameter from a configuration line.
+ * This function searches for a specified parameter in a given line of text,
+ * and extracts its associated value if found. It handles comments and whitespace appropriately.
+ * @param parameterstr The parameter name to search for.
+ * @param line The line of text to search within.
+ * @return The extracted parameter value as a string, or an empty string if the parameter is not found.
+ */
 std::string findparameter(std::string parameterstr, std::string line)
 {
 	std::vector<std::string> parametervec;
@@ -1389,11 +1741,16 @@ std::string findparameter(std::string parameterstr, std::string line)
 }
 
 
-/*! \fn void split(const std::string &s, char delim, std::vector<std::string> &elems)
-* split string based in character
-*
-*/
-void split(const std::string &s, char delim, std::vector<std::string> &elems) {
+
+/**
+ * @brief Split a string into tokens based on a specified delimiter, skipping empty tokens.
+ * This function takes a string and splits it into a vector of substrings using the specified delimiter.
+ * Empty tokens resulting from consecutive delimiters are skipped.
+ * @param s The input string to be split.
+ * @param delim The character used as the delimiter for splitting the string.
+ * @param elems A reference to a vector where the resulting substrings will be stored.
+ */
+void split(const std::string& s, char delim, std::vector<std::string>& elems) {
 	std::stringstream ss;
 	ss.str(s);
 	std::string item;
@@ -1402,18 +1759,112 @@ void split(const std::string &s, char delim, std::vector<std::string> &elems) {
 		{
 			elems.push_back(item);
 		}
-		
+
 	}
 }
 
-/*! \fn std::vector<std::string> split(const std::string &s, char delim)
-* split string based in character
-*
-*/
-std::vector<std::string> split(const std::string &s, char delim) {
+
+/**
+ * @brief Split a string into tokens based on a specified character delimiter, skipping empty tokens.
+ * This function takes a string and splits it into a vector of substrings using the specified delimiter.
+ * Empty tokens resulting from consecutive delimiters are skipped.	
+ * @param s The input string to be split.
+ * @param delim The character used as the delimiter for splitting the string.
+ * @return A vector containing the resulting substrings.
+ */
+std::vector<std::string> split(const std::string& s, char delim) {
 	std::vector<std::string> elems;
 	split(s, delim, elems);
 	return elems;
+}
+
+
+
+/*! \fn void split_full(const std::string &s, char delim, std::vector<std::string> &elems)
+* split string based in character, conserving empty item
+*
+*/
+/**
+ * @brief Split a string into tokens based on a specified delimiter, preserving empty tokens.
+ * This function takes a string and splits it into a vector of substrings using the specified delimiter.
+ * Unlike the standard split function, this version preserves empty tokens that result from consecutive delimiters.	
+ * @param s The input string to be split.
+ * @param delim The character used as the delimiter for splitting the string.
+ * @param elems A reference to a vector where the resulting substrings will be stored.
+ */
+void split_full(const std::string& s, char delim, std::vector<std::string>& elems) {
+	std::stringstream ss;
+	ss.str(s);
+	std::string item;
+	while (std::getline(ss, item, delim)) {
+		std::string::iterator end_pos = std::remove(item.begin(), item.end(), ' ');
+		item.erase(end_pos, item.end());
+		elems.push_back(item);
+	}
+	if (s[s.length() - 1] == delim)
+	{
+		std::string item;
+		elems.push_back(item);
+	}
+}
+
+/*! \fn std::vector<std::string> split_full(const std::string &s, char delim)
+* split string based in character, conserving empty items
+*
+*/
+/**
+ * @brief Split a string into tokens based on a specified character delimiter, preserving empty tokens.
+ * This function takes a string and splits it into a vector of substrings using the specified delimiter.
+ * Unlike the standard split function, this version preserves empty tokens that result from consecutive delimiters.	
+ * @param s The input string to be split.
+ * @param delim The character used as the delimiter for splitting the string.
+ */
+std::vector<std::string> split_full(const std::string& s, char delim) {
+	std::vector<std::string> elems;
+	split_full(s, delim, elems);
+	return elems;
+}
+
+/**
+ * @brief Split a string into tokens based on a specified substring delimiter.
+ * This function takes a string and splits it into a vector of substrings using the specified substring delimiter.
+ * @param s The input string to be split.
+ * @param delim The substring used as the delimiter for splitting the string.
+ * @return A vector containing the resulting substrings.
+ */
+std::vector<std::string> split(const std::string s, const std::string delim)
+{
+	size_t ide = 0;
+	int loc = 0;
+	std::vector<std::string> output;
+	std::string rem = s;
+
+
+	while (ide < std::string::npos || output.size() == 0)
+	{
+
+		ide = rem.find(delim);
+		if (ide == 0 || ide == std::string::npos)
+		{
+			output.push_back(rem);
+			ide = std::string::npos;
+		}
+		else
+		{
+			output.push_back(rem.substr(loc, ide));
+		}
+
+		if (ide < (rem.length() - delim.length()))
+		{
+			loc = int(ide + delim.length());
+			rem = rem.substr(loc);
+		}
+	}
+
+	return output;
+
+
+
 }
 
 
@@ -1421,6 +1872,13 @@ std::vector<std::string> split(const std::string &s, char delim) {
 * remove leading and trailing space in a string
 *
 */
+/**
+ * @brief Trim leading and trailing whitespace from a string.
+ * This function removes all leading and trailing characters from the input string
+ * that are present in the specified whitespace string.
+ * @param str The input string to be trimmed.
+ * @param whitespace A string containing all characters considered as whitespace.
+ */
 std::string trim(const std::string& str, const std::string& whitespace)
 {
 	const auto strBegin = str.find_first_not_of(whitespace);
@@ -1433,6 +1891,458 @@ std::string trim(const std::string& str, const std::string& whitespace)
 	return str.substr(strBegin, strRange);
 }
 
+/*! \fn std::size_t case_insensitive_compare(const std::string& str, const std::string& str)
+* case non-sensitive string comparison (return 0 if the same, as for the "compare" function)
+*
+*/
+/**
+ * @brief Perform a non case-insensitive comparison between two strings or a string and a vector of strings.
+ * This function converts both strings to lowercase and compares them.
+ * If a vector of strings is provided, it compares the first string against each string in the vector.
+ * @param s1 The first string to compare.
+ * @param s2 The second string to compare, or a vector of strings to compare against
+ */
+std::size_t case_insensitive_compare(std::string s1, std::string s2)
+{
+	//Convert s1 and s2 to lower case strings
+	std::transform(s1.begin(), s1.end(), s1.begin(), ::tolower);
+	std::transform(s2.begin(), s2.end(), s2.begin(), ::tolower);
+	//if (s1.compare(s2) == 0)
+	return s1.compare(s2);
+}
+
+/**
+ * @brief Perform a non case-insensitive comparison between a string and a vector of strings.
+ * This function converts the first string to lowercase and compares it against each string in the vector.	
+ * @param s1 The first string to compare.
+ * @param vecstr The vector of strings to compare against.
+ */
+std::size_t case_insensitive_compare(std::string s1, std::vector<std::string> vecstr)
+{
+	std::size_t found;
+	//Convert s1 and s2 to lower case strings
+	for (int ii = 0; ii < vecstr.size(); ii++)
+	{
+		found = case_insensitive_compare(s1, vecstr[ii]);// it needs to strictly compare
+		if (found == 0)
+		{
+			break;
+		}
+	}
+	return found;
+}
+
+/**
+ * @brief Read boundary segment information from a parameter value string for a specific side.
+ * This function parses a parameter value string to extract boundary segment information,
+ * including type, input file, and polygon file for a specified side.
+ * It also reads file information and sets the expected type of input based on the file extension.
+ * @param parametervalue The parameter value string containing boundary segment information.
+ * @param side The side (e.g., "left", "right", "top", "bot") for which the boundary segment is defined.
+ */
+bndsegment readbndlineside(std::string parametervalue, std::string side)
+{
+	bndsegment bnd;
+
+
+	std::vector<std::string> items = split(parametervalue, ',');
+
+	if (items.size() == 1)
+	{
+		bnd.type = std::stoi(items[0]);
+
+	}
+	else if (items.size() >= 2)
+	{
+		const char* cstr = items[1].c_str();
+
+		if (isdigit(cstr[0]))
+		{
+			//?
+			bnd.type = std::stoi(items[1]);
+			bnd.inputfile = items[0];
+			bnd.on = true;
+
+
+
+		}
+		else
+		{
+			bnd.type = std::stoi(items[0]);
+			bnd.inputfile = items[1];
+			bnd.on = true;
+		}
+
+	}
+	bnd.polyfile = side;
+	if (bnd.on)
+	{
+		bnd.WLmap = readfileinfo(bnd.inputfile, bnd.WLmap);
+
+		//set the expected type of input
+
+		if (bnd.WLmap.extension.compare("nc") == 0)
+		{
+			bnd.WLmap.uniform = 0;
+			bnd.uniform = 0;
+		}
+		else
+		{
+			bnd.WLmap.uniform = 1;
+			bnd.uniform = 1;
+		}
+	}
+	return bnd;
+}
+
+/**
+ * @brief Read boundary segment information from a parameter value string.
+ * This function parses a parameter value string to extract boundary segment information,
+ * including type, input file, and polygon file.
+ * It also reads file information and sets the expected type of input based on the file extension.
+ * @param parametervalue The parameter value string containing boundary segment information.
+ */
+bndsegment readbndline(std::string parametervalue)
+{
+	//bndseg = area.txt, waterlevelforcing, 1;
+	bndsegment bnd;
+	std::vector<std::string> items = split(parametervalue, ',');
+	if (items.size() == 1)
+	{
+		bnd.type = std::stoi(items[0]);
+
+	}
+	else if (items.size() >= 2)
+	{
+		const char* cstr = items[1].c_str();
+		if (items[1].length() > 2)
+		{
+			bnd.polyfile = items[0];
+			bnd.type = std::stoi(items[2]);
+			bnd.inputfile = items[1];
+			bnd.on = true;
+
+		}
+		else
+		{
+			bnd.polyfile = items[0];
+			bnd.type = std::max(std::stoi(items[1]), 1); // only 2 param implies that it is either a wall or Neumann bnd
+
+		}
+	}
+
+
+	//set the expected type of input
+
+	if (bnd.on)
+	{
+		bnd.WLmap = readfileinfo(bnd.inputfile, bnd.WLmap);
+
+		//set the expected type of input
+
+		if (bnd.WLmap.extension.compare("nc") == 0)
+		{
+			bnd.WLmap.uniform = 0;
+			bnd.uniform = 0;
+		}
+		else
+		{
+			bnd.WLmap.uniform = 1;
+			bnd.uniform = 1;
+		}
+	}
+	return bnd;
+}
+
+
+/**
+ * @brief Convert a parameter string to a boolean value, with a default fallback.
+ * This function interprets a parameter string as a boolean value, returning true for
+ * recognized true values and false for recognized false values. If the string does not match any known values,
+ * it returns a specified default value.	
+ * @param paramstr The parameter string to be interpreted.
+ * @param defaultval The default boolean value to return if the string does not match known values
+ */
+bool readparambool(std::string paramstr, bool defaultval)
+{
+	bool out = defaultval;
+	std::vector<std::string> truestr = { "1","true","yes", "on" };
+	std::vector<std::string> falsestr = { "-1","false","no","off" };
+
+	if (case_insensitive_compare(paramstr, truestr) == 0)
+	{
+		out = true;
+	}
+	if (case_insensitive_compare(paramstr, falsestr) == 0)
+	{
+		out = false;
+	}
+
+	return out;
+}
+
+
+
+
+//inline bool fileexists(const std::string& name) {
+//	struct stat buffer;
+//	return (stat(name.c_str(), &buffer) == 0);
+//}
+
+/**
+ * @brief Split a comma-separated parameter string into a vector of strings.
+ * 
+ * This function takes a parameter string containing values separated by commas
+ * and splits it into a vector of individual strings.
+ * @param paramstr The parameter string to be split.
+ * @return A vector of strings obtained by splitting the input string at commas.
+ */
+std::vector<std::string> ReadToutSTR(std::string paramstr)
+{
+	std::vector<std::string> Toutputpar = split(paramstr, ',');
+	return Toutputpar;
+
+}
+
+/**
+ * @brief Read and interpret a time value string, converting it to a double within specified bounds.
+ * This function interprets a time value string, which can represent specific keywords
+ * ("start", "end"), relative times, or absolute date-time strings. It converts the	
+ * string to a double value representing time, ensuring it falls within the provided start and end bounds.
+ * @param timestr The time value string to be interpreted.
+ * @param start The start time bound.
+ * @param end The end time bound.
+ * @param reftime The reference time for interpreting absolute date-time strings.
+ * @return A double value representing the interpreted time, constrained within the start and end bounds.
+ */
+double ReadTvalstr(std::string timestr,double start, double end,std::string reftime)
+{
+	double time = 0.0;
+	std::vector<std::string> STstr = { "start","begin" };
+	std::vector<std::string> ENstr = { "end","finish" };
+
+	bool isdatest = timestr.find('T') != std::string::npos;
+
+	if (case_insensitive_compare(timestr, STstr) == 0)
+	{
+		time = start;
+	}
+	else if (case_insensitive_compare(timestr, ENstr) == 0)
+	{
+		time = end;
+	}
+	else if (!isdatest)
+	{
+		time = start + readApproxtimestr(timestr);
+	}
+	else
+	{
+		time = date_string_to_s(timestr, reftime);
+	}
+
+	return time = std::min(std::max(start, time), end);
+
+}
+
+/**
+ * @brief Read and interpret a time range string, converting it to a vector of doubles within specified bounds.
+ * This function interprets a time range string formatted as "t_init:t_step:t_end", where each component can be
+ * a specific time value or a keyword representing the start or end of the overall time range.
+ * It converts the range into a vector of double values representing discrete time steps,
+ * ensuring all values fall within the provided start and end bounds.
+ * @param timestr A vector of strings representing the time range components: [t_init, t_step, t_end].
+ * @param start The start time bound.
+ * @param end The end time bound.
+ * @param reftime The reference time for interpreting absolute date-time strings.
+ * @return A vector of double values representing the interpreted time steps within the specified range.	
+ */
+std::vector<double> ReadTRangestr(std::vector<std::string> timestr, double start, double end, std::string reftime)
+{
+	double init = 0.0;
+	double step = 0.0;
+	double last = 0.0;
+
+	std::vector<std::string> STstr = { "start","begin" };
+
+	std::vector<std::string> ENstr = { "end","finish" };
+
+	std::string initstr = timestr[0];
+	std::string stepstr = timestr[1];
+	std::string laststr = timestr[2];
+
+	bool isdateinit = initstr.find('T') != std::string::npos;
+	
+	bool isdatelast = laststr.find('T') != std::string::npos;
+
+	
+	if (case_insensitive_compare(initstr, STstr) == 0 || initstr.empty())
+	{
+		init = start;
+	}
+	else if (!isdateinit)
+	{
+		init = start + readApproxtimestr(initstr);
+	}
+	else
+	{
+		init = date_string_to_s(initstr, reftime);
+	}
+	
+	if (case_insensitive_compare(laststr, ENstr) == 0 || laststr.empty())
+	{
+		last = end;
+	}
+	else if (!isdatelast)
+	{
+		last = start + readApproxtimestr(laststr);
+	}
+	else
+	{
+		last = date_string_to_s(laststr, reftime);
+	}
+
+	if (stepstr.empty())
+	{
+		step = (last - init);
+	}
+	else
+	{
+		step = readApproxtimestr(stepstr);
+	}
+
+	std::vector<double> tout;
+	int nstep = (last - init) / step + 1;
+
+	for (int k = 0; k < nstep; k++)
+	{
+		tout.push_back(std::min(init + step * k, last));
+	}
+
+
+	return tout;
+
+}
+
+/**
+ * @brief Convert an approximate time string to a double value in seconds.
+ * This function interprets a time string that may include a numeric value followed by a time unit
+ * (e.g., "seconds", "minutes", "hours", "days", "months", "years") and converts it to a double value
+ * representing the equivalent time in seconds. If the unit is not recognized, it defaults to seconds.
+ * @param input The approximate time string to be converted (e.g., "10 minutes", "2.5 hours").
+ * @return A double value representing the time in seconds.
+ */
+double readApproxtimestr(std::string input)
+{
+	double time = 0.0;
+
+	double fac = 1.0;
+
+	std::string numberst;
+	std::string unit;
+	
+	// first split the digit from the string
+	for (auto e : input)
+	{
+		if (isalpha(e) && e!='.')
+			unit.push_back(e);
+		else if (isdigit(e) || e == '.')
+			numberst.push_back(e);
+	}
+
+	double number = std::stod(numberst);
+
+	std::vector<std::string> secondvec = { "seconds","second","sec","s" };
+	std::vector<std::string> minutevec = { "minutes","minute","min","m" };
+	std::vector<std::string> hourvec = { "hours","hour","hrs","hr","h" };
+	std::vector<std::string> dayvec = { "days","day","d" };
+	std::vector<std::string> monthvec = { "months","month","mths", "mth", "mon" };
+	std::vector<std::string> yearvec = { "years","year","yrs", "yr", "y" };
+
+
+	std::size_t found;
+	found = case_insensitive_compare(unit, secondvec);
+	if (found == 0)
+		fac = 1.0;
+
+	found = case_insensitive_compare(unit, minutevec);
+	if (found == 0)
+		fac = 60.0;
+
+	found = case_insensitive_compare(unit, hourvec);
+	if (found == 0)
+		fac = 3600.0;
+
+	found = case_insensitive_compare(unit, dayvec);
+	if (found == 0)
+		fac = 3600.0 * 24.0;
+
+	found = case_insensitive_compare(unit, monthvec);
+	if (found == 0)
+		fac = 3600.0 * 24.0 * 30.4375;
+
+	found = case_insensitive_compare(unit, yearvec);
+	if (found == 0)
+		fac = 3600.0 * 24.0 * 365.25;
+
+	// If unit is not understood it will return number
+	time = fac * number;
+
+	return time;
+}
+
+/**
+ * @brief Read and interpret output time specifications from a vector of parameter strings.
+ * This function processes a vector of parameter strings that specify output times,	
+ * which can include individual time values or ranges defined by a start, step, and end.
+ * It converts these specifications into a vector of double values representing the output times,
+ * ensuring all times fall within the simulation's total time and end time.
+ * @param paramstr A vector of strings specifying output times or ranges.
+ * @param XParam The Param structure containing simulation parameters, including total time and end time.
+ * @return A vector of double values representing the interpreted output times.
+ */
+std::vector<double> ReadToutput(std::vector<std::string> paramstr,Param XParam)
+{
+	//
+
+	T_output tout;
+	double Xstart = XParam.totaltime;
+	double Xend = XParam.endtime;
+	std::string reftime = XParam.reftime;
+	
+
+	for (int ipa = 0; ipa < paramstr.size(); ipa++)
+	{
+
+		//Check if it is a range or a single value
+
+
+		std::vector<std::string> Toutputpar_vect = split_full(paramstr[ipa], '|');
+
+		if (Toutputpar_vect.size() == 3)
+		{
+
+			// It is range
+			std::vector<double> rgvals = ReadTRangestr(Toutputpar_vect, Xstart, Xend, reftime);
+			//a.insert(a.end(), b.begin(), b.end());
+			tout.val.insert(tout.val.end(), rgvals.begin(), rgvals.end());
+			
+
+		}
+		else if (Toutputpar_vect.size() > 1)
+		{
+			//Failed: Toutput must be exactly 3 values, separated by ":" for a vector shape, in virst position. "t_init:t_step:t_end" (with possible empty values as "t_init:t_setps: " to use the last time steps as t_end;
+			std::cerr << "Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end; see log file for details" << std::endl;
+
+			log("Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end;");
+			log(paramstr[ipa]);
+		}
+		else {
+			tout.val.push_back(ReadTvalstr(paramstr[ipa],Xstart, Xend, reftime));
+		}
+	}
+	
+	return tout.val;
+}
 
 
 

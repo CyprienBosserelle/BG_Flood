@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doxygenlayout version="1.0">
+  <navindex>
+    <tab type="mainpage"/>
+    <tab type="pages"/>
+    <tab type="modules"/>
+    <tab type="namespaces"/>
+    <tab type="classes"/>
+    <tab type="files"/>
+    <tab type="user-defined"/>
+      <title>Introduction</title>
+      <page refid="custom_page"/>
+    </tab>
+    <tab type="user-defined">
+      <title>Code</title>
+      <sectiondef type="user-defined">
+        <title>Namespaces</title>
+        <tab type="namespaces"/>
+      </sectiondef>
+      <sectiondef type="user-defined">
+        <title>Classes</title>
+        <tab type="classes"/>
+      </sectiondef>
+      <sectiondef type="user-defined">
+        <title>Files</title>
+        <tab type="files"/>
+      </sectiondef>
+
+
+  </navindex>
+</doxygenlayout>

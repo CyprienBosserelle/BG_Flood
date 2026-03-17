@@ -5,13 +5,22 @@
 
 
 
+/**
+ * @brief Performs mesh adaptation (refinement/coarsening) for the model.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XForcing Forcing data
+ * @param XModel Model structure
+ *
+ * Iteratively refines or coarsens the mesh based on adaptation criteria, updating block info and variables.
+ */
 template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model<T>& XModel)
 {
 	int oldnblk = 0;
 
 	int niteration = 0;
 
-	int maxiteration = 20;
+	int maxiteration = XParam.adaptmaxiteration;
 	//fillHalo(XParam, XModel.blocks, XModel.evolv_o);
 	//fillCorners(XParam, XModel.blocks, XModel.evolv_o);
 	if (XParam.maxlevel != XParam.minlevel)
@@ -49,20 +58,20 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 				copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.BotRight, XModel.grad.dvdx);
 				copyBlockinfo2var(XParam, XModel.blocks, XModel.blocks.BotLeft, XModel.grad.dvdy);
 
-				creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo);
-				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "blockID", 3, XModel.flux.Fhu);
+				creatncfileBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XModel.blocks.outZone[0]);
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "blockID", 3, XModel.flux.Fhu, XModel.blocks.outZone[0]);
 				
-				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "LeftBot", 3, XModel.grad.dhdx);
-				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "LeftTop", 3, XModel.grad.dhdy);
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "LeftBot", 3, XModel.grad.dhdx, XModel.blocks.outZone[0]);
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "LeftTop", 3, XModel.grad.dhdy, XModel.blocks.outZone[0]);
 
-				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "TopLeft", 3, XModel.grad.dzsdx);
-				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "TopRight", 3, XModel.grad.dzsdy);
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "TopLeft", 3, XModel.grad.dzsdx, XModel.blocks.outZone[0]);
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "TopRight", 3, XModel.grad.dzsdy, XModel.blocks.outZone[0]);
 				
-				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "RightTop", 3, XModel.grad.dudx);
-				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "RightBot", 3, XModel.grad.dudy);
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "RightTop", 3, XModel.grad.dudx, XModel.blocks.outZone[0]);
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "RightBot", 3, XModel.grad.dudy, XModel.blocks.outZone[0]);
 
-				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "BotLeft", 3, XModel.grad.dvdx);
-				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "BotRight", 3, XModel.grad.dvdy);
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "BotLeft", 3, XModel.grad.dvdx, XModel.blocks.outZone[0]);
+				defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "BotRight", 3, XModel.grad.dvdy, XModel.blocks.outZone[0]);
 				exit(2);
 				break;
 			}
@@ -72,7 +81,7 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 		//=====================================
 		// Initialise Friction map
 
-		if (!XForcing.cf.inputfile.empty())
+		if (!XForcing.cf.empty())
 		{
 			interp2BUQ(XParam, XModel.blocks, XForcing.cf, XModel.cf);
 		}
@@ -83,12 +92,44 @@ template <class T> void Adaptation(Param& XParam, Forcing<float> XForcing, Model
 		// Set edges of friction map
 		setedges(XParam, XModel.blocks, XModel.cf);
 
+		//=====================================
+		// Initialise the continuous losses map
+		if (XParam.infiltration)
+		{
+			if (!XForcing.il.inputfile.empty())
+			{
+				interp2BUQ(XParam, XModel.blocks, XForcing.il, XModel.il);
+			}
+			else
+			{
+				InitArrayBUQ(XParam, XModel.blocks, (T)XParam.il, XModel.il);
+			}
+			if (!XForcing.cl.inputfile.empty())
+			{
+				interp2BUQ(XParam, XModel.blocks, XForcing.cl, XModel.cl);
+			}
+			else
+			{
+				InitArrayBUQ(XParam, XModel.blocks, (T)XParam.cl, XModel.cl);
+			}
+			// Set edges of friction map
+			setedges(XParam, XModel.blocks, XModel.il);
+			setedges(XParam, XModel.blocks, XModel.cl);
+		}
+
 	}
 }
 template void Adaptation<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel);
 template void Adaptation<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel);
 
 //Initial adaptation also reruns initial conditions
+/**
+ * @brief Performs initial mesh adaptation and reruns initial conditions.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XForcing Forcing data
+ * @param XModel Model structure
+ */
 template <class T> void InitialAdaptation(Param& XParam, Forcing<float> &XForcing, Model<T>& XModel)
 {
 	if (XParam.maxlevel != XParam.minlevel)
@@ -96,19 +137,11 @@ template <class T> void InitialAdaptation(Param& XParam, Forcing<float> &XForcin
 		log("Adapting mesh");
 		Adaptation(XParam, XForcing, XModel);
 
-		//recalculate river positions (They may belong to a different block)
-		InitRivers(XParam, XForcing, XModel);
 
-		//rerun boundary block (there may be new bnd block and old ones that do not belong anymore)
-		//Initbnds(XParam, XForcing, XModel);
-		Calcbndblks(XParam, XForcing, XModel.blocks);
-		Findbndblks(XParam, XModel, XForcing);
+		InitialConditions(XParam, XForcing, XModel);
 
-		//Recalculate the masks
-		FindMaskblk(XParam, XModel.blocks);
 
-		// Re run initial contions to avoid dry/wet issues
-		initevolv(XParam, XModel.blocks, XForcing, XModel.evolv, XModel.zb);
+		
 	}
 }
 template void InitialAdaptation<float>(Param& XParam, Forcing<float> &XForcing, Model<float>& XModel);
@@ -137,6 +170,9 @@ template <class T> bool refinesanitycheck(Param XParam, BlockP<T> XBlock,  bool*
 		{
 			coarsen[ib] = false;
 		}
+		// Warning, Here cancelling all coasening because of a bug
+		// This could become an option for optimising the refinment process ??
+		coarsen[ib] = false;
 	}
 
 
@@ -281,6 +317,13 @@ int checkneighbourrefine(int neighbourib,int levelib, int levelneighbour, bool*&
 *
 *	Needs improvements
 */
+/**
+ * @brief Checks the consistency and sanity of the block uniform quadtree mesh.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @return True if mesh is sane, false otherwise.
+ */
 template <class T> bool checkBUQsanity(Param XParam,BlockP<T> XBlock)
 {
 	bool check = true;
@@ -340,6 +383,19 @@ bool checklevel(int ib, int levelib, int neighbourib, int levelneighbour)
 	return check;
 }
 
+/**
+ * @brief Checks if the distance between a block and its neighbor is consistent with their levels.
+ * @tparam T Data type
+ * @param dx Base grid spacing
+ * @param ib Block index
+ * @param levelib Block level
+ * @param blocko Block coordinate
+ * @param neighbourib Neighbor block index
+ * @param levelneighbour Neighbor block level
+ * @param neighbourblocko Neighbor block coordinate
+ * @param rightortop True if neighbor is right/top, false if left/bottom
+ * @return True if distance is consistent, false otherwise.
+ */
 template <class T> bool checkneighbourdistance(double dx, int ib, int levelib, T blocko, int neighbourib, int levelneighbour, T neighbourblocko, bool rightortop )
 {
 	T expecteddistance= blocko;
@@ -348,11 +404,11 @@ template <class T> bool checkneighbourdistance(double dx, int ib, int levelib, T
 	{
 		if (rightortop)
 		{
-			expecteddistance = blocko + calcres(T(dx), levelib) * 15.5 + 0.5 * calcres(T(dx), levelneighbour);
+			expecteddistance = blocko + calcres(T(dx), levelib) * T(15.5) + T(0.5) * calcres(T(dx), levelneighbour);
 		}
 		else
 		{
-			expecteddistance = blocko - calcres(T(dx), levelib) * 0.5 - 15.5 * calcres(T(dx), levelneighbour);
+			expecteddistance = blocko - calcres(T(dx), levelib) * T(0.5) - T(15.5) * calcres(T(dx), levelneighbour);
 		}
 
 	}
@@ -369,6 +425,13 @@ template <class T> bool checkneighbourdistance(double dx, int ib, int levelib, T
 
 
 
+/**
+ * @brief Applies adaptation (refinement/coarsening) to the mesh and updates variables.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XForcing Forcing data
+ * @param XModel Model structure
+ */
 template <class T> void Adapt(Param &XParam, Forcing<float> XForcing, Model<T>& XModel)
 {
 	int nnewblk = CalcAvailblk(XParam, XModel.blocks, XModel.adapt);
@@ -461,6 +524,14 @@ template <class T> void Adapt(Param &XParam, Forcing<float> XForcing, Model<T>& 
 *
 *
 */
+/**
+ * @brief Calculates the number of available blocks for refinement.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param XAdapt Adaptation data structure
+ * @return Number of available blocks for refinement.
+ */
 template <class T> int CalcAvailblk(Param &XParam, BlockP<T> XBlock, AdaptP& XAdapt)
 {
 	//
@@ -526,6 +597,14 @@ template <class T> int CalcAvailblk(Param &XParam, BlockP<T> XBlock, AdaptP& XAd
 template int CalcAvailblk<float>(Param &XParam, BlockP<float> XBlock, AdaptP& XAdapt);
 template int CalcAvailblk<double>(Param &XParam, BlockP<double> XBlock, AdaptP& XAdapt);
 
+/**
+ * @brief Adds new blocks to the mesh for adaptation.
+ * @tparam T Data type
+ * @param nnewblk Number of new blocks to add
+ * @param XParam Model parameters
+ * @param XModel Model structure
+ * @return New total number of blocks in memory.
+ */
 template <class T> int AddBlocks(int nnewblk, Param& XParam, Model<T>& XModel)
 {
 	//
@@ -586,6 +665,15 @@ template int AddBlocks<float>(int nnewblk, Param& XParam, Model<float>& XModel);
 template int AddBlocks<double>(int nnewblk, Param& XParam, Model<double>& XModel);
 
 
+/**
+ * @brief Coarsens mesh blocks and updates conserved variables.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param XAdapt Adaptation data structure
+ * @param XEvo Old evolving variables
+ * @param XEv New evolving variables
+ */
 template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,EvolvingP<T> XEvo, EvolvingP<T>& XEv )
 {
 	//=========================================================
@@ -608,8 +696,8 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 		if (XAdapt.coarsen[ib] == true)
 		{
 			double dxfac = calcres(XParam.dx, XBlock.level[ib]);
-			int xnode = int((XBlock.xo[ib]) / dxfac / XParam.blkwidth);
-			int ynode = int((XBlock.yo[ib]) / dxfac / XParam.blkwidth);
+			//int xnode = int((XBlock.xo[ib]) / dxfac / XParam.blkwidth);
+			//int ynode = int((XBlock.yo[ib]) / dxfac / XParam.blkwidth);
 
 			int ibr = XBlock.RightBot[ib];
 			int ibtl = XBlock.TopLeft[ib];
@@ -669,10 +757,10 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 
 
 					// These are the only guys that need to be coarsen, other are recalculated on the fly or interpolated from forcing
-					XEv.h[i] = 0.25 * (XEvo.h[ii] + XEvo.h[ir] + XEvo.h[it] + XEvo.h[itr]);
-					XEv.zs[i] = 0.25 * (XEvo.zs[ii] + XEvo.zs[ir] + XEvo.zs[it] + XEvo.zs[itr]);
-					XEv.u[i] = 0.25 * (XEvo.u[ii] + XEvo.u[ir] + XEvo.u[it] + XEvo.u[itr]);
-					XEv.v[i] =  0.25 * (XEvo.v[ii] + XEvo.v[ir] + XEvo.v[it] + XEvo.v[itr]);
+					XEv.h[i] = T(0.25) * (XEvo.h[ii] + XEvo.h[ir] + XEvo.h[it] + XEvo.h[itr]);
+					XEv.zs[i] = T(0.25) * (XEvo.zs[ii] + XEvo.zs[ir] + XEvo.zs[it] + XEvo.zs[itr]);
+					XEv.u[i] = T(0.25) * (XEvo.u[ii] + XEvo.u[ir] + XEvo.u[it] + XEvo.u[itr]);
+					XEv.v[i] =  T(0.25) * (XEvo.v[ii] + XEvo.v[ir] + XEvo.v[it] + XEvo.v[itr]);
 					//zb will be interpolated from input grid later // I wonder is this makes the bilinear interpolation scheme crash at the refining step for zb?
 					// No because zb is also interpolated later from the original mesh data
 					//zb[i] = 0.25 * (zbo[ii] + zbo[ir] + zbo[it], zbo[itr]);
@@ -768,8 +856,8 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 
 			// Bot and left blk should remain unchanged at this stage(they will change if the neighbour themselves change)
 
-			XBlock.xo[ib] = XBlock.xo[ib] + calcres(XParam.dx, XBlock.level[ib] + 1);
-			XBlock.yo[ib] = XBlock.yo[ib] + calcres(XParam.dx, XBlock.level[ib] + 1);
+			XBlock.xo[ib] = XBlock.xo[ib] + T(calcres(XParam.dx, XBlock.level[ib] + 1));
+			XBlock.yo[ib] = XBlock.yo[ib] + T(calcres(XParam.dx, XBlock.level[ib] + 1));
 
 
 
@@ -783,7 +871,7 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XBlock.active[ibl];
-		int i, ii, ir, it, itr;
+		
 		if (ib >= 0) // ib can be -1 for newly inactive blocks
 		{
 
@@ -869,7 +957,7 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		int ib = XBlock.active[ibl];
-		int i, ii, ir, it, itr;
+		
 		if (ib >= 0 && (XAdapt.newlevel[ib] < XBlock.level[ib])) // ib can be -1 for newly inactive blocks
 		{
 			if (XAdapt.newlevel[XBlock.LeftBot[ib]] <= XAdapt.newlevel[ib])
@@ -917,6 +1005,15 @@ template <class T> void coarsen(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt,
 template void coarsen<float>(Param XParam, BlockP<float>& XBlock, AdaptP& XAdapt, EvolvingP<float> XEvo, EvolvingP<float>& XEv);
 template void coarsen<double>(Param XParam, BlockP<double>& XBlock, AdaptP& XAdapt, EvolvingP<double> XEvo, EvolvingP<double>& XEv);
 
+/**
+ * @brief Refines mesh blocks and interpolates conserved variables.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param XAdapt Adaptation data structure
+ * @param XEvo Old evolving variables
+ * @param XEv New evolving variables
+ */
 template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, EvolvingP<T> XEvo, EvolvingP<T>& XEv)
 {
 	//==========================================================================
@@ -938,7 +1035,7 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 		//
 
 		int ib = XBlock.active[ibl];
-		int o, oo, ooo, oooo;
+		int o;
 		int  ii, ir, it,itr;
 
 
@@ -965,8 +1062,8 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							
 							T lx, ly, rx, ry;
 
-							lx = ix * 0.5 - 0.25;
-							ly = iy * 0.5 - 0.25;
+							lx = ix * T(0.5) - T(0.25);
+							ly = iy * T(0.5) - T(0.25);
 
 
 							fx = (int)floor(lx) + kx[kk];
@@ -974,8 +1071,8 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 							fy = (int)floor(ly) + ky[kk];
 							cy = (int)ceil(ly) + ky[kk];
 
-							rx = (lx)+(double)kx[kk];
-							ry = (ly)+(double)ky[kk];
+							rx = (lx)+T(kx[kk]);
+							ry = (ly)+T(ky[kk]);
 
 							o = memloc(XParam,ix,iy, kb[kk]);//ix + iy * 16 + kb[kk] * XParam.blksize;
 
@@ -1018,20 +1115,21 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 				double xoblk = XBlock.xo[ib] - 0.5 * delx;
 				double yoblk = XBlock.yo[ib] - 0.5 * delx;
 
-				int oldtopleft, oldleftbot, oldrightbot, oldbotleft;
+				int oldtopleft, oldrightbot;
+				//int oldleftbot, oldbotleft;
 				int oldtopright, oldlefttop, oldrighttop, oldbotright;
 
 
 				oldtopleft = XBlock.TopLeft[ib];
 				oldtopright = XBlock.TopRight[ib];
 
-				oldbotleft = XBlock.BotLeft[ib];
+				//oldbotleft = XBlock.BotLeft[ib];
 				oldbotright = XBlock.BotRight[ib];
 
 				oldrightbot = XBlock.RightBot[ib];
 				oldrighttop = XBlock.RightTop[ib];
 
-				oldleftbot = XBlock.LeftBot[ib];
+				//oldleftbot = XBlock.LeftBot[ib];
 				oldlefttop = XBlock.LeftTop[ib];
 
 				// One block becomes 4 blocks:
@@ -1051,17 +1149,17 @@ template <class T> void refine(Param XParam, BlockP<T>& XBlock, AdaptP& XAdapt, 
 				XAdapt.newlevel[ibtl] = XBlock.level[ib] + 1;
 				XAdapt.newlevel[ibtr] = XBlock.level[ib] + 1;
 
-				XBlock.xo[ib] = xoblk;
-				XBlock.yo[ib] = yoblk;
+				XBlock.xo[ib] = T(xoblk);
+				XBlock.yo[ib] = T(yoblk);
 				//bottom right blk
-				XBlock.xo[ibr] = xoblk + (XParam.blkwidth) * delx;
-				XBlock.yo[ibr] = yoblk;
+				XBlock.xo[ibr] = T(xoblk + (XParam.blkwidth) * delx);
+				XBlock.yo[ibr] = T(yoblk);
 				//top left blk
-				XBlock.xo[ibtl] = xoblk;
-				XBlock.yo[ibtl] = yoblk + (XParam.blkwidth) * delx;
+				XBlock.xo[ibtl] = T(xoblk);
+				XBlock.yo[ibtl] = T(yoblk + (XParam.blkwidth) * delx);
 				//top right blk
-				XBlock.xo[ibtr] = xoblk + (XParam.blkwidth) * delx;
-				XBlock.yo[ibtr] = yoblk + (XParam.blkwidth) * delx;
+				XBlock.xo[ibtr] = T(xoblk + (XParam.blkwidth) * delx);
+				XBlock.yo[ibtr] = T(yoblk + (XParam.blkwidth) * delx);
 
 
 				//sort out internal blocks neighbour
@@ -1697,6 +1795,15 @@ template void refine<float>(Param XParam, BlockP<float>& XBlock, AdaptP& XAdapt,
 template void refine<double>(Param XParam, BlockP<double>& XBlock, AdaptP& XAdapt, EvolvingP<double> XEvo, EvolvingP<double>& XEv);
 
 
+/**
+ * @brief Cleans up and updates block lists after adaptation.
+ * @tparam T Data type
+ * @param XParam Model parameters
+ * @param XBlock Block data structure
+ * @param XAdapt Adaptation data structure
+ *
+ * Updates block levels, reorders active block list, and finalizes adaptation.
+ */
 template <class T> void Adaptationcleanup(Param &XParam, BlockP<T>& XBlock, AdaptP& XAdapt)
 {
 	//===========================================================
@@ -1709,7 +1816,7 @@ template <class T> void Adaptationcleanup(Param &XParam, BlockP<T>& XBlock, Adap
 	for (int ibl = 0; ibl < XParam.nblkmem; ibl++)
 	{
 		//
-		int oldlevel;
+		
 		int ib = XBlock.active[ibl];
 
 

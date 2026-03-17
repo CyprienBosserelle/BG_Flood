@@ -2,15 +2,33 @@
 #include "Setup_GPU.h"
 
 
-
-template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &XForcing, Model<T>& XModel_g)
+/**
+ * @brief Setup and initialize GPU for simulation.
+ *
+ * This function sets up the GPU device, allocates memory, and copies data from the host to the device.	
+ * @param XParam Simulation parameters
+ * @param XModel Host model data structure
+ * @param XForcing Forcing data structure
+ * @param XModel_g Device model data structure
+ * 
+ */
+template <class T> void SetupGPU(Param &XParam, Model<T> XModel,Forcing<float> &XForcing, Model<T>& XModel_g)
 {
 	if (XParam.GPUDEVICE >= 0)
 	{
 		log("Setting up GPU");
 
+		size_t free_byte;
+
+		size_t total_byte;
 
 		cudaSetDevice(XParam.GPUDEVICE);
+
+		CUDA_CHECK(cudaMemGetInfo(&free_byte, &total_byte));
+
+		XParam.GPU_initmem_byte = total_byte - free_byte;
+
+
 		//Allocate memory for the model on the GPU
 		AllocateGPU(XParam.nblkmem, XParam.blksize, XParam, XModel_g);
 		
@@ -38,6 +56,35 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 		AllocateGPU(XForcing.bot.nblk, 1, XForcing.bot.blks_g);
 		CopytoGPU(XForcing.bot.nblk, 1, XForcing.bot.blks, XForcing.bot.blks_g);
 
+
+		for (int s = 0; s < XForcing.bndseg.size(); s++)
+		{
+			AllocateGPU(XForcing.bndseg[s].left.nblk, 1, XForcing.bndseg[s].left.blk_g);
+			CopytoGPU(XForcing.bndseg[s].left.nblk, 1, XForcing.bndseg[s].left.blk, XForcing.bndseg[s].left.blk_g);
+
+			AllocateGPU(XForcing.bndseg[s].right.nblk, 1, XForcing.bndseg[s].right.blk_g);
+			CopytoGPU(XForcing.bndseg[s].right.nblk, 1, XForcing.bndseg[s].right.blk, XForcing.bndseg[s].right.blk_g);
+
+			AllocateGPU(XForcing.bndseg[s].top.nblk, 1, XForcing.bndseg[s].top.blk_g);
+			CopytoGPU(XForcing.bndseg[s].top.nblk, 1, XForcing.bndseg[s].top.blk, XForcing.bndseg[s].top.blk_g);
+
+			AllocateGPU(XForcing.bndseg[s].bot.nblk, 1, XForcing.bndseg[s].bot.blk_g);
+			CopytoGPU(XForcing.bndseg[s].bot.nblk, 1, XForcing.bndseg[s].bot.blk, XForcing.bndseg[s].bot.blk_g);
+
+			AllocateGPU(XForcing.bndseg[s].left.nblk, XParam.blkwidth, XForcing.bndseg[s].left.qmean_g);
+			CopytoGPU(XForcing.bndseg[s].left.nblk, XParam.blkwidth, XForcing.bndseg[s].left.qmean, XForcing.bndseg[s].left.qmean_g);
+
+			AllocateGPU(XForcing.bndseg[s].right.nblk, XParam.blkwidth, XForcing.bndseg[s].right.qmean_g);
+			CopytoGPU(XForcing.bndseg[s].right.nblk, XParam.blkwidth, XForcing.bndseg[s].right.qmean, XForcing.bndseg[s].right.qmean_g);
+
+			AllocateGPU(XForcing.bndseg[s].top.nblk, XParam.blkwidth, XForcing.bndseg[s].top.qmean_g);
+			CopytoGPU(XForcing.bndseg[s].top.nblk, XParam.blkwidth, XForcing.bndseg[s].top.qmean, XForcing.bndseg[s].top.qmean_g);
+
+			AllocateGPU(XForcing.bndseg[s].bot.nblk, XParam.blkwidth, XForcing.bndseg[s].bot.qmean_g);
+			CopytoGPU(XForcing.bndseg[s].bot.nblk, XParam.blkwidth, XForcing.bndseg[s].bot.qmean, XForcing.bndseg[s].bot.qmean_g);
+		}
+
+
 		// Also for mask
 		XModel_g.blocks.mask.nblk = XModel.blocks.mask.nblk;
 		AllocateGPU(XModel_g.blocks.mask.nblk, 1, XModel_g.blocks.mask.side);
@@ -47,7 +94,7 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 
 
 		// things are quite different for Time Series output. Why is that?.
-		if (XModel.bndblk.nblkTs > 0)
+		if (XParam.TSnodesout.size() > 0)
 		{
 
 			AllocateGPU(XModel.bndblk.nblkTs, 1, XModel_g.bndblk.Tsout);
@@ -62,6 +109,33 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 			XModel_g.bndblk.nblkriver = XModel.bndblk.nblkriver;
 			AllocateGPU(XModel.bndblk.nblkriver, 1, XModel_g.bndblk.river);
 			CopytoGPU(XModel.bndblk.nblkriver, 1, XModel.bndblk.river, XModel_g.bndblk.river);
+
+			int nribmax = XModel.bndblk.Riverinfo.nribmax;
+			int nburmax = XModel.bndblk.Riverinfo.nburmax;
+
+			XModel_g.bndblk.Riverinfo.nribmax = nribmax;
+			XModel_g.bndblk.Riverinfo.nburmax = nburmax;
+
+
+			AllocateMappedMemGPU(XForcing.rivers.size(), 1,XParam.GPUDEVICE, XModel_g.bndblk.Riverinfo.qnow_g,XModel.bndblk.Riverinfo.qnow);
+			XModel_g.bndblk.Riverinfo.qnow = XModel.bndblk.Riverinfo.qnow;
+
+
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.Xbidir);
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.Xridib);
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.Xbidir, XModel_g.bndblk.Riverinfo.Xbidir);
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.Xridib, XModel_g.bndblk.Riverinfo.Xridib);
+
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.xstart);
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.xend);
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.ystart);
+			AllocateGPU(nribmax, nburmax, XModel_g.bndblk.Riverinfo.yend);
+
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.xstart, XModel_g.bndblk.Riverinfo.xstart);
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.xend, XModel_g.bndblk.Riverinfo.xend);
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.ystart, XModel_g.bndblk.Riverinfo.ystart);
+			CopytoGPU(nribmax, nburmax, XModel.bndblk.Riverinfo.yend, XModel_g.bndblk.Riverinfo.yend);
+
 		}
 
 		// Reset GPU mean and max arrays
@@ -75,12 +149,23 @@ template <class T> void SetupGPU(Param XParam, Model<T> XModel,Forcing<float> &X
 		}
 
 		Initmaparray(XModel_g);
+
+		//InitzbgradientGPU(XParam, XModel_g);
+		
+
 	}
 }
-template void SetupGPU<float>(Param XParam, Model<float> XModel, Forcing<float>& XForcing, Model<float>& XModel_g);
-template void SetupGPU<double>(Param XParam, Model<double> XModel, Forcing<float>& XForcing, Model<double>& XModel_g);
+template void SetupGPU<float>(Param &XParam, Model<float> XModel, Forcing<float>& XForcing, Model<float>& XModel_g);
+template void SetupGPU<double>(Param &XParam, Model<double> XModel, Forcing<float>& XForcing, Model<double>& XModel_g);
 
 
+/**
+ * @brief Check CUDA error status and print message if error occurs.
+ *
+ * Checks the CUDA error code and prints an error message if the code indicates failure.
+ *
+ * @param CUDerr CUDA error code
+ */
 void CUDA_CHECK(cudaError CUDerr)
 {
 
@@ -97,6 +182,17 @@ void CUDA_CHECK(cudaError CUDerr)
 }
 
 
+/**
+ * @brief Copy data from CPU to GPU memory.
+ *
+ * Copies an array from host (CPU) memory to device (GPU) memory using CUDA.
+ *
+ * @tparam T Data type
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param z_cpu Source array (CPU)
+ * @param z_gpu Destination array (GPU)
+ */
 template <class T> void CopytoGPU(int nblk, int blksize, T * z_cpu, T* z_gpu)
 {
 	CUDA_CHECK(cudaMemcpy(z_gpu, z_cpu, nblk * blksize * sizeof(T), cudaMemcpyHostToDevice));
@@ -106,6 +202,17 @@ template void CopytoGPU<int>(int nblk, int blksize, int* z_cpu, int* z_gpu);
 template void CopytoGPU<float>(int nblk, int blksize, float* z_cpu, float* z_gpu);
 template void CopytoGPU<double>(int nblk, int blksize, double* z_cpu, double* z_gpu);
 
+/**
+ * @brief Copy data from GPU to CPU memory.
+ *
+ * Copies an array from device (GPU) memory to host (CPU) memory using CUDA.
+ *
+ * @tparam T Data type
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param z_cpu Destination array (CPU)
+ * @param z_gpu Source array (GPU)
+ */
 template <class T> void CopyGPUtoCPU(int nblk, int blksize, T* z_cpu, T* z_gpu)
 {
 	CUDA_CHECK(cudaMemcpy(z_cpu, z_gpu, nblk * blksize * sizeof(T), cudaMemcpyDeviceToHost));
@@ -115,6 +222,17 @@ template void CopyGPUtoCPU<int>(int nblk, int blksize, int* z_cpu, int* z_gpu);
 template void CopyGPUtoCPU<float>(int nblk, int blksize, float* z_cpu, float* z_gpu);
 template void CopyGPUtoCPU<double>(int nblk, int blksize, double* z_cpu, double* z_gpu);
 
+/**
+ * @brief Copy complex data structures from CPU to GPU.
+ *
+ * This function copies the evolving variables structure from the host (CPU) to the device (GPU) memory.
+ *
+ * @tparam T Data type
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param XEv_cpu Source evolving variables structure (CPU)
+ * @param XEv_gpu Destination evolving variables structure (GPU)
+ */
 template <class T> void CopytoGPU(int nblk, int blksize, EvolvingP<T> XEv_cpu, EvolvingP<T> XEv_gpu)
 {
 	CopytoGPU(nblk, blksize, XEv_cpu.h, XEv_gpu.h);
@@ -123,9 +241,43 @@ template <class T> void CopytoGPU(int nblk, int blksize, EvolvingP<T> XEv_cpu, E
 	CopytoGPU(nblk, blksize, XEv_cpu.v, XEv_gpu.v);
 }
 template void CopytoGPU<float>(int nblk, int blksize, EvolvingP<float> XEv_cpu, EvolvingP<float> XEv_gpu);
-template void CopytoGPU < double >(int nblk, int blksize, EvolvingP<double> XEv_cpu, EvolvingP < double >  XEv_gpu);
+template void CopytoGPU < double >(int nblk, int blksize, EvolvingP<double> XEv_cpu, EvolvingP<double> XEv_gpu);
+
+/**
+ * @brief Copy complex data structures from CPU to GPU.
+ *
+ * This function copies the evolving variables with momentum structure from the host (CPU) to the device (GPU) memory.
+ *
+ * @tparam T Data type
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param XEv_cpu Source evolving variables with momentum structure (CPU)
+ * @param XEv_gpu Destination evolving variables with momentum structure (GPU)
+ */
+template <class T> void CopytoGPU(int nblk, int blksize, EvolvingP_M<T> XEv_cpu, EvolvingP_M<T> XEv_gpu)
+{
+	CopytoGPU(nblk, blksize, XEv_cpu.h, XEv_gpu.h);
+	CopytoGPU(nblk, blksize, XEv_cpu.zs, XEv_gpu.zs);
+	CopytoGPU(nblk, blksize, XEv_cpu.u, XEv_gpu.u);
+	CopytoGPU(nblk, blksize, XEv_cpu.v, XEv_gpu.v);
+	CopytoGPU(nblk, blksize, XEv_cpu.U, XEv_gpu.U);
+	CopytoGPU(nblk, blksize, XEv_cpu.hU, XEv_gpu.hU);
+}
+template void CopytoGPU<float>(int nblk, int blksize, EvolvingP_M<float> XEv_cpu, EvolvingP_M<float> XEv_gpu);
+template void CopytoGPU < double >(int nblk, int blksize, EvolvingP_M<double> XEv_cpu, EvolvingP_M < double >  XEv_gpu);
 
 
+/**
+ * @brief Copy complex data structures from CPU to GPU.
+ *
+ * This function copies the gradients structure from the host (CPU) to the device (GPU) memory.
+ *
+ * @tparam T Data type
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param XGrad_cpu Source gradients structure (CPU)
+ * @param XGrad_gpu Destination gradients structure (GPU)
+ */
 template <class T> void CopytoGPU(int nblk, int blksize, GradientsP<T> XGrad_cpu, GradientsP<T> XGrad_gpu)
 {
 	CopytoGPU(nblk, blksize, XGrad_cpu.dhdx, XGrad_gpu.dhdx);
@@ -140,6 +292,18 @@ template <class T> void CopytoGPU(int nblk, int blksize, GradientsP<T> XGrad_cpu
 template void CopytoGPU(int nblk, int blksize, GradientsP<float> XGrad_cpu, GradientsP<float> XGrad_gpu);
 template void CopytoGPU(int nblk, int blksize, GradientsP<double> XGrad_cpu, GradientsP<double> XGrad_gpu);
 
+/**
+ * @brief Copy complex data structures from CPU to GPU.
+ *
+ * This function copies the entire model structure from the host (CPU) to the device (GPU) memory.
+ *
+ * @tparam T Data type
+ * @param nblk Number of blocks
+ * @param blksize Block size
+ * @param XParam Simulation parameters
+ * @param XModel_cpu Source model structure (CPU)
+ * @param XModel_gpu Destination model structure (GPU)
+ */
 template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> XModel_cpu, Model<T> XModel_gpu)
 {
 	CopytoGPU(nblk, blksize, XModel_cpu.zb, XModel_gpu.zb);
@@ -151,12 +315,13 @@ template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> 
 
 	CopytoGPU(nblk, blksize, XModel_cpu.cf, XModel_gpu.cf);
 
-	CopytoGPU(nblk, blksize, XModel_cpu.zb, XModel_gpu.zb);
-
+	CopytoGPU(nblk, blksize, XModel_cpu.grad.dzbdx, XModel_gpu.grad.dzbdx);
+	CopytoGPU(nblk, blksize, XModel_cpu.grad.dzbdy, XModel_gpu.grad.dzbdy);
 	
 
 	//Block info
 	CopytoGPU(nblk, 1, XModel_cpu.blocks.active, XModel_gpu.blocks.active);
+	CopytoGPU(nblk, blksize, XModel_cpu.blocks.activeCell, XModel_gpu.blocks.activeCell);
 	CopytoGPU(nblk, 1, XModel_cpu.blocks.level, XModel_gpu.blocks.level);
 
 	CopytoGPU(nblk, 1, XModel_cpu.blocks.xo, XModel_gpu.blocks.xo);
@@ -175,20 +340,40 @@ template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> 
 	CopytoGPU(nblk, 1, XModel_cpu.blocks.RightTop, XModel_gpu.blocks.RightTop);
 	
 
+	if (XParam.infiltration)
+	{
+		CopytoGPU(nblk, blksize, XModel_cpu.il, XModel_gpu.il);
+		CopytoGPU(nblk, blksize, XModel_cpu.cl, XModel_gpu.cl);
+		CopytoGPU(nblk, blksize, XModel_cpu.hgw, XModel_gpu.hgw);
+	}
+
 	if (XParam.outmax)
 	{
-		CopytoGPU(nblk, blksize, XModel_cpu.evolv, XModel_gpu.evmax);
+		CopytoGPU(nblk, blksize, XModel_cpu.evmax, XModel_gpu.evmax);
 	}
 	if (XParam.outmean)
 	{
-		CopytoGPU(nblk, blksize, XModel_cpu.evolv, XModel_gpu.evmean);
+		CopytoGPU(nblk, blksize, XModel_cpu.evmean, XModel_gpu.evmean);
 	}
-
+	if (XParam.outtwet)
+	{
+		CopytoGPU(nblk, blksize, XModel_cpu.wettime, XModel_gpu.wettime);
+	}
 }
 template void CopytoGPU<float>(int nblk, int blksize, Param XParam, Model<float> XModel_cpu, Model<float> XModel_gpu);
 template void CopytoGPU<double>(int nblk, int blksize, Param XParam, Model<double> XModel_cpu, Model<double> XModel_gpu);
 
 
+/**
+ * @brief Allocate and bind a CUDA texture object.
+ *
+ * Allocates a CUDA array and creates a texture object for use in GPU kernels.
+ *
+ * @param nx Number of x grid points
+ * @param ny Number of y grid points
+ * @param Tex Texture set structure
+ * @param input Input data array
+ */
 void AllocateTEX(int nx, int ny, TexSetP& Tex, float* input)
 {
 
@@ -201,6 +386,7 @@ void AllocateTEX(int nx, int ny, TexSetP& Tex, float* input)
 	Tex.texDesc.addressMode[0] = cudaAddressModeClamp;
 	Tex.texDesc.addressMode[1] = cudaAddressModeClamp;
 	Tex.texDesc.filterMode = cudaFilterModeLinear;
+	//Tex.texDesc.filterMode = cudaFilterModePoint;
 	Tex.texDesc.normalizedCoords = false;
 
 	memset(&Tex.resDesc, 0, sizeof(cudaResourceDesc));
@@ -215,6 +401,13 @@ void AllocateTEX(int nx, int ny, TexSetP& Tex, float* input)
 }
 
 
+/**
+ * @brief Allocate boundary texture for GPU.
+ *
+ * Allocates and binds boundary water level data as a CUDA texture for GPU use.
+ *
+ * @param side Boundary parameter structure
+ */
 void AllocateBndTEX(bndparam & side)
 {
 	int nbndtimes = (int)side.data.size();

@@ -12,6 +12,26 @@ public:
 	std::string outname;
 };
 
+// Flexible definition of time outputs
+class T_output {
+public: 
+	double init = NAN;
+	double tstep = NAN;
+	double end = NAN;
+	std::vector<std::string> inputstr;
+	std::vector<double> val;
+};
+
+// Special output zones for nc files, informatin given by the user
+class outzoneP {
+public:
+	//std::vector<int> blocks; // one zone will spread across multiple blocks (entire blocks containing a part of the area will be output)
+	double xstart, xend, ystart, yend; // definition of the zone needed for special nc output (rectangular zone) by the user
+	//double xo, xmax, yo, ymax; // Real zone for output (because we output full blocks)
+	std::string outname; // name for the output file (one for each zone)
+	T_output Toutput; // time for outputs for the zone
+};
+
 class Flowin {
 public:
 	double time, q;
@@ -27,6 +47,7 @@ public:
 	std::vector<int> i, j, block; // one river can spring across multiple cells
 	double disarea; // discharge area
 	double xstart,xend, ystart,yend; // location of the discharge as a rectangle
+	double to, tmax;
 	std::string Riverflowfile; // river flow input time[s] flow in m3/s
 	std::vector<Flowin> flowinput; // vector to store the data of the river flow input file
 	
@@ -41,7 +62,11 @@ public:
 	double xmax = 0.0;
 	double ymax = 0.0;
 	double dx = 0.0;
+	double dy = 0.0;
 	double grdalpha=0.0;
+	double denanval = NAN;
+	bool flipxx = false;
+	bool flipyy = false;
 	std::string inputfile;
 	std::string extension;
 	std::string varname;
@@ -74,6 +99,16 @@ public:
 	double time, zs, h, u,v;
 };
 
+class Vertex {
+public:
+	double x, y;
+};
+
+class Polygon {
+public:
+	double xmin, xmax, ymin, ymax;
+	std::vector<Vertex> vertices;
+};
 
 // End of global definition
 #endif

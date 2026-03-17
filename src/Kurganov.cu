@@ -1,14 +1,28 @@
 #include "Kurganov.h"
 
 
+/**
+ * @brief CUDA kernel for updating X-direction fluxes using the Kurganov scheme.
+ *
+ * Computes fluxes and time step constraints for each cell in the X direction (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param dtmax Maximum time step array
+ * @param zb Bathymetry array
+ */
 template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T*zb)
 {
 	
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
-	unsigned int ix = threadIdx.x;
-	unsigned int iy = threadIdx.y;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
 	unsigned int ib = XBlock.active[ibl];
 
@@ -24,7 +38,7 @@ template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps)+epsi;
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 	// This is based on kurganov and Petrova 2007
@@ -33,12 +47,11 @@ template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ileft = memloc(halowidth, blkmemwidth, ix-1, iy, ib);
 
-	
+	T ybo = T(XParam.yo + XBlock.yo[ib]);
 
-	
 	T dhdxi = XGrad.dhdx[i];
 	T dhdxmin = XGrad.dhdx[ileft];
-	T cm = T(1.0);
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 	T fmu = T(1.0);
 
 	T hi = XEv.h[i];
@@ -90,10 +103,7 @@ template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock
 		{
 			dtmax[i] = dt;
 		}
-		else
-		{
-			dtmax[i] = T(1.0) / epsi;
-		}
+		
 		
 
 
@@ -160,12 +170,197 @@ template <class T> __global__ void updateKurgXGPU(Param XParam, BlockP<T> XBlock
 template __global__ void updateKurgXGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float* zb);
 template __global__ void updateKurgXGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double *zb);
 
+/**
+ * @brief CUDA kernel for updating X-direction fluxes with atmospheric pressure effects.
+ *
+ * Computes fluxes and time step constraints for each cell in the X direction, including atmospheric pressure terms (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param dtmax Maximum time step array
+ * @param zb Bathymetry array
+ * @param Patm Atmospheric pressure array
+ * @param dPdx Pressure gradient array
+ */
+template <class T> __global__ void updateKurgXATMGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb, T* Patm, T*dPdx)
+{
 
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+	int RB, LBRB, LB, RBLB, levRB, levLB;
+	RB = XBlock.RightBot[ib];
+	levRB = XBlock.level[RB];
+	LBRB = XBlock.LeftBot[RB];
+
+	LB = XBlock.LeftBot[ib];
+	levLB = XBlock.level[LB];
+	RBLB = XBlock.RightBot[LB];
+
+	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	T eps = T(XParam.eps) + epsi;
+	T delta = calcres(T(XParam.delta), lev);
+	T g = T(XParam.g);
+	T CFL = T(XParam.CFL);
+	// This is based on kurganov and Petrova 2007
+
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+	int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
+
+	T ybo = T(XParam.yo + XBlock.yo[ib]);
+
+
+	T dhdxi = XGrad.dhdx[i];
+	T dhdxmin = XGrad.dhdx[ileft];
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+	T fmu = T(1.0);
+
+	T hi = XEv.h[i];
+
+	T hn = XEv.h[ileft];
+
+
+	if (hi > eps || hn > eps)
+	{
+		T dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, sl, sr, ga;
+
+		// along X
+		dx = delta * T(0.5);
+		zi = XEv.zs[i] - hi + XParam.Pa2m * Patm[i];
+
+		//printf("%f\n", zi);
+
+
+		//zl = zi - dx*(dzsdx[i] - dhdx[i]);
+		zl = zi - dx * (XGrad.dzsdx[i] - dhdxi + XParam.Pa2m * dPdx[i]);
+		//printf("%f\n", zl);
+
+		zn = XEv.zs[ileft] - hn + XParam.Pa2m * Patm[ileft];
+
+		//printf("%f\n", zn);
+		zr = zn + dx * (XGrad.dzsdx[ileft] - dhdxmin + XParam.Pa2m * dPdx[ileft]);
+
+
+		zlr = max(zl, zr);
+
+		//hl = hi - dx*dhdx[i];
+		hl = hi - dx * dhdxi;
+		up = XEv.u[i] - dx * XGrad.dudx[i];
+		hp = max(T(0.0), hl + zl - zlr);
+
+		hr = hn + dx * dhdxmin;
+		um = XEv.u[ileft] + dx * XGrad.dudx[ileft];
+		hm = max(T(0.0), hr + zr - zlr);
+
+		ga = g * T(0.5);
+
+		T fh, fu, fv, dt;
+
+
+		//solver below also modifies fh and fu
+		dt = KurgSolver(g, delta, epsi, CFL, cm, fmu, hp, hm, up, um, fh, fu);
+
+		if (dt < dtmax[i])
+		{
+			dtmax[i] = dt;
+		}
+
+
+
+
+		if (fh > T(0.0))
+		{
+			fv = (XEv.v[ileft] + dx * XGrad.dvdx[ileft]) * fh;// Eq 3.7 third term? (X direction)
+		}
+		else
+		{
+			fv = (XEv.v[i] - dx * XGrad.dvdx[i]) * fh;
+		}
+		//fv = (fh > 0.f ? vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
+		//dtmax needs to be stored in an array and reduced at the end
+		//dtmax = dtmaxf;
+		//dtmaxtmp = min(dtmax, dtmaxtmp);
+		/*if (ix == 11 && iy == 0)
+		{
+			printf("a=%f\t b=%f\t c=%f\t d=%f\n", ap*(qm*um + ga*hm2), -am*(qp*up + ga*hp2),( ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm) ) *ad/100.0f, ad);
+		}
+		*/
+		/*
+		#### Topographic source term
+
+		In the case of adaptive refinement, care must be taken to ensure
+		well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+		if ((ix == blockDim.y) && levRB < lev)//(ix==16) i.e. in the right halo
+		{
+			int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + blockDim.y / 2;
+			int iright = memloc(halowidth, blkmemwidth, 0, jj, RB);;
+			hi = XEv.h[iright];
+			zi = zb[iright] + XParam.Pa2m * Patm[iright];
+		}
+		if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo
+		{
+			int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + blockDim.y / 2;
+			int ilc = memloc(halowidth, blkmemwidth, blockDim.y - 1, jj, LB);
+			hn = XEv.h[ilc];
+			zn = zb[ilc] + XParam.Pa2m * Patm[ilc];
+		}
+
+		sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
+		sr = ga * (utils::sq(hm) - utils::sq(hr) + (hr + hn) * (zn - zr));
+
+		////Flux update
+
+		XFlux.Fhu[i] = fmu * fh;
+		XFlux.Fqux[i] = fmu * (fu - sl);
+		XFlux.Su[i] = fmu * (fu - sr);
+		XFlux.Fqvx[i] = fmu * fv;
+	}
+	else
+	{
+		dtmax[i] = T(1.0) / epsi;
+		XFlux.Fhu[i] = T(0.0);
+		XFlux.Fqux[i] = T(0.0);
+		XFlux.Su[i] = T(0.0);
+		XFlux.Fqvx[i] = T(0.0);
+	}
+
+
+
+
+}
+template __global__ void updateKurgXATMGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float* zb, float* Patm, float* dPdx);
+template __global__ void updateKurgXATMGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double* zb, double* Patm, double* dPdx);
+
+
+/**
+ * @brief CUDA kernel for adding topographic slope source terms in X direction.
+ *
+ * Updates fluxes with slope source terms for well-balanced solutions (based on Kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param zb Bathymetry array
+ */
 template <class T> __global__ void AddSlopeSourceXGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T * zb)
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -187,7 +382,7 @@ template <class T> __global__ void AddSlopeSourceXGPU(Param XParam, BlockP<T> XB
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps) + epsi;
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
 
 	T ga = T(0.5) * g;
@@ -200,7 +395,7 @@ template <class T> __global__ void AddSlopeSourceXGPU(Param XParam, BlockP<T> XB
 
 	T dhdxi = XGrad.dhdx[i];
 	T dhdxmin = XGrad.dhdx[ileft];
-	T cm = T(1.0);
+	//T cm = T(1.0);
 	T fmu = T(1.0);
 
 	T dx, zi, zl, zn, zr, zlr, hl, hp, hr, hm;
@@ -262,6 +457,20 @@ template <class T> __global__ void AddSlopeSourceXGPU(Param XParam, BlockP<T> XB
 template __global__ void AddSlopeSourceXGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* zb);
 template __global__ void AddSlopeSourceXGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* zb);
 
+/**
+ * @brief Host function for updating X-direction fluxes using the Kurganov scheme.
+ *
+ * Computes fluxes and time step constraints for each cell in the X direction on CPU (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param dtmax Maximum time step array
+ * @param zb Bathymetry array
+ */
 template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T*zb)
 {
 
@@ -271,7 +480,7 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 	T CFL = T(XParam.CFL);
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps)+epsi;
-
+	T ybo;
 	int ib;
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
@@ -282,7 +491,9 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 	{
 		ib = XBlock.active[ibl];
 		int lev = XBlock.level[ib];
-		delta = calcres(T(XParam.dx), lev);
+		delta = calcres(T(XParam.delta), lev);
+
+		ybo = T(XParam.yo + XBlock.yo[ib]);
 
 		// neighbours for source term
 		
@@ -310,7 +521,7 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 
 				T dhdxi = XGrad.dhdx[i];
 				T dhdxmin = XGrad.dhdx[ileft];
-				T cm = T(1.0);
+				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);;
 				T fmu = T(1.0);
 
 				T hi = XEv.h[i];
@@ -361,10 +572,7 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 					{
 						dtmax[i] = dt;
 					}
-					else
-					{
-						dtmax[i] = T(1.0) / epsi;
-					}
+					
 
 
 
@@ -393,15 +601,16 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 
 					if ((ix == XParam.blkwidth) && levRB < lev)//(ix==16) i.e. in the right halo
 					{
-						int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+						int jj = LBRB == ib ? ftoi(floor(iy * (T)0.5)) : ftoi(floor(iy * (T)0.5) + XParam.blkwidth / 2);
 						int iright = memloc(halowidth, blkmemwidth, 0, jj, RB);;
 						hi = XEv.h[iright];
 						zi = zb[iright];
 					}
 					if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo if you 
 					{
-						int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+						int jj = RBLB == ib ? ftoi(floor(iy * (T)0.5)) : ftoi(floor(iy * (T)0.5) + XParam.blkwidth / 2);
 						int ilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, jj, LB);
+						//int ilc = memloc(halowidth, blkmemwidth, -1, iy, ib);
 						hn = XEv.h[ilc];
 						zn = zb[ilc];
 					}
@@ -433,12 +642,214 @@ template <class T> __host__ void updateKurgXCPU(Param XParam, BlockP<T> XBlock, 
 template __host__ void updateKurgXCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float *zb);
 template __host__ void updateKurgXCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double *zb);
 
-
-template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* zb)
+/**
+ * @brief Host function for updating X-direction fluxes with atmospheric pressure effects.
+ *
+ * Computes fluxes and time step constraints for each cell in the X direction on CPU, including atmospheric pressure terms (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param dtmax Maximum time step array
+ * @param zb Bathymetry array
+ * @param Patm Atmospheric pressure array
+ * @param dPdx Pressure gradient array
+ */
+template <class T> __host__ void updateKurgXATMCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb,T* Patm,T*dPdx)
 {
+
+
 	T delta;
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
+	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	T eps = T(XParam.eps) + epsi;
+
+	T ybo;
+
+	int ib;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+
+	int RB, LBRB, LB, RBLB, levRB, levLB;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+		int lev = XBlock.level[ib];
+		delta = calcres(T(XParam.delta), lev);
+
+		// neighbours for source term
+
+		RB = XBlock.RightBot[ib];
+		levRB = XBlock.level[RB];
+		LBRB = XBlock.LeftBot[RB];
+
+		LB = XBlock.LeftBot[ib];
+		levLB = XBlock.level[LB];
+		RBLB = XBlock.RightBot[LB];
+
+		ybo = T(XParam.yo + XBlock.yo[ib]);
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < (XParam.blkwidth + XParam.halowidth); ix++)
+			{
+
+
+
+
+				// This is based on kurganov and Petrova 2007
+
+
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
+
+
+				T dhdxi = XGrad.dhdx[i];
+				T dhdxmin = XGrad.dhdx[ileft];
+				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);;
+				T fmu = T(1.0);
+
+				T hi = XEv.h[i];
+
+				T hn = XEv.h[ileft];
+
+
+				if (hi > eps || hn > eps)
+				{
+					T dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, ga;
+
+					// along X
+					dx = delta * T(0.5);
+					zi = XEv.zs[i] - hi + T(XParam.Pa2m) * Patm[i];
+
+					//printf("%f\n", zi);
+
+
+					//zl = zi - dx*(dzsdx[i] - dhdx[i]);
+					zl = zi - dx * (XGrad.dzsdx[i] - dhdxi + T(XParam.Pa2m) * dPdx[i]);
+					//printf("%f\n", zl);
+
+					zn = XEv.zs[ileft] - hn + T(XParam.Pa2m) * Patm[ileft];
+
+					//printf("%f\n", zn);
+					zr = zn + dx * (XGrad.dzsdx[ileft] - dhdxmin + T(XParam.Pa2m) * dPdx[ileft]);
+
+
+					zlr = max(zl, zr);
+
+					//hl = hi - dx*dhdx[i];
+					hl = hi - dx * dhdxi;
+					up = XEv.u[i] - dx * XGrad.dudx[i];
+					hp = max(T(0.0), hl + zl - zlr);
+
+					hr = hn + dx * dhdxmin;
+					um = XEv.u[ileft] + dx * XGrad.dudx[ileft];
+					hm = max(T(0.0), hr + zr - zlr);
+
+					ga = g * T(0.5);
+					///// Reimann solver
+					T fh, fu, fv, sl, sr, dt;
+
+					//solver below also modifies fh and fu
+					dt = KurgSolver(g, delta, epsi, CFL, cm, fmu, hp, hm, up, um, fh, fu);
+
+					if (dt < dtmax[i])
+					{
+						dtmax[i] = dt;
+					}
+
+
+
+
+					if (fh > T(0.0))
+					{
+						fv = (XEv.v[ileft] + dx * XGrad.dvdx[ileft]) * fh;// Eq 3.7 third term? (X direction)
+					}
+					else
+					{
+						fv = (XEv.v[i] - dx * XGrad.dvdx[i]) * fh;
+					}
+					//fv = (fh > 0.f ? vv[xminus + iy*nx] + dx*dvdx[xminus + iy*nx] : vv[i] - dx*dvdx[i])*fh;
+					//dtmax needs to be stored in an array and reduced at the end
+					//dtmax = dtmaxf;
+					//dtmaxtmp = min(dtmax, dtmaxtmp);
+					/*if (ix == 11 && iy == 0)
+					{
+						printf("a=%f\t b=%f\t c=%f\t d=%f\n", ap*(qm*um + ga*hm2), -am*(qp*up + ga*hp2),( ap*(qm*um + g*sq(hm) / 2.0f) - am*(qp*up + g*sq(hp) / 2.0f) + ap*am*(qp - qm) ) *ad/100.0f, ad);
+					}
+					*/
+					/*
+					#### Topographic source term
+
+					In the case of adaptive refinement, care must be taken to ensure
+					well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+
+					if ((ix == XParam.blkwidth) && levRB < lev)//(ix==16) i.e. in the right halo
+					{
+						int jj = LBRB == ib ? ftoi(floor(iy * (T)0.5)) : ftoi(floor(iy * (T)0.5) + XParam.blkwidth / 2);
+						int iright = memloc(halowidth, blkmemwidth, 0, jj, RB);;
+						hi = XEv.h[iright];
+						zi = zb[iright] + T(XParam.Pa2m) * Patm[iright];
+					}
+					if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo if you 
+					{
+						int jj = RBLB == ib ? ftoi(floor(iy * (T)0.5)) : ftoi(floor(iy * (T)0.5) + XParam.blkwidth / 2);
+						int ilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, jj, LB);
+						//int ilc = memloc(halowidth, blkmemwidth, -1, iy, ib);
+						hn = XEv.h[ilc];
+						zn = zb[ilc] + T(XParam.Pa2m) * Patm[ilc];
+					}
+
+					sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
+					sr = ga * (utils::sq(hm) - utils::sq(hr) + (hr + hn) * (zn - zr));
+
+					////Flux update
+					XFlux.Fhu[i] = fmu * fh;
+					XFlux.Fqux[i] = fmu * (fu - sl);
+					XFlux.Su[i] = fmu * (fu - sr);
+					XFlux.Fqvx[i] = fmu * fv;
+				}
+				else
+				{
+					dtmax[i] = T(1.0) / epsi;
+					XFlux.Fhu[i] = T(0.0);
+					XFlux.Fqux[i] = T(0.0);
+					XFlux.Su[i] = T(0.0);
+					XFlux.Fqvx[i] = T(0.0);
+				}
+
+			}
+		}
+	}
+
+
+}
+template __host__ void updateKurgXATMCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float* zb, float* Patm, float* dPdx);
+template __host__ void updateKurgXATMCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double* zb, double* Patm, double* dPdx);
+
+
+/**
+ * @brief Host function for adding topographic slope source terms in X direction.
+ *
+ * Updates fluxes with slope source terms for well-balanced solutions on CPU (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param zb Bathymetry array
+ */
+template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* zb)
+{
+	T delta;
+	//T g = T(XParam.g);
+	//T CFL = T(XParam.CFL);
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps) + epsi;
 
@@ -450,7 +861,7 @@ template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlo
 	{
 		ib = XBlock.active[ibl];
 		int lev = XBlock.level[ib];
-		delta = calcres(XParam.dx, lev);
+		delta = T(calcres(XParam.delta, lev));
 
 		// neighbours for source term
 		int RB, LBRB, LB, RBLB, levRB, levLB;
@@ -464,8 +875,8 @@ template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlo
 
 
 
-		T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
-		T eps = T(XParam.eps) + epsi;
+		//T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+		//T eps = T(XParam.eps) + epsi;
 
 		T g = T(XParam.g);
 		T ga = T(0.5) * g;
@@ -481,7 +892,7 @@ template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlo
 
 				T dhdxi = XGrad.dhdx[i];
 				T dhdxmin = XGrad.dhdx[ileft];
-				T cm = T(1.0);
+				//T cm = T(1.0);
 				T fmu = T(1.0);
 
 				T dx, zi, zl, zn, zr, zlr, hl, hp, hr, hm;
@@ -518,14 +929,14 @@ template <class T> __host__ void AddSlopeSourceXCPU(Param XParam, BlockP<T> XBlo
 
 					if ((ix == XParam.blkwidth) && levRB < lev)//(ix==16) i.e. in the right halo
 					{
-						int jj = LBRB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+						int jj = LBRB == ib ? ftoi(floor(iy * (T)0.5)) : ftoi(floor(iy * (T)0.5) + XParam.blkwidth / 2);
 						int iright = memloc(halowidth, blkmemwidth, 0, jj, RB);;
 						hi = XEv.h[iright];
 						zi = zb[iright];
 					}
 					if ((ix == 0) && levLB < lev)//(ix==16) i.e. in the right halo if you 
 					{
-						int jj = RBLB == ib ? floor(iy * (T)0.5) : floor(iy * (T)0.5) + XParam.blkwidth / 2;
+						int jj = RBLB == ib ? ftoi(floor(iy * (T)0.5)) : ftoi(floor(iy * (T)0.5) + XParam.blkwidth / 2);
 						int ilc = memloc(halowidth, blkmemwidth, XParam.blkwidth - 1, jj, LB);
 						hn = XEv.h[ilc];
 						zn = zb[ilc];
@@ -549,11 +960,25 @@ template __host__ void AddSlopeSourceXCPU<double>(Param XParam, BlockP<double> X
 
 
 
+/**
+ * @brief CUDA kernel for updating Y-direction fluxes using the Kurganov scheme.
+ *
+ * Computes fluxes and time step constraints for each cell in the Y direction (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param dtmax Maximum time step array
+ * @param zb Bathymetry array
+ */
 template <class T> __global__ void updateKurgYGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb)
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -572,16 +997,17 @@ template <class T> __global__ void updateKurgYGPU(Param XParam, BlockP<T> XBlock
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps)+epsi;
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 	
+	T ybo = T(XParam.yo + XBlock.yo[ib]);
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ibot = memloc(halowidth, blkmemwidth, ix , iy-1, ib);
 
-	T cm = T(1.0);
-	T fmv = T(1.0);
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
 		
 	T dhdyi = XGrad.dhdy[i];
 	T dhdymin = XGrad.dhdy[ibot];
@@ -622,10 +1048,7 @@ template <class T> __global__ void updateKurgYGPU(Param XParam, BlockP<T> XBlock
 		{
 			dtmax[i] = dt;
 		}
-		else
-		{
-			dtmax[i] = T(1.0) / epsi;
-		}
+		
 
 		
 		if (fh > T(0.0))
@@ -688,11 +1111,185 @@ template __global__ void updateKurgYGPU<float>(Param XParam, BlockP<float> XBloc
 template __global__ void updateKurgYGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double *zb);
 
 
+/**
+ * @brief CUDA kernel for updating Y-direction fluxes with atmospheric pressure effects.
+ *
+ * Computes fluxes and time step constraints for each cell in the Y direction, including atmospheric pressure terms (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param dtmax Maximum time step array
+ * @param zb Bathymetry array
+ * @param Patm Atmospheric pressure array
+ * @param dPdy Pressure gradient array
+ */
+template <class T> __global__ void updateKurgYATMGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb, T* Patm,T* dPdy)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+
+	int TL, BLTL, BL, TLBL, levTL, levBL;
+	TL = XBlock.TopLeft[ib];
+	levTL = XBlock.level[TL];
+	BLTL = XBlock.BotLeft[TL];
+
+	BL = XBlock.BotLeft[ib];
+	levBL = XBlock.level[BL];
+	TLBL = XBlock.TopLeft[BL];
+
+	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	T eps = T(XParam.eps) + epsi;
+	T delta = calcres(T(XParam.delta), lev);
+	T g = T(XParam.g);
+	T CFL = T(XParam.CFL);
+
+	T ybo = T(XParam.yo + XBlock.yo[ib]);
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+	int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
+
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
+
+	T dhdyi = XGrad.dhdy[i];
+	T dhdymin = XGrad.dhdy[ibot];
+	T hi = XEv.h[i];
+	T hn = XEv.h[ibot];
+	T dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, ga;
+
+
+
+	if (hi > eps || hn > eps)
+	{
+		hn = XEv.h[ibot];
+		dx = delta * T(0.5);
+		
+		//zi = XEv.zs[i] - hi;
+		//zl = zi - dx * (XGrad.dzsdy[i] - dhdyi);
+		//zn = XEv.zs[ibot] - hn;
+		//zr = zn + dx * (XGrad.dzsdy[ibot] - dhdymin);
+
+		zi = XEv.zs[i] - hi + XParam.Pa2m * Patm[i];
+		zl = zi - dx * (XGrad.dzsdy[i] - dhdyi + XParam.Pa2m * dPdy[i]);
+		zn = XEv.zs[ibot] - hn + XParam.Pa2m * Patm[ibot];
+		zr = zn + dx * (XGrad.dzsdy[ibot] - dhdymin + XParam.Pa2m * dPdy[ibot]);
+
+		zlr = max(zl, zr);
+
+		hl = hi - dx * dhdyi;
+		up = XEv.v[i] - dx * XGrad.dvdy[i];
+		hp = max(T(0.0), hl + zl - zlr);
+
+		hr = hn + dx * dhdymin;
+		um = XEv.v[ibot] + dx * XGrad.dvdy[ibot];
+		hm = max(T(0.0), hr + zr - zlr);
+
+
+		ga = g * T(0.5);
+
+		//// Reimann solver
+		T fh, fu, fv, sl, sr, dt;
+
+		//solver below also modifies fh and fu
+		dt = KurgSolver(g, delta, epsi, CFL, cm, fmv, hp, hm, up, um, fh, fu);
+
+		if (dt < dtmax[i])
+		{
+			dtmax[i] = dt;
+		}
+
+
+
+		if (fh > T(0.0))
+		{
+			fv = (XEv.u[ibot] + dx * XGrad.dudy[ibot]) * fh;
+		}
+		else
+		{
+			fv = (XEv.u[i] - dx * XGrad.dudy[i]) * fh;
+		}
+		//fv = (fh > 0.f ? uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
+		/**
+		#### Topographic source term
+
+		In the case of adaptive refinement, care must be taken to ensure
+		well-balancing at coarse/fine faces (see [notes/balanced.tm]()). */
+		//sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
+		//sr = ga * (utils::sq(hm) - utils::sq(hr) + (hr + hn) * (zn - zr));
+
+		//#### Topographic source term
+		//In the case of adaptive refinement, care must be taken to ensure
+		//	well - balancing at coarse / fine faces(see[notes / balanced.tm]()). * /
+
+		if ((iy == blockDim.x) && levTL < lev)//(ix==16) i.e. in the right halo
+		{
+			int jj = BLTL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + blockDim.x / 2;
+			int itop = memloc(halowidth, blkmemwidth, jj, 0, TL);;
+			hi = XEv.h[itop];
+			zi = zb[itop] + XParam.Pa2m * Patm[itop];
+		}
+		if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the right halo
+		{
+			int jj = TLBL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + blockDim.x / 2;
+			int ibc = memloc(halowidth, blkmemwidth, jj, blockDim.x - 1, BL);
+			hn = XEv.h[ibc];
+			zn = zb[ibc] + +XParam.Pa2m * Patm[ibc];
+		}
+
+		sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
+		sr = ga * (utils::sq(hm) - utils::sq(hr) + (hr + hn) * (zn - zr));
+
+		////Flux update
+
+		XFlux.Fhv[i] = fmv * fh;
+		XFlux.Fqvy[i] = fmv * (fu - sl);
+		XFlux.Sv[i] = fmv * (fu - sr);
+		XFlux.Fquy[i] = fmv * fv;
+	}
+	else
+	{
+		dtmax[i] = T(1.0) / epsi;
+		XFlux.Fhv[i] = T(0.0);
+		XFlux.Fqvy[i] = T(0.0);
+		XFlux.Sv[i] = T(0.0);
+		XFlux.Fquy[i] = T(0.0);
+	}
+
+}
+template __global__ void updateKurgYATMGPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float* zb, float* Patm, float* dPdy);
+template __global__ void updateKurgYATMGPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double* zb, double* Patm, double* dPdy);
+
+
+
+/**
+ * @brief CUDA kernel for adding topographic slope source terms in Y direction.
+ *
+ * Updates fluxes with slope source terms for well-balanced solutions in Y direction (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param zb Bathymetry array
+ */
 template <class T> __global__ void AddSlopeSourceYGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* zb)
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
-	unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	unsigned int ix = threadIdx.x;
 	unsigned int iy = threadIdx.y;
 	unsigned int ibl = blockIdx.x;
@@ -714,9 +1311,11 @@ template <class T> __global__ void AddSlopeSourceYGPU(Param XParam, BlockP<T> XB
 
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps) + epsi;
-	T delta = calcres(T(XParam.dx), lev);
+	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
 	T ga = T(0.5) * g;
+
+	T ybo = T(XParam.yo + XBlock.yo[ib]);
 
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
@@ -724,8 +1323,8 @@ template <class T> __global__ void AddSlopeSourceYGPU(Param XParam, BlockP<T> XB
 
 
 	
-	T cm = T(1.0);
-	T fmv = T(1.0);
+	//T cm = T(1.0);
+	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
 
 	T dx, zi, zl, zn, zr, zlr, hl, hp, hr, hm;
 
@@ -788,6 +1387,20 @@ template __global__ void AddSlopeSourceYGPU<double>(Param XParam, BlockP<double>
 
 
 
+/**
+ * @brief Host function for updating Y-direction fluxes using the Kurganov scheme.
+ *
+ * Computes fluxes and time step constraints for each cell in the Y direction on CPU (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param dtmax Maximum time step array
+ * @param zb Bathymetry array
+ */
 template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax,T*zb)
 {
 
@@ -797,6 +1410,7 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 	
+	T ybo;
 
 	int ib;
 	int halowidth = XParam.halowidth;
@@ -821,7 +1435,9 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 
 		lev = XBlock.level[ib];
 
-		delta = calcres(XParam.dx, lev);
+		delta = T(calcres(XParam.delta, lev));
+
+		ybo = T(XParam.yo + XBlock.yo[ib]);
 
 		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
 		{
@@ -830,8 +1446,8 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 				int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
 
-				T cm = T(1.0);
-				T fmv = T(1.0);
+				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+				T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
 
 				T dhdyi = XGrad.dhdy[i];
 				T dhdymin = XGrad.dhdy[ibot];
@@ -873,10 +1489,7 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 					{
 						dtmax[i] = dt;
 					}
-					else
-					{
-						dtmax[i] = T(1.0) / epsi;
-					}
+					
 
 
 					if (fh > T(0.0))
@@ -896,14 +1509,14 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 
 					if ((iy == XParam.blkwidth) && levTL < lev)//(ix==16) i.e. in the top halo
 					{
-						int jj = BLTL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
+						int jj = BLTL == ib ? ftoi(floor(ix * (T)0.5)) : ftoi(floor(ix * (T)0.5) + XParam.blkwidth / 2);
 						int itop = memloc(halowidth, blkmemwidth, jj, 0, TL);
 						hi = XEv.h[itop];
 						zi = zb[itop];
 					}
 					if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the bot halo
 					{
-						int jj = TLBL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
+						int jj = TLBL == ib ? ftoi(floor(ix * (T)0.5)) : ftoi(floor(ix * (T)0.5) + XParam.blkwidth / 2);
 						int ibc = memloc(halowidth, blkmemwidth, jj, XParam.blkwidth - 1, BL);
 						hn = XEv.h[ibc];
 						zn = zb[ibc];
@@ -934,6 +1547,190 @@ template <class T> __host__ void updateKurgYCPU(Param XParam, BlockP<T> XBlock, 
 template __host__ void updateKurgYCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float *zb);
 template __host__ void updateKurgYCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double *zb);
 
+/**
+ * @brief Host function for updating Y-direction fluxes with atmospheric pressure effects.
+ *
+ * Computes fluxes and time step constraints for each cell in the Y direction on CPU, including atmospheric pressure terms (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param dtmax Maximum time step array
+ * @param zb Bathymetry array
+ * @param Patm Atmospheric pressure array
+ * @param dPdy Pressure gradient array
+ */
+template <class T> __host__ void updateKurgYATMCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* dtmax, T* zb, T* Patm, T* dPdy)
+{
+
+	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+	T eps = T(XParam.eps) + epsi;
+	T delta;
+	T g = T(XParam.g);
+	T CFL = T(XParam.CFL);
+
+	T ybo;
+
+	int ib;
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+
+	int TL, BLTL, BL, TLBL, levTL, levBL, lev;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+
+
+
+		TL = XBlock.TopLeft[ib];
+		levTL = XBlock.level[TL];
+		BLTL = XBlock.BotLeft[TL];
+
+		BL = XBlock.BotLeft[ib];
+		levBL = XBlock.level[BL];
+		TLBL = XBlock.TopLeft[BL];
+
+		lev = XBlock.level[ib];
+
+		delta = T(calcres(XParam.delta, lev));
+
+		ybo = T(XParam.yo + XBlock.yo[ib]);
+
+		for (int iy = 0; iy < (XParam.blkwidth + XParam.halowidth); iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+				int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
+
+				T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+				T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
+
+				T dhdyi = XGrad.dhdy[i];
+				T dhdymin = XGrad.dhdy[ibot];
+				T hi = XEv.h[i];
+				T hn = XEv.h[ibot];
+				T dx, zi, zl, zn, zr, zlr, hl, up, hp, hr, um, hm, ga;
+
+
+
+
+				if (hi > eps || hn > eps)
+				{
+					hn = XEv.h[ibot];
+					dx = delta * T(0.5);
+
+
+					//zi = XEv.zs[i] - hi;
+					//zl = zi - dx * (XGrad.dzsdy[i] - dhdyi);
+					//zn = XEv.zs[ibot] - hn;
+					//zr = zn + dx * (XGrad.dzsdy[ibot] - dhdymin);
+
+					zi = XEv.zs[i] - hi + T(XParam.Pa2m) * Patm[i];
+					zl = zi - dx * (XGrad.dzsdy[i] - dhdyi + T(XParam.Pa2m) * dPdy[i]);
+					zn = XEv.zs[ibot] - hn + T(XParam.Pa2m) * Patm[ibot];
+					zr = zn + dx * (XGrad.dzsdy[ibot] - dhdymin + T(XParam.Pa2m) * dPdy[ibot]);
+
+					zlr = max(zl, zr);
+
+					hl = hi - dx * dhdyi;
+					up = XEv.v[i] - dx * XGrad.dvdy[i];
+					hp = max(T(0.0), hl + zl - zlr);
+
+					hr = hn + dx * dhdymin;
+					um = XEv.v[ibot] + dx * XGrad.dvdy[ibot];
+					hm = max(T(0.0), hr + zr - zlr);
+
+
+					ga = g * T(0.5);
+
+					//// Reimann solver
+					T fh, fu, fv, sl, sr, dt;
+
+					//solver below also modifies fh and fu
+					dt = KurgSolver(g, delta, epsi, CFL, cm, fmv, hp, hm, up, um, fh, fu);
+
+					if (dt < dtmax[i])
+					{
+						dtmax[i] = dt;
+					}
+
+
+
+					if (fh > T(0.0))
+					{
+						fv = (XEv.u[ibot] + dx * XGrad.dudy[ibot]) * fh;
+					}
+					else
+					{
+						fv = (XEv.u[i] - dx * XGrad.dudy[i]) * fh;
+					}
+					//fv = (fh > 0.f ? uu[ix + yminus*nx] + dx*dudy[ix + yminus*nx] : uu[i] - dx*dudy[i])*fh;
+					/**
+					#### Topographic source term
+
+					In the case of adaptive refinement, care must be taken to ensure
+					well-balancing at coarse/fine faces */
+
+					if ((iy == XParam.blkwidth) && levTL < lev)//(ix==16) i.e. in the top halo
+					{
+						int jj = BLTL == ib ? ftoi(floor(ix * (T)0.5)) : ftoi(floor(ix * (T)0.5) + XParam.blkwidth / 2);
+						int itop = memloc(halowidth, blkmemwidth, jj, 0, TL);
+						hi = XEv.h[itop];
+						zi = zb[itop] + T(XParam.Pa2m) * Patm[itop];
+					}
+					if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the bot halo
+					{
+						int jj = TLBL == ib ? ftoi(floor(ix * (T)0.5)) : ftoi(floor(ix * (T)0.5) + XParam.blkwidth / 2);
+						int ibc = memloc(halowidth, blkmemwidth, jj, XParam.blkwidth - 1, BL);
+						hn = XEv.h[ibc];
+						zn = zb[ibc] + T(XParam.Pa2m) * Patm[ibc];
+					}
+
+					sl = ga * (utils::sq(hp) - utils::sq(hl) + (hl + hi) * (zi - zl));
+					sr = ga * (utils::sq(hm) - utils::sq(hr) + (hr + hn) * (zn - zr));
+
+					////Flux update
+
+					XFlux.Fhv[i] = fmv * fh;
+					XFlux.Fqvy[i] = fmv * (fu - sl);
+					XFlux.Sv[i] = fmv * (fu - sr);
+					XFlux.Fquy[i] = fmv * fv;
+				}
+				else
+				{
+					dtmax[i] = T(1.0) / epsi;
+					XFlux.Fhv[i] = T(0.0);
+					XFlux.Fqvy[i] = T(0.0);
+					XFlux.Sv[i] = T(0.0);
+					XFlux.Fquy[i] = T(0.0);
+				}
+			}
+		}
+	}
+}
+template __host__ void updateKurgYATMCPU<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> XEv, GradientsP<float> XGrad, FluxP<float> XFlux, float* dtmax, float* zb, float* Patm, float* dPdy);
+template __host__ void updateKurgYATMCPU<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> XEv, GradientsP<double> XGrad, FluxP<double> XFlux, double* dtmax, double* zb, double* Patm, double* dPdy);
+
+
+/**
+ * @brief Host function for adding topographic slope source terms in Y direction.
+ *
+ * Updates fluxes with slope source terms for well-balanced solutions in Y direction on CPU (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param XParam Simulation parameters
+ * @param XBlock Block parameters
+ * @param XEv Evolving variables
+ * @param XGrad Gradients
+ * @param XFlux Fluxes
+ * @param zb Bathymetry array
+ */
 template <class T> __host__ void AddSlopeSourceYCPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxP<T> XFlux, T* zb)
 {
 	T delta;
@@ -941,6 +1738,8 @@ template <class T> __host__ void AddSlopeSourceYCPU(Param XParam, BlockP<T> XBlo
 	T ga = T(0.5) * g;
 	T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
 	T eps = T(XParam.eps) + epsi;
+
+	T ybo;
 
 	int ib;
 	int halowidth = XParam.halowidth;
@@ -952,7 +1751,7 @@ template <class T> __host__ void AddSlopeSourceYCPU(Param XParam, BlockP<T> XBlo
 		
 
 		int lev = XBlock.level[ib];
-		delta = calcres(XParam.dx, lev);
+		delta = T(calcres(XParam.delta, lev));
 		// neighbours for source term
 		int TL, BLTL, BL, TLBL, levTL, levBL;
 		TL = XBlock.TopLeft[ib];
@@ -963,7 +1762,7 @@ template <class T> __host__ void AddSlopeSourceYCPU(Param XParam, BlockP<T> XBlo
 		levBL = XBlock.level[BL];
 		TLBL = XBlock.TopLeft[BL];
 
-
+		ybo = T(XParam.yo + XBlock.yo[ib]);
 
 
 
@@ -977,8 +1776,8 @@ template <class T> __host__ void AddSlopeSourceYCPU(Param XParam, BlockP<T> XBlo
 
 
 
-				T cm = T(1.0);
-				T fmv = T(1.0);
+				//T cm = T(1.0);
+				T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, T(iy)) : T(1.0);
 
 				T dx, zi, zl, zn, zr, zlr, hl, hp, hr, hm;
 
@@ -1013,14 +1812,14 @@ template <class T> __host__ void AddSlopeSourceYCPU(Param XParam, BlockP<T> XBlo
 
 					if ((iy == XParam.blkwidth) && levTL < lev)//(ix==16) i.e. in the right halo
 					{
-						int jj = BLTL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
+						int jj = BLTL == ib ? ftoi(floor(ix * (T)0.5)) : ftoi(floor(ix * (T)0.5) + XParam.blkwidth / 2);
 						int itop = memloc(halowidth, blkmemwidth, jj, 0, TL);;
 						hi = XEv.h[itop];
 						zi = zb[itop];
 					}
 					if ((iy == 0) && levBL < lev)//(ix==16) i.e. in the right halo
 					{
-						int jj = TLBL == ib ? floor(ix * (T)0.5) : floor(ix * (T)0.5) + XParam.blkwidth / 2;
+						int jj = TLBL == ib ? ftoi(floor(ix * (T)0.5)) : ftoi(floor(ix * (T)0.5) + XParam.blkwidth / 2);
 						int ibc = memloc(halowidth, blkmemwidth, jj, XParam.blkwidth - 1, BL);
 						hn = XEv.h[ibc];
 						zn = zb[ibc];
@@ -1043,6 +1842,26 @@ template __host__ void AddSlopeSourceYCPU<double>(Param XParam, BlockP<double> X
 
 
 
+/**
+ * @brief Kurganov-Petrova approximate Riemann solver for fluxes and time step.
+ *
+ * Computes fluxes and time step for the Kurganov scheme given left/right states and velocities (based on kurganov and Petrova 2007).
+ *
+ * @tparam T Data type
+ * @param g Gravity
+ * @param delta Cell size
+ * @param epsi Small epsilon for stability
+ * @param CFL CFL number
+ * @param cm Metric coefficient
+ * @param fm Flux metric
+ * @param hp Water depth (plus side)
+ * @param hm Water depth (minus side)
+ * @param up Velocity (plus side)
+ * @param um Velocity (minus side)
+ * @param fh Output: flux for h
+ * @param fu Output: flux for u
+ * @return Time step
+ */
 template <class T> __host__ __device__ T KurgSolver(T g, T delta,T epsi, T CFL, T cm, T fm,  T hp, T hm, T up,T um, T &fh, T &fu)
 {
 	//// Reimann solver

@@ -33,7 +33,12 @@ inline int nc_get_var_T(int ncid, int varid, double * &zb)
 	status = nc_get_var_double(ncid, varid, zb);
 	return status;
 }
-
+inline int nc_get_var_T(int ncid, int varid, int*& zb)
+{
+	int status;
+	status = nc_get_var_int(ncid, varid, zb);
+	return status;
+}
 
 inline int nc_get_vara_T(int ncid, int varid, const size_t* startp, const size_t* countp, int*& zb)
 {
@@ -72,12 +77,45 @@ inline int nc_get_var1_T(int ncid, int varid, const size_t* startp, double * zsa
 
 
 
-void readgridncsize(const std::string ncfilestr, const std::string varstr, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax)
+
+//void readgridncsize(const std::string ncfilestr, const std::string varstr, int &nx, int &ny, int &nt, double &dx, double &xo, double &yo, double &to, double &xmax, double &ymax, double &tmax, bool & flipx, bool & flipy)
+//void readgridncsize(forcingmap &Fmap, Param XParam)
+/**
+ * @brief Read grid size and metadata from a NetCDF file.
+ *
+ * Reads dimensions, coordinates, and time information for a variable in a NetCDF file.
+ *
+ * @param ncfilestr NetCDF filename
+ * @param varstr Variable name
+ * @param reftime Reference time string
+ * @param nx Number of x grid points
+ * @param ny Number of y grid points
+ * @param nt Number of time steps
+ * @param dx Grid spacing in x
+ * @param dy Grid spacing in y
+ * @param dt Time step size
+ * @param xo Origin x
+ * @param yo Origin y
+ * @param to Origin time
+ * @param xmax Maximum x
+ * @param ymax Maximum y
+ * @param tmax Maximum time
+ * @param flipx Flip x axis
+ * @param flipy Flip y axis
+ */
+void readgridncsize(const std::string ncfilestr, const std::string varstr, std::string reftime, int& nx, int& ny, int& nt, double& dx, double& dy, double& dt, double& xo, double& yo, double& to, double& xmax, double& ymax, double& tmax, bool& flipx, bool& flipy)
 {
+	//std::string ncfilestr = Fmap.inputfile;
+	//std::string varstr = Fmap.varname;
+
+	//int nx, ny, nt;
+	//double dx, dt, xo, xmax, yo, ymax, to, tmax;
+	//bool flipx, flipy;
+
 	//read the dimentions of grid, levels and time
 	int status;
 	int ncid, ndimshh, ndims;
-	double *xcoord, *ycoord, *tcoord;
+	double *xcoord, *ycoord;
 	int varid;
 
 	//int ndimsp, nvarsp, nattsp, unlimdimidp;
@@ -167,7 +205,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 		double * ytempvar;
 		ytempvar = (double *)malloc(ny*sizeof(double));
 		size_t start[] = { 0 };
-		size_t count[] = { ny };
+		size_t count[] = { (size_t)ny };
 		status = nc_get_vara_double(ncid, varid, start, count, ytempvar);
 		if (status != NC_NOERR) handle_ncerror(status);
 
@@ -185,7 +223,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 	else
 	{
 		size_t start[] = { 0, 0 };
-		size_t count[] = { ny, nx };
+		size_t count[] = { (size_t)ny, (size_t)nx };
 		status = nc_get_vara_double(ncid, varid, start, count, ycoord);
 		if (status != NC_NOERR) handle_ncerror(status);
 
@@ -205,7 +243,7 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 		double * xtempvar;
 		xtempvar = (double *)malloc(nx*sizeof(double));
 		size_t start[] = { 0 };
-		size_t count[] = { nx };
+		size_t count[] = { (size_t)nx };
 		status = nc_get_vara_double(ncid, varid, start, count, xtempvar);
 		if (status != NC_NOERR) handle_ncerror(status);
 
@@ -223,15 +261,16 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 	else
 	{
 		size_t start[] = { 0, 0 };
-		size_t count[] = { ny, nx };
+		size_t count[] = { (size_t)ny, (size_t)nx };
 		status = nc_get_vara_double(ncid, varid, start, count, xcoord);
 		if (status != NC_NOERR) handle_ncerror(status);
 
 	}
 
-	double dxx;
+	double dxx,ddy;
 	//check dx
-	dxx = (xcoord[nx - 1] - xcoord[0]) / (nx - 1.0);
+	dxx = abs(xcoord[nx - 1] - xcoord[0]) / (nx - 1.0);
+	ddy = abs(ycoord[(ny - 1) * nx]- ycoord[0]) / (ny - 1.0);
 	//log("xo=" + std::to_string(xcoord[0])+"; xmax="+ std::to_string(xcoord[nx - 1]) +"; nx="+ std::to_string(nx) +"; dxx=" +std::to_string(dxx));
 	//dyy = (float) abs(ycoord[0] - ycoord[(ny - 1)*nx]) / (ny - 1);
 
@@ -243,9 +282,15 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 		status = nc_inq_dimname(ncid, tcovar, coordname);
 		if (status != NC_NOERR) handle_ncerror(status);
 
+		
+
+
 		//inquire variable id
 		status = nc_inq_varid(ncid, coordname, &varid);
 		if (status != NC_NOERR) handle_ncerror(status);
+
+		
+
 
 		// read the dimension of time variable // yes it should be == 1
 		status = nc_inq_varndims(ncid, varid, &ndims);
@@ -254,12 +299,15 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 		//allocate temporary array and read time vector
 		double * ttempvar;
 		ttempvar = (double *)malloc(nt * sizeof(double));
-		size_t start[] = { 0 };
-		size_t count[] = { nt };
-		status = nc_get_vara_double(ncid, varid, start, count, ttempvar);
+		//size_t start[] = { 0 };
+		//size_t count[] = { (size_t)nt };
+		//status = nc_get_vara_double(ncid, varid, start, count, ttempvar);
+
+		status = readnctime2(ncid, coordname, reftime, nt, ttempvar);
 
 		to = ttempvar[0];
 		tmax= ttempvar[nt-1];
+		dt = ttempvar[1] - ttempvar[0];
 
 		free(ttempvar);
 	}
@@ -271,15 +319,24 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 	}
 
 	dx = dxx;
+	dy = ddy;
 
-	xo = xcoord[0];
-	xmax = xcoord[nx - 1];
-	yo= ycoord[0];
-	ymax= ycoord[(ny - 1)*nx];
+	xo = utils::min(xcoord[0], xcoord[nx - 1]);
+	xmax = utils::max(xcoord[0], xcoord[nx - 1]);
+	yo = utils::min(ycoord[0], ycoord[(ny - 1) * nx]);
+	ymax = utils::max(ycoord[(ny - 1)*nx], ycoord[0]);
 
+
+	if (xcoord[0] > xcoord[nx - 1])
+		flipx = true;
+
+	if (ycoord[0] > ycoord[(ny - 1) * nx])
+		flipy = true;
 
 
 	status = nc_close(ncid);
+
+	
 
 	free(ddimhh);
 	free(xcoord);
@@ -288,9 +345,57 @@ void readgridncsize(const std::string ncfilestr, const std::string varstr, int &
 
 }
 
+
+/**
+ * @brief Read grid size and metadata for a forcing map.
+ *
+ * Reads grid size and metadata for a forcing map using model parameters.
+ *
+ * @param Fmap Forcing map structure
+ * @param XParam Model parameters
+ */
+void readgridncsize(forcingmap& Fmap, Param XParam)
+{
+
+	readgridncsize(Fmap.inputfile, Fmap.varname, XParam.reftime, Fmap.nx, Fmap.ny, Fmap.nt, Fmap.dx, Fmap.dy, Fmap.dt, Fmap.xo, Fmap.yo, Fmap.to, Fmap.xmax, Fmap.ymax, Fmap.tmax, Fmap.flipxx, Fmap.flipyy);
+}
+
+
+/**
+ * @brief Read grid size and metadata for a generic map type.
+ *
+ * Reads grid size and metadata for a generic map type (inputmap, forcingmap, etc.).
+ *
+ * @tparam T Map type
+ * @param Imap Map structure
+ */
+template<class T> void readgridncsize(T& Imap)
+{
+	double a, b, c;
+	int duma;
+	readgridncsize(Imap.inputfile, Imap.varname, "2000-01-01T00:00:00", Imap.nx, Imap.ny, duma, Imap.dx, Imap.dy, a, Imap.xo, Imap.yo, b, Imap.xmax, Imap.ymax, c, Imap.flipxx, Imap.flipyy);
+}
+template void readgridncsize<inputmap>(inputmap &Imap);
+template void readgridncsize<forcingmap>(forcingmap &Imap);
+template void readgridncsize<StaticForcingP<int >>(StaticForcingP<int>& Imap);
+template void readgridncsize<StaticForcingP<float >>(StaticForcingP<float> &Imap);
+template void readgridncsize<deformmap<float >>(deformmap<float >& Imap);
+template void readgridncsize<DynForcingP<float >>(DynForcingP<float >& Imap);
+
+
+/**
+ * @brief Read variable dimension info from a NetCDF file.
+ *
+ * Reads the dimensions for a variable in a NetCDF file.
+ *
+ * @param filename NetCDF filename
+ * @param Varname Variable name
+ * @param ddimU Output array for dimension sizes
+ * @return Number of dimensions
+ */
 int readvarinfo(std::string filename, std::string Varname, size_t *&ddimU)
 {
-	// This function reads the dimentions for each variables
+	// This function reads the dimensions for each variables
 	int status, varid;
 	int ncid, ndims;
 	int dimids[NC_MAX_VAR_DIMS];
@@ -330,6 +435,15 @@ int readvarinfo(std::string filename, std::string Varname, size_t *&ddimU)
 }
 
 
+/**
+ * @brief Read time variable from a NetCDF file.
+ *
+ * Reads the time variable from a NetCDF file into a double array.
+ *
+ * @param filename NetCDF filename
+ * @param time Output array for time values
+ * @return Status code
+ */
 int readnctime(std::string filename, double * &time)
 {
 	int status, ncid, varid;
@@ -371,10 +485,165 @@ int readnctime(std::string filename, double * &time)
 	return status;
 }
 
-template <class T>
-int readncslev1(std::string filename, std::string varstr, size_t indx, size_t indy, size_t indt, bool checkhh, double eps, T * &zsa)
+/**
+ * @brief Read time variable from a NetCDF file with reference date.
+ *
+ * Reads the time variable from a NetCDF file using a reference date and time coordinate name.
+ *
+ * @param ncid NetCDF file ID
+ * @param timecoordname Time coordinate variable name
+ * @param refdate Reference date string
+ * @param nt Number of time steps
+ * @param time Output array for time values
+ * @return Status code
+ */
+int readnctime2(int ncid,char * timecoordname,std::string refdate,size_t nt, double*& time)
 {
-	int status, ncid, varid,ndims,sferr,oferr,misserr,fillerr, iderr, varerr;
+
+	int status, varid;
+
+	std::string ncfilestr;
+	std::string varstr;
+
+	double fac = 1.0;
+	double offset = 0.0;
+
+	//char ncfile[]="ocean_ausnwsrstwq2.nc";
+	///std::vector<std::string> nameelements;
+
+	///nameelements = split(filename, '?');
+	///if (nameelements.size() > 1)
+	///{
+	///	//variable name for bathy is not given so it is assumed to be zb
+	///	ncfilestr = nameelements[0];
+	///	//varstr = nameelements[1];
+	///}
+	///else
+	///{
+	///	ncfilestr = filename;
+	///	//varstr = "time";
+	///}
+
+	// Warning this could be more robust by taking the unlimited dimension if time does not exist!
+	//std::string Varname = "time";
+
+	///status = nc_open(ncfilestr.c_str(), 0, &ncid);
+	///if (status != NC_NOERR) handle_ncerror(status);
+
+	status = nc_inq_varid(ncid, timecoordname, &varid);
+	if (status != NC_NOERR) handle_ncerror(status);
+
+	// inquire unit of time
+	int ncAttid;
+	size_t t_len;
+
+	char* tunit;
+
+	std::string tunitstr;
+
+	/* Get the attribute ID */
+	status = nc_inq_attid(ncid, varid, "units", &ncAttid);
+	if (status == NC_NOERR)
+	{
+		/* Read units attribute length from the variable */
+		status = nc_inq_attlen(ncid, varid, "units", &t_len);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		tunit = (char*)malloc(t_len + 1); // +1 to automatically have a null character at the end. Is this cross platform portable?
+
+		/* Read units attribute from the variable */
+		status = nc_get_att_text(ncid, varid, "units", tunit);
+		if (status != NC_NOERR) handle_ncerror(status);
+
+		// convert to string
+		tunitstr = std::string(tunit);
+
+		std::string ncstepunit= tunitstr;
+
+		if (tunitstr.find("since") != std::string::npos)
+		{
+
+			// Try to make sense of the unit
+			// The word "since" should be in the center
+			// e.g. hour since 2000-01-01 00:00:00 
+			std::vector<std::string> nodeitems = split(tunitstr, "since");
+			ncstepunit = trim(nodeitems[0], " ");
+			std::string ncrefdatestr = trim(nodeitems[1], " ");
+
+			//time_t ncrefdate = date_string_to_time(ncrefdatestr);
+			offset = date_string_to_s(ncrefdatestr, refdate);
+		}
+	
+		std::vector<std::string> secondvec = { "seconds","second","sec","s" };
+		std::vector<std::string> minutevec = { "minutes","minute","min","m" };
+		std::vector<std::string> hourvec = { "hours","hour","hrs","hr","h" };
+		std::vector<std::string> dayvec = { "days","day","d" };
+		std::vector<std::string> monthvec = { "months","month","mths", "mth", "mon" };
+		std::vector<std::string> yearvec = { "years","year","yrs", "yr", "y" };
+
+
+		std::size_t found;
+		found = case_insensitive_compare(ncstepunit, secondvec);
+		if (found == 0)
+			fac = 1.0;
+
+		found = case_insensitive_compare(ncstepunit, minutevec);
+		if (found == 0)
+			fac = 60.0;
+
+		found = case_insensitive_compare(ncstepunit, hourvec);
+		if (found == 0)
+			fac = 3600.0;
+
+		found = case_insensitive_compare(ncstepunit, dayvec);
+		if (found == 0)
+			fac = 3600.0*24.0;
+	
+		found = case_insensitive_compare(ncstepunit, monthvec);
+		if (found == 0)
+			fac = 3600.0 * 24.0 * 30.4375;
+
+		found = case_insensitive_compare(ncstepunit, yearvec);
+		if (found == 0)
+			fac = 3600.0 * 24.0 * 365.25;
+		
+
+	}
+
+	status = nc_get_var_double(ncid, varid, time);
+	if (status != NC_NOERR) handle_ncerror(status);
+
+	for (int it = 0; it < nt; it++)
+	{
+		time[it] = time[it] * fac + offset;
+		//printf("%f\n", time[it]);
+	}
+
+	///status = nc_close(ncid);
+
+	return status;
+	
+}
+
+/**
+ * @brief Read a single level of data from a NetCDF file.
+ *
+ * Reads a single level of data for a variable from a NetCDF file.
+ *
+ * @tparam T Data type
+ * @param filename NetCDF filename
+ * @param varstr Variable name
+ * @param indx X index
+ * @param indy Y index
+ * @param indt Time index
+ * @param checkhh Check for missing values
+ * @param eps Epsilon for missing value detection
+ * @param zsa Output array for data
+ * @return Status code
+ */
+template <class T> int readncslev1(std::string filename, std::string varstr, size_t indx, size_t indy, size_t indt, bool checkhh, double eps, T * &zsa)
+{
+	int status, ncid, varid,ndims,sferr,oferr,misserr,fillerr, iderr;
 	double scalefac, offset, missing, fillval;
 
 	double hha,zza;
@@ -383,7 +652,7 @@ int readncslev1(std::string filename, std::string varstr, size_t indx, size_t in
 
 	int wet = 1;
 
-	size_t *start, *count;
+	size_t *start;
 	//std::string Varname = "time";
 	ndims = 3;
 
@@ -458,7 +727,7 @@ int readncslev1(std::string filename, std::string varstr, size_t indx, size_t in
 
 	if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
 	{
-		zsa[0] = zsa[0] * scalefac + offset;
+		zsa[0] = zsa[0] * (T)scalefac + (T)offset;
 	}
 
 	if (checkhh)
@@ -503,17 +772,17 @@ int readncslev1(std::string filename, std::string varstr, size_t indx, size_t in
 
 			if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
 			{
-				zsa[0] = zsa[0] * scalefac + offset;
+				zsa[0] = zsa[0] * (T)scalefac + (T)offset;
 			}
 
 			hha = zsa[0];
 			if (hha > eps)
 			{
-				zsa[0] = zza;
+				zsa[0] = T(zza);
 			}
 			else
 			{
-				zsa[0] = 0.0;
+				zsa[0] = T(0.0);
 				wet = 0;
 			}
 			
@@ -537,22 +806,40 @@ template int readncslev1<float>(std::string filename, std::string varstr, size_t
 template int readncslev1<double>(std::string filename, std::string varstr, size_t indx, size_t indy, size_t indt, bool checkhh, double eps, double * &zsa);
 
 
-template <class T>
-int readvardata(std::string filename, std::string Varname, int step, T * &vardata)
+/**
+ * @brief Read variable data from a NetCDF file for a specific time step.
+ *
+ * Reads data for a variable from a NetCDF file for a given time step, with optional axis flipping.
+ *
+ * @tparam T Data type
+ * @param filename NetCDF filename
+ * @param Varname Variable name
+ * @param step Time step to read
+ * @param vardata Output array for data
+ * @param flipx Flip x axis
+ * @param flipy Flip y axis
+ * @return Status code
+ */
+template <class T> int readvardata(std::string filename, std::string Varname, int step, T * &vardata, bool flipx, bool flipy)
 {
 	// function to standardise the way to read netCDF data off a file
 	// The role of this function is to offload and simplify the rest of the code
 
 
-	int nx, ny, nt, status, ncid, varid, sferr, oferr,ndims;
+	int nx, ny, nt, status, ncid, varid, sferr, oferr, merr,ndims;
 	size_t * start, * count, *ddim;
-	double scalefac, offset;
+	double scalefac, offset, missing;
+
+	
+
+
 
 	ndims = readvarinfo(filename, Varname, ddim);
 
 	start = (size_t *)malloc(ndims*sizeof(size_t));
 	count = (size_t *)malloc(ndims*sizeof(size_t));
 
+	
 
 	//
 	status = nc_open(filename.c_str(), 0, &ncid);
@@ -580,6 +867,8 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 		count[0] = ny;
 		count[1] = nx;
 
+		
+
 
 	}
 	else //(ndim>2)
@@ -587,33 +876,116 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 		nt = (int)ddim[0];
 		ny = (int)ddim[1];
 		nx = (int)ddim[2];
-		start[0] = utils::min(step, nt - 1);
-		start[1] = 0;
-		start[2] = 0;
+		start[0] = size_t(utils::min(step, nt - 1));
+		start[1] = size_t(0);
+		start[2] = size_t(0);
 
-		count[0] = 1;
-		count[1] = ny;
-		count[2] = nx;
+		count[0] = size_t(1);
+		count[1] = size_t(ny);
+		count[2] = size_t(nx);
 
 
 
 	}
+
+	//double* xo,xnd;
+	
+
 	status = nc_get_vara_T(ncid, varid, start, count, vardata);
 	if (status != NC_NOERR) handle_ncerror(status);
 
 	if (ndims > 1)
 	{
+
 		sferr = nc_get_att_double(ncid, varid, "scale_factor", &scalefac);
 		oferr = nc_get_att_double(ncid, varid, "add_offset", &offset);
 
+		merr = nc_get_att_double(ncid, varid, "missingvalue", &missing);
+		if (merr != NC_NOERR)
+		{
+			merr = nc_get_att_double(ncid, varid, "_FillValue", &missing);
+		}
+		if (merr != NC_NOERR)
+		{
+			merr = nc_get_att_double(ncid, varid, "missing_value", &missing);
+		}
+
+		// remove fill value
+		if (merr == NC_NOERR)
+		{
+			//T maxval = T(-99999.0);
+			for (int j = 0; j < ny; j++)
+			{
+				for (int i = 0; i < nx; i++)
+				{
+					bool test = missing != missing ? vardata[i + j * nx] != vardata[i + j * nx] : (abs(vardata[i + j * nx]) > abs(T(0.9 * missing)));
+					if (test) // i.e. if vardata is anywhere near missing
+					{
+						
+						vardata[i + j * nx] = T(NAN);
+					}
+					//maxval = utils::max(maxval, vardata[i + j * nx]);
+				}
+			}
+			//printf("maxval = %f\n", float(maxval));
+		}
+
+		if (flipx)
+		{
+			T* xdata;
+			xdata=(T*)malloc(nx * sizeof(T));
+			for (int j = 0; j < ny; j++)
+			{
+				for (int i = 0; i < nx; i++)
+				{
+					xdata[i] = vardata[i + j * nx];
+					//unpacked_value = packed_value * scale_factor + add_offset
+
+				}
+				for (int i = 0; i < nx; i++)
+				{
+					vardata[i + j * nx] = xdata[nx - 1 - i];
+					//unpacked_value = packed_value * scale_factor + add_offset
+
+				}
+			}
+			free(xdata);
+		}
+
+		if (flipy)
+		{
+			T* ydata;
+			ydata = (T*)malloc(ny * sizeof(T));
+			for (int i = 0; i < nx; i++)
+			{
+				for (int j = 0; j < ny; j++)
+				{
+					ydata[j] = vardata[i + j * nx];
+					//unpacked_value = packed_value * scale_factor + add_offset
+
+				}
+				for (int j = 0; j < ny; j++)
+				{
+					vardata[i + j * nx] = ydata[ny - 1 - j];
+					//unpacked_value = packed_value * scale_factor + add_offset
+
+				}
+			}
+			free(ydata);
+		}
+
+
+
+		// apply scale and offset
 		if (sferr == NC_NOERR || oferr == NC_NOERR) // data must be packed
 		{
 			for (int j = 0; j < ny; j++)
 			{
 				for (int i = 0; i < nx; i++)
 				{
-					vardata[i + j*nx] = vardata[i + j*nx] * (T)scalefac + (T)offset;
+					vardata[i + j * nx] = vardata[i + j * nx] * (T)scalefac + (T)offset;
 					//unpacked_value = packed_value * scale_factor + add_offset
+					
 				}
 			}
 		}
@@ -630,17 +1002,29 @@ int readvardata(std::string filename, std::string Varname, int step, T * &vardat
 	return status;
 
 }
-template int readvardata<int>(std::string filename, std::string Varname, int step, int*& vardata);
-template int readvardata<float>(std::string filename, std::string Varname, int step, float * &vardata);
-template int readvardata<double>(std::string filename, std::string Varname, int step, double * &vardata);
+template int readvardata<int>(std::string filename, std::string Varname, int step, int*& vardata, bool flipx, bool flipy);
+template int readvardata<float>(std::string filename, std::string Varname, int step, float * &vardata, bool flipx, bool flipy);
+template int readvardata<double>(std::string filename, std::string Varname, int step, double * &vardata, bool flipx, bool flipy);
 
 
 
-
-std::string checkncvarname(int ncid, std::string stringA, std::string stringB, std::string stringC, std::string stringD)
+/**
+ * @brief Check for the existence of NetCDF variable names and return the first found.
+ *
+ * Checks up to five possible variable names in a NetCDF file and returns the first one that exists.
+ *
+ * @param ncid NetCDF file ID
+ * @param stringA First variable name to check
+ * @param stringB Second variable name to check
+ * @param stringC Third variable name to check
+ * @param stringD Fourth variable name to check
+ * @param stringE Fifth variable name to check
+ * @return The first variable name found in the NetCDF file, or an empty string if none are found.
+ */
+std::string checkncvarname(int ncid, std::string stringA, std::string stringB, std::string stringC, std::string stringD, std::string stringE)
 {
 	int varid;
-	int errorA, errorB,errorC,errorD;
+	int errorA, errorB,errorC,errorD,errorE;
 	std::string outstring;
 
 	//std::vector<std::string> teststr;
@@ -652,6 +1036,8 @@ std::string checkncvarname(int ncid, std::string stringA, std::string stringB, s
 	errorB = nc_inq_varid(ncid, stringB.c_str(), &varid);
 	errorC = nc_inq_varid(ncid, stringC.c_str(), &varid);
 	errorD = nc_inq_varid(ncid, stringD.c_str(), &varid);
+	errorE = nc_inq_varid(ncid, stringE.c_str(), &varid);
+
 
 	if (errorA == NC_NOERR)
 	{
@@ -669,7 +1055,10 @@ std::string checkncvarname(int ncid, std::string stringA, std::string stringB, s
 	{
 		outstring = stringD;
 	}
-
+	else if (errorE == NC_NOERR)
+	{
+		outstring = stringE;
+	}
 
 	return outstring;
 
@@ -677,12 +1066,24 @@ std::string checkncvarname(int ncid, std::string stringA, std::string stringB, s
 }
 
 //By default we want to read wind info as float because it will reside in a texture. the value is converted to the apropriate type only when it is used. so there is no need to template this function 
+/**
+ * @brief Read wind data from NetCDF files for a specific time step.
+ *
+ * Reads U and V wind components from NetCDF files for a given time step.
+ * By default we want to read wind info as float because it will reside in a texture. the value is converted to the apropriate type only when it is used. so there is no need to template this function
+ * 
+ * @param WNDUmap Forcing map for U wind
+ * @param WNDVmap Forcing map for V wind
+ * @param steptoread Time step to read
+ * @param Uo Output array for U wind
+ * @param Vo Output array for V wind
+ */
 void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *&Uo, float *&Vo)
 {
 	//
 	int status;
 	int ncid;
-	float NanValU = -9999, NanValV = -9999, NanValH = -9999;
+	//float NanValU = -9999, NanValV = -9999, NanValH = -9999;
 	int uu_id, vv_id;
 	// step to read should be adjusted in each variables so that it keeps using the last output and teh model keeps on going
 	// right now the model will catch anexception
@@ -690,12 +1091,12 @@ void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *
 	//size_t startl[]={hdstep-1,lev,0,0};
 	//size_t countlu[]={1,1,netau,nxiu};
 	//size_t countlv[]={1,1,netav,nxiv};
-	size_t startl[] = { steptoread, 0, 0 };
-	size_t countlu[] = { 1, WNDUmap.ny, WNDUmap.nx };
-	size_t countlv[] = { 1, WNDVmap.ny, WNDVmap.nx };
+	size_t startl[] = { (size_t)steptoread, 0, 0 };
+	size_t countlu[] = { 1, (size_t)WNDUmap.ny, (size_t)WNDUmap.nx };
+	size_t countlv[] = { 1, (size_t)WNDVmap.ny, (size_t)WNDVmap.nx };
 
 	//static ptrdiff_t stridel[]={1,1,1,1};
-	static ptrdiff_t stridel[] = { 1, 1, 1 };
+	//static ptrdiff_t stridel[] = { 1, 1, 1 };
 
 	std::string ncfilestrU, ncfilestrV;
 	std::string Uvarstr, Vvarstr;
@@ -767,26 +1168,36 @@ void readWNDstep(forcingmap WNDUmap, forcingmap WNDVmap, int steptoread, float *
 
 }
 
-//Atm pressure is same as wind we on;ly read floats and that is plenty for real world application
+//Atm pressure is same as wind we only read floats and that is plenty for real world application
+/**
+ * @brief Read atmospheric pressure data from NetCDF file for a specific time step.
+ *
+ * Reads atmospheric pressure data from a NetCDF file for a given time step.
+ * Atm pressure is same as wind we only read floats and that is plenty for real world application.
+ *
+ * @param ATMPmap Forcing map for atmospheric pressure
+ * @param steptoread Time step to read
+ * @param Po Output array for pressure data
+ */
 void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po)
 {
 	//
 	int status;
 	int ncid;
-	float NanValU = -9999, NanValV = -9999, NanValH = -9999;
-	int uu_id, vv_id;
+	//float NanValU = -9999, NanValV = -9999, NanValH = -9999;
+	int uu_id;
 	// step to read should be adjusted in each variables so that it keeps using the last output and teh model keeps on going
 	// right now the model will catch anexception
 	printf("Reading atm pressure data. step: %d ...", steptoread);
 	//size_t startl[]={hdstep-1,lev,0,0};
 	//size_t countlu[]={1,1,netau,nxiu};
 	//size_t countlv[]={1,1,netav,nxiv};
-	size_t startl[] = { steptoread, 0, 0 };
-	size_t countlu[] = { 1, ATMPmap.ny, ATMPmap.nx };
+	size_t startl[] = { (size_t)steptoread, 0, 0 };
+	size_t countlu[] = { 1, (size_t)ATMPmap.ny, (size_t)ATMPmap.nx };
 	//size_t countlv[] = { 1, WNDVmap.ny, WNDVmap.nx };
 
 	//static ptrdiff_t stridel[]={1,1,1,1};
-	static ptrdiff_t stridel[] = { 1, 1, 1 };
+	//static ptrdiff_t stridel[] = { 1, 1, 1 };
 
 	std::string ncfilestr;
 	std::string atmpvarstr;
@@ -830,5 +1241,41 @@ void readATMstep(forcingmap ATMPmap, int steptoread, float *&Po)
 
 }
 
+// The following functions are simple tools to create 2D or 3D netcdf files (for testing for example)
 
+extern "C" void read3Dnc(int nx, int ny, int ntheta, char ncfile[], float * &ee)
+{
+	int status;
+	int ncid, ee_id;
+	//static size_t count[] = { nx, ny,ntheta };
+	status = nc_open(ncfile, NC_NOWRITE, &ncid);
+	status = nc_inq_varid(ncid, "z", &ee_id);
+	status = nc_get_var_float(ncid, ee_id, ee);
+	status = nc_close(ncid);
+	if (status != NC_NOERR) handle_ncerror(status);
+}
 
+extern "C" void read2Dnc(int nx, int ny, char ncfile[], float * &hh)
+{
+	int status;
+	int ncid, hh_id;
+	//static size_t count[] = { nx, ny };
+	status = nc_open(ncfile, NC_NOWRITE, &ncid);
+	status = nc_inq_varid(ncid, "hh", &hh_id);
+	status = nc_get_var_float(ncid, hh_id, hh);
+	status = nc_close(ncid);
+	if (status != NC_NOERR) handle_ncerror(status);
+}
+
+extern "C" void readnczb(int nx, int ny, std::string ncfile, float * &zb)
+{
+	int status;
+	int ncid, hh_id;
+	//static size_t count[] = { nx, ny };
+
+	status = nc_open(ncfile.c_str(), NC_NOWRITE, &ncid);
+	status = nc_inq_varid(ncid, "zb", &hh_id);
+	status = nc_get_var_float(ncid, hh_id, zb);
+	status = nc_close(ncid);
+	if (status != NC_NOERR) handle_ncerror(status);
+}
