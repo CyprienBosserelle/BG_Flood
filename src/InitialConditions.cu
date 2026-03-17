@@ -677,6 +677,7 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 		}
 
 		//Now identify sort and unique blocks where culverts are being inserted
+		/*
 		std::vector<int> activeCulvertBlk;
 
 		for (int cc = 0; cc < XForcing.culverts.size(); cc++)
@@ -688,7 +689,7 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 		std::sort(activeCulvertBlk.begin(), activeCulvertBlk.end());
 		activeCulvertBlk.erase(std::unique(activeCulvertBlk.begin(), activeCulvertBlk.end()), activeCulvertBlk.end());
 		
-		/*if (activeCulvertBlk.size() > size_t(XModel.bndblk.nblkculvert))
+		if (activeCulvertBlk.size() > size_t(XModel.bndblk.nblkculvert))
 		{
 			ReallocArray(activeCulvertBlk.size(), 1, XModel.bndblk.culvert);
 			XModel.bndblk.nblkculvert = int(activeCulvertBlk.size());
@@ -698,12 +699,12 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.h2);
 			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.zs1);
 			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.zs2);
-		}*/
+		}
 		for (int b = 0; b < activeCulvertBlk.size(); b++)
 		{
 			XModel.bndblk.culvert[b] = activeCulvertBlk[b];
 		}
-
+		*/
 
 
 		//Initialisation of the culvert states variables (and other needed on the GPUs)
@@ -722,7 +723,7 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 			XModel.culvertsF.Qmax[cc] = XForcing.culverts[cc].Qmax;
 			XModel.culvertsF.dx1[cc] = XForcing.culverts[cc].dx1;
 
-			printf("Culvert_init =%f \n", XModel.culvertsF.h1[0]);
+			//printf("Culvert_init =%f \n", XModel.culvertsF.h1[0]);
 		}
 		
 	}
