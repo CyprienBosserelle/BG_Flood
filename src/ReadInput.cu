@@ -1173,6 +1173,66 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 
 	}
 
+	parameterstr = "culvert";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		std::vector<std::string> culvertpar = split(parametervalue, ',');
+
+		if (!culvertpar.empty())
+		{	
+			int MyCulvertType = std::stoi(culvertpar[0]);
+			Culvert myculvert;
+			
+			myculvert.type = MyCulvertType;
+			if (culvertpar.size() > 1)
+				myculvert.x1 = std::stof(culvertpar[1]);
+			if (culvertpar.size() > 2)
+				myculvert.y1 = std::stof(culvertpar[2]);
+			if (culvertpar.size() > 3)
+				myculvert.x2 = std::stof(culvertpar[3]);
+			if (culvertpar.size() > 4)
+				myculvert.y2 = std::stof(culvertpar[4]);
+			if (culvertpar.size() > 5)
+			{
+				if (MyCulvertType >= 1)
+				{
+					myculvert.width = std::stof(culvertpar[5]);
+				}
+				else
+				{
+					myculvert.Qmax = std::stof(culvertpar[5]);
+				}
+			}
+			if (culvertpar.size() > 6)
+				myculvert.fac = std::stof(culvertpar[6]);
+
+			if (culvertpar.size() > 7)
+				myculvert.shape = std::stof(culvertpar[7]);
+			if (culvertpar.size() > 8)
+				myculvert.n = std::stof(culvertpar[8]);
+			if (culvertpar.size() > 9)
+				myculvert.k_ex = std::stof(culvertpar[9]);
+			if (culvertpar.size() > 10)
+				myculvert.k_en = std::stof(culvertpar[10]);
+			if (culvertpar.size() > 11)
+				myculvert.C_d = std::stof(culvertpar[11]);
+			if (culvertpar.size() > 12)
+				myculvert.zb1 = std::stof(culvertpar[12]);
+			if (culvertpar.size() > 13)
+				myculvert.zb2 = std::stof(culvertpar[13]);
+			forcing.culverts.push_back(myculvert);
+		}
+		else
+		{
+			//Failed there should be 5 arguments (comma separated) when inputing a river: type, xstart,xend,ystart,yend;
+			std::cerr << "Culvert input failed there should be 5 arguments (comma separated) when inputing a river: culvert = type, xstart,xend,ystart,yend; see log file for details" << std::endl;
+
+			log("Culvert input below failed there should be 5 arguments (comma separated) when inputing a culvert: culvert = type, xstart,xend,ystart,yend;");
+			log(parametervalue);
+		}
+	}
+
 	return forcing;
 }
 
@@ -1407,6 +1467,9 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 
 	// Make sure the nriver in param (used for preallocation of memory) and number of rivers in XForcing are consistent
 	XParam.nrivers = int(XForcing.rivers.size());
+
+  // Same for culverts
+	XParam.nculverts = int(XForcing.culverts.size());
 
 	// Engine checks
 	if (XParam.engine == 5)
