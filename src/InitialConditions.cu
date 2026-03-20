@@ -643,10 +643,27 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 			{
 				XForcing.culverts[cc].zb1 = XModel.zb[memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1)];
 			}
+			else
+			{
+				if (XModel.zb[memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1)]> XForcing.culverts[cc].zb1)
+				{
+					// Make sure ground elevation is at least zb
+					XModel.zb[memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1)] = XForcing.culverts[cc].zb1;
+				}
+			}
 			if (XForcing.culverts[cc].zb2 < -998.0) // i.e. not set by user so use the ground elevation
 			{
 				XForcing.culverts[cc].zb2 = XModel.zb[memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2)];
 			}
+			else
+			{
+				if (XModel.zb[memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2)] > XForcing.culverts[cc].zb2)
+				{
+					// Make sure ground elevation is at least zb
+					XModel.zb[memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2)] = XForcing.culverts[cc].zb2;
+				}
+			}
+
 			//Calculate the length of the culvert
 			if (XForcing.culverts[cc].type > 0)
 			{
