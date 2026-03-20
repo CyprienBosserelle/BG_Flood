@@ -3,16 +3,16 @@
     Collection of function to create input and process output of the BG model
 
     Available functions:
-    SetEdges, patchgrids
+    plotvar
 
     #Example:
-    using BG
+    using .BG
 
 """
 module BG
 
     import Printf, NetCDF, GMT
-    export CalcRunup, plotvar
+    export plotvar
 
 
     function scanminmax(file,var,stp)
