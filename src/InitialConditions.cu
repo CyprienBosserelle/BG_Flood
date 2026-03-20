@@ -72,6 +72,8 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	// Initial forcing
 	InitRivers(XParam, XForcing, XModel);
 
+	InitCulverts(XParam, XForcing, XModel);
+
 	//=====================================
 	// Initial bndinfo
 	//Calcbndblks(XParam, XForcing, XModel.blocks);
@@ -579,6 +581,178 @@ template void InitRivers<float>(Param XParam, Forcing<float> &XForcing, Model<fl
 template void InitRivers<double>(Param XParam, Forcing<float> &XForcing, Model<double> &XModel);
 
 
+template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Model<T>& XModel)
+{
+	//========================
+	// Culvert set-up
+
+	if (XForcing.culverts.size() > 0)
+	{
+		//
+		double x1,x2,y1,y2,zb1,zb2;
+		int ib;
+		double levdx, dxblk;
+		double blkxmin, blkxmax, blkymin, blkymax;
+
+		log("\tInitializing culverts");
+		//For each culvert
+		for (int cc = 0; cc < XForcing.culverts.size(); cc++)
+		{
+			// find the cell where the culvert well / source will be applied
+
+			x1 = (T)XForcing.culverts[cc].x1;
+			x2 = (T)XForcing.culverts[cc].x2;
+			y1 = (T)XForcing.culverts[cc].y1;
+			y2 = (T)XForcing.culverts[cc].y2;
+
+
+			for (int ibl = 0; ibl < XParam.nblk; ibl++)
+			{
+				ib = XModel.blocks.active[ibl];
+				levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
+
+				dxblk = (T)(XParam.blkwidth) * levdx;
+
+				blkxmin = ((T)XParam.xo + XModel.blocks.xo[ib] - T(0.5) * levdx);
+				blkymin = ((T)XParam.yo + XModel.blocks.yo[ib] - T(0.5) * levdx);
+
+				blkxmax = (blkxmin + dxblk);
+				blkymax = (blkymin + dxblk);
+				
+
+				if (x1 > blkxmin && x1 <= blkxmax && y1 > blkymin && y1 <= blkymax)
+				{
+					XForcing.culverts[cc].block1 = ib;
+					//XForcing.culverts[cc].i1 = i;
+					XForcing.culverts[cc].ix1 = min(max((int)round((x1 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					XForcing.culverts[cc].iy1 = min(max((int)round((y1 - (XParam.yo + XModel.blocks.yo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					XForcing.culverts[cc].dx1 = levdx;
+				}
+
+				if (x2 > blkxmin && x2 <= blkxmax && y2 > blkymin && y2 <= blkymax)
+				{
+					XForcing.culverts[cc].block2 = ib;
+					XForcing.culverts[cc].ix2 = min(max((int)round((x2 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					XForcing.culverts[cc].iy2 = min(max((int)round((y2 - (XParam.yo + XModel.blocks.yo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					XForcing.culverts[cc].dx2 = levdx;
+				}
+			}
+
+			//Calculate the bottom elevation of the culvert
+			if (XForcing.culverts[cc].zb1 < -998.0) // i.e. not set by user so use the ground elevation
+			{
+				XForcing.culverts[cc].zb1 = XModel.zb[memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1)];
+			}
+			else
+			{
+				if (XModel.zb[memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1)]> XForcing.culverts[cc].zb1)
+				{
+					// Make sure ground elevation is at least zb
+					XModel.zb[memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1)] = XForcing.culverts[cc].zb1;
+				}
+			}
+			if (XForcing.culverts[cc].zb2 < -998.0) // i.e. not set by user so use the ground elevation
+			{
+				XForcing.culverts[cc].zb2 = XModel.zb[memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2)];
+			}
+			else
+			{
+				if (XModel.zb[memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2)] > XForcing.culverts[cc].zb2)
+				{
+					// Make sure ground elevation is at least zb
+					XModel.zb[memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2)] = XForcing.culverts[cc].zb2;
+				}
+			}
+
+			//Calculate the length of the culvert
+			if (XForcing.culverts[cc].type > 0)
+			{
+				zb1 = XForcing.culverts[cc].zb1;
+				zb2 = XForcing.culverts[cc].zb2;
+				XForcing.culverts[cc].length = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (zb2 - zb1) * (zb2 - zb1));
+			}
+			//initialise the height if not set (circulare or square culvert)
+			if (XForcing.culverts[cc].type > 0)
+			{
+				if (XForcing.culverts[cc].height == 0.0)
+				{
+					XForcing.culverts[cc].height = XForcing.culverts[cc].width;
+				}
+			}
+			//Adjust the Discharge coefficient for submerged inlet based on the shape if not user defined
+			if (XForcing.culverts[cc].C_d < -998.0)
+			{
+				if (XForcing.culverts[cc].shape == 1) //circular
+				{
+					XForcing.culverts[cc].C_d = 1.0;
+				}
+				if (XForcing.culverts[cc].shape == 0) //rectangular
+				{
+					XForcing.culverts[cc].C_d = 0.62;
+				}
+			}
+		}
+
+		//Now identify sort and unique blocks where culverts are being inserted
+		/*
+		std::vector<int> activeCulvertBlk;
+
+		for (int cc = 0; cc < XForcing.culverts.size(); cc++)
+		{
+			activeCulvertBlk.push_back(XForcing.culverts[cc].block1);
+			activeCulvertBlk.push_back(XForcing.culverts[cc].block2);
+		}
+
+		std::sort(activeCulvertBlk.begin(), activeCulvertBlk.end());
+		activeCulvertBlk.erase(std::unique(activeCulvertBlk.begin(), activeCulvertBlk.end()), activeCulvertBlk.end());
+		
+		if (activeCulvertBlk.size() > size_t(XModel.bndblk.nblkculvert))
+		{
+			ReallocArray(activeCulvertBlk.size(), 1, XModel.bndblk.culvert);
+			XModel.bndblk.nblkculvert = int(activeCulvertBlk.size());
+
+			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.dq);
+			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.h1);
+			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.h2);
+			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.zs1);
+			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.zs2);
+		}
+		for (int b = 0; b < activeCulvertBlk.size(); b++)
+		{
+			XModel.bndblk.culvert[b] = activeCulvertBlk[b];
+		}
+		*/
+
+
+		//Initialisation of the culvert states variables (and other needed on the GPUs)
+		for (int cc = 0; cc < XForcing.culverts.size(); cc++)
+		{
+			XModel.culvertsF.dq[cc] = 0.0;
+			XModel.culvertsF.h1[cc] = 0.0;
+			XModel.culvertsF.h2[cc] = 0.0;
+			XModel.culvertsF.zs1[cc] = 0.0;
+			XModel.culvertsF.zs2[cc] = 0.0;
+			XModel.culvertsF.u1[cc] = 0.0;
+			XModel.culvertsF.u2[cc] = 0.0;
+			XModel.culvertsF.v1[cc] = 0.0;
+			XModel.culvertsF.v2[cc] = 0.0;
+			XModel.culvertsF.type[cc] = XForcing.culverts[cc].type;
+			XModel.culvertsF.Qmax[cc] = XForcing.culverts[cc].Qmax;
+			XModel.culvertsF.dx1[cc] = XForcing.culverts[cc].dx1;
+
+			//printf("Culvert_init =%f \n", XModel.culvertsF.h1[0]);
+		}
+		
+	}
+
+}
+
+
+template void InitCulverts<float>(Param XParam, Forcing<float>& XForcing, Model<float>& XModel);
+template void InitCulverts<double>(Param XParam, Forcing<float>& XForcing, Model<double>& XModel);
+
+
+
 /**
  * @brief Initializes output variable maps and metadata for the simulation.
  *
@@ -602,7 +776,7 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.Outvarunits["u"] = "m s-1";
 
 	XModel.OutputVarMap["v"] = XModel.evolv.v;
-	XModel.Outvarlongname["v"] = "Velocity in y-direction";// meridional
+	XModel.Outvarlongname["v"] = "Water velocity in y-direction";// meridional
 	XModel.Outvarstdname["v"] = "v_velocity";
 	XModel.Outvarunits["v"] = "m s-1";
 
