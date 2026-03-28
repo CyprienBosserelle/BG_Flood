@@ -24,7 +24,7 @@
 
 template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g);
 
-template <class T> bool GaussianHumptest(T zsnit, int gpu,bool compare);
+template <class T> bool GaussianHumptest(T zsnit, int gpu,bool compare,int engine);
 
 
 template <class T> void TestingOutput(Param XParam, Model<T> XModel);
