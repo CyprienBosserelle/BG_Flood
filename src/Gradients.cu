@@ -927,6 +927,113 @@ template <class T> __global__ void gradientSMC(int halowidth, int* active, int* 
 template __global__ void gradientSMC<float>(int halowidth, int* active, int* level, float theta, float dx, float* a, float* dadx, float* dady);
 template __global__ void gradientSMC<double>(int halowidth, int* active, int* level, double theta, double dx, double* a, double* dadx, double* dady);
 
+template <class T> __global__ void gradientSMD(int halowidth,int blkmemsize, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady)
+{
+	//int *leftblk,int *rightblk,int* topblk, int * botblk,
+
+	//int ix = threadIdx.x+1;
+	//int iy = threadIdx.y+1;
+	int blkmemwidth = blockDim.x + halowidth * 2;
+	int flatenwidth = blockDim.x * blockDim.y;
+	int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = active[ibl];
+
+	int lev = level[ib];
+
+	T delta = calcres(dx, lev);
+
+	int ism = ix + iy * blockDim.x;
+
+	int istore = ism + ib * (blkmemwidth * blkmemwidth);
+	//(i + halowidth) + (j + halowidth) * blkmemwidth + ib * (blkmemwidth * blkmemwidth);
+	//memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+
+	int ileft, iright, itop, ibot, i, iwrite;
+
+
+	// shared array index to make the code bit more readable
+	int sx = ix + halowidth;
+	int sy = iy + halowidth;
+
+	T* my_global_a = &a[ib * blkmemsize];
+	T* mg_dadx = &dadx[ib * blkmemsize];
+	T* mg_dady = &dady[ib * blkmemsize];
+
+	__shared__ T a_s[324];
+	//__shared__ T dadx_out[18 * 18];
+	//__shared__ T dady_out[18 * 18];
+	//__shared__ T a_s[324];
+	//__shared__ T a_left[324];
+	//__shared__ T a_right[324];
+	//__shared__ T a_top[324];
+	//__shared__ T a_bot[324];
+	int tid = threadIdx.y * blockDim.x + threadIdx.x;
+	int threads_in_block = blockDim.x * blockDim.y;
+	int total_to_load = (blkmemwidth * blkmemwidth);//324
+
+	for (int istore = tid; istore < total_to_load; istore += threads_in_block) {
+		// Direct linear mapping: global[0...N] -> shared[0...N]
+		// Since my_global_tile is 128-byte aligned, this warp-wide access is coalesced
+		a_s[istore] = my_global_a[istore];
+	}
+
+
+	//(i + halowidth) + (j + halowidth) * blkmemwidth + ib * (blkmemwidth * blkmemwidth);
+	//memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+//
+	/*a_s[ism] = a[istore];
+
+	if (ism < (324 - (flatenwidth)))
+	{
+		a_s[ism + flatenwidth] = a[istore + flatenwidth];
+	}*/
+
+
+
+
+	__syncthreads();
+	i = memloc(halowidth, blkmemwidth, ix, iy, 0);
+	ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, 0);
+	iright = memloc(halowidth, blkmemwidth, ix + 1, iy, 0);
+	itop = memloc(halowidth, blkmemwidth, ix, iy + 1, 0);
+	ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, 0);
+	iwrite = memloc(halowidth, blkmemwidth, ix, iy, 0);
+
+	//a_left[i] = a_s[ileft];
+	//a_right[i] = a_s[iright];
+	//a_top[i] = a_s[itop];
+	//a_bot[i] = a_s[ibot];
+
+	//dadx[iwrite] = minmod2(theta, a_left[i], a_s[i], a_right[i]) / delta;
+	//dady[iwrite] = minmod2(theta, a_bot[i], a_s[i], a_top[i]) / delta;
+	mg_dadx[iwrite] = minmod2(theta, a_s[ileft], a_s[i], a_s[iright]) / delta;
+
+	mg_dady[iwrite] = minmod2(theta, a_s[ibot], a_s[i], a_s[itop]) / delta;
+
+	/*
+	dadx_out[i] = minmod2(theta, a_s[ileft], a_s[i], a_s[iright]) / delta;
+	dady_out[i] = minmod2(theta, a_s[ibot], a_s[i], a_s[itop]) / delta;
+
+
+	dadx[istore] = dadx_out[ism];// = a[istore];
+	dady[istore] = dady_out[ism];
+
+	if (ism < (324 - (flatenwidth)))
+	{
+		dadx[istore + flatenwidth] = dadx_out[ism + flatenwidth];
+		dady[istore + flatenwidth] = dady_out[ism + flatenwidth];
+	}
+	*/
+
+
+}
+template __global__ void gradientSMD<float>(int halowidth, int blkmemsize, int* active, int* level, float theta, float dx, float* a, float* dadx, float* dady);
+template __global__ void gradientSMD<double>(int halowidth, int blkmemsize, int* active, int* level, double theta, double dx, double* a, double* dadx, double* dady);
 
 
 /**

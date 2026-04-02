@@ -1277,8 +1277,19 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	}
 
 	XParam.blkmemwidth = XParam.blkwidth + 2 * XParam.halowidth;
-	XParam.blksize = utils::sq(XParam.blkmemwidth);
 
+	
+	XParam.blksize = utils::sq(XParam.blkmemwidth);
+	size_t stride;
+	if (XParam.doubleprecision == 1)
+	{
+		stride = calculate_aligned_stride(XParam.blksize, 1.0);
+	}
+	else
+	{
+		stride = calculate_aligned_stride(XParam.blksize, 1.0f);
+	}
+	XParam.blkmemsize = stride;
 	///////////////////////////////////////////
 	// zsoffset
 	///////////////////////////////////////////

@@ -39,6 +39,40 @@ __host__ __device__ int memloc(int halowidth, int blkmemwidth, int i, int j, int
 	return (i + halowidth) + (j + halowidth) * blkmemwidth + ib * (blkmemwidth* blkmemwidth);
 }
 
+
+/**
+ * @brief Compute memory index for a cell in a block (using explicit sizes).
+ *
+ * Calculates the linear memory index for a cell in a block using explicit halo and block sizes.
+ *
+ * @param halowidth Halo width
+ * @param blkmemwidth Block memory width
+ * @param i Cell x-index
+ * @param j Cell y-index
+ * @param ib Block index
+ * @return Linear memory index
+ */
+__host__ __device__ int memlocP(int halowidth, int blkmemwidth,int blocksize, int i, int j, int ib)
+{
+	return (i + halowidth) + (j + halowidth) * blkmemwidth + ib * (blocksize);
+}
+
+
+template <class T>
+__host__ size_t calculate_aligned_stride(int blocksize, T sample)
+{
+	size_t total_elements = blocksize;
+
+	// 128 bytes is the standard coalescing segment size.
+	// float: 32 elements | double: 16 elements
+	size_t elements_per_cache_line = 128 / sizeof(T);
+
+	// Round up total_elements to the next multiple of elements_per_cache_line
+	return (total_elements + (elements_per_cache_line - 1)) & ~(elements_per_cache_line - 1);
+}
+template __host__ size_t calculate_aligned_stride<float>(int blocksize, float sample);
+template __host__ size_t calculate_aligned_stride<double>(int blocksize, double sample);
+
 /**
  * @brief Allocate memory for a single array on the CPU.
  *

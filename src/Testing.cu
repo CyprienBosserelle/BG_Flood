@@ -4008,11 +4008,91 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	// for flux reconstruction the loop overlap the right(or top for the y direction) halo
 	dim3 blockDimX2(XParam.blkwidth + XParam.halowidth * 2, XParam.blkwidth + XParam.halowidth * 2, 1);
 
+	// Do special allocations and dummy assignments
+	T* a, *dadx, *dady;
+	T* b,* dbdx, *dbdy;
+	T* c, *dcdx, *dcdy;
+	T* aa,* daadx, *daady;
 
+	T* a_g, *dadx_g, *dady_g;
+
+	T* aa_g, *daadx_g, *daady_g;
+	T* b_g,* dbdx_g, *dbdy_g;
+	T* c_g, *dcdx_g, *dcdy_g;
+	int ntiles = 4096;
+	int domainwidth = 64;
+
+	AllocateCPU(ntiles, XParam.blksize, a);
+	AllocateCPU(ntiles, XParam.blksize, dadx);
+	AllocateCPU(ntiles, XParam.blksize, dady);
+
+	AllocateCPU(ntiles, XParam.blksize, aa);
+	AllocateCPU(ntiles, XParam.blksize, daadx);
+	AllocateCPU(ntiles, XParam.blksize, daady);
+
+	AllocateCPU(ntiles, XParam.blksize, b);
+	AllocateCPU(ntiles, XParam.blksize, dbdx);
+	AllocateCPU(ntiles, XParam.blksize, dbdy);
+
+	AllocateCPU(ntiles, XParam.blksize, c);
+	AllocateCPU(ntiles, XParam.blksize, dcdx);
+	AllocateCPU(ntiles, XParam.blkmemsize, dcdy);
+	T amp = T(1.0);
+	T cc = T(0.05);
+
+	T xorigin = 0.5;
+	T yorigin = 0.5;
+	int ib = 0;
+	int dx = 1 / (domainwidth * XParam.blkwidth);
+	for (int it = 0; it < domainwidth; it++)
+	{
+		for (int jt = 0; jt < domainwidth; jt++)
+		{
+			ib = ib + 1;
+			for (int i = 0; i < XParam.blkmemwidth; i++)
+			{
+				for (int j = 0; j < XParam.blkmemwidth; j++)
+				{
+					T x = (i - 1) * dx + it * XParam.blkwidth * dx;
+					T y = (j - 1) * dx + jt * XParam.blkwidth * dx;
+					int mla = i + j * XParam.blkmemwidth + ib * (XParam.blksize);
+					int mlc = i + j * XParam.blkmemwidth + ib * (XParam.blkmemsize);
+					a[mla] = amp * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (T(2.0) * cc * cc));
+					aa[mla] = amp * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (T(2.0) * cc * cc));
+					b[mla] = amp * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (T(2.0) * cc * cc));
+					c[mlc] = amp * exp(T(-1.0) * ((x - xorigin) * (x - xorigin) + (y - yorigin) * (y - yorigin)) / (T(2.0) * cc * cc));
+				}
+			}
+		}
+	}
+
+	
+
+
+
+	AllocateGPU(ntiles, XParam.blksize,a_g);
+	AllocateGPU(ntiles, XParam.blksize, aa_g);
+	AllocateGPU(ntiles, XParam.blksize, b_g);
+	AllocateGPU(ntiles, XParam.blkmemsize, c_g);
+
+	CUDA_CHECK(cudaMemcpy(a_g, a, ntiles * XParam.blksize * sizeof(T), cudaMemcpyHostToDevice));
+	CUDA_CHECK(cudaMemcpy(aa_g, aa, ntiles * XParam.blksize * sizeof(T), cudaMemcpyHostToDevice));
+	CUDA_CHECK(cudaMemcpy(b_g, b, ntiles * XParam.blksize * sizeof(T), cudaMemcpyHostToDevice));
+	CUDA_CHECK(cudaMemcpy(c_g, c, ntiles * XParam.blkmemsize * sizeof(T), cudaMemcpyHostToDevice));
+
+	AllocateGPU(ntiles, XParam.blksize, dady_g);
+	AllocateGPU(ntiles, XParam.blksize, daady_g);
+	AllocateGPU(ntiles, XParam.blksize, dbdy_g);
+	AllocateGPU(ntiles, XParam.blkmemsize, dcdy_g);
+
+	AllocateGPU(ntiles, XParam.blksize, dadx_g);
+	AllocateGPU(ntiles, XParam.blksize, daadx_g);
+	AllocateGPU(ntiles, XParam.blksize, dbdx_g);
+	AllocateGPU(ntiles, XParam.blkmemsize, dcdx_g);
 
 	// Allocate CUDA events that we'll use for timing
-	cudaEvent_t startA, startB, startC, startG, startGnew;
-	cudaEvent_t stopA, stopB, stopC, stopG, stopGnew;
+	cudaEvent_t startA, startB, startC, startD, startG, startGnew;
+	cudaEvent_t stopA, stopB, stopC, stopD ,stopG, stopGnew;
 
 	fillHalo(XParam, XModel.blocks, XModel.evolv, XModel.zb);
 
@@ -4041,7 +4121,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	// Record the start event
 	cudaEventRecord(startA, NULL);
-	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzbdx, XModel_g.grad.dzbdy);
+	gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)dx, a_g, dadx_g, dady_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
@@ -4064,7 +4144,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	// Record the start event
 	cudaEventRecord(startB, NULL);
-	gradientSM <<< gridDim, blockDim >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dzsdx, XModel_g.grad.dzsdy);
+	gradientSM <<< gridDim, blockDim >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)dx, aa_g, daadx_g, daady_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
@@ -4087,7 +4167,7 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 	// Record the start event
 	cudaEventRecord(startC, NULL);
-	gradientSMC <<< gridDim, blockDim >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel_g.zb, XModel_g.grad.dhdx, XModel_g.grad.dhdy);
+	gradientSMC <<< gridDim, blockDim >>> (XParam.halowidth, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)dx, b_g, dbdx_g, dbdy_g);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Record the stop event
@@ -4105,6 +4185,33 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 
 
 
+	///////////////////////////////////////
+	// Same as SMC but with coalesced memory access 
+	cudaEventCreate(&startD);
+
+
+	cudaEventCreate(&stopD);
+
+	// Record the start event
+	cudaEventRecord(startD, NULL);
+	gradientSMD << < gridDim, blockDim >> > (XParam.halowidth,XParam.blkmemsize, XModel_g.blocks.active, XModel_g.blocks.level, (T)XParam.theta, (T)dx, c_g, dcdx_g, dcdy_g);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	// Record the stop event
+	cudaEventRecord(stopD, NULL);
+
+	// Wait for the stop event to complete
+	cudaEventSynchronize(stopD);
+
+	float msecTotalSMC = 0.0f;
+	cudaEventElapsedTime(&msecTotalSMC, startD, stopD);
+
+	cudaEventDestroy(startD);
+	cudaEventDestroy(stopD);
+
+
+
+
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dudx, XModel_g.grad.dzbdx);
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dudy, XModel_g.grad.dzbdy);
 
@@ -4114,7 +4221,10 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dhdx, XModel_g.grad.dhdx);
 	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dhdy, XModel_g.grad.dhdy);
 
-	printf("Runtime : normal=%f, shared mem=%f, SharedmemB=%f in msec\n", msecTotalGrad, msecTotalSM, msecTotalSMB);
+	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dudx, XModel_g.grad.dudx);
+	CopyGPUtoCPU(XParam.nblkmem, XParam.blksize, XModel.grad.dudy, XModel_g.grad.dudy);
+
+	printf("Runtime : normal=%f, shared mem=%f, SharedmemB=%f, SMCoealesced=%f in msec\n", msecTotalGrad, msecTotalSM, msecTotalSMB, msecTotalSMC);
 
 	/*
 	creatncfileBUQ(XParam, XModel.blocks);

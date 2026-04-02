@@ -52,6 +52,7 @@ public:
 	int blkwidth = 16; //Block width in number of cells
 	int blkmemwidth = 0; // Calculated in sanity check as blkwidth+2*halowidth
 	int blksize = 0; // Calculated in sanity check as blkmemwidth*blkmemwidth
+	int blkmemsize = 0; // Calculated in sanity check as blkmemwidth*blkmemwidth+coalesce padding
 	int halowidth = 1; // Use a halo around the blocks default is 1 cell: the memory for each blk is 18x18 when blkwidth is 16
 
 

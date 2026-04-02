@@ -37,5 +37,7 @@ __host__ __device__ int memloc(int halowidth, int blkmemwidth, int i, int j, int
 template <class T> void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel);
 template <class T> void AllocateGPU(int nx, int ny, T*& z_g);
 template <class T> void AllocateMappedMemGPU(int nx, int ny, int gpudevice, T*& z_g, T* z);
+
+template <class T> __host__ size_t calculate_aligned_stride(int blocksize,  T sample);
 // End of global definition
 #endif
