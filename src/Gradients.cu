@@ -947,7 +947,7 @@ template <class T> __global__ void gradientSMD(int halowidth,int blkmemsize, int
 
 	int ism = ix + iy * blockDim.x;
 
-	int istore = ism + ib * (blkmemwidth * blkmemwidth);
+	//int istore = ism + ib * (blkmemwidth * blkmemwidth);
 	//(i + halowidth) + (j + halowidth) * blkmemwidth + ib * (blkmemwidth * blkmemwidth);
 	//memloc(halowidth, blkmemwidth, ix, iy, ib);
 
@@ -971,16 +971,21 @@ template <class T> __global__ void gradientSMD(int halowidth,int blkmemsize, int
 	//__shared__ T a_right[324];
 	//__shared__ T a_top[324];
 	//__shared__ T a_bot[324];
-	int tid = threadIdx.y * blockDim.x + threadIdx.x;
-	int threads_in_block = blockDim.x * blockDim.y;
-	int total_to_load = (blkmemwidth * blkmemwidth);//324
+	//int tid = threadIdx.y * blockDim.x + threadIdx.x;
+	//int threads_in_block = blockDim.x * blockDim.y;
+	//int total_to_load = (blkmemwidth * blkmemwidth);//324
 
-	for (int istore = tid; istore < total_to_load; istore += threads_in_block) {
-		// Direct linear mapping: global[0...N] -> shared[0...N]
-		// Since my_global_tile is 128-byte aligned, this warp-wide access is coalesced
-		a_s[istore] = my_global_a[istore];
+	//for (int istore = tid; istore < total_to_load; istore += threads_in_block) {
+	//	// Direct linear mapping: global[0...N] -> shared[0...N]
+	//	// Since my_global_tile is 128-byte aligned, this warp-wide access is coalesced
+	//	a_s[istore] = my_global_a[istore];
+	//}
+	a_s[ism] = my_global_a[ism];
+
+	if (ism < (324 - (flatenwidth)))
+	{
+		a_s[ism + flatenwidth] = my_global_a[ism + flatenwidth];
 	}
-
 
 	//(i + halowidth) + (j + halowidth) * blkmemwidth + ib * (blkmemwidth * blkmemwidth);
 	//memloc(halowidth, blkmemwidth, ix, iy, ib);

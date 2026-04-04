@@ -4019,8 +4019,8 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	T* aa_g, *daadx_g, *daady_g;
 	T* b_g,* dbdx_g, *dbdy_g;
 	T* c_g, *dcdx_g, *dcdy_g;
-	int ntiles = 4096;
-	int domainwidth = 64;
+	int ntiles = 1638400;
+	int domainwidth = 1280;
 
 	AllocateCPU(ntiles, XParam.blksize, a);
 	AllocateCPU(ntiles, XParam.blksize, dadx);
@@ -4034,8 +4034,8 @@ template <class T> int TestGradientSpeed(Param XParam, Model<T> XModel, Model<T>
 	AllocateCPU(ntiles, XParam.blksize, dbdx);
 	AllocateCPU(ntiles, XParam.blksize, dbdy);
 
-	AllocateCPU(ntiles, XParam.blksize, c);
-	AllocateCPU(ntiles, XParam.blksize, dcdx);
+	AllocateCPU(ntiles, XParam.blkmemsize, c);
+	AllocateCPU(ntiles, XParam.blkmemsize, dcdx);
 	AllocateCPU(ntiles, XParam.blkmemsize, dcdy);
 	T amp = T(1.0);
 	T cc = T(0.05);
