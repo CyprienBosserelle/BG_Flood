@@ -73,14 +73,14 @@ This is a relatively small model so we can force the netcdf variable to be saved
 
     smallnc=0
 
-Sepcify the model duration, output timestep and output file name and variables
+Specify the model duration, output timestep and output file name and variables
 
     endtime=1800
     outtimestep=10
     outfile=Jet_demo.nc
     outvars=zb,uu,vv,zs,vort;
 
-Specify absorbing boundaries for left and right (There is a wal at the top and bottom so no need to specify any boundary there).
+Specify absorbing boundaries for left and right (There is a wall at the top and bottom so no need to specify any boundary there).
 
     right = 3; # Absorbing bnd
     rightbndfile = right.bnd
@@ -116,7 +116,7 @@ Using Julia: See section below with the hotstart file.
 
 In any case you can pick up the file in the example folder.
 
-## Hortstart
+## Hotstart
 We want to setup a bump in the water level centered in the middle of the bathy. IN the example below this is done using Julia, but it should be easily done in Matlab or Python. Note that the script below also generates a bathymetry file.
 
 
