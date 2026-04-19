@@ -158,7 +158,7 @@ struct Forcing
 	DynForcingP<T> UWind;
 	DynForcingP<T> VWind;
 	//Forcing the Wind;
-	/*Spacially varying (.nc): 2 files are given, 1st file is U wind and second is V wind (no rotation of the data is performed)
+	/* Spatially varying (.nc): 2 files are given, 1st file is U wind and second is V wind (no rotation of the data is performed)
 	Spacially uniform (.txt): 1 file is given then a 3 column file is expected, showing time, windspeed and direction.
 	Wind direction is rotated (later) to the grid direction (using grdalpha input parameter)
 	Ex: Wind = mywind.nc?uw,mywind.nc?vw
@@ -168,9 +168,9 @@ struct Forcing
 	
 
 	DynForcingP<T> Rain;
-	/* This allow to force a time varying, space varying rain intensity on the model, in mm/h.
-	Spacially varrying (rain map), a netcdf file is expected (with the variable associated to the rain after "?").
-	Spacially uniform: the rain is forced using a time serie using a 2 column values table containing time (not necessary unformly distributed) and rain.
+	/* This allows to force a time varying, space varying rain intensity on the model, in mm/h.
+	Spatially varying (rain map), a netcdf file is expected (with the variable associated to the rain after "?").
+	Spatially uniform: the rain is forced using a time serie using a 2 column values table containing time (not necessarily uniformly distributed) and rain.
 	Ex: rain=rain_forcing.txt 
 	Ex: rain=rain_forcing.nc?RainIntensity
 	Default: None

@@ -20,7 +20,7 @@ Simply download and unzip the file in a suitable directory and either add the fo
 To build BG_Flood from source on Windows you will need to have pre-install:
 
 - Visual Studio Community with C++ component installed
-- Compatible (Cuda toolkit)[https://developer.nvidia.com/cuda-toolkit]
+- Compatible [CUDA Toolkit](https://developer.nvidia.com/cuda-toolkit)
 - Downloaded/cloned/forked source of the repo
 - Netcdf developer install (i.e. netcdf.h and netcdf.lib)
 
@@ -194,7 +194,7 @@ For more detailed information on each command, see their corresponding man pages
 
 
 ### NESI (Maui-Mahuika)
-!!! danger "Depreciated"
+!!! danger "Deprecated"
     NESI supercomputer has now been closed and replaced by REANZ new generation of machines.
 
 The code is actually running on [New Zealand eScience Infrastructure (NeSI)](https://www.nesi.org.nz).

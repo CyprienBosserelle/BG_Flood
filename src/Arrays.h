@@ -101,6 +101,8 @@ struct EvolvingP_M : public EvolvingP<T>
 {
 	/** Norm of the velocity */
 	T* U;
+	/** Direction of the velocity */
+	T* Udir;
 	/** Product of water depth and velocity norm */
 	T* hU;
 };

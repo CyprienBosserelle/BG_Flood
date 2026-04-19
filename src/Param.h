@@ -14,12 +14,12 @@ public:
 	int test = -1; //-1: no test, 99: run all independent tests, X: run test X
 	double g = 9.81; // Acceleration of gravity in m.s-2
 	double rho = 1025.0; // Fluid density in kg.m-3
-	double eps = 0.0001; // Drying height in m (if h<eps, the surface is concidered dry)
+	double eps = 0.0001; // Drying height in m (if h<eps, the surface is considered dry)
 	double dt = 0.0; // Model time step in s.
-	double CFL = 0.5; // Current Freidrich Limiter criterium (between 0 and 1. Higher values may make the model unstable)
+	double CFL = 0.5; // Current Friedrichs Limiter criterion (between 0 and 1. Higher values may make the model unstable)
 	double theta = 1.3; // Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).
-	double VelThreshold = -1.0; // Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off
-	int frictionmodel = 0; // Bottom friction model flag (-1: Manning model, 0: quadratic, 1: Smart roughtness length model)
+	double VelThreshold = -1.0; // Using Velocity threshold if the velocity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off
+	int frictionmodel = 0; // Bottom friction model flag (-1: Manning model, 0: quadratic, 1: Smart roughness length model)
 	double cf = 0.0001; // Bottom friction coefficient for the model (if constant)
 	double Cd = 0.002; // Wind drag coefficient
 	double il = 0.0; //Initial Loss value (if constant)
@@ -44,7 +44,7 @@ public:
 	int engine = 1; // 1: Buttinger-Kreuzhuber et al. 2019, 2: Kurganov (Popinet 2011), 3: KurganovATMP same as Kurganov but with atmospheric forcing terms 
 
 	//*Grid parameters
-	double dx = nan(""); // Grid resolution, in m for a metric grid or in decimal degree for a sperical grid.
+	double dx = nan(""); // Grid resolution, in m for a metric grid or in decimal degrees for a spherical grid.
 	double delta; // Grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0
 	int nx = 0; // Initial/input grid size (number of nodes) in x direction
 	int ny = 0; //Initial/input grid size (number of nodes) in y direction
@@ -61,14 +61,14 @@ public:
 	double xmax = nan(""); // Grid xmax (if not alter by the user, will be defined based on the topography/bathymetry input map)
 	double grdalpha = nan(""); // Grid rotation on Y axis from the North input in degrees but later converted to rad
 	int posdown = 0; // Flag for bathy input. Model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f
-	bool spherical = 0; // Flag for sperical coordinate (still in development)
+	bool spherical = 0; // Flag for spherical coordinate (still in development)
 	double Radius = 6371220.; //Earth radius [m]
 	double mask = 9999.0; //Mask any zb above this value. If the entire Block is masked then it is not allocated in the memory
 
 	//*Adaptation
 	int initlevel = 0; //Initial level of grid adaptation (based on dx if defined by the user or on the resolution of the topography/bathymetry input)
 	int maxlevel = -99999; //Maximum level for grid adaptation (overwrite the adaptation map if use) 
-	int minlevel = -99999; //Minumim level for grid adaptation (overwrite the adaptation map if use) 
+	int minlevel = -99999; //Minimum level for grid adaptation (overwrite the adaptation map if use) 
 	int nblkmem = 0;
 	int navailblk = 0;
 	double membuffer = 1.05; //Needs to allocate more memory than initially needed so adaptation can happen without memory reallocation
@@ -81,8 +81,8 @@ public:
 	double endtime = std::numeric_limits<double>::max(); // Total runtime in s, will be calculated based on bnd input as min(length of the shortest time series, user defined) and should be shorter than any time-varying forcing
 	double totaltime = 0.0; // Total simulation time in s
 	double inittime = 0.0; // Initital model time. At start of simulation inittime==totaltime
-	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) 
-	double dtmin = 0.0005; //Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)
+	double dtinit = -1; // Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initially) 
+	double dtmin = 0.0005; //Minimum accepted time steps in s (a lower value will be considered a crash of the code, and stop the run)
 	std::string reftime = ""; // Reference time string as yyyy-mm-ddTHH:MM:SS
 	std::string crs_ref = "no_crs"; //crs reference string 
 	//"PROJCS[\"NZGD2000 / New Zealand Transverse Mercator 2000\",GEOGCS[\"NZGD2000\",DATUM[\"New_Zealand_Geodetic_Datum_2000\",SPHEROID[\"GRS 1980\",6378137,298.257222101]],PRIMEM[\"Greenwich\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4167\"]],PROJECTION[\"Transverse_Mercator\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",173],PARAMETER[\"scale_factor\",0.9996],PARAMETER[\"false_easting\",1600000],PARAMETER[\"false_northing\",10000000],UNIT[\"metre\",1],AXIS[\"Northing\",NORTH],AXIS[\"Easting\",EAST],AUTHORITY[\"EPSG\",\"2193\"]]";
@@ -95,13 +95,13 @@ public:
 	bool botbnd = false; // bnd is forced (i.e. not a wall or neuman)
 
 	int aoibnd = 0; // Boundary type for AOI: 0=wall; 1 neumann; 3 absorbing
-	double bndrelaxtime = 3600.0; // Realxation time for absorbing boundary
+	double bndrelaxtime = 3600.0; // Relaxation time for absorbing boundary
 	double bndfiltertime = 60.0; // Filtering time for absorbing boundary
 
 	// deformation forcing for tsunami generation
 	//std::vector<deformmap> deform;
 	double deformmaxtime = 0.0; // time (s) after which no deformation occurs (internal parameter to cut some of the loops)
-	bool rainbnd = false; // when false it force the rain forcing on the bnd cells to be null.
+	bool rainbnd = false; // when false it forces the rain forcing on the bnd cells to be null.
 
 
 	//* Initialisation
@@ -147,7 +147,7 @@ public:
 	std::string outfile = "Output.nc"; // Netcdf output file name (if it exists, a number will be happened to the file name to not overwrite it)
 	std::vector<std::string> outvars; 
 	/*List of names of the variables to output (for 2D maps)
-	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm", "datmpdx","datmpdy","il","cl","hgw";
+	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "Umeandir", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "Umaxdir", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm", "datmpdx","datmpdy","il","cl","hgw";
 	Example: "outvars = zs,h,u,v,zb,hmax,Umax;"
 	Default: "zb", "zs", "u", "v", "h"
 	*/

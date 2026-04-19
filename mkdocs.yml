@@ -43,6 +43,7 @@ plugins:
 
 nav:
   - Home: 'index.md'
+  - Quick Start: 'QuickStart.md'
   #- TMP Examples of Mkdocs material: 'index.md'
   - Installation: 'Install.md'
   - Parameters list : 'ParametersList-py.md'

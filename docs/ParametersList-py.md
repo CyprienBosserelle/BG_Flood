@@ -1,4 +1,4 @@
-# Paramter and Forcing list for BG_Flood
+# Parameter and Forcing list for BG_Flood
 
 BG_flood user interface consists in a text file (`BG_param.txt` by default), associating key words to user chosen input parameters and forcing information.
 ## List of the input Parameters
@@ -10,12 +10,12 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 |test|test| -1|-1: no test, 99: run all independent tests, X: run test X|
 |g|g| 9.81|Acceleration of gravity in m.s-2|
 |rho|rho| 1025.0|Fluid density in kg.m-3|
-|eps|eps| 0.0001|Drying height in m (if h<eps, the surface is concidered dry)|
+|eps|eps| 0.0001|Drying height in m (if h<eps, the surface is considered dry)|
 |dt|dt| 0.0|Model time step in s.|
-|CFL|CFL| 0.5|Current Freidrich Limiter criterium (between 0 and 1. Higher values may make the model unstable)|
+|CFL|CFL| 0.5|Current Friedrichs Limiter criterion (between 0 and 1. Higher values may make the model unstable)|
 |theta|theta| 1.3|Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).|
-|VelThreshold| VelThreshold , vthresh , vmax , velmax | -1.0|Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off|
-|frictionmodel|frictionmodel| 0|Bottom friction model flag (-1: Manning model, 0: quadratic, 1: Smart roughtness length model)|
+|VelThreshold| VelThreshold , vthresh , vmax , velmax | -1.0|Using Velocity threshold if the velocity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off|
+|frictionmodel|frictionmodel| 0|Bottom friction model flag (-1: Manning model, 0: quadratic, 1: Smart roughness length model)|
 |cf| cf , roughness , cfmap | 0.0001|Bottom friction coefficient for the model (if constant)|
 |Cd|Cd| 0.002|Wind drag coefficient|
 |il| il , Rain_il , initialloss | 0.0|Initial Loss value (if constant)|
@@ -33,7 +33,7 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 ### Grid parameters
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
-|dx|dx| nan("")|Grid resolution, in m for a metric grid or in decimal degree for a sperical grid.|
+|dx|dx| nan("")|Grid resolution, in m for a metric grid or in decimal degrees for a spherical grid.|
 |nx|nx| 0|Initial/input grid size (number of nodes) in x direction|
 |ny|ny| 0|Initial/input grid size (number of nodes) in y direction|
 |xo| xo , xmin | nan("")|Grid x origin (if not alter by the user, will be defined based on the topography/bathymetry input map)|
@@ -42,7 +42,7 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 |xmax|xmax| nan("")|Grid xmax (if not alter by the user, will be defined based on the topography/bathymetry input map)|
 |grdalpha|grdalpha| nan("")|Grid rotation on Y axis from the North input in degrees but later converted to rad|
 |posdown|posdown| 0|Flag for bathy input. Model requirement is positive up  so if posdown ==1 then zb=zb*-1.0f|
-|spherical| spherical , geo | 0|Flag for sperical coordinate (still in development)|
+|spherical| spherical , geo | 0|Flag for spherical coordinate (still in development)|
 |Radius|Radius| 6371220.|Earth radius [m]|
 |mask|mask| 9999.0|Mask any zb above this value. If the entire Block is masked then it is not allocated in the memory|
 
@@ -51,28 +51,27 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 |---|---|---|---|
 |initlevel|initlevel| 0|Initial level of grid adaptation (based on dx if defined by the user or on the resolution of the topography/bathymetry input)|
 |maxlevel|maxlevel| -99999|Maximum level for grid adaptation (overwrite the adaptation map if use) |
-|minlevel|minlevel| -99999|Minumim level for grid adaptation (overwrite the adaptation map if use) |
+|minlevel|minlevel| -99999|Minimum level for grid adaptation (overwrite the adaptation map if use) |
 |membuffer|membuffer| 1.05|Needs to allocate more memory than initially needed so adaptation can happen without memory reallocation|
 
 ### Timekeeping
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
 |outputtimestep| outputtimestep , outtimestep , outputstep | 0.0|Number of seconds between netCDF outputs, 0.0 for none|
-|endtime| endtime , stoptime , end , stop , end_time , stop_time | 0.0|Number of seconds between netCDF outputs, 0.0 for none|
+|endtime| endtime , stoptime , end , stop , end_time , stop_time | 0.0|End time of the simulation in s|
 |totaltime| totaltime , inittime , starttime , start_time , init_time , start , init | 0.0|Total simulation time in s|
-|dtinit|dtinit| -1|Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initialement) |
-|dtmin|dtmin| 0.0005|Minimum accepted time steps in s (a lower value will be concidered a crash of the code, and stop the run)|
+|dtinit|dtinit| -1|Maximum initial time steps in s (should be positive, advice 0.1 if dry domain initially) |
+|dtmin|dtmin| 0.0005|Minimum accepted time steps in s (a lower value will be considered a crash of the code, and stop the run)|
 |reftime| reftime , referencetime , timeref | ""|Reference time string as yyyy-mm-ddTHH:MM:SS|
 |crs_ref| crs_ref , crs , spatialref , spatial_ref , wtk , crsinfo , crs_info | "no_crs"|crs reference string |
-|Toutput|Toutput| "no_crs"|crs reference string |
 
 ### Boundaries
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
 |aoibnd| aoibnd , remainderbnd , remainbndtype , aoibndtype | 0; // Boundary type for AOI: 0=wall; 1 neumann|3 absorbing|
-|bndrelaxtime|bndrelaxtime| 3600.0|Realxation time for absorbing boundary|
+|bndrelaxtime|bndrelaxtime| 3600.0|Relaxation time for absorbing boundary|
 |bndfiltertime|bndfiltertime| 60.0|Filtering time for absorbing boundary|
-|rainbnd| rainbnd , rainonbnd | false|when false it force the rain forcing on the bnd cells to be null.|
+|rainbnd| rainbnd , rainonbnd | false|when false it forces the rain forcing on the bnd cells to be null.|
 
 ###  Initialisation
 |_Reference_|_Keys_|_default_|_Explanation_|
@@ -86,6 +85,7 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 ### Outputs
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
+|Toutput|Toutput||Flexible time definition for outputs (nc files)<br>Example: "Toutput = 0.0:3600:7200,7000,7100; which mean every 3600s from 0 to 7200s, and the two times 7000 and 7100"<br>Default = First and last time steps<br>|
 |TSnodesout| TSnodesout , TSOutput |None<br>|Time serie output, giving a file name and a (x,y) position<br>(which will be converted to nearest grid position).<br>This keyword can be used multiple times to extract time series at different locations.<br>The data is stocked for each timestep and written by flocs.<br>The resulting file contains (t,zs,h,u,v)<br>Example: "TSnodesout = Offshore.txt,3101.00,4982.57" (*filename,x,y*)<br>|
 |outfile|outfile| "Output.nc"|Netcdf output file name (if it exists, a number will be happened to the file name to not overwrite it)|
 |outvars|outvars|"zb", "zs", "u", "v", "h"<br>|List of names of the variables to output (for 2D maps)<br>Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm", "datmpdx","datmpdy","il","cl","hgw";<br>Example: "outvars = zs,h,u,v,zb,hmax,Umax;"<br>|
@@ -128,9 +128,9 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 |bot| bot , botbndfile , botbnd , bottom |1|bot = 0;<br>bot = botBnd.txt,2;|Same as left boundary|
 |deform|deform|None|deform = myDeform.nc?z_def,3.0,10.0;<br>deform = *filename*, *time of initial rupture*, *rising time*;|Deform are maps to apply to both zs and zb; this is often co-seismic vertical deformation used to generate tsunami initial wave<br>Here you can spread the deformation across a certain amount of time and apply it at any point in the model.|
 |rivers| rivers , river |None|river = Votualevu_R.txt,1867430,1867455,3914065,3914090;<br>river = *Fluxfile*, *xstart*, *xend*, *ystart*, *yend*;|The river is added as a vertical discharge (m3/s) on a chosen area (the user input consists in a time serie and a rectangular area definition).<br>The whole cells containing the corners of the area will be included in the area, no horizontal velocity is applied.<br>To add multiple rivers, just add different lines in the input file (one by river).|
-|Wind| Wind , windfiles |None|Wind = mywind.nc?uw,mywind.nc?vw<br>Wind = MyWind.txt|Spacially varying (.nc): 2 files are given, 1st file is U wind and second is V wind (no rotation of the data is performed)<br>Spacially uniform (.txt): 1 file is given then a 3 column file is expected, showing time, windspeed and direction.<br>Wind direction is rotated (later) to the grid direction (using grdalpha input parameter)|
+|Wind| Wind , windfiles |None|Wind = mywind.nc?uw,mywind.nc?vw<br>Wind = MyWind.txt| Spatially varying (.nc): 2 files are given, 1st file is U wind and second is V wind (no rotation of the data is performed)<br>Spacially uniform (.txt): 1 file is given then a 3 column file is expected, showing time, windspeed and direction.<br>Wind direction is rotated (later) to the grid direction (using grdalpha input parameter)|
 |Atmp| Atmp , atmpfile |None|Atmp=AtmosphericPressure.nc?p| Atmospheric forcing file. The forcing pressure is expected to be in Pa and the effect of the atmospheric pressure gradient is calculated as the difference to a reference pressure Paref, converted to a height using the Pa2m parameter.|
-|Rain| Rain , rainfile |None|rain=rain_forcing.txt <br>rain=rain_forcing.nc?RainIntensity| This allow to force a time varying, space varying rain intensity on the model, in mm/h.<br>Spacially varrying (rain map), a netcdf file is expected (with the variable associated to the rain after "?").<br>Spacially uniform: the rain is forced using a time serie using a 2 column values table containing time (not necessary unformly distributed) and rain.|
+|Rain| Rain , rainfile |None|rain=rain_forcing.txt <br>rain=rain_forcing.nc?RainIntensity| This allows to force a time varying, space varying rain intensity on the model, in mm/h.<br>Spatially varying (rain map), a netcdf file is expected (with the variable associated to the rain after "?").<br>Spatially uniform: the rain is forced using a time serie using a 2 column values table containing time (not necessarily uniformly distributed) and rain.|
 
 
 ## List of the non-identified inputs
