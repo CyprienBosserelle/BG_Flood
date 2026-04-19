@@ -537,7 +537,7 @@ Param readparamstr(std::string line, Param param)
 			//Need to add more here
 
 
-			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","hmean","zsmean","umean","vmean","hUmean","Umean","hmax","zsmax","umax","vmax","hUmax","Umax","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw","hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy" };
+			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","hmean","zsmean","umean","vmean","hUmean","Umean","Umeandir","hmax","zsmax","umax","vmax","hUmax","Umax","Umaxdir","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw","hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy"};
 
 
 			std::string vvar = trim(vars[nv], " ");
@@ -558,6 +558,7 @@ Param readparamstr(std::string line, Param param)
 			param.outmean = (vvar.compare("umean") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("vmean") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("Umean") == 0) ? true : param.outmean;
+			param.outmean = (vvar.compare("Umeandir") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("hUmean") == 0) ? true : param.outmean;
 
 			param.outmax = (vvar.compare("hmax") == 0) ? true : param.outmax;
@@ -565,6 +566,7 @@ Param readparamstr(std::string line, Param param)
 			param.outmax = (vvar.compare("umax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("vmax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("Umax") == 0) ? true : param.outmax;
+			param.outmax = (vvar.compare("Umaxdir") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("hUmax") == 0) ? true : param.outmax;
 
 			param.outtwet = (vvar.compare("twet") == 0) ? true : param.outtwet;

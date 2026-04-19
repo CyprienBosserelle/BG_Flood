@@ -147,7 +147,7 @@ public:
 	std::string outfile = "Output.nc"; // Netcdf output file name (if it exists, a number will be happened to the file name to not overwrite it)
 	std::vector<std::string> outvars; 
 	/*List of names of the variables to output (for 2D maps)
-	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm", "datmpdx","datmpdy","il","cl","hgw";
+	Supported variables = "zb", "zs", "u", "v", "h", "hmean", "zsmean", "umean", "vmean", "hUmean", "Umean", "Umeandir", "hmax", "zsmax", "umax", "vmax", "hUmax", "Umax", "Umaxdir", "twet", "dhdx","dhdy","dzsdx","dzsdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm", "datmpdx","datmpdy","il","cl","hgw";
 	Example: "outvars = zs,h,u,v,zb,hmax,Umax;"
 	Default: "zb", "zs", "u", "v", "h"
 	*/

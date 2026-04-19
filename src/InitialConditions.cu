@@ -659,13 +659,23 @@ template<class T> void Initmaparray(Model<T>& XModel)
 
 	XModel.OutputVarMap["Umean"] = XModel.evmean.U;
 	XModel.Outvarlongname["Umean"] = "Mean velocity magnitude since last output";
-	XModel.Outvarstdname["Umean"] = "mean_velocity";
+	XModel.Outvarstdname["Umean"] = "mean_velocity_magnitude";
 	XModel.Outvarunits["Umean"] = "m s-1";
 
 	XModel.OutputVarMap["Umax"] = XModel.evmax.U;
 	XModel.Outvarlongname["Umax"] = "Maximum velocity magnitude since simulation start";
-	XModel.Outvarstdname["Umax"] = "maximum_velocity";
+	XModel.Outvarstdname["Umax"] = "maximum_velocity_magitude";
 	XModel.Outvarunits["Umax"] = "m s-1";
+
+	XModel.OutputVarMap["Umeandir"] = XModel.evmean.Udir;
+	XModel.Outvarlongname["Umeandir"] = "Mean velocity direction since last output";
+	XModel.Outvarstdname["Umeandir"] = "mean_velocity_direction";
+	XModel.Outvarunits["Umeandir"] = "rad";
+
+	XModel.OutputVarMap["Umaxdir"] = XModel.evmax.Udir;
+	XModel.Outvarlongname["Umaxdir"] = "Maximum velocity direction since simulation start";
+	XModel.Outvarstdname["Umaxdir"] = "maximum_velocity_direction";
+	XModel.Outvarunits["Umaxdir"] = "rad";
 
 	XModel.OutputVarMap["hUmean"] = XModel.evmean.hU;
 	XModel.Outvarlongname["hUmean"] = "Mean depth times velocity since last output";
