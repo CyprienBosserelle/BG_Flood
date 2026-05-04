@@ -14,6 +14,7 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 template <class T> void resetmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XModel, Model<T> XModel_g);
 template <class T> void Initmeanmax(Param XParam, Loop<T> XLoop, Model<T> XModel, Model<T> XModel_g);
 template <class T> void resetvalGPU(Param XParam, BlockP<T> XBlock, T*& var, T val);
+template <class T> void resetvalCPU(Param XParam, BlockP<T> XBlock, T*& var, T val);
 
 
 template <class T> __global__ void addavg_varGPU(Param XParam, BlockP<T> XBlock, T* Varmean, T* Var);
