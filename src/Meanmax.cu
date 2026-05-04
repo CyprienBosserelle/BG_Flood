@@ -70,6 +70,17 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 			//XLoop.nstep will be reset after a save to the disk which occurs in a different function
 		}
 
+		//Calculation of the mean velocity direction based on the mean projections (u and v)
+		if (XParam.GPUDEVICE >= 0)
+		{
+			calcdir_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmean.Udir, XModel_g.evmean.u, XModel_g.evmean.v);
+			CUDA_CHECK(cudaDeviceSynchronize());
+		}
+		else
+		{
+			calcdir_varCPU(XParam, XModel.blocks, XModel.evmean.Udir, XModel.evmean.u, XModel.evmean.v);
+		}
+
 	}
 	if (XParam.outmax)
 	{
@@ -79,7 +90,7 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 			max_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.zs, XModel_g.evolv.zs);
 			max_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.u, XModel_g.evolv.u);
 			max_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.v, XModel_g.evolv.v);
-			max_Norm_GPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.U, XModel_g.evolv.u, XModel_g.evolv.v);
+			max_Norm_GPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.U, XModel_g.evmax.Udir, XModel_g.evolv.u, XModel_g.evolv.v);
 			max_hU_GPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.hU, XModel_g.evolv.h, XModel_g.evolv.u, XModel_g.evolv.v);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
@@ -89,7 +100,7 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 			max_varCPU(XParam, XModel.blocks, XModel.evmax.zs, XModel.evolv.zs);
 			max_varCPU(XParam, XModel.blocks, XModel.evmax.u, XModel.evolv.u);
 			max_varCPU(XParam, XModel.blocks, XModel.evmax.v, XModel.evolv.v);
-			max_Norm_CPU(XParam, XModel.blocks, XModel.evmax.U, XModel.evolv.u, XModel.evolv.v);
+			max_Norm_CPU(XParam, XModel.blocks, XModel.evmax.U, XModel.evmax.Udir, XModel.evolv.u, XModel.evolv.v);
 			max_hU_CPU(XParam, XModel.blocks, XModel.evmax.hU, XModel.evolv.h, XModel.evolv.u, XModel.evolv.v);
 		}
 	}
@@ -222,6 +233,8 @@ template <class T> void resetmaxGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBloc
 	CUDA_CHECK(cudaDeviceSynchronize());
 	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.U);
 	CUDA_CHECK(cudaDeviceSynchronize());
+	reset_var << < gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, XLoop.epsilon, XEv.Udir);
+	CUDA_CHECK(cudaDeviceSynchronize());
 	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.hU);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -247,6 +260,7 @@ template <class T> void resetmaxCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBloc
 	InitArrayBUQ(XParam, XBlock, XLoop.hugenegval, XEv.u);
 	InitArrayBUQ(XParam, XBlock, XLoop.hugenegval, XEv.v);
 	InitArrayBUQ(XParam, XBlock, XLoop.hugenegval, XEv.U);
+	InitArrayBUQ(XParam, XBlock, XLoop.epsilon, XEv.Udir);
 	InitArrayBUQ(XParam, XBlock, XLoop.hugenegval, XEv.hU);
 
 }
@@ -271,6 +285,7 @@ template <class T> void resetmeanCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlo
 	InitArrayBUQ(XParam, XBlock, T(0.0), XEv.u);
 	InitArrayBUQ(XParam, XBlock, T(0.0), XEv.v);
 	InitArrayBUQ(XParam, XBlock, T(0.0), XEv.U);
+	InitArrayBUQ(XParam, XBlock, T(0.0), XEv.Udir);
 	InitArrayBUQ(XParam, XBlock, T(0.0), XEv.hU);
 
 }
@@ -298,6 +313,7 @@ template <class T> void resetmeanGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlo
 	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, T(0.0), XEv.u);
 	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, T(0.0), XEv.v);
 	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, T(0.0), XEv.U);
+	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XBlock.active, T(0.0), XEv.Udir);
 	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, T(0.0), XEv.hU);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -470,7 +486,7 @@ template <class T> __host__ void divavg_varCPU(Param XParam, BlockP<T> XBlock, T
 }
 
 /**
- * @brief CUDA kernel to compute velocity magnitude and hU product.
+ * @brief CUDA kernel to compute velocity magnitud and hU product.
  *
  * Calculates the velocity magnitude and its product with water depth for each cell on the GPU.
  *
@@ -494,9 +510,9 @@ template <class T> __global__ void addUandhU_GPU(Param XParam, BlockP<T> XBlock,
 	unsigned int ib = XBlock.active[ibl];
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-
-	U[i] = sqrt((u[i] * u[i]) + (v[i] * v[i]));
-	hU[i] = h[i] * U[i];
+	T U_loc = sqrt(u[i] * u[i] + v[i] * v[i]);
+	U[i] = U[i] + U_loc;
+	hU[i] = hU[i] + h[i] * U_loc;
 
 }
 
@@ -517,6 +533,7 @@ template <class T> __global__ void addUandhU_GPU(Param XParam, BlockP<T> XBlock,
 template <class T> __host__ void addUandhU_CPU(Param XParam, BlockP<T> XBlock, T* h, T* u, T* v, T* U, T* hU)
 {
 	int ib, n;
+	T U_loc;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
 	{
 		ib = XBlock.active[ibl];
@@ -527,13 +544,109 @@ template <class T> __host__ void addUandhU_CPU(Param XParam, BlockP<T> XBlock, T
 			{
 				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
 
-				U[i] = sqrt((u[i] * u[i]) + (v[i] * v[i]));
-				hU[i] = h[i] * U[i];
+				U_loc = sqrt(u[i] * u[i] + v[i] * v[i]);
+				U[i] = U[i] + U_loc;
+				hU[i] = hU[i] + h[i] * U_loc;
 			}
 		}
 	}
 
 }
+
+/**
+ * @brief CUDA kernel to compute direction value for a vector.
+ *
+ * Updates the direction value for each cell by comparing with the current value on the GPU.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param Vardir direction variable array
+ * @param Var1 Source variable array x projection
+ * @param Var2 Source variable array y projection
+
+ */
+template <class T> __global__ void calcdir_varGPU(Param XParam, BlockP<T> XBlock, T* Vardir, T* Var1, T* Var2)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	Vardir[i] = atan2(Var2[i], Var1[i]);
+
+}
+
+ /**
+ * @brief Compute direction value for a vector on the CPU.
+ *
+ * Updates the direction value for each cell by comparing with the current value using CPU routines.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XBlock Block data
+ * @param Vardir direction variable array
+ * @param Var1 Source variable array x projection
+ * @param Var2 Source variable array y projection
+ */
+template <class T> __host__ void calcdir_varCPU(Param XParam, BlockP<T> XBlock, T* Vardir, T* Var1, T* Var2)
+ {
+	 int ib;
+	 for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	 {
+		 ib = XBlock.active[ibl];
+
+		 for (int iy = 0; iy < XParam.blkwidth; iy++)
+		 {
+			 for (int ix = 0; ix < XParam.blkwidth; ix++)
+			 {
+				 int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+				 Vardir[i] = atan2(Var2[i], Var1[i]);
+			 }
+		 }
+	 }
+ }
+
+ /**
+  * @brief CUDA kernel to compute max velocity magnitude and direction.
+  *
+  * Updates the max velocity magnitude for each cell by comparing with the current value on the GPU.
+  *
+  * @tparam T Data type (float or double)
+  * @param XParam Model parameters
+  * @param XBlock Block data
+  * @param Varmax Max variable amplitude array
+  * @param Varmax Max variable direction array
+  * @param Var1 U-velocity array
+  * @param Var2 V-velocity array
+  */
+ template <class T> __global__ void max_Norm_GPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Vardir, T* Var1, T* Var2)
+ {
+	 T Var_norm;
+	 unsigned int halowidth = XParam.halowidth;
+	 unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+
+	 unsigned int ix = threadIdx.x;
+	 unsigned int iy = threadIdx.y;
+	 unsigned int ibl = blockIdx.x;
+	 unsigned int ib = XBlock.active[ibl];
+
+	 int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	 Var_norm = sqrt((Var1[i] * Var1[i]) + (Var2[i] * Var2[i]));
+	
+	 if (Var_norm > Varmax[i])
+	 {
+		 Varmax[i] = Var_norm;
+		 Vardir[i] = atan2(Var2[i], Var1[i]);
+	 }
+
+ }
 
 /**
  * @brief CUDA kernel to compute max value for a variable.
@@ -562,35 +675,6 @@ template <class T> __global__ void max_varGPU(Param XParam, BlockP<T> XBlock, T*
 
 }
 
-/**
- * @brief CUDA kernel to compute max velocity magnitude.
- *
- * Updates the max velocity magnitude for each cell by comparing with the current value on the GPU.
- *
- * @tparam T Data type (float or double)
- * @param XParam Model parameters
- * @param XBlock Block data
- * @param Varmax Max variable array
- * @param Var1 U-velocity array
- * @param Var2 V-velocity array
- */
-template <class T> __global__ void max_Norm_GPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Var1, T* Var2)
-{
-	T Var_norm;
-	unsigned int halowidth = XParam.halowidth;
-	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
-
-	unsigned int ix = threadIdx.x;
-	unsigned int iy = threadIdx.y;
-	unsigned int ibl = blockIdx.x;
-	unsigned int ib = XBlock.active[ibl];
-
-	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-	
-	Var_norm = sqrt((Var1[i] * Var1[i]) + (Var2[i] * Var2[i]));
-	Varmax[i] = max(Varmax[i], Var_norm);
-
-}
 
 /**
  * @brief CUDA kernel to compute max hU value.
@@ -662,11 +746,12 @@ template <class T> __host__ void max_varCPU(Param XParam, BlockP<T> XBlock, T* V
  * @tparam T Data type (float or double)
  * @param XParam Model parameters
  * @param XBlock Block data
- * @param Varmax Max variable array
+ * @param Varmax Max variable amplitude array
+ * @param Varmax Max variable direction array
  * @param Var1 U-velocity array
  * @param Var2 V-velocity array
  */
-template <class T> __host__ void max_Norm_CPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Var1, T* Var2)
+template <class T> __host__ void max_Norm_CPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Vardir, T* Var1, T* Var2)
 {
 	int ib, n;
 	T Var_norm;
@@ -680,7 +765,12 @@ template <class T> __host__ void max_Norm_CPU(Param XParam, BlockP<T> XBlock, T*
 			{
 				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
 				Var_norm = sqrt((Var1[i] * Var1[i]) + (Var2[i] * Var2[i]));
-				Varmax[i] = utils::max(Varmax[i], Var_norm);
+				
+				if (Var_norm > Varmax[i])
+				{
+					Varmax[i] = Var_norm;
+					Vardir[i] = atan2(Var2[i], Var1[i]);
+				}
 			}
 		}
 	}

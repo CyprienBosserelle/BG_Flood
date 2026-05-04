@@ -8,11 +8,11 @@ Here is a list of all the available tutorials:
 
 - [Jet tutorial (Julia)](tutorial/TutorialJetJulia.md): Simple tutorial presenting a jet simulation in BG_Flood. All imputs files are generated manually or with Julia.
 
-- [Gaussian wave](tutorial/Gaussian_Wave_Julia.md): Simple tutoral presenting a Gaussian wave propagation
+- [Gaussian wave](tutorial/Gaussian_Wave_Julia.md): Simple tutorial presenting a Gaussian wave propagation
 
 - [Transpacific tsunami](tutorial/Transpacific_tsunami.md): Simple tutorial presenting a transpacific tsunami propagation
 
-- Monia tutorial (Julia) (still in construction)
+- Monai tutorial (Julia) (still in construction)
 
 ### Real configuration tutorials
 

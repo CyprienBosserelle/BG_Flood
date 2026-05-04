@@ -23,7 +23,7 @@ BG_Flood is a hydrodynamics model for simulating 2D depth-averaged flow. The fol
 ## Model controls
 BG_Flood model reads an instruction file (or *param* file) that tells the model what to do and what forcing files to read. when instructions are not explicitely given the model will use the default value. How to use the param file is important for making BG_Flood do what you want it to do.
 
-By default this instruction file is called ```BG_param.txt```and is the file BG_Flood will be looking for if it is launched without aregument. You can specify any filename you like if you launch BG_Flood this way:
+By default this instruction file is called ```BG_param.txt```and is the file BG_Flood will be looking for if it is launched without argument. You can specify any filename you like if you launch BG_Flood this way:
 
 ```
 ./BG_Flood my_param_file.txt
@@ -86,7 +86,7 @@ This input file is critical as it defines the extent of the model grid and the b
 
 !!! info "BG_Flood generates its own mesh"
 
-BG_Flood generates its own mesh based on the a referrence point, size and resolution ( by default extracted from the DEM (Digital Elevation Model) extent and resolution). 
+BG_Flood generates its own mesh based on a reference point, size and resolution ( by default extracted from the DEM (Digital Elevation Model) extent and resolution). 
 The extent of the mesh and resolution of the mesh can be overridden by the user via several options. The mesh can also be refined/coarsen in areas or following patterns prescribed by the user.
 
 The mesh is a Block Uniform Quadtree. Meaning that it is a domain similar to a quadtree except that each element of the quadtree is a regular cartesian grid of 16x16 elements.
@@ -98,7 +98,7 @@ The mesh is a Block Uniform Quadtree. Meaning that it is a domain similar to a q
 
 By default, the mesh origin, extent, and resolution are read from the DEM. when several DEMs are used (see #Bathymetry/topography files) the model domain is extracted from the first(closer to the top of the file) dem specified.
 
-THe domain can be adjusted by specifying (one or more) coordinates of the bounding box of the domain such as:
+The domain can be adjusted by specifying (one or more) coordinates of the bounding box of the domain such as:
 
 ```
 xo = 1.0;
@@ -113,17 +113,17 @@ In the case above BG_Flood will create a grid that has a bottom left corner at t
 
 ### Resolution
 
-The base (or reference) resolution is specified by `dx. By default it is the same as the DEM but can be overule. This is useful when testing the model with a coarser mesh for a quick run.
+The base (or reference) resolution is specified by `dx. By default it is the same as the DEM but can be overridden. This is useful when testing the model with a coarser mesh for a quick run.
 
 BG_Flood can build a refine mesh. In this case `dx` is the resolution of the reference level of refinement (level 0). Level 1 of refinement has a resolution of `0.5*dx`, level 2 is `0.25*dx`, level -1 is `2*dx` etc...
 
 BG_Flood will automatically calculate the topography values at each mesh nodes from the DEM. This step can require interpolation (when DEM is coarser or out of phase with the DEM) or averaging (when the mesh is coarser than the DEM). 
 !!! danger "Beware of aliasing"
-  interpolating and averaging can lead to aliasing so 
+    Interpolating and averaging can lead to aliasing, so the mesh resolution should ideally be close to or coarser than the DEM resolution for best results.
  
 #### top and right domain extend will not necessarily be what you specify
 The ```(xmax,ymax)``` is at least reached because the final extent of the domain depends on what resolution (`dx`) is specified and the mesh block size so that the domain covers a round number of blocks. The mesh requires strictly compatible extent, resolution and round number of block in both `x` and `y` directions.
-While this is sometimes confusing to acheive exactly, BG_Flood automatically adjust `xmax` and `ymax` to produce the mesh domain compatible with `dx` and the block size. Thus `xo`, `yo` and `dx` are always enforced.
+While this is sometimes confusing to achieve exactly, BG_Flood automatically adjust `xmax` and `ymax` to produce the mesh domain compatible with `dx` and the block size. Thus `xo`, `yo` and `dx` are always enforced.
 
 !!! danger "Beware"
     When specifying `xo`, `yo`, `xmax`, `ymax` outside of the DEM extent, BG_Flood will extrapolate the values of forcing and DEM by repeating the values on the edge of the DEM domain. 
@@ -134,7 +134,7 @@ While this is sometimes confusing to acheive exactly, BG_Flood automatically adj
 
 ### Area of Interest: polygonal extent
 
-Instsead of a rectangular extent BG_Flood can build a mesh based on a polygon domain.
+Instead of a rectangular extent BG_Flood can build a mesh based on a polygon domain.
 
 By specifying ```aoi = mydomain.xy``` BG_Flood will first build a virtual mesh but only keep the block that are inside or intersect the specified polygon.
 
@@ -150,7 +150,7 @@ The AOI is prefered other the mask method as the later can create waterfalls on 
 There are no fancy treatment of the boundaries of masked blocks so it is safer to select a mask threshold (`mask`) to keep most of the masked are dry. If water tries to cross to a masked block, The boundary of blocks are treated as Neumann (no gradient) boundaries so the bathymetry of the 2 cells adjacent to a masked block are set to the same value (the value of the second cell removed from the masked block). 
 
 #### Example
-Below is an example of di
+Below is an example of different masking configurations.
 
 ## Boundaries
 Four type of boundaries can be applied at the edge of the model. By default neumann (no perpendicular gradient) is applied. 
@@ -159,10 +159,10 @@ Four type of boundaries can be applied at the edge of the model. By default neum
 - 0: No slip (wall)
 - 1: Neumann
 - 2: dirichlets (water level )
-- 3: Absorbing (only 1D/perpendicular absorbion is implemented)
+- 3: Absorbing (only 1D/perpendicular absorption is implemented)
 - (4: 2D Absorbing (Not implemented yet))
 
-For Boundary type 2 and 3 (Dirichlet and Absorbing) the level at the boundary level is imposed from a file so a file needs to be sepcified:
+For Boundary type 2 and 3 (Dirichlet and Absorbing) the level at the boundary level is imposed from a file so a file needs to be specified:
 ```{txt}
     left = 1;
     right = mybndfile.txt,3;
@@ -217,7 +217,7 @@ Bottom friction is applied implicitly in the model (applied to velocities after 
 There are 3 friction equations implemented defined in `BG_param.txt` as:
 
 * ```frictionmodel = 0```: Basic Quadratic friction law (expecting the non-dimensional friction coefficient $c_f$ )
-* ```frictionmodel = 1```: Roughtness length model from Smart (expecting a $z_0$ parameter in $c_f$)
+* ```frictionmodel = 1```: Roughness length model from Smart (expecting a $z_0$ parameter in $c_f$)
 * ```frictionmodel = -1```: Manning's friction model (expecting a Manning n parameter $c_f$)
 Quadratic friction is the default, with a uniform friction coefficient:
 
@@ -333,13 +333,13 @@ The max can be calculated for the overall simulation (default) or between output
 | zsmax     | Maximum Water level elevation above datum | [m] |
 
 #### Risk assesment related output
-These variables are used to evaluate the damage resulting from the innundation (as a complement to hmax for example).
+These variables are used to evaluate the damage resulting from the inundation (as a complement to hmax for example).
 
 | Parameter                 | Definition          |     Unit         |
 | ------------------------ |:----------------:|---------------------:|
 | hUmax       | Maximum of h time the velocity (U for amplitude of (u,v)) | [m2/s] |
 | Umax       | Maximum of the velocity (U for amplitude of (u,v)) | [m/s] |
-| twet       | Duration innundation of the cell in s (h>0.1m)  | [s] |
+| twet       | Duration of inundation of the cell in s (h>0.1m)  | [s] |
 
 #### Model related outputs
 These outputs  will be produce only if the associated model/forcing is used.
@@ -369,8 +369,8 @@ Terms of the equation can also been output such as the gradients (for error trac
 | dudx / dudy       | Gradient of x-velocity (u) in the x and y direction respectively  | [s-1] |
 | dvdx / dvdy       | Gradient of y-velocity (v) in the x and y direction respectively  | [s-1] |
 | Fhu / Fhv       | Flux of h time u in the x and y direction respectively  | [m2/s2] |
-| Fqux / Fqvx       |  XXXXXXXXXXXX | [XXX] |
-| Su / Sv       | Topographic source term  | [XXX] |
+| Fqux / Fqvx       |  Flux of qu in x and qv in x direction respectively | [m3/s3] |
+| Su / Sv       | Topographic source term  | [m/s2] |
 | dh       | Variation in elevation  | [m] |
 | du / dv       | Variation of the x- and y-velocity respectively  | [m/s] |
 
@@ -384,17 +384,17 @@ TSnodesout=Offshore.txt,xloc,yloc;
 ```
 The file contains 5 colums $(t, zs, h, u,v)$ with the value at the nearest grid point (to the position defined by the user).
 
-## Adaptative grid
-At the stage of development, the code will adapt the grid only before the computation but not along the calcul.
+## Adaptive grid
+At the stage of development, the code will adapt the grid only before the computation but not along the calculation.
 
 The code is based on a Block-uniform quadtree mesh. Each block, actually a 16 by 16 cells, is one unit of computation in the GPU.
 These blocks can have different resolutions (but the resolution does not change during the computation at this stage).
 
-By default, the initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can weather use the ```dx``` key word and choose a new resolution for the whole domain; wether use different levels of resolution. 
-The reference level, correponding to the bathymetry resolution or $dx$ if defined by the user, will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  $n$ , the resolution  $dx_n$
+By default, the initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can either use the ```dx``` key word and choose a new resolution for the whole domain; or use different levels of resolution. 
+The reference level, corresponding to the bathymetry resolution or $dx$ if defined by the user, will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  $n$ , the resolution  $dx_n$
   will be:
 $$
-dx_n=$rac{dx_0}{2^n}
+dx_n=\frac{dx_0}{2^n}
 $$
  
 with  $dx_0$ the resolution at level 0. 
@@ -402,10 +402,10 @@ with  $dx_0$ the resolution at level 0.
 When refinning using the level implementation, different key words are expected:
 
 - ```Initlevel```: level used to create the first mesh created by the code in the mesh refinement process (only a technical information)
-- ```Maxlevel```: maximim level of refinement (over-ruling other commands)
+- ```Maxlevel```: maximum level of refinement (over-ruling other commands)
 - ```Minlevel```: minimum level of refinement (over-ruling other commands)
 
-The grid can also be unregular with an adaptition of the grid to the model (variables at initialisation step or user-defined refinement map). In this case, the cells will be devided in 4 cells for refinement, or 4 cells merged in one for coarsening. The code will ensure a progressive change of resolution (no cell should have a neighbour with more than 1 level of resolution of difference.)
+The grid can also be irregular with an adaptation of the grid to the model (variables at initialisation step or user-defined refinement map). In this case, the cells will be devided in 4 cells for refinement, or 4 cells merged in one for coarsening. The code will ensure a progressive change of resolution (no cell should have a neighbour with more than 1 level of resolution of difference.)
 
 The different methods of refinement available in the code are called using the key word "Adaptation". The refinement can be based on a classical input variable or a variable calculated during the initialisation:
 

@@ -76,14 +76,14 @@ This is a relatively small model so we can force the netcdf variable to be saved
 ``` txt
     smallnc=0
 ```
-Sepcify the model duration, output timestep and output file name and variables
+Specify the model duration, output timestep and output file name and variables
 ``` txt
     endtime=1800
     outtimestep=10
     outfile=Jet_demo.nc
     outvars=zb,uu,vv,zs,vort;
 ```
-Specify absorbing boundaries for left and right (There is a wal at the top and bottom so no need to specify any boundary there).
+Specify absorbing boundaries for left and right (There is a wall at the top and bottom so no need to specify any boundary there).
 ``` txt
     right = 3; # Absorbing bnd
     rightbndfile = right.bnd

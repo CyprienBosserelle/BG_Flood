@@ -4,7 +4,7 @@
 # <span style="color: blue;">Welcome to the BG_Flood documentation !</span>
 BG-Flood is a Shallow Water Equation (SWE) model based on the St Venant formulation of [Basilisk](http://basilisk.fr/) but applied to a Block Uniform Quadtree memory structure on the GPU (based on [Vacondio _et al._](https://dl.acm.org/citation.cfm?id=3031292)). The code is a shock-capturing finite volume water solver, design to handle complex topography.
 
-The model is designed to simulate [flood/inundation](https://english.stackexchange.com/questions/131195/difference-between-flooding-and-inundation) caused by tsunami, river, rain, tide or storm surge (from wind stress or atmospherique pressure differential) or any combination of these. The model does not (yet) include the effect of wind waves. The model is not restricted to simulating inundation hazard and can also be used for depth averaged circulation simulation. 
+The model is designed to simulate [flood/inundation](https://english.stackexchange.com/questions/131195/difference-between-flooding-and-inundation) caused by tsunami, river, rain, tide or storm surge (from wind stress or atmospheric pressure differential) or any combination of these. The model does not (yet) include the effect of wind waves. The model is not restricted to simulating inundation hazard and can also be used for depth averaged circulation simulation. 
 
 !!! info 
     This wiki is to help users getting started on using the model. 
@@ -12,7 +12,7 @@ The model is designed to simulate [flood/inundation](https://english.stackexchan
     If you have any issue/question post it on the issue board. While the model is fairly user friendly, it was designed for users with a basic understanding of hydrodynamics and some experience in modelling. The wiki (and the model) expect that users have some experience in basic file manipulations and are comfortable with handling NetCDF files for input and output.
 
 
-This code is an open-source shallow water solver. Designed to be fast, it run on GPUs and generate its own adaptative mesh. It is mainly used in a context of flooding:
+This code is an open-source shallow water solver. Designed to be fast, it runs on GPUs and generates its own adaptive mesh. It is mainly used in a context of flooding:
 
 - Fresh water flooding (fluvial and pluvial)
 - Tides and storm-surges
@@ -68,7 +68,7 @@ BG-Flood has now reach the first release stage but some further development are 
 - [x] Block Uniform formulation at constant level with masked blocks (with a full swing of _user friendly_ capabilities)
 - [x] Static Block uniform Quad-tree formulation (i.e. adapted mesh at the first step only), grid self-generated
 - [x] Set of core solvers:
-    * [x] Reimann
+    * [x] Riemann
     * [x] Kurganov
 - [x] Multi-forcings
     * [x] River input

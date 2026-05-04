@@ -1,23 +1,23 @@
 # River flooding tutorial
 
-The objectif of this tutorial is to explain how to use the code BG_Flood to model river flooding.
+The objective of this tutorial is to explain how to use the code BG_Flood to model river flooding.
 As the code allows rain on grid, we will look at pluvial and fluvial flooding.
 
 This testcase aims to broadly reproduce the flooding event that occured from the 16 to the 18 of July 2021 (a 1 in 50 year flood event). 
 During this event, the Buller river, passing through the town of Westport, on the West Coast of the South Island of Aotearoa New Zealand, get out of its primary bed and flooded the Westport area.
 
 !!! info "Prerequisite"
-     Before begining this tutoral, the user is expected to have downloaded the windows executable ([last release](https://github.com/CyprienBosserelle/BG_Flood/releases/latest) on github) or compiled the sources (version > 0.8) of the BG_flood code on linux.
+     Before beginning this tutorial, the user is expected to have downloaded the windows executable ([last release](https://github.com/CyprienBosserelle/BG_Flood/releases/latest) on github) or compiled the sources (version > 0.8) of the BG_flood code on linux.
 
 During this tutorial, we will build, step by step, a test case. A relatively simple testcase will be build first. Then an example with more complex rain, tidal boundaries inputs will also be shared and explained.
 
 
 ## Param file
 The interface with BG_flood software is done using only a text file: `BG_param.txt`
-(This is the name of the input parameter file by defauls, an other name can be use as first variable when lauching BG_Flood.)
+(This is the name of the input parameter file by default, another name can be used as first variable when launching BG_Flood.)
 
 This file consists in a list of key words and inputs, separated by a "=" sign. 
-For a full list of the available key words and a further description of this file, please refer to the [parameter list]{../ParametersList-py.md} and the [manual]{../Manual.md}.
+For a full list of the available key words and a further description of this file, please refer to the [parameter list](../ParametersList-py.md) and the [manual](../Manual.md).
 
 ### Preparation of the topography/bathymetry (DEM: Digital Elevation Model)
 The DEM, topography or bathymetry file is the only necessary file to be added to BG_param file to run the model.
@@ -36,7 +36,7 @@ Without further information, the code will run will default values for physical 
 ![shell](../figure/Shell_output.png)
 
 
-A result files: `output.nc` is created (here opened with the [PyNcView]{https://pyncview.software.informer.com/}) 
+A result files: `output.nc` is created (here opened with the [PyNcView](https://pyncview.software.informer.com/)) 
 
 ![outputs](../figure/outputs.png)
 
@@ -100,7 +100,7 @@ The end of the simulation is prescribed in second as :
 endtime = 21600;
 ```
 
-The time steps can't be defined by the used, it will be automatically computed as the more restrictive one in the domain by the solver, using the prescribe CFL (Current Friedrich Limiter) value, $CFL=0.5000$ by default.
+The time steps can't be defined by the user, it will be automatically computed as the more restrictive one in the domain by the solver, using the prescribed CFL (Courant-Friedrichs-Lewy) value, $CFL=0.5000$ by default.
 
 The simulation begin, by default at $t=0(s)$, but this can modify using "totaltime": 
 ``` txt 
@@ -156,7 +156,7 @@ For a first test, we will modify the resolution and set it to 40m to decrease th
 dx=40;
 ```
 
-### Basic fluvial innundation results
+### Basic fluvial inundation results
 This the shell output:
 ![shell2](../figure/Shell_output2.png)
 It shows that 1 river has been added to the model, and also the time progression with 5 map outputs (in addition to the initial time step).
@@ -263,7 +263,7 @@ doubleprecision = 1;
 ``` txt 
 theta=1.3; #default value=1.3
 ```
-- Minimum heigh to concidere a cell wet (m)
+- Minimum height to consider a cell wet (m)
 ``` txt 
 eps = 0.00010000; #default=0.0001
 ```
@@ -318,7 +318,7 @@ AOI=Domain_buffered-sea2.gmt;
 The code is based on a Block-uniform quadtree mesh. Each block, actually a 16 by 16 cells, is one unit of computation in the GPU.
 These blocks can have different resolutions (but resolution does not change during the computation at this stage).
 
-The initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can weather use the "dx" key word and choose a new resolution for the whole domain; wether use the levels of resolution. The reference level, correponding to the bathymetry resolution will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  $n$ , the resolution  $dx_n$ will be:
+The initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can either use the "dx" key word and choose a new resolution for the whole domain; or use the levels of resolution. The reference level, corresponding to the bathymetry resolution will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  $n$ , the resolution  $dx_n$ will be:
 $$
 dx_n=\frac{dx_0}{2^n}
 $$
@@ -328,15 +328,15 @@ with  $dx_0$ the resolution at level 0.
 When refinning using the level implementation, different key words are expected:
 
 - `Initlevel`: level used to create the first mesh created by the code in the mesh refinement process
-- `Maxlevel`: maximim level of refinement (over-ruling other commands)
+- `Maxlevel`: maximum level of refinement (over-ruling other commands)
 - `Minlevel`: minimum level of refinement (over-ruling other commands)
 
-The grid can also be unregular with an adaptition of the grid to the model (variables at initialisation step or user-defined refinement map). In this case, the cells will be devided in 4 cells for refinement, or 4 cells merged in one for coarsening. The code will ensure a progressive change of resolution (no cell should have a neighbour with more than 1 level of resolution of difference.)
+The grid can also be irregular with an adaptation of the grid to the model (variables at initialisation step or user-defined refinement map). In this case, the cells will be devided in 4 cells for refinement, or 4 cells merged in one for coarsening. The code will ensure a progressive change of resolution (no cell should have a neighbour with more than 1 level of resolution of difference.)
 
 The different methods of refinement available in the code are called using the key word "Adaptation". The refinement can be based on a classical input variable or a variable calculated during the initialisation:
 
 - `Threshold`: impose a threshold for a different level of resolution
-- `Inrange`: impose a range for a different level of resolutuion or it can be defined using a map of target levels for refinement:
+- `Inrange`: impose a range for a different level of resolution or it can be defined using a map of target levels for refinement:
 - `Targetlevel`: the levels of resolution will be targeted but will be overruled by the maxlevel, minlevel entrance.
 
 To refine the grid for this case, we will use the *former coarse simulation* and create a map for values where hmax is strictly positive (and/or $umax$,$vmax$ different from zero), after removing the sea area. 

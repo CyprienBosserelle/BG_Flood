@@ -17,6 +17,10 @@
 
 #include "ReadInput.h"
 
+// Flag set by findparameter() when a keyword match is found.
+// Used by Readparamfile() to detect unrecognized keywords.
+static bool g_parameterMatched = false;
+
 // Collection of functions to read input to the model
 
 
@@ -126,8 +130,25 @@ void Readparamfile(Param& XParam, Forcing<float>& XForcing, std::string Paramfil
 			//Get param or skip empty lines
 			if (!line.empty() && line.substr(0, 1).compare("#") != 0)
 			{
+					// Reset match flag before processing this line
+				g_parameterMatched = false;
+
 				XParam = readparamstr(line, XParam);
 				XForcing = readparamstr(line, XForcing);
+
+				// Warn if the line has an '=' sign but no keyword was matched
+				if (!g_parameterMatched)
+				{
+					std::vector<std::string> splittedline = split(line, '=');
+					if (splittedline.size() > 1)
+					{
+						std::string keyword = trim(splittedline[0], " ");
+						if (!keyword.empty())
+						{
+							log("WARNING: Unrecognized parameter keyword \"" + keyword + "\" in line: " + line);
+						}
+					}
+				}
 
 				//std::cout << line << std::endl;
 			}
@@ -516,7 +537,7 @@ Param readparamstr(std::string line, Param param)
 			//Need to add more here
 
 
-			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","hmean","zsmean","umean","vmean","hUmean","Umean","hmax","zsmax","umax","vmax","hUmax","Umax","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw","hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy" };
+			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","hmean","zsmean","umean","vmean","hUmean","Umean","Umeandir","hmax","zsmax","umax","vmax","hUmax","Umax","Umaxdir","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw","hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy"};
 
 
 			std::string vvar = trim(vars[nv], " ");
@@ -537,6 +558,7 @@ Param readparamstr(std::string line, Param param)
 			param.outmean = (vvar.compare("umean") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("vmean") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("Umean") == 0) ? true : param.outmean;
+			param.outmean = (vvar.compare("Umeandir") == 0) ? true : param.outmean;
 			param.outmean = (vvar.compare("hUmean") == 0) ? true : param.outmean;
 
 			param.outmax = (vvar.compare("hmax") == 0) ? true : param.outmax;
@@ -544,6 +566,7 @@ Param readparamstr(std::string line, Param param)
 			param.outmax = (vvar.compare("umax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("vmax") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("Umax") == 0) ? true : param.outmax;
+			param.outmax = (vvar.compare("Umaxdir") == 0) ? true : param.outmax;
 			param.outmax = (vvar.compare("hUmax") == 0) ? true : param.outmax;
 
 			param.outtwet = (vvar.compare("twet") == 0) ? true : param.outtwet;
@@ -1673,6 +1696,7 @@ double setendtime(Param XParam, Forcing<float> XForcing)
  * @brief Find and extract the value of a specified parameter from a configuration line.
  * This function searches for a specified parameter in a given line of text,
  * and extracts its associated value if found. It handles comments and whitespace appropriately.
+ * Sets g_parameterMatched = true when a keyword match is found.
  * @param parameterstr The parameter name to search for.
  * @param line The line of text to search within.
  * @return The extracted parameter value as a string, or an empty string if the parameter is not found.
@@ -1704,8 +1728,7 @@ std::string findparameter(std::vector<std::string> parameterstr, std::string lin
 		}
 		if (found == 0) // found the parameter
 		{
-			//std::cout <<"found LonMin at : "<< found << std::endl;
-			//Numberstart = found + parameterstr.length();
+			g_parameterMatched = true;
 
 			
 			splittedstrnohash = split(right, '#');

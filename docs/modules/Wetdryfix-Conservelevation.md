@@ -3,7 +3,7 @@
 
 At the interface of coarse and fine blocks we often cannot **strictly** conserve both mass (h) and water elevation. The difference in most cases is relatively small but near the wet/dry interface, trying to conserve mass leads to instabilities. Since these instabilities are a bit annoying by default BG_Flood enforces the conservation of elevation at the interface between coarse and fine blocks where wet and dry cells are present. This might lead to a mismatch between the expected volume and actual volume when simulating rain or river flooding. Similarly, ignoring the conserve elevation requirement when simulating a tsunami can lead to a underestimate of the tsunami. The impact of these switch is small and we can show how small they are below.
 
-Below are two examples of basic flood model to test the impact of the wet/dry instability fix (hereafter wetdryfix) on mass conservation. Further below is to test the impact of the wetdryfix and conserve elevation routimne (hereafter conserveElevation) on a tsunami wave propagating on a real steep bathymetry (Samoa).
+Below are two examples of basic flood model to test the impact of the wet/dry instability fix (hereafter wetdryfix) on mass conservation. Further below is to test the impact of the wetdryfix and conserve elevation routine (hereafter conserveElevation) on a tsunami wave propagating on a real steep bathymetry (Samoa).
 
 
 

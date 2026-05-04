@@ -15,7 +15,7 @@ Using Julia: See section below with the hotstart file.
 
 In any case you can pick up the file in the example folder.
 
-## Hortstart
+## Hotstart
 We want to setup a bump in the water level centered in the middle of the bathy. IN the example below this is done using Julia, but it should be easily done in Matlab or Python. Note that the script below also generates a bathymetry file.
 
 ``` julia

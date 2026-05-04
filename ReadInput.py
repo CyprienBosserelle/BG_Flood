@@ -8,8 +8,8 @@ Creation of a md table containing the input parameters and their description.
 This table is based only on BG_Flood files used to read, allocate and initiate 
 the code variables.
 First, the ReadInput.cu file is used to get the list of available input keys
-and code variable associated to the "param" and "forcing" objects. We concidere 
-that the fist input key correspond to the variable name.
+and code variable associated to the "param" and "forcing" objects. We consider 
+that the first input key correspond to the variable name.
 Then, having the list of keys and their associated variable, the "Param.h"/"Forcing.h"
 files are used to get the description of the variable, default value, and possibly 
 examples.
@@ -103,13 +103,13 @@ for ind in range(len(ref_name)):
     if (refword in myParams):
         #Domain='Param'
         com=[]
+        Line=-1
         for i in range(len(P_lines)):
             line=P_lines[i]
-            if 'std' in line:
-                found=re.findall(rf"\s*std.*\s* {re.escape(refword)}\s*=*(.*);\s*(\/\/)*\s*(.*)" , line)
-            else:
-                found=re.findall(rf"\s*\w\s* {re.escape(refword)} \s*=*(.*);\s*(\/\/)*\s*(.*)" , line)
-            #found=re.findall(rf"\.*{re.escape(refword)}\s*=*\s*([^\s]+)*;\s*(//)*\s*(.*)" , line)
+            # Match variable declarations: type varname = value; // comment
+            # Handles std::string, double, int, bool, float, etc.
+            # Use word boundary \b to avoid partial matches (e.g. 'dt' matching 'dtmin')
+            found=re.findall(rf"\s*\w[\w:<>]*\s+{re.escape(refword)}\b\s*=*(.*);\s*(\/\/)*\s*(.*)" , line)
             if len(found) > 0:
                 com=found[0]
                 Line=i
@@ -140,11 +140,12 @@ for ind in range(len(ref_name)):
         if com:
             Comment=Comment + '<br>' + com[2]
             Default=Default + '<br>' + com[0]
-        ParamTable.Reference.append(refword)
-        ParamTable.Keys.append(key)
-        ParamTable.Default.append(Default)
-        ParamTable.Comment.append(Comment)
-        ParamTable.Line.append(Line)
+        if Line >= 0:
+            ParamTable.Reference.append(refword)
+            ParamTable.Keys.append(key)
+            ParamTable.Default.append(Default)
+            ParamTable.Comment.append(Comment)
+            ParamTable.Line.append(Line)
         ###
     if (refword in myForcings):
         Domain='Forcing'
@@ -199,7 +200,7 @@ for i in range(len(P_lines)):
 
 #Creating the mark-down file/table for the list of the user input parameters
 Out=open(ParamListFile,'w')
-Out.write('# Paramter and Forcing list for BG_Flood\n\n')
+Out.write('# Parameter and Forcing list for BG_Flood\n\n')
 Out.write('BG_flood user interface consists in a text file (`BG_param.txt` by default), associating key words to user chosen input parameters and forcing information.\n')
 
 #Creation of the Parameter table in MD

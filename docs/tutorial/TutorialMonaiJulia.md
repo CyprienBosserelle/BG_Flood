@@ -16,7 +16,7 @@ Success
 ### Settings
 
 ### Results
-Model behaves similar to other codes and ca reproduce the bulk of the tsunami waves. Results are comparable to the same class of models. The double precision simulation is virtually identical to the Double precision run confirming that in this case there is not much point on using the Double precision.
+Model behaves similar to other codes and can reproduce the bulk of the tsunami waves. Results are comparable to the same class of models. The double precision simulation is virtually identical to the Double precision run confirming that in this case there is not much point on using the Double precision.
 
 skill assessment:
 **Single precision**
