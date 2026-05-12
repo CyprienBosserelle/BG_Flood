@@ -1,4 +1,5 @@
 #include "FlowGPU.h"
+#include "groundwater.h"
 
 /**
  * @brief Main GPU flow solver for the flood model.
@@ -288,7 +289,11 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 
-	if (XParam.infiltration)
+	if (XParam.groundwater)
+	{
+		GroundwaterStepGPU(XParam, XLoop, XModel);
+	}
+	else if (XParam.infiltration)
 	{
 		AddinfiltrationImplicitGPU <<< gridDim, blockDim, 0 >>> (XParam, XLoop, XModel.blocks, XModel.il, XModel.cl, XModel.evolv, XModel.hgw);
 		CUDA_CHECK(cudaDeviceSynchronize());

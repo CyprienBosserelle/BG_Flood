@@ -217,6 +217,36 @@ struct Forcing
 	Default: (see constant in parameters)
 	*/
 
+	StaticForcingP<T> K_gw;
+	/*Hydraulic conductivity map (m/s)
+	Ex: K_gw=K_gw.nc?K;
+	Default: (see constant in parameters)
+	*/
+
+	StaticForcingP<T> fs_gw;
+	/*Saturated infiltration rate map (m/s)
+	Ex: fs_gw=fs_gw.nc?fs;
+	Default: (see constant in parameters)
+	*/
+
+	StaticForcingP<T> Sy_gw;
+	/*Specific yield map
+	Ex: Sy_gw=Sy_gw.nc?Sy;
+	Default: (see constant in parameters)
+	*/
+
+	StaticForcingP<T> Aquifer_Depth;
+	/*Aquifer depth map (m)
+	Ex: Aquifer_Depth=Aquifer_Depth.nc?depth;
+	Default: (see constant in parameters)
+	*/
+
+	StaticForcingP<T> hgw_init;
+	/*Initial groundwater elevation map (m)
+	Ex: hgw_init=hgw_init.nc?hgw;
+	Default: (see constant in parameters)
+	*/
+
 	std::vector<StaticForcingP<int>> targetadapt;
 
 	std::vector<deformmap<T>> deform;

@@ -315,6 +315,16 @@ struct Model
 
 	//GroundWater elevation (due to the accumulation of water by infiltration during the simulation)
 	T* hgw;
+
+	// Groundwater Physical Parameters
+	T* K_gw;
+	T* fs_gw;
+	T* Sy_gw;
+	T* Aquifer_Depth;
+
+	// Groundwater Fluxes
+	T* Qx;
+	T* Qy;
 	
 	// Used for external forcing too
 	// May need a better placeholder
