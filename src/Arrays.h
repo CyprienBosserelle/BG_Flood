@@ -261,9 +261,10 @@ struct AdaptP
 template <class T>
 struct BndblockP
 {
-	int nblkriver, nblkTs, nbndblkleft, nbndblkright, nbndblktop, nbndblkbot;
+	int nblkriver, nblkculvert, nblkTs, nbndblkleft, nbndblkright, nbndblktop, nbndblkbot;
 	int* river;
 	int* Tsout;
+	int* culvert;
 	//int * DrainSink;
 	//int * DrainSource;
 	//int * Bridges;
@@ -283,10 +284,6 @@ struct RiverBlk
 	std::vector<int> block;
 };
 
-
-
-
-
 template <class T>
 struct TimeP
 {
@@ -295,6 +292,25 @@ struct TimeP
 	T* dtmax;
 	T* arrmax, *arrmin;
 };
+
+
+template <class T>
+struct CulvertF
+{
+	T* zs1;
+	T* zs2;
+	T* h1;
+	T* h2;
+	T* u1;
+	T* u2;
+	T* v1;
+	T* v2;
+	T* dq; //positive if frow from P1 toward P2
+	int* type;
+	double* Qmax;
+	double* dx1;
+};
+
 
 template <class T>
 struct Model
@@ -306,6 +322,9 @@ struct Model
 	FluxP<T> flux;
 	FluxMLP<T> fluxml;
 	AdvanceP<T> adv;
+
+	//Culverts
+	CulvertF<T> culvertsF;
 	
 	//external forcing
 	T* zb;

@@ -337,6 +337,12 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
 	}
 
+	if (XForcing.culverts.size() > 0)
+	{
+		AddCulverts(XParam, XLoop.dt, XForcing.culverts, XModel);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+	}
+
 	if (!XForcing.UWind.inputfile.empty())//&& !XForcing.UWind.inputfile.empty()
 	{
 		AddwindforcingGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XForcing.UWind, XForcing.VWind, XModel.adv);
@@ -354,6 +360,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 		AddrainforcingImplicitGPU << < gridDim, blockDim, 0 >> > (XParam, XLoop, XModel.blocks, XForcing.Rain, XModel.evolv);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
+	
 
 	if (XParam.infiltration)
 	{

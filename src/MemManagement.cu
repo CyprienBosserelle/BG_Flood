@@ -332,6 +332,24 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		AllocateCPU(1, 1, XModel.bndblk.Riverinfo.Xbidir);
 		AllocateCPU(1, 1, XModel.bndblk.Riverinfo.Xridib);
 	}
+
+	if (XParam.nculverts > 0) 
+	{
+		AllocateCPU(1, 1, XModel.bndblk.culvert);
+		XModel.bndblk.nblkculvert = 1;
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.dq);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.h1);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.h2);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.zs1);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.zs2);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.u1);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.u2);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.v1);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.v2);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.type);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.Qmax);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.dx1);
+	}
 	// preallocate 1 block along all bnds
 	//this will be eventually reallocated later
 	//AllocateCPU(1, 1, XModel.bndblk.left);
@@ -555,9 +573,18 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	{
 		ReallocArray(nblk, blksize, XModel.wettime);
 	}
-	//ReallocArray(nx, ny, XModel.);
-
-
+	if (XParam.nculverts)
+	{
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.zs1);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.zs2);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.h1);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.h2);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.u1);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.u2);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.v1);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.v2);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.dq);
+	}
 
 }
 
@@ -872,7 +899,21 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 	{
 		AllocateGPU(nblk, blksize, XModel.wettime);
 	}
-
+	if (XParam.nculverts)
+	{
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.zs1);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.zs2);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.h1);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.h2);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.u1);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.u2);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.v1);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.v2);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.dq);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.type);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.Qmax);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.dx1);
+	}
 	
 	/*if (XParam.outvort)
 	{
