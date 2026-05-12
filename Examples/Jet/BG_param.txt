@@ -25,7 +25,6 @@ outfile = Demo_jet.nc;
 
 # Boundaries
 # 0:Wall (no slip); 1:neumann (zeros gredient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D
-left = 3;
-leftbndfile = Leftbnd.txt
-right = 3; # shock absorbing
-rightbndfile = Rightbnd.txt
+left = Leftbnd.txt,3;
+
+right = Rightbnd.txt,3; # shock absorbing
