@@ -50,6 +50,48 @@ template <class T> __global__ void DarcyFluxXGPU(Param XParam, BlockP<T> XBlock,
 }
 
 /**
+ * @brief CUDA kernel to calculate groundwater CFL condition.
+ *
+ * Stability for diffusion: dt < 0.5 * dx^2 / (K * D / Sy)
+ * where D is saturated thickness.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block data structure
+ * @param hgw Groundwater elevation array
+ * @param zb Topography elevation array
+ * @param K_gw Hydraulic conductivity array
+ * @param Sy_gw Specific yield array
+ * @param Aquifer_Depth Aquifer depth array
+ * @param dtmax Maximum time step array
+ */
+template <class T> __global__ void GroundwaterCFLGPU(Param XParam, BlockP<T> XBlock, T* hgw, T* zb, T* K_gw, T* Sy_gw, T* Aquifer_Depth, T* dtmax)
+{
+    int halowidth = XParam.halowidth;
+    int blkmemwidth = blockDim.x + halowidth * 2;
+    int ix = threadIdx.x;
+    int iy = threadIdx.y;
+    int ibl = blockIdx.x;
+    int ib = XBlock.active[ibl];
+
+    int idx = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+    T levdx = calcres(T(XParam.dx), XBlock.level[ib]);
+
+    T bed = zb[idx] - Aquifer_Depth[idx];
+    T thick = utils::max(T(0.0), utils::min(hgw[idx], zb[idx]) - bed);
+
+    T diffusion = (K_gw[idx] * thick) / utils::max(Sy_gw[idx], T(1e-6));
+
+    if (diffusion > T(1e-10)) {
+        T dt_gw = T(0.5) * T(XParam.CFL) * levdx * levdx / diffusion;
+        if (dt_gw < dtmax[idx]) {
+            dtmax[idx] = dt_gw;
+        }
+    }
+}
+
+/**
  * @brief CUDA kernel to calculate Darcy flux in the y-direction.
  *
  * @tparam T Data type (float or double)
