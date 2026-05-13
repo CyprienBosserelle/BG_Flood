@@ -1,6 +1,6 @@
 
 #include "groundwater.h"
-#include "MemManagement.h"
+
 
 /**
  * @brief CUDA kernel to calculate Darcy flux in the x-direction.
@@ -34,8 +34,8 @@ template <class T> __global__ void DarcyFluxXGPU(Param XParam, BlockP<T> XBlock,
     T bed_R = zb[idx_r] - Aquifer_Depth[idx_r];
 
     // Saturated thickness (D) = max(0, min(H_gw, Topo) - Z_bed)
-    T thick_L = fmaxf(T(0.0), fminf(hgw[idx], zb[idx]) - bed_L);
-    T thick_R = fmaxf(T(0.0), fminf(hgw[idx_r], zb[idx_r]) - bed_R);
+    T thick_L = max(T(0.0), min(hgw[idx], zb[idx]) - bed_L);
+    T thick_R = max(T(0.0), min(hgw[idx_r], zb[idx_r]) - bed_R);
     T avg_thick = T(0.5) * (thick_L + thick_R);
 
     // Qx = -K * avg_thick * ((h_gw[idx+1] + h_sw[idx+1]) - (h_gw[idx] + h_sw[idx])) / dx
@@ -76,8 +76,8 @@ template <class T> __global__ void DarcyFluxYGPU(Param XParam, BlockP<T> XBlock,
     T bed_B = zb[idx] - Aquifer_Depth[idx];
     T bed_T = zb[idx_t] - Aquifer_Depth[idx_t];
 
-    T thick_B = fmaxf(T(0.0), fminf(hgw[idx], zb[idx]) - bed_B);
-    T thick_T = fmaxf(T(0.0), fminf(hgw[idx_t], zb[idx_t]) - bed_T);
+    T thick_B = max(T(0.0), min(hgw[idx], zb[idx]) - bed_B);
+    T thick_T = max(T(0.0), min(hgw[idx_t], zb[idx_t]) - bed_T);
     T avg_thick = T(0.5) * (thick_B + thick_T);
 
     T K_avg = T(0.5) * (K_gw[idx] + K_gw[idx_t]);
@@ -122,7 +122,7 @@ template <class T> __global__ void GroundwaterMassBalanceGPU(Param XParam, T dt,
     T net_lateral = -( (Qx[idx] - Qx[idx_l]) / levdx + (Qy[idx] - Qy[idx_b]) / levdx );
 
     // actual_inf = min(h_sw, fs * dt)
-    T actual_inf = fminf(h_sw[idx], fs_gw[idx] * dt);
+    T actual_inf = min(h_sw[idx], fs_gw[idx]/1000/3600 * dt);
 
     // Update surface water depth
     h_sw[idx] -= actual_inf;

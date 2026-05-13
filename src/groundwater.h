@@ -5,6 +5,7 @@
 #include "General.h"
 #include "Param.h"
 #include "Arrays.h"
+#include "MemManagement.h"
 
 template <class T> void GroundwaterStepGPU(Param XParam, Loop<T>& XLoop, Model<T> XModel);
 
