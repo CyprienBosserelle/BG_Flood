@@ -145,7 +145,7 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 		else
 		{
 			// Default: hgw = zb (saturated to the surface)
-			Copy2CartCPU(XParam.nblk * XParam.blksize, 1, XModel.hgw, XModel.zb);
+			Copy2CartCPU(XParam.nblk, XParam.blksize, XModel.hgw, XModel.zb);
 		}
 
 		// Initialise fluxes to 0

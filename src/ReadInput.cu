@@ -305,7 +305,7 @@ Param readparamstr(std::string line, Param param)
 		param.groundwater = readparambool(parametervalue, param.groundwater);
 		if (param.groundwater) param.infiltration = true;
 	}
-
+	/*
 	parameterstr = "K_gw";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -355,7 +355,7 @@ Param readparamstr(std::string line, Param param)
 			param.hgw_init = std::stod(parametervalue);
 		}
 	}
-
+	*/
 	paramvec = { "cl","Rain_cl","continuousloss" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())

@@ -1,9 +1,124 @@
 
 #include "groundwater.h"
-#include "MemManagement.h"
-#include "Setup_GPU.h"
-#include "Util_CPU.h"
-#include "Halo.h"
+
+
+
+/**
+ * @brief CUDA kernel to calculate groundwater CFL condition.
+ *
+ * Stability for diffusion: dt < 0.5 * dx^2 / (K * D / Sy)
+ * where D is saturated thickness.
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Simulation parameters
+ * @param XBlock Block data structure
+ * @param hgw Groundwater elevation array
+ * @param zb Topography elevation array
+ * @param K_gw Hydraulic conductivity array
+ * @param Sy_gw Specific yield array
+ * @param Aquifer_Depth Aquifer depth array
+ * @param dtmax Maximum time step array
+ */
+template <class T> __global__ void GroundwaterCFLGPU(Param XParam, BlockP<T> XBlock, T* hgw, T* zb, T* K_gw, T* Sy_gw, T* Aquifer_Depth, T* dtmax)
+{
+    int halowidth = XParam.halowidth;
+    int blkmemwidth = blockDim.x + halowidth * 2;
+    int ix = threadIdx.x;
+    int iy = threadIdx.y;
+    int ibl = blockIdx.x;
+    int ib = XBlock.active[ibl];
+
+    int idx = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+    T levdx = calcres(T(XParam.dx), XBlock.level[ib]);
+
+    T bed = zb[idx] - Aquifer_Depth[idx];
+    T thick = utils::max(T(0.0), utils::min(hgw[idx], zb[idx]) - bed);
+
+    T diffusion = (K_gw[idx] * thick) / utils::max(Sy_gw[idx], T(1e-6));
+
+    if (diffusion > T(1e-10)) {
+        T dt_gw = T(0.5) * T(XParam.CFL) * levdx * levdx / diffusion;
+        if (dt_gw < dtmax[idx]) {
+            dtmax[idx] = dt_gw;
+        }
+    }
+}
+template __global__ void GroundwaterCFLGPU<float>(Param XParam, BlockP<float> XBlock, float* hgw, float* zb, float* K_gw, float* Sy_gw, float* Aquifer_Depth, float* dtmax);
+template __global__ void GroundwaterCFLGPU<double>(Param XParam, BlockP<double> XBlock, double* hgw, double* zb, double* K_gw, double* Sy_gw, double* Aquifer_Depth, double* dtmax);
+
+
+template <class T> __host__ T CalctimestepGWGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime,T dtmax_surf)
+{
+    T* dummy;
+    AllocateCPU(32, 1, dummy);
+
+    // densify dtmax (i.e. remove empty block and halo that may sit in the middle of the memory structure)
+    int s = XParam.nblk * (XParam.blkwidth * XParam.blkwidth); // Not blksize wich includes Halo
+
+    dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+    dim3 gridDim(XParam.nblk, 1, 1);
+
+    densify << < gridDim, blockDim, 0 >> > (XParam, XBlock, XTime.dtmax, XTime.arrmin);
+    CUDA_CHECK(cudaDeviceSynchronize());
+
+
+    CUDA_CHECK(cudaMemcpy(XTime.dtmax, XTime.arrmin, s * sizeof(T), cudaMemcpyDeviceToDevice));
+
+
+    //GPU Harris reduction #3. 8.3x reduction #0  Note #7 if a lot faster
+    // This was successfully tested with a range of grid size
+    //reducemax3 <<<gridDimLine, blockDimLine, 64*sizeof(float) >>>(dtmax_g, arrmax_g, nx*ny)
+
+    int maxThreads = 256;
+    int threads = (s < maxThreads * 2) ? nextPow2((s + 1) / 2) : maxThreads;
+    int blocks = (s + (threads * 2 - 1)) / (threads * 2);
+    int smemSize = (threads <= 32) ? 2 * threads * sizeof(T) : threads * sizeof(T);
+    dim3 blockDimLine(threads, 1, 1);
+    dim3 gridDimLine(blocks, 1, 1);
+
+
+    reducemin3 << <gridDimLine, blockDimLine, smemSize >> > (XTime.dtmax, XTime.arrmin, s);
+    CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+    s = gridDimLine.x;
+    while (s > 1)//cpuFinalThreshold
+    {
+        threads = (s < maxThreads * 2) ? nextPow2((s + 1) / 2) : maxThreads;
+        blocks = (s + (threads * 2 - 1)) / (threads * 2);
+
+        smemSize = (threads <= 32) ? 2 * threads * sizeof(T) : threads * sizeof(T);
+
+        dim3 blockDimLineS(threads, 1, 1);
+        dim3 gridDimLineS(blocks, 1, 1);
+
+        CUDA_CHECK(cudaMemcpy(XTime.dtmax, XTime.arrmin, s * sizeof(T), cudaMemcpyDeviceToDevice));
+
+        reducemin3 << <gridDimLineS, blockDimLineS, smemSize >> > (XTime.dtmax, XTime.arrmin, s);
+        CUDA_CHECK(cudaDeviceSynchronize());
+
+        s = (s + (threads * 2 - 1)) / (threads * 2);
+    }
+
+
+    CUDA_CHECK(cudaMemcpy(dummy, XTime.arrmin, 32 * sizeof(T), cudaMemcpyDeviceToHost)); // replace 32 by word here?
+
+    T dtmaxgw = dummy[0];
+
+
+    int n_substeps = ceil(dtmax_surf / dtmaxgw);
+    //float dt_gw = dtmax_surf / n_substeps
+    free(dummy);
+
+
+
+    return n_substeps;
+
+    
+}
+
 
 /**
  * @brief CUDA kernel to calculate Darcy flux in the x-direction.
@@ -49,47 +164,7 @@ template <class T> __global__ void DarcyFluxXGPU(Param XParam, BlockP<T> XBlock,
     Qx[idx] = -K_avg * avg_thick * (H_eff_R - H_eff_L) / levdx;
 }
 
-/**
- * @brief CUDA kernel to calculate groundwater CFL condition.
- *
- * Stability for diffusion: dt < 0.5 * dx^2 / (K * D / Sy)
- * where D is saturated thickness.
- *
- * @tparam T Data type (float or double)
- * @param XParam Simulation parameters
- * @param XBlock Block data structure
- * @param hgw Groundwater elevation array
- * @param zb Topography elevation array
- * @param K_gw Hydraulic conductivity array
- * @param Sy_gw Specific yield array
- * @param Aquifer_Depth Aquifer depth array
- * @param dtmax Maximum time step array
- */
-template <class T> __global__ void GroundwaterCFLGPU(Param XParam, BlockP<T> XBlock, T* hgw, T* zb, T* K_gw, T* Sy_gw, T* Aquifer_Depth, T* dtmax)
-{
-    int halowidth = XParam.halowidth;
-    int blkmemwidth = blockDim.x + halowidth * 2;
-    int ix = threadIdx.x;
-    int iy = threadIdx.y;
-    int ibl = blockIdx.x;
-    int ib = XBlock.active[ibl];
 
-    int idx = memloc(halowidth, blkmemwidth, ix, iy, ib);
-
-    T levdx = calcres(T(XParam.dx), XBlock.level[ib]);
-
-    T bed = zb[idx] - Aquifer_Depth[idx];
-    T thick = utils::max(T(0.0), utils::min(hgw[idx], zb[idx]) - bed);
-
-    T diffusion = (K_gw[idx] * thick) / utils::max(Sy_gw[idx], T(1e-6));
-
-    if (diffusion > T(1e-10)) {
-        T dt_gw = T(0.5) * T(XParam.CFL) * levdx * levdx / diffusion;
-        if (dt_gw < dtmax[idx]) {
-            dtmax[idx] = dt_gw;
-        }
-    }
-}
 
 /**
  * @brief CUDA kernel to calculate Darcy flux in the y-direction.
@@ -197,21 +272,37 @@ template <class T> void GroundwaterStepGPU(Param XParam, Loop<T>& XLoop, Model<T
     dim3 blockDimKX(XParam.blkwidth + XParam.halowidth, XParam.blkwidth, 1);
     dim3 blockDimKY(XParam.blkwidth, XParam.blkwidth + XParam.halowidth, 1);
 
-    // Fill halo for groundwater head
-    fillHaloGPU(XParam, XModel.blocks, XModel.hgw);
+    
+    // It is likely that the GW timestep is smaller then surface water the GW model is simple so we run only the GW model n time to keep up with surface water. 
+    // We hope that the CFL condition don't change too drastically during this calculation. the CFL of 0.5 should help with that
 
-    // Calculate Darcy Fluxes
-    DarcyFluxXGPU<<<gridDim, blockDimKX, 0>>>(XParam, XModel.blocks, XModel.hgw, XModel.evolv.h, XModel.zb, XModel.K_gw, XModel.Aquifer_Depth, XModel.Qx);
-    DarcyFluxYGPU<<<gridDim, blockDimKY, 0>>>(XParam, XModel.blocks, XModel.hgw, XModel.evolv.h, XModel.zb, XModel.K_gw, XModel.Aquifer_Depth, XModel.Qy);
+    GroundwaterCFLGPU << <gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.hgw, XModel.zb, XModel.K_gw, XModel.Sy_gw, XModel.Aquifer_Depth, XModel.time.dtmax);
     CUDA_CHECK(cudaDeviceSynchronize());
 
-    // Fill halo for groundwater fluxes
-    fillHaloGPU(XParam, XModel.blocks, XModel.Qx);
-    fillHaloGPU(XParam, XModel.blocks, XModel.Qy);
+    int n_substeps = CalctimestepGWGPU(XParam, XLoop, XModel.blocks, XModel.time, T(XLoop.dtmax));
 
-    // Update Mass Balance and Seepage
-    GroundwaterMassBalanceGPU<<<gridDim, blockDim, 0>>>(XParam, T(XLoop.dt), XModel.blocks, XModel.hgw, XModel.evolv.h, XModel.evolv.zs, XModel.zb, XModel.fs_gw, XModel.Sy_gw, XModel.Qx, XModel.Qy);
-    CUDA_CHECK(cudaDeviceSynchronize());
+    T dtgw = XLoop.dtmax / n_substeps;
+
+    for (int i = 0; i < n_substeps; i++) 
+    {
+
+
+        // Fill halo for groundwater head
+        fillHaloGPU(XParam, XModel.blocks, XModel.hgw);
+
+        // Calculate Darcy Fluxes
+        DarcyFluxXGPU << <gridDim, blockDimKX, 0 >> > (XParam, XModel.blocks, XModel.hgw, XModel.evolv.h, XModel.zb, XModel.K_gw, XModel.Aquifer_Depth, XModel.Qx);
+        DarcyFluxYGPU << <gridDim, blockDimKY, 0 >> > (XParam, XModel.blocks, XModel.hgw, XModel.evolv.h, XModel.zb, XModel.K_gw, XModel.Aquifer_Depth, XModel.Qy);
+        CUDA_CHECK(cudaDeviceSynchronize());
+
+        // Fill halo for groundwater fluxes
+        fillHaloGPU(XParam, XModel.blocks, XModel.Qx);
+        fillHaloGPU(XParam, XModel.blocks, XModel.Qy);
+
+        // Update Mass Balance and Seepage
+        GroundwaterMassBalanceGPU << <gridDim, blockDim, 0 >> > (XParam, dtgw, XModel.blocks, XModel.hgw, XModel.evolv.h, XModel.evolv.zs, XModel.zb, XModel.fs_gw, XModel.Sy_gw, XModel.Qx, XModel.Qy);
+        CUDA_CHECK(cudaDeviceSynchronize());
+    }
 }
 
 template void GroundwaterStepGPU<float>(Param XParam, Loop<float>& XLoop, Model<float> XModel);
