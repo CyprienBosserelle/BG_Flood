@@ -80,11 +80,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth,XModel.blocks.active,XLoop.hugeposval,XModel.time.dtmax);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	if (XParam.groundwater)
-	{
-		GroundwaterCFLGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.hgw, XModel.zb, XModel.K_gw, XModel.Sy_gw, XModel.Aquifer_Depth, XModel.time.dtmax);
-		CUDA_CHECK(cudaDeviceSynchronize());
-	}
+	
 
 	//============================================
 	// Calculate gradient for evolving parameters for predictor step

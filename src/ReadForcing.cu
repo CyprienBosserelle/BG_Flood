@@ -396,11 +396,11 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		XForcing.Sy_gw.denanval = 0.0;
 		readstaticforcing(XForcing.Sy_gw);
 
-		XForcing.Aquifer_Depth.denanval = 0.0;
-		readstaticforcing(XForcing.Aquifer_Depth);
+		XForcing.zb_gw.denanval = 0.0;
+		readstaticforcing(XForcing.zb_gw);
 
-		XForcing.hgw_init.denanval = 0.0;
-		readstaticforcing(XForcing.hgw_init);
+		XForcing.zs_gw_init.denanval = 0.0;
+		readstaticforcing(XForcing.zs_gw_init);
 		//XForcing.fs_gw = readforcinghead(XForcing.fs_gw);
 		//XForcing.Sy_gw = readforcinghead(XForcing.Sy_gw);
 		//XForcing.Aquifer_Depth = readforcinghead(XForcing.Aquifer_Depth);
