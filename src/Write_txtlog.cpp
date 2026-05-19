@@ -82,7 +82,7 @@ void create_logfile()
 
 	log("#################################");
 
-	log("BG_Flood v0.95");
+	log("BG_Flood v1.0");
 
 	log("#################################");
 	//log("model started at " + ss.str());
