@@ -347,6 +347,23 @@ template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> 
 		CopytoGPU(nblk, blksize, XModel_cpu.hgw, XModel_gpu.hgw);
 	}
 
+	if (XParam.groundwater)
+	{
+		CopytoGPU(nblk, blksize, XModel_cpu.gw.K, XModel_gpu.gw.K);
+		CopytoGPU(nblk, blksize, XModel_cpu.gw.fs, XModel_gpu.gw.fs);
+		CopytoGPU(nblk, blksize, XModel_cpu.gw.zb, XModel_gpu.gw.zb);
+		CopytoGPU(nblk, blksize, XModel_cpu.gw.Sy, XModel_gpu.gw.Sy);
+		CopytoGPU(nblk, blksize, XModel_cpu.gw.zs, XModel_gpu.gw.zs);
+		CopytoGPU(nblk, blksize, XModel_cpu.gw.h, XModel_gpu.gw.h);
+
+		/*AllocateCPU(nblk, blksize, XModel.K_gw);
+		AllocateCPU(nblk, blksize, XModel.fs_gw);
+		AllocateCPU(nblk, blksize, XModel.Sy_gw);
+		AllocateCPU(nblk, blksize, XModel.Aquifer_Depth);
+		AllocateCPU(nblk, blksize, XModel.Qx);
+		AllocateCPU(nblk, blksize, XModel.Qy);*/
+	}
+
 	if (XParam.outmax)
 	{
 		CopytoGPU(nblk, blksize, XModel_cpu.evmax, XModel_gpu.evmax);
