@@ -105,13 +105,14 @@ rain = rain.txt
 
 ### Optional but useful
 
-While we could stop there, it is not very useful to let BG_Flood's default behaviour run the show. In particular, we want to specify what to output, how often, and where.
+While we could stop there, it is not very useful to let BG_Flood's default behaviour run the show. In particular, we want to specify what to output, how often, how long and where.
 
 ```
 ##########
 # output
 ##########
 
+endtime = 36000.0
 outputtimestep = 600.00
 outvars = hmax, zsmax, hUmax, h, zs, u, v, Umax
 outfile = StressTest_Port_Charles.nc
@@ -119,6 +120,18 @@ outfile = StressTest_Port_Charles.nc
 
 > **Tip:** BG_Flood will **never** overwrite an existing file. Instead, it will add an incremental number to the end of the filename each time it runs (e.g., `StressTest_Port_Charles_1.nc`).
 
+### Use non-default engine
+
+BG_Flood default engine is great for many use but doesn't do too well with heavy rain on steep catchment (i.e. this tutorial). so to get better results we will change the engine to a more suitable one.
+
+```
+#################
+## Use the engine 5 for rain-on-grid
+#################
+
+engine = 5
+
+```
 
 ## Full BG_param.txt
 
@@ -147,10 +160,17 @@ dx = 32.0
 
 rain = rain.txt
 
+#################
+## Use the multi-layer engine with just 1 layer
+#################
+
+engine = 5
+
 ##########
 # output
 ##########
 
+endtime = 36000.0
 outputtimestep = 600.00
 outvars = hmax, zsmax, hUmax, h, zs, u, v, Umax
 
