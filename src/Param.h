@@ -198,7 +198,7 @@ public:
 
 
 	//*Netcdf parameters
-	int smallnc = 1; //Short integer conversion for netcdf outputs. 1: save as short integer for the netcdf file, if 0 then save all variables as float
+	int smallnc = 0; //Short integer conversion for netcdf outputs. 1: save as short integer for the netcdf file, if 0 then save all variables as float
 	float scalefactor = 0.01f; //Scale factor used for the short integer conversion for netcdf outputs. This follow the COARDS convention.
 	float addoffset = 0.0f; //Offset add during the short integer conversion for netcdf outputs (follow the COARDS convention)
 
