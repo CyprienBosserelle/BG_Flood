@@ -103,6 +103,22 @@ Now this is a bit coarser than my input resolution. BG_Flood will automatically 
 rain = rain.txt
 ```
 
+### Adding a realistic friction
+BG_Flood includes several roughness formulations. You can used Mannings (very commonly used but somewhat flawed) `frictionmodel = -1`. You can use a quadratic friction (The default `frictionmodel = 0`, quick and easy but not very realistic). You can also use the Smart friction which requires a roughness length (not as common as manning but less flawed) `frictionmodel = 1`.
+
+For this example we are using a zo of 0.04 with the Smart formulation:
+
+```
+##########
+# Roughness
+##########
+
+frictionmodel = 1
+
+roughness = 0.04
+
+```
+
 ### Optional but useful
 
 While we could stop there, it is not very useful to let BG_Flood's default behaviour run the show. In particular, we want to specify what to output, how often, how long and where.
@@ -122,7 +138,7 @@ outfile = StressTest_Port_Charles.nc
 
 ### Use non-default engine
 
-BG_Flood default engine is great for many use but doesn't do too well with heavy rain on steep catchment (i.e. this tutorial). so to get better results we will change the engine to a more suitable one.
+BG_Flood default engine is great for many use but doesn't do too well with heavy rain on steep catchment (i.e. this tutorial). so to get better results we will change the engine to a more suitable one. Also, when using Rain-on-grid, steep topography can lead to waterfalls and out-of-control flow velocity. We want to prevent that by adding the `vmax` parameter that will prevent flow velocity exceeding 16 m/s in our case.
 
 ```
 #################
@@ -130,6 +146,8 @@ BG_Flood default engine is great for many use but doesn't do too well with heavy
 #################
 
 engine = 5
+
+vmax = 16.0
 
 ```
 
