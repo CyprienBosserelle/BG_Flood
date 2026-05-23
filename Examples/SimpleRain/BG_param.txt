@@ -24,6 +24,15 @@ dx = 32.0;
 rain = rain.txt
 
 ##########
+# Roughness
+##########
+
+frictionmodel = 1
+
+roughness = 0.04
+
+
+##########
 # output
 ##########
 
