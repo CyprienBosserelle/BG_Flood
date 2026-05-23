@@ -27,6 +27,7 @@ rain = rain.txt
 # output
 ##########
 
+endtime = 36000.0
 outputtimestep = 600.00;
 outvars = hmax, zsmax, hUmax,h,zs,u,v,Umax;
 
