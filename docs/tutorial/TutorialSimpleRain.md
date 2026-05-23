@@ -178,11 +178,22 @@ dx = 32.0
 
 rain = rain.txt
 
+##########
+# Roughness
+##########
+
+frictionmodel = 1
+
+roughness = 0.04
+
 #################
 ## Use the multi-layer engine with just 1 layer
 #################
 
 engine = 5
+
+vmax = 16.0
+
 
 ##########
 # output
@@ -196,3 +207,71 @@ outfile = StressTest_Port_Charles.nc
 ```
 
 ## Run the model
+
+To run BG_Flood simply launch the executable by double click or via a terminal. 
+
+> **Tip:** BG_Flood looks for a `BG_param.txt` file by default, but when launching via a terminal you can use whatever file name you want just specify it as argument to BG_Flood when you launch. This is useful when keeping several setof parameter for a similar area or for running scenarios.
+
+### Screen log and file log
+
+After launching BG_Flood you should see a bunch of info scrollin on the screen. an almost identical amount of information is generated in a `BG_log.txt` file. This should be your go-to file for info when things do go as planned. if there is an error you should get your clues here. My screen shows this:
+
+```
+#################################
+BG_Flood v0.95
+#################################
+#################################
+#
+
+Reading parameter file: BG_param.txt ...
+
+Reading bathymetry grid data...
+Reading forcing metadata. file: PortCharles_DEM.nc extension: nc
+Forcing grid info: nx=3152 ny=2127 dx=4.000000 dy=4.000000 grdalpha=0.000000 xo=1815197.000000 xmax=1827801.000000 yo=5950097.000000 ymax=5958601.000000
+Reading CRS information from forcing metadata (file: PortCharles_DEM.nc)
+grid info detected: grid_mapping
+CRS_info: PROJCS["NZGD2000 / New Zealand Transverse Mercator 2000",GEOGCS["NZGD2000",DATUM["New_Zealand_Geodetic_Datum_2000",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6167"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4167"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",173],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",1600000],PARAMETER["false_northing",10000000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Northing",NORTH],AXIS["Easting",EAST],AUTHORITY["EPSG","2193"]]
+
+Reading boundary data...
+
+Preparing Rain forcing
+
+Adjusted model domain (xo/xmax/yo/ymax):
+        1815195.000000/1827995.000000/5950095.000000/5958799.000000
+         Initial resolution (level 0) = 32.000000
+Reference time: 2000-01-01T00:00:00
+Model Initial time: 0.000000 ;
+
+Model Initial time: 0.000000 ;
+Model end time: 36000.000000
+There are 1 GPU devices on this machine
+Using Device: NVIDIA T1000 8GB
+
+Initializing mesh
+        Initial number of blocks: 425; Will be allocating 447 in memory.
+
+Initial condition:
+        Cold start
+
+Boundary Segment 0 :  has 80 blocks
+Output Times:
+0.000000e+00, 6.000000e+02, 1.200000e+03, 1.800000e+03, 2.400000e+03, 3.000000e+03, 3.600000e+03, 4.200000e+03, 4.800000e+03, 5.400000e+03, 6.000000e+03, 6.600000e+03, 7.200000e+03, 7.800000e+03, 8.400000e+03, 9.000000e+03, 9.600000e+03, 1.020000e+04, 1.080000e+04, 1.140000e+04, 1.200000e+04, 1.260000e+04, 1.320000e+04, 1.380000e+04, 1.440000e+04, 1.500000e+04, 1.560000e+04, 1.620000e+04, 1.680000e+04, 1.740000e+04, 1.800000e+04, 1.860000e+04, 1.920000e+04, 1.980000e+04, 2.040000e+04, 2.100000e+04, 2.160000e+04, 2.220000e+04, 2.280000e+04, 2.340000e+04, 2.400000e+04, 2.460000e+04, 2.520000e+04, 2.580000e+04, 2.640000e+04, 2.700000e+04, 2.760000e+04, 2.820000e+04, 2.880000e+04, 2.940000e+04, 3.000000e+04, 3.060000e+04, 3.120000e+04, 3.180000e+04, 3.240000e+04, 3.300000e+04, 3.360000e+04, 3.420000e+04, 3.480000e+04, 3.540000e+04, 3.600000e+04,
+Setting up GPU
+
+Model setup complete
+#################################
+Initialising model main loop
+Create netCDF output file...
+Warning! Output file name already exist
+                Completed
+Model Running...
+
+```
+
+And if I'm patient enough (about 3 min on my T1000) the model if finished and I can look at the results.
+
+## Looking at results
+
+For this part I will use GMT and QGIS to look at the result and make a quick screenshot. There are plenty of other option for reading CCF-compliant NetCDF. pick your favorite.
+
+ 
