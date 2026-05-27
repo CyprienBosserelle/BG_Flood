@@ -268,10 +268,26 @@ Model Running...
 
 ```
 
-And if I'm patient enough (about 3 min on my T1000) the model if finished and I can look at the results.
+And if I'm patient enough (about 3 min on my T1000) the model is finished and I can look at the results.
 
 ## Looking at results
 
-For this part I will use GMT and QGIS to look at the result and make a quick screenshot. There are plenty of other option for reading CCF-compliant NetCDF. pick your favorite.
+For this part I normally use GMT and QGIS to look at the result and make a quick screenshot. There are plenty of other option for reading CCF-compliant NetCDF. pick your favorite.
 
- 
+### Convert the results to plot ready geotiff
+
+You can drage and drop BG_FLood results in your favorite netcdf viewer and visualise the results but for making the results more portable I like to export the results to Geotiff. With GMT it is just one line of code and another line to make the results look better.
+
+First extract the maximum flood depth but ignore any flooding under 10 cm. 
+
+```
+gmt grdmath myBGF_outputfile.nc?hmax_P0[9] DUP 0.1 GT 0 NAN MUL = maxflood.nc
+
+gmt grdconvert maxflood.nc -Gmaxflood.tif=gd:GTIFF
+```
+
+ > **Tip:** With Rain-on-grid there is water everywhere that's why it is important to remove small flood depth from visualisation.
+
+### What's with the variable name and `_P0`
+
+BG_Flood can handle variable grid size. This is tricky can be annoying to handle in Netcdf format. One way is to save the data in a unstructured format but that would not be easy to visualise and manipulate. Instead we save each level of refinment in a separate variable with it's own grid. that way each level of refinement is a raster in itself and can be stacked with other level of refinment allowing the display of the true grid as a stack of regular grids. Clever... but that requires multiple output variable for the same model variable. the simplest way is to extend the model variable name with its level of refinment `_P0` is level 0, `_P1` is level 1, `_N1` is level -1 etc... 
