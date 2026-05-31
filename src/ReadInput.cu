@@ -1470,6 +1470,8 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 			{
 				XParam.Toutput.val.push_back(std::min(XParam.totaltime + XParam.outputtimestep * k, XParam.endtime));
 			}
+			// the loop above does not always include endtime and should
+			XParam.Toutput.val.push_back(XParam.endtime);
 
 		}
 	}
@@ -1607,9 +1609,14 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
  */
 void InitialiseToutput(T_output& Toutput_loc, Param XParam)
 {
+	double totaltime = XParam.totaltime;
 	
 	Toutput_loc.val = ReadToutput(Toutput_loc.inputstr, XParam);
 	// Make sure Toutput is not empty and that all values are >= totaltime and <= endtime
+
+	Toutput_loc.val.erase(
+		std::remove_if(Toutput_loc.val.begin(), Toutput_loc.val.end(), [totaltime](double x) {
+			return x < totaltime; }), Toutput_loc.val.end());
 	if (Toutput_loc.val.empty())
 	{
 		for (int i = 0; i < XParam.Toutput.val.size(); i++)
@@ -2331,9 +2338,9 @@ std::vector<double> ReadToutput(std::vector<std::string> paramstr,Param XParam)
 		else if (Toutputpar_vect.size() > 1)
 		{
 			//Failed: Toutput must be exactly 3 values, separated by ":" for a vector shape, in virst position. "t_init:t_step:t_end" (with possible empty values as "t_init:t_setps: " to use the last time steps as t_end;
-			std::cerr << "Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end; see log file for details" << std::endl;
+			std::cerr << "Failed: Toutput must be exactly 3 values, separated by '|' for a vector shape, in virst position. 't_init | t_step | t_end' (with possible empty values as 't_init | t_setps | ' to use the last time steps as t_end; see log file for details" << std::endl;
 
-			log("Failed: Toutput must be exactly 3 values, separated by ':' for a vector shape, in virst position. 't_init : t_step : t_end' (with possible empty values as 't_init : t_setps : ' to use the last time steps as t_end;");
+			log("Failed: Toutput must be exactly 3 values, separated by '|' for a vector shape, in virst position. 't_init | t_step | t_end' (with possible empty values as 't_init | t_setps | ' to use the last time steps as t_end;");
 			log(paramstr[ipa]);
 		}
 		else {
