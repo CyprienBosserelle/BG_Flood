@@ -235,15 +235,15 @@ struct Forcing
 	Default: (see constant in parameters)
 	*/
 
-	StaticForcingP<T> Aquifer_Depth;
+	StaticForcingP<T> zb_gw;
 	/*Aquifer depth map (m)
 	Ex: Aquifer_Depth=Aquifer_Depth.nc?depth;
 	Default: (see constant in parameters)
 	*/
 
-	StaticForcingP<T> hgw_init;
+	StaticForcingP<T> zs_gw_init;
 	/*Initial groundwater elevation map (m)
-	Ex: hgw_init=hgw_init.nc?hgw;
+	Ex: zgw_init=zgw_init.nc?zgw;
 	Default: (see constant in parameters)
 	*/
 

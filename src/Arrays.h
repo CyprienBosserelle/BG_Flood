@@ -174,7 +174,21 @@ struct AdvanceP
 	T* dhv;
 };
 
+template <class T>
+struct GoundWaterP
+{
+	// Groundwater Physical Parameters
+	T* zs;// groundwater celing elevation
+	T* h;// groundwater depth (z_gw - zaqb)
+	T* K;
+	T* fs;
+	T* Sy;
+	T* zb;// Elevation of aquifer bottom
 
+	// Groundwater Fluxes
+	T* Qx;
+	T* Qy;
+};
 struct outP
 {
 	float* z;
@@ -316,15 +330,7 @@ struct Model
 	//GroundWater elevation (due to the accumulation of water by infiltration during the simulation)
 	T* hgw;
 
-	// Groundwater Physical Parameters
-	T* K_gw;
-	T* fs_gw;
-	T* Sy_gw;
-	T* Aquifer_Depth;
-
-	// Groundwater Fluxes
-	T* Qx;
-	T* Qy;
+	GoundWaterP<T> gw;
 	
 	// Used for external forcing too
 	// May need a better placeholder
