@@ -349,12 +349,19 @@ template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> 
 
 	if (XParam.groundwater)
 	{
-		CopytoGPU(nblk, blksize, XModel_cpu.K_gw, XModel_gpu.K_gw);
-		CopytoGPU(nblk, blksize, XModel_cpu.fs_gw, XModel_gpu.fs_gw);
-		CopytoGPU(nblk, blksize, XModel_cpu.Sy_gw, XModel_gpu.Sy_gw);
-		CopytoGPU(nblk, blksize, XModel_cpu.Aquifer_Depth, XModel_gpu.Aquifer_Depth);
-		CopytoGPU(nblk, blksize, XModel_cpu.Qx, XModel_gpu.Qx);
-		CopytoGPU(nblk, blksize, XModel_cpu.Qy, XModel_gpu.Qy);
+		CopytoGPU(nblk, blksize, XModel_cpu.gw.K, XModel_gpu.gw.K);
+		CopytoGPU(nblk, blksize, XModel_cpu.gw.fs, XModel_gpu.gw.fs);
+		CopytoGPU(nblk, blksize, XModel_cpu.gw.zb, XModel_gpu.gw.zb);
+		CopytoGPU(nblk, blksize, XModel_cpu.gw.Sy, XModel_gpu.gw.Sy);
+		CopytoGPU(nblk, blksize, XModel_cpu.gw.zs, XModel_gpu.gw.zs);
+		CopytoGPU(nblk, blksize, XModel_cpu.gw.h, XModel_gpu.gw.h);
+
+		/*AllocateCPU(nblk, blksize, XModel.K_gw);
+		AllocateCPU(nblk, blksize, XModel.fs_gw);
+		AllocateCPU(nblk, blksize, XModel.Sy_gw);
+		AllocateCPU(nblk, blksize, XModel.Aquifer_Depth);
+		AllocateCPU(nblk, blksize, XModel.Qx);
+		AllocateCPU(nblk, blksize, XModel.Qy);*/
 	}
 
 	if (XParam.outmax)

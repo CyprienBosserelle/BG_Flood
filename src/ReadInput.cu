@@ -305,7 +305,7 @@ Param readparamstr(std::string line, Param param)
 		param.groundwater = readparambool(parametervalue, param.groundwater);
 		if (param.groundwater) param.infiltration = true;
 	}
-
+	
 	parameterstr = "K_gw";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -346,8 +346,8 @@ Param readparamstr(std::string line, Param param)
 		}
 	}
 
-	paramvec = { "hgw_init","zs_gw_init" };
-	parametervalue = findparameter(paramvec, line);
+	parameterstr = "hgw_init";
+	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha) == false)
@@ -355,7 +355,7 @@ Param readparamstr(std::string line, Param param)
 			param.hgw_init = std::stod(parametervalue);
 		}
 	}
-
+	
 	paramvec = { "cl","Rain_cl","continuousloss" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
@@ -574,7 +574,7 @@ Param readparamstr(std::string line, Param param)
 			//Need to add more here
 
 
-			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","hmean","zsmean","umean","vmean","hUmean","Umean","hmax","zsmax","umax","vmax","hUmax","Umax","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw","hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy","K_gw","fs_gw","Sy_gw","Aquifer_Depth" };
+			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","hmean","zsmean","umean","vmean","hUmean","Umean","hmax","zsmax","umax","vmax","hUmax","Umax","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw","hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy","K_gw","fs_gw","Sy_gw","zb_gw","zs_gw","h_gw"};
 
 
 			std::string vvar = trim(vars[nv], " ");
@@ -1171,26 +1171,6 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		}
 	}
 
-	parameterstr = "Aquifer_Depth";
-	parametervalue = findparameter(parameterstr, line);
-	if (!parametervalue.empty())
-	{
-		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha))
-		{
-			forcing.Aquifer_Depth = readfileinfo(parametervalue, forcing.Aquifer_Depth);
-		}
-	}
-
-	paramvec = { "hgw_init","zs_gw_init" };
-	parametervalue = findparameter(paramvec, line);
-	if (!parametervalue.empty())
-	{
-		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha))
-		{
-			forcing.hgw_init = readfileinfo(parametervalue, forcing.hgw_init);
-		}
-	}
-
 	parameterstr = "zb_gw";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
@@ -1198,6 +1178,16 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha))
 		{
 			forcing.zb_gw = readfileinfo(parametervalue, forcing.zb_gw);
+		}
+	}
+
+	parameterstr = "zs_gw_init";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha))
+		{
+			forcing.zs_gw_init = readfileinfo(parametervalue, forcing.zs_gw_init);
 		}
 	}
 
