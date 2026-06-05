@@ -382,32 +382,6 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 	}
 
 	//======================
-	// groundwater file
-
-	if (XParam.groundwater)
-	{
-		//XForcing.K_gw = readforcinghead(XForcing.K_gw);
-		XForcing.K_gw.denanval = 0.0;
-		readstaticforcing(XForcing.K_gw);
-
-		XForcing.fs_gw.denanval = 0.0;
-		readstaticforcing(XForcing.fs_gw);
-
-		XForcing.Sy_gw.denanval = 0.0;
-		readstaticforcing(XForcing.Sy_gw);
-
-		XForcing.zb_gw.denanval = 0.0;
-		readstaticforcing(XForcing.zb_gw);
-
-		XForcing.zs_gw_init.denanval = 0.0;
-		readstaticforcing(XForcing.zs_gw_init);
-		//XForcing.fs_gw = readforcinghead(XForcing.fs_gw);
-		//XForcing.Sy_gw = readforcinghead(XForcing.Sy_gw);
-		//XForcing.Aquifer_Depth = readforcinghead(XForcing.Aquifer_Depth);
-		//XForcing.hgw_init = readforcinghead(XForcing.hgw_init);
-	}
-
-	//======================
 	// Polygon data
 	if (!XForcing.AOI.file.empty())
 	{
@@ -479,6 +453,15 @@ template <class T> void readstaticforcing(int step,T& Sforcing)
 
 	}
 
+	if (XParam.groundwater)
+	{
+		XForcing.K_gw = readforcinghead(XForcing.K_gw);
+		XForcing.fs_gw = readforcinghead(XForcing.fs_gw);
+		XForcing.Sy_gw = readforcinghead(XForcing.Sy_gw);
+		XForcing.Aquifer_Depth = readforcinghead(XForcing.Aquifer_Depth);
+		XForcing.zb_gw = readforcinghead(XForcing.zb_gw);
+		XForcing.hgw_init = readforcinghead(XForcing.hgw_init);
+	}
 	else
 	{
 		//Error message

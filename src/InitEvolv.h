@@ -22,7 +22,5 @@ template <class T> int AddZSoffset(Param XParam, BlockP<T> XBlock, EvolvingP<T>&
 
 template <class T> int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb);
 
-template <class T> int Inith(Param XParam, BlockP<T> XBlock, T* h_gw, T* zs_gw, T* zb_gw);
-
 // End of global definition;
 #endif

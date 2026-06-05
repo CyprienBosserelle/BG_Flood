@@ -296,14 +296,12 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	if (XParam.groundwater)
 	{
-		AllocateCPU(nblk, blksize, XModel.gw.h);
-		AllocateCPU(nblk, blksize, XModel.gw.zs);
-		AllocateCPU(nblk, blksize, XModel.gw.K);
-		AllocateCPU(nblk, blksize, XModel.gw.fs);
-		AllocateCPU(nblk, blksize, XModel.gw.Sy);
-		AllocateCPU(nblk, blksize, XModel.gw.zb);
-		AllocateCPU(nblk, blksize, XModel.gw.Qx);
-		AllocateCPU(nblk, blksize, XModel.gw.Qy);
+		AllocateCPU(nblk, blksize, XModel.K_gw);
+		AllocateCPU(nblk, blksize, XModel.fs_gw);
+		AllocateCPU(nblk, blksize, XModel.Sy_gw);
+		AllocateCPU(nblk, blksize, XModel.Aquifer_Depth);
+		AllocateCPU(nblk, blksize, XModel.Qx);
+		AllocateCPU(nblk, blksize, XModel.Qy);
 	}
 
 	if (XParam.outmax)
@@ -556,14 +554,12 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	if (XParam.groundwater)
 	{
-		ReallocArray(nblk, blksize, XModel.gw.K);
-		ReallocArray(nblk, blksize, XModel.gw.fs);
-		ReallocArray(nblk, blksize, XModel.gw.Sy);
-		ReallocArray(nblk, blksize, XModel.gw.zb);
-		ReallocArray(nblk, blksize, XModel.gw.zs);
-		ReallocArray(nblk, blksize, XModel.gw.h);
-		ReallocArray(nblk, blksize, XModel.gw.Qx);
-		ReallocArray(nblk, blksize, XModel.gw.Qy);
+		ReallocArray(nblk, blksize, XModel.K_gw);
+		ReallocArray(nblk, blksize, XModel.fs_gw);
+		ReallocArray(nblk, blksize, XModel.Sy_gw);
+		ReallocArray(nblk, blksize, XModel.Aquifer_Depth);
+		ReallocArray(nblk, blksize, XModel.Qx);
+		ReallocArray(nblk, blksize, XModel.Qy);
 	}
 
 	if (XParam.outmax)
@@ -885,14 +881,12 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	if (XParam.groundwater)
 	{
-		AllocateGPU(nblk, blksize, XModel.gw.h);
-		AllocateGPU(nblk, blksize, XModel.gw.zs);
-		AllocateGPU(nblk, blksize, XModel.gw.K);
-		AllocateGPU(nblk, blksize, XModel.gw.fs);
-		AllocateGPU(nblk, blksize, XModel.gw.Sy);
-		AllocateGPU(nblk, blksize, XModel.gw.zb);
-		AllocateGPU(nblk, blksize, XModel.gw.Qx);
-		AllocateGPU(nblk, blksize, XModel.gw.Qy);
+		AllocateGPU(nblk, blksize, XModel.K_gw);
+		AllocateGPU(nblk, blksize, XModel.fs_gw);
+		AllocateGPU(nblk, blksize, XModel.Sy_gw);
+		AllocateGPU(nblk, blksize, XModel.Aquifer_Depth);
+		AllocateGPU(nblk, blksize, XModel.Qx);
+		AllocateGPU(nblk, blksize, XModel.Qy);
 	}
 
 	if (XParam.outmax)
