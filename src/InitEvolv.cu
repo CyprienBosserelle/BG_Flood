@@ -548,34 +548,6 @@ int AddZSoffset(Param XParam, BlockP<T> XBlock, EvolvingP<T> &XEv, T*zb)
 	return success;
 }
 
-template <class T>
-int Inith(Param XParam, BlockP<T> XBlock, T* h_gw,T* zs_gw,T* zb_gw)
-{
-	int success = 1;
-	int ib;
-	for (int ibl = 0; ibl < XParam.nblk; ibl++)
-	{
-		ib = XBlock.active[ibl];
-		for (int j = 0; j < XParam.blkwidth; j++)
-		{
-			for (int i = 0; i < XParam.blkwidth; i++)
-			{
-				int n = memloc(XParam, i, j, ib);
-
-				zs_gw[n] = max(zs_gw[n], zb_gw[n]);
-
-				h_gw[n] = utils::max(zs_gw[n] - zb_gw[n], T(0.0));
-				
-			}
-
-		}
-	}
-
-	return success;
-}
-template int Inith<float>(Param XParam, BlockP<float> XBlock, float* h_gw, float* zs_gw, float* zb_gw);
-template int Inith<double>(Param XParam, BlockP<double> XBlock, double* h_gw, double* zs_gw, double* zb_gw);
-
 
 /**
  * @brief Read BG_Flood hotstart file and extract block attributes.
