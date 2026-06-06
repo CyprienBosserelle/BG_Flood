@@ -16,4 +16,6 @@ Bosserelle C., Lane E., Harang A., (2021) BG-Flood: A GPU adaptive, open-source,
 
 
 ## Testing
+CI test (main branch):![Test](https://github.com/CyprienBosserelle/BG_Flood/actions/workflows//main.yml/badge.svg?branch=main)
 CI test (development branch):![Test](https://github.com/CyprienBosserelle/BG_Flood/actions/workflows//main.yml/badge.svg?branch=development)
+
