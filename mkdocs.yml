@@ -69,6 +69,7 @@ nav:
       - 'Ground infiltration': 'modules/RainLoss_ILCL-model.md'
       - 'New Gradient Method': 'modules/NewGradient.md'
       - 'Wet-dry fix': 'modules/Wetdryfix-Conservelevation.md'
+      - 'How to make breaches': 'modules/Breaches.md'
   - References: 'References.md'
   #- Examples : 
   - Code sources:
