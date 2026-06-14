@@ -19,11 +19,11 @@ The water that infiltrates is directly added to the surface of the aquifer. This
 ### Need more inputs
 the groundwater module require a bunch of additional inputs. These are required to be given as maps:
 
-* **Aquifer floor** | zb_gw : Defines the bottom of the aquifer. In reality this could be really deep but using the true aquifer floor might results in debilitating small time steps. We would recommend artificially limit the dept of the aquifer to a safe distance below ground maybe as a __hard__ (i.e. no-flow) bourdary with the deeper aquifer.
-* **Aquifer porosity** | Sy_gw : The depth-averaged porosity of the aquifer. Typically between 20% and 40%. Ask your favorite hydrogeologist!
-* **Aquifer conductivity** | K_gw : The depth-averaged hydraulic conductivity of the aquifer [m/s]. Sometimes expressed in m/day by our hydogeologist friends so can be a very small number. If you aquifer has a small conductivity it may not be worth having a groundwater module!
-* **Infiltration rates** | fs_gw : This is the soil infltration rates in mm/h. This only applies to infiltration and not exfiltration (exfiltration rate not used, all groundwater head above ground becomes surface flow)
-* **Aquifer surface level** | zs_gw_init : This is the elevation of the groundwater water level [m above the DEM datum]. This could be extracted from a groundwater model or interpolated from bore data. By default the model will not allow it to be higher than ground level. 
+* **zb_gw : Aquifer floor elevation** : Defines the bottom of the aquifer. In reality this could be really deep but using the true aquifer floor might results in debilitating small time steps. We would recommend artificially limit the dept of the aquifer to a safe distance below ground maybe as a __hard__ (i.e. no-flow) bourdary with the deeper aquifer.
+* **Sy_gw : Aquifer porosity** The depth-averaged porosity of the aquifer. Typically between 20% and 40%. Ask your favorite hydrogeologist!
+* **K_gw : Aquifer conductivity** | The depth-averaged hydraulic conductivity of the aquifer [m/s]. Sometimes expressed in m/day by our hydogeologist friends so can be a very small number. If you aquifer has a small conductivity it may not be worth having a groundwater module!
+* **fs_gw : Infiltration rates** | fs_gw : This is the soil infltration rates in mm/h. This only applies to infiltration and not exfiltration (exfiltration rate not used, all groundwater head above ground becomes surface flow)
+* **zs_gw_init : Aquifer surface level** | This is the elevation of the groundwater water level [m above the DEM datum]. This could be extracted from a groundwater model or interpolated from bore data. By default the model will not allow it to be higher than ground level. 
 
 
 # Usage
