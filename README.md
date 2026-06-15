@@ -65,3 +65,5 @@ Welsh R., Williams S., Bosserelle C., Paulik R., Chan Ting J., Wild A., Talia L.
 Sischka L.; Bosserelle C.; Williams S.; Ting J.C.; Paulik R.; Whitworth, M.; Talia L.; Viskovic P. (2022) Reconstructing the 26 June 1917 Samoa Tsunami Disaster. Appl. Sci. 2022, 12, 3389. https://doi.org/10.3390/app12073389
 
 Bosserelle C., Williams S., Cheung K. F., Lay T., Yamazaki Y., Simi T., et al. (2020). Effects of source faulting and fringing reefs on the 2009 South Pacific Tsunami inundation in southeast Upolu, Samoa. Journal of Geophysical Research: Oceans, 125, e2020JC016537. https://doi.org/10.1029/2020JC016537
+
+
