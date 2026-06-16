@@ -47,11 +47,11 @@ You can repeat the culvert param for as many culver as you have.
 
 ## example
 ```
-# this culvert I know well. 1 barrel circular 2m diameter 
+# this culvert I know well. 1 barrel circular 2 m diameter
 Culvert = 2,415169.26,7655100.06,415145.79,7655102.49,2.00,1.00,0,0.01,0.70,0.50,1.0,0.40,0.30
 
 # this one has two barrels
-# I don't know the cd paramter (-999 will be corrected to default(1.0 for circular or 0.62 for rectangular))
+# I don't know the cd parameter (-999 will be corrected to default(1.0 for circular or 0.62 for rectangular))
 Culvert = 2,415407.06,7655083.92,415405.44,7655095.28,1.20,2.00,1,0.01,0.70,0.50,-999.00,0.80,0.50
 
 # more culverts
@@ -73,9 +73,9 @@ Culvert = 2,419863.03,7654624.69,419850.63,7654626.61,2.00,1.00
  * only 1 cell is used as inlet and a single cell as outlet
  * Ideally culvert width is smaller than the cell width. the model doesn't check that so beware, putting a 10m culvert in a 2m resolution cell will cause some serious instabilities.
  * When inlet and outlet (invert) elevation is specified, BG_Flood enforce makes sure the ground levvel is at least as low as this. 
- * Culverts don't conserve velocity! depression and water level  humps may be exagerated.
+ * Culverts don't conserve velocity! depression and water level  humps may be exaggerated.
  
-# More ressource
+# More resource
 if you are looking for info on what parameter to use for you culvert, refer to the following documents. Note that the formulations used in BG_Flood are closer to the fhwa methods. Beware that BG_Flood uses metric unit system. 
 
 * [fhwa](https://www.fhwa.dot.gov/engineering/hydraulics/pubs/12026/hif12026.pdf)
@@ -96,7 +96,7 @@ I've been running some sanity check test. All successful:
 ## Quantitative validation
 For validation, calculating the "inverse" problem of the [USGS example](https://pubs.usgs.gov/twri/twri3-a3/pdf/TWRI_3-A3.pdf) on culvert is a good idea. It's what HecRas [does](https://www.hec.usace.army.mil/confluence/rasdocs/ras1dtechref/latest/modeling-culverts/culvert-hydraulics/comparison-to-the-usgs-culvert-procedures) too.
 
-In the USGS exercice the heads are imposed and the user calculates the flow. In BG_Flood that is not easy to do since culvert flow rates are not an output of the model. Instead we impose the flow rate on one side and the head downstream and calculate at what level the downstream water level settles.
+In the USGS exercise the heads are imposed and the user calculates the flow. In BG_Flood that is not easy to do since culvert flow rates are not an output of the model. Instead we impose the flow rate on one side and the head downstream and calculate at what level the downstream water level settles.
 
 
 ### Example 6. Type 4 flow through a concrete pipe culvert. Outlet controlled 

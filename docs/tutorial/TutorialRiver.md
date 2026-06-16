@@ -3,18 +3,18 @@
 The objectif of this tutorial is to explain how to use the code BG_Flood to model river flooding.
 As the code allows rain on grid, we will look at pluvial and fluvial flooding.
 
-This testcase aims to broadly reproduce the flooding event that occured from the 16 to the 18 of July 2021 (a 1 in 50 year flood event). 
+This testcase aims to broadly reproduce the flooding event that occurred from the 16 to the 18 of July 2021 (a 1 in 50 year flood event).
 During this event, the Buller river, passing through the town of Westport, on the West Coast of the South Island of Aotearoa New Zealand, get out of its primary bed and flooded the Westport area.
 
 !!! info "Prerequisite"
-     Before begining this tutoral, the user is expected to have downloaded the windows executable ([last release](https://github.com/CyprienBosserelle/BG_Flood/releases/latest) on github) or compiled the sources (version > 0.8) of the BG_flood code on linux.
+     Before beginning this tutorial, the user is expected to have downloaded the windows executable ([last release](https://github.com/CyprienBosserelle/BG_Flood/releases/latest) on github) or compiled the sources (version > 0.8) of the BG_flood code on linux.
 
 During this tutorial, we will build, step by step, a test case. A relatively simple testcase will be build first. Then an example with more complex rain, tidal boundaries inputs will also be shared and explained.
 
 
 ## Param file
 The interface with BG_flood software is done using only a text file: `BG_param.txt`
-(This is the name of the input parameter file by defauls, an other name can be use as first variable when lauching BG_Flood.)
+(This is the name of the input parameter file by defaults, an other name can be use as first variable when launching BG_Flood.)
 
 This file consists in a list of key words and inputs, separated by a "=" sign. 
 For a full list of the available key words and a further description of this file, please refer to the [parameter list]{../ParametersList-py.md} and the [manual]{../Manual.md}.
@@ -41,7 +41,7 @@ A result files: `output.nc` is created (here opened with the [PyNcView]{https://
 ![outputs](../figure/outputs.png)
 
 It contains 2D spatial fields saved regularly in time.
-It details the blocs information:
+It details the blocks information:
 
 - `blockid`: block index
 - `blocklevel`: level of refinement for each block
@@ -52,7 +52,7 @@ It details the blocs information:
 the time 1D variables or coordinates:
 
 - `time`: time vector in second or real time
-- `xx`/`yy` axis: spacial coordinate in m (by default)
+- `xx`/`yy` axis: spatial coordinate in m (by default)
 
 and the by default outputs:
 
@@ -65,7 +65,7 @@ and the by default outputs:
 (see manual for further description of the variables).
 
 !!! note
-    In BG_Flood, the memory is organised in blocked for an optimal parallelisation on GPU. All the cells on a block will share some status and parameter such as the level of refinement (or cell size) and the active status.
+    In BG_Flood, the memory is organised in blocks for an optimal parallelisation on GPU. All the cells on a block will share some status and parameter such as the level of refinement (or cell size) and the active status.
 
 
 
@@ -86,7 +86,7 @@ where the four final numbers are: $x_1$, $x_2$, $y_1$, $y_2$, to define the area
 
 ![riverfile](../figure/river_discharge.png)
 
-This file has been generated from an observed hydrograph, with data saved every $5$min, in second from the begining of the simulation (or event):
+This file has been generated from an observed hydrograph, with data saved every $5$min, in second from the beginning of the simulation (or event):
 
 ![riverF](../figure/TE_Kuha_hydrograph.png)
 
@@ -118,7 +118,7 @@ There is two types of outputs:
  - time-serie (TS) output of basic values, at a chosen point position, at each time step.
 
 #### Map outputs
-By default, there is only a map output at the begining and end of the simulation.
+By default, there is only a map output at the beginning and end of the simulation.
 
 The map output can be modify by:
 
@@ -131,7 +131,7 @@ outputtimestep = 3600.0;
 outvars = zs,h,u,v,zb,hmax,Umax,hUmax,twet;
 ```
 The "max" variables will be the maximum value during the whole simulation. To reset it between the outputs, see the resetmax variable.
-There is also special variables for risk assesment after inundation (Umax, hmax, hUmax, twet)
+There is also special variables for risk assessment after inundation (Umax, hmax, hUmax, twet)
 - changing the name of the output file:
 ``` txt 
 outfile = Results_tuto_basicRun.nc;
@@ -142,13 +142,13 @@ smallnc = 0;
 ```
 
 #### Time-Serie outputs
-For each TS output needed, a line with the destination file and the postition is needed:
+For each TS output needed, a line with the destination file and the position is needed:
 
 ``` txt 
 TSnodesout=Offshore.txt,1482120,53814890;
 ```
 corresponding to `TSnodesout=filename.txt,x_p,y_p;`
-The file contains 5 colums $(t, zs, h, u,v)$ with the value at the nearest grid point (to the position defined by the user).
+The file contains 5 columns $(t, zs, h, u,v)$ with the value at the nearest grid point (to the position defined by the user).
 
 ### Resolution
 For a first test, we will modify the resolution and set it to 40m to decrease the computational time:
@@ -170,7 +170,7 @@ The Time-Serie output is:
 
 ## Completing the set-up
 ### Adding boundary conditions
-Boundaries' conditions are refered by their position, using 'top/bottom/right/left' keywords. They are associated to a boundary type ( 0:wall; 1: Neumann (Default); 2:Dirichlet (zs); 3: abs1d) and possibly a file containing a time serie. In this case, the file name is placed before the type, coma-separated. 
+Boundaries' conditions are referred by their position, using 'top/bottom/right/left' keywords. They are associated to a boundary type ( 0:wall; 1: Neumann (Default); 2:Dirichlet (zs); 3: abs1d) and possibly a file containing a time series. In this case, the file name is placed before the type, coma-separated.
 
 In this case, we will use tide boundaries at when at least a part of the boundary is open on the sea, i.e. for the top, left and right boundaries.
 At the bottom, we will conserve the default value: 1.
@@ -208,7 +208,7 @@ tide_file
 340200.000000 	-0.955286 
 ```
 
-They correspond to a classic time Serie observed offshore of the river mouth.
+They correspond to a classic time Series observed offshore of the river mouth.
 
 ![Tide](../figure/tide_westport.png)
 
@@ -229,7 +229,7 @@ cf=z0_100423_rec3.asc; #cf=0.01;  #If using a uniform value
 ![Friction](../figure/Bottom_friction_zo.png)
 
 !!! warning
-    The model allows a roughness heigh or manning number map smaller than the computational domain and will extrapolate outside of the map.
+    The model allows a roughness height or manning number map smaller than the computational domain and will extrapolate outside of the map.
 
 ### Initialisation
 By default, the model is initialised by a plane water surface located at $z=0.0$.
@@ -263,7 +263,7 @@ doubleprecision = 1;
 ``` txt 
 theta=1.3; #default value=1.3
 ```
-- Minimum heigh to concidere a cell wet (m)
+- Minimum height to consider a cell wet (m)
 ``` txt 
 eps = 0.00010000; #default=0.0001
 ```
@@ -278,30 +278,30 @@ The model allows rain on grid forcing to model pluvial inundations.
 ### Rain forcing
 A rain intensity in $mm.h^{-1}$, time and space varying can be forced in the model.
 
-The rain can be forced with a time serie (with uniform values on the domain) or a netCDF file if a spacial file is available:
+The rain can be forced with a time series (with uniform values on the domain) or a netCDF file if a spatial file is available:
 
-- Time serie forcing:
+- Time series forcing:
 ``` txt 
 rainfall=rain_westport.txt
 ```
-- Spacial file forcing:
+- Spatial file forcing:
 ``` txt 
 rainfile=VCSN_buller_202107_dailynzcsmcov_disaggdaily_500m_nztm_clipped.nc?depth;
 ```
-Here, we will use a time serie:
+Here, we will use a time series:
 ![RainTS](../figure/rain_westport.png)
 
 If the data is given in "rain height", a post-processing to turn it in rain intensity will be needed (at least at this stage of development).
 
 Using the rain on grid forcing will activate all the cells of the domain and will increase the computational time of the simulation. 
-Part of the domain can be "de-activate" (the blocs memory will not be allocated for this area) using different methods:
+Part of the domain can be "de-activate" (the blocks memory will not be allocated for this area) using different methods:
 
 - using the `x0` / `xmax` / `y0` / `ymax` keywords to restrain the extend of the computational domain (but still rectangular)
 ``` txt 
 x0=1475000; #m
 ```
 - a manual mask with values 999 in the bathymetry will be read by the code as "non-active" area
-- masking all the bloc with all cells having an elevation superior to some value:
+- masking all the block with all cells having an elevation superior to some value:
 ``` txt 
 mask=250; #m
 ```
@@ -318,7 +318,7 @@ AOI=Domain_buffered-sea2.gmt;
 The code is based on a Block-uniform quadtree mesh. Each block, actually a 16 by 16 cells, is one unit of computation in the GPU.
 These blocks can have different resolutions (but resolution does not change during the computation at this stage).
 
-The initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can weather use the "dx" key word and choose a new resolution for the whole domain; wether use the levels of resolution. The reference level, correponding to the bathymetry resolution will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  $n$ , the resolution  $dx_n$ will be:
+The initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can either use the "dx" key word and choose a new resolution for the whole domain; or use the levels of resolution. The reference level, corresponding to the bathymetry resolution will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  $n$ , the resolution  $dx_n$ will be:
 $$
 dx_n=\frac{dx_0}{2^n}
 $$
@@ -328,10 +328,10 @@ with  $dx_0$ the resolution at level 0.
 When refinning using the level implementation, different key words are expected:
 
 - `Initlevel`: level used to create the first mesh created by the code in the mesh refinement process
-- `Maxlevel`: maximim level of refinement (over-ruling other commands)
+- `Maxlevel`: maximum level of refinement (over-ruling other commands)
 - `Minlevel`: minimum level of refinement (over-ruling other commands)
 
-The grid can also be unregular with an adaptition of the grid to the model (variables at initialisation step or user-defined refinement map). In this case, the cells will be devided in 4 cells for refinement, or 4 cells merged in one for coarsening. The code will ensure a progressive change of resolution (no cell should have a neighbour with more than 1 level of resolution of difference.)
+The grid can also be unregular with an adaptation of the grid to the model (variables at initialisation step or user-defined refinement map). In this case, the cells will be divided in 4 cells for refinement, or 4 cells merged in one for coarsening. The code will ensure a progressive change of resolution (no cell should have a neighbour with more than 1 level of resolution of difference.)
 
 The different methods of refinement available in the code are called using the key word "Adaptation". The refinement can be based on a classical input variable or a variable calculated during the initialisation:
 
@@ -461,7 +461,7 @@ Output to map. Totaltime = 7200.000000 s; Mean dt = 2.230207e-01 s
 
 ```
 In the model output, each resolution is store independently. 
-When open with pyncview, we can visualise each layer. QGIS can merge all these layer togather or a postratement steps will be needed.
+When open with pyncview, we can visualise each layer. QGIS can merge all these layer together or a postratement steps will be needed.
 
 ![output_v3](../figure/outputs_v3.png)
 
@@ -470,7 +470,7 @@ When open with pyncview, we can visualise each layer. QGIS can merge all these l
 Some more complex inputs can be used in this type of realistic model:
 
 ### Date as time reference
-Up to here, the time was define as a duration in second from an arbitrary reference (begining of the simulation for example). All the inputs and the BG_param.txt file used this definition. Due to this convention, most of the inputs had to be modified to change date to duration in seconds, and the resluts are also in second (which can be confusing).
+Up to here, the time was define as a duration in second from an arbitrary reference (beginning of the simulation for example). All the inputs and the BG_param.txt file used this definition. Due to this convention, most of the inputs had to be modified to change date to duration in seconds, and the results are also in second (which can be confusing).
 The solver can use dates in the inputs (same time zone for all dates) and in the BG_param.txt, as:
 
 ``` txt
@@ -513,13 +513,13 @@ aoibnd = 3;
 
 
 ### Multi DEM/roughness inputs
-The code support different inputs of DEMs or roughness maps. It will use the first DEM to define the computational extend by default. Then, for each grid point, it will use the last DEM provided where a valide value is defined at this location.
+The code support different inputs of DEMs or roughness maps. It will use the first DEM to define the computational extend by default. Then, for each grid point, it will use the last DEM provided where a valid value is defined at this location.
 One can for example provide a low resolution DEM of all the domain then add a high resolution of a given urban area if higher resolution will be sought after there. Similar set-up is also allowed for roughness maps.
 ``` txt
 # DEM for the full domain, 8m resolution
 topofile = geofabric_8m_rupp_and_smart.nc?z;
 
-# DEM for the urban center, 2m resolution
+# DEM for the urban centre, 2 m resolution
 topofile = geofabric_2m_town.nc?z;
 ```
 
@@ -538,7 +538,7 @@ Just repeat the river injection line as many times as needed.
 # DEM for the full domain, 8m resolution
 topofile = geofabric_8m_rupp_and_smart.nc?z;
 
-# DEM for the urban center, 2m resolution
+# DEM for the urban centre, 2 m resolution
 topofile = geofabric_2m_town.nc?z;
 
 

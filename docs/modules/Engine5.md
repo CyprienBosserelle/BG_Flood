@@ -29,7 +29,7 @@ There is a test for the solver as part of `test=1` note this is only tested for 
 
 
 # Validation 
-Bwlow are a serie of validation of the solver for rain-on-grid, dam break and tsunami. 
+Bwlow are a series of validation of the solver for rain-on-grid, dam break and tsunami.
 
 ## Rain on grid validation
 ### Simple mass-conservation test
@@ -63,7 +63,7 @@ This is one of my favourite test for Rain on grid even though the lab test has s
 The new engine is performing very well and looks like is able to dramatically improve results using rain on grid. In the past BG_Flood didn't see much improvement using old engine with no-infiltration, the new engine might require a tighter use of infiltration for rain-on-grid.
 
 ## Dam Break
-Dam break lab experiments are very difficult to replicate but they are widely use for model comparison so this is a great to compare engine and compare with other hydrodynamic packages (we wont be doing that explicitly here...).
+Dam break lab experiments are very difficult to replicate but they are widely use for model comparison so this is a great to compare engine and compare with other hydrodynamic packages (we won't be doing that explicitly here...).
 
 The Dam break experiment we are replicating here is the classic _dam-break against an isolated obstacle_ from [Soares-Frazão and Zech (2002)](https://www.tandfonline.com/doi/abs/10.1080/00221686.2007.9521830). This test is used in the [_Benchmarking of 2D Hydraulic Modelling Packages_](https://assets.publishing.service.gov.uk/media/5a75765c40f0b6360e4744dd/scho0510bsno-e-e.pdf) from the UK Environment Agency.
 
@@ -125,4 +125,4 @@ It's actually quite hard to see the difference between the two model. this is ac
 <img width="1038" height="693" alt="image" src="https://github.com/user-attachments/assets/30e5182c-f485-4a6f-b108-92ed418afc69" />
 
 ### Tsunami summary
-The new engine shows better shock capture but that might be only helpful for nearshore processess (this is still very good). 
+The new engine shows better shock capture but that might be only helpful for nearshore processes (this is still very good).

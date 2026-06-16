@@ -3,7 +3,7 @@ Numerical model for simulating shallow water hydrodynamics on the GPU using an A
 
 The core SWE engine and adaptivity has been inspired and taken from St Venant solver from [Basilisk](http://basilisk.fr/) and the CUDA GPU memory model has been inspired by the work from [Vacondio _et al._2017](https://dl.acm.org/citation.cfm?id=3031292))
 
-The model is under constant development with features added to extent the processes captured and simplify user inputs. current developement include:
+The model is under constant development with features added to extend the processes captured and simplify user inputs. Current development includes:
 * New engine
 * Culverts
 * groundwater module
@@ -31,7 +31,7 @@ The simplest usage of BG_Flood is to move the executable (an accompanying DLLs f
 ./BG_FLood BG_param.txt
 ```
 
-or by double clicking the excecutable (BG_Flood will automatically look for ```BG_param.txt```)
+or by double clicking the executable (BG_Flood will automatically look for ```BG_param.txt```)
 
 Refer to [Manual](https://cyprienbosserelle.github.io/BG_Flood/) and examples to understand how to use the param file and  parameters.
 
