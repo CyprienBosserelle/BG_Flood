@@ -341,6 +341,17 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			isfailed = (!FlexibleOutTime || isfailed) ? true : false;
 
 		}
+		if (mytest == 16)
+			/* Test 16 is to test the groundwater model egainst values computed using an analytical model
+			*/
+		{
+			bool gwtest=TestGWmodel(-10.0);
+			result = gwtest ? "successful" : "failed";
+			log("\t\t ##### \n");
+			log("\t\t ##### Groundwater test : " + result + "\n");
+			log("\t\t ##### \n");
+			isfailed = (!gwtest || isfailed) ? true : false;
+		}
 
 
 
@@ -5174,6 +5185,228 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 
 	//log("#####");
 	return modelgood;
+}
+
+template <class T> int TestGWmodel(T zs)
+{
+	//
+	Param XParam;
+	
+	log("#####");
+	
+	XParam.zsinit = -10.0;
+	XParam.zsoffset = 0.0;
+
+	//Output times for comparisons
+	XParam.endtime = 7200.0;
+	XParam.outputtimestep = 600.0;
+
+	XParam.smallnc = 0;
+
+	XParam.groundwater = true;
+
+	XParam.cf = 0.001;
+	XParam.frictionmodel = 0;
+
+	XParam.aoibnd = 0;
+
+	// Enforce GPU/CPU
+	XParam.GPUDEVICE = 1;
+	std::vector<std::string> outv = { "zb","zs","u","v","h","h_gw","K_gw","fs_gw","Sy_gw","zs_gw","zb_gw" }; //
+
+	XParam.outvars = outv;
+	// create Model setup
+	Model<T> XModel;
+	Model<T> XModel_g;
+
+	Forcing<float> XForcing;
+
+	StaticForcingP<float> bathy;
+
+	XForcing.Bathy.push_back(bathy);
+
+	// initialise forcing bathymetry to 0
+	XForcing.Bathy[0].xo = 0;
+	XForcing.Bathy[0].yo = 0;
+
+	XForcing.Bathy[0].xmax = 250.0;
+	XForcing.Bathy[0].ymax = 250.0;
+	XForcing.Bathy[0].nx = 250;
+	XForcing.Bathy[0].ny = 250;
+
+	XForcing.Bathy[0].dx = 1.0;
+	XForcing.Bathy[0].dy = XForcing.Bathy[0].dx;
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+			XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = T(-10.0);
+		}
+	}
+	//
+	//
+
+	XForcing.fs_gw.dx = 1.0;
+	XForcing.K_gw.dx = 1.0;
+	XForcing.zs_gw_init.dx = 1.0;
+	XForcing.zb_gw.dx = 1.0;
+	XForcing.Sy_gw.dx = 1.0;
+
+	XForcing.fs_gw.nx = 250;
+	XForcing.K_gw.nx = 250;
+	XForcing.zs_gw_init.nx = 250;
+	XForcing.zb_gw.nx = 250;
+	XForcing.Sy_gw.nx = 250;
+
+	XForcing.fs_gw.ny = 250;
+	XForcing.K_gw.ny = 250;
+	XForcing.zs_gw_init.ny = 250;
+	XForcing.zb_gw.ny = 250;
+	XForcing.Sy_gw.ny = 250;
+
+	XForcing.fs_gw.dy = 1.0;
+	XForcing.K_gw.dy = 1.0;
+	XForcing.zs_gw_init.dy = 1.0;
+	XForcing.zb_gw.dy = 1.0;
+	XForcing.Sy_gw.dy = 1.0;
+
+	XForcing.fs_gw.xo = 0;
+	XForcing.K_gw.xo = 0;
+	XForcing.zs_gw_init.xo = 0;
+	XForcing.zb_gw.xo = 0;
+	XForcing.Sy_gw.xo = 0;
+
+	XForcing.fs_gw.yo = 0;
+	XForcing.K_gw.yo = 0;
+	XForcing.zs_gw_init.yo = 0;
+	XForcing.zb_gw.yo = 0;
+	XForcing.Sy_gw.yo = 0;
+
+	XForcing.fs_gw.xmax = 250;
+	XForcing.K_gw.xmax = 250;
+	XForcing.zs_gw_init.xmax = 250;
+	XForcing.zb_gw.xmax = 250;
+	XForcing.Sy_gw.xmax = 250;
+
+	XForcing.fs_gw.ymax = 250;
+	XForcing.K_gw.ymax = 250;
+	XForcing.zs_gw_init.ymax = 250;
+	XForcing.zb_gw.ymax = 250;
+	XForcing.Sy_gw.ymax = 250;
+
+	AllocateCPU(XForcing.fs_gw.nx, XForcing.fs_gw.ny, XForcing.fs_gw.val);
+	AllocateCPU(XForcing.K_gw.nx, XForcing.K_gw.ny, XForcing.K_gw.val);
+	AllocateCPU(XForcing.zs_gw_init.nx, XForcing.zs_gw_init.ny, XForcing.zs_gw_init.val);
+	AllocateCPU(XForcing.zb_gw.nx, XForcing.zb_gw.ny, XForcing.zb_gw.val);
+	AllocateCPU(XForcing.Sy_gw.nx, XForcing.Sy_gw.ny, XForcing.Sy_gw.val);
+
+	for (int j = 0; j < XForcing.fs_gw.ny; j++)
+	{
+		for (int i = 0; i < XForcing.fs_gw.nx; i++)
+		{
+			XForcing.fs_gw.val[i + j * XForcing.fs_gw.nx] = T(50.0);
+			XForcing.K_gw.val[i + j * XForcing.K_gw.nx] = T(500.0/(24.0*60.0*60.0));// 500m/day in m/s
+			XForcing.zs_gw_init.val[i + j * XForcing.zs_gw_init.nx] = T(-13.0);
+			XForcing.zb_gw.val[i + j * XForcing.zb_gw.nx] = T(-15.0);
+			XForcing.Sy_gw.val[i + j * XForcing.Sy_gw.nx] = T(0.3);
+
+		}
+	}
+	double Q = 0.034720;
+
+	std::ofstream river_file(
+		"testriver.tmp", std::ios_base::out | std::ios_base::trunc);
+	river_file << "0.0 " + std::to_string(Q) << std::endl;
+	river_file << "3600.0 " + std::to_string(Q) << std::endl;
+	river_file << "3600.1 " + std::to_string(0.0) << std::endl;
+	river_file << "36000.0 " + std::to_string(0.0) << std::endl;
+	river_file.close(); //destructor implicitly does it
+
+	River thisriver;
+	thisriver.Riverflowfile = "testriver.tmp";
+	thisriver.xstart =100;
+	thisriver.xend = 150;
+	thisriver.ystart = 100;
+	thisriver.yend = 150;
+
+	XForcing.rivers.push_back(thisriver);
+
+
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile, XParam.reftime);
+
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	Loop<T> XLoop;
+
+	XLoop.hugenegval = std::numeric_limits<T>::min();
+
+	XLoop.hugeposval = std::numeric_limits<T>::max();
+	XLoop.epsilon = std::numeric_limits<T>::epsilon();
+
+	XLoop.totaltime = 0.0;
+
+	MainLoop(XParam, XForcing, XModel, XModel_g);
+
+
+
+	double xx_Verif[8] = { -60.0,-50.0,-40.0,-30.0,-20.0,-10.0,-5.0,0. };
+	double ZsGW_Verif[8] = { 2.00551,2.01393,2.02929,2.05114,2.0748,2.09302,2.09809,2.09983 };
+
+	bool modelgood = true;
+
+	int xxmodel[8] = {66,76,86,96,106,116,121,126};
+
+	for (int iv = 0; iv < 8; iv++)
+	{
+
+		int ix, iy, ib, ii, jj, ibx, iby, nbx;
+		jj = 127;
+		ii = xxmodel[iv]-1;
+
+		// Theoretical size is 255x255
+		nbx = 256 / 16;
+
+
+		ibx = ftoi(floor(ii / XParam.blkwidth));
+		iby = ftoi(floor(jj / XParam.blkwidth));
+
+		ib = (iby)*nbx + ibx;
+
+		ix = ii - ibx * XParam.blkwidth;
+		iy = jj - iby * XParam.blkwidth;
+
+		int n = memloc(XParam, ix, iy, ib);
+
+		double diff = abs(T(XModel.gw.h[n]) - ZsGW_Verif[iv]);
+		if (diff > 2e-3)//Tolerance is 2e-3 against analytical solution
+		{
+
+			printf("ib=%d, ix=%d, iy=%d; simulated=%f; expected=%f; diff=%e\n", ib, ix, iy, XModel.gw.h[n], ZsGW_Verif[iv], diff);
+			modelgood = false;
+			
+		}
+
+
+
+	}
+
+	
+
+	return modelgood;
+
 }
 
 /**

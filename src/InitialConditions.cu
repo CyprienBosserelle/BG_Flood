@@ -118,27 +118,27 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	if (XParam.groundwater)
 	{
 		log("\tInitializing groundwater parameters");
-		if (!XForcing.K_gw.inputfile.empty())
+		if (XForcing.K_gw.nx > 0)
 			interp2BUQ(XParam, XModel.blocks, XForcing.K_gw, XModel.gw.K);
 		else
 			InitArrayBUQ(XParam, XModel.blocks, (T)XParam.K_gw, XModel.gw.K);
 
-		if (!XForcing.fs_gw.inputfile.empty())
+		if (XForcing.fs_gw.nx > 0)
 			interp2BUQ(XParam, XModel.blocks, XForcing.fs_gw, XModel.gw.fs);
 		else
 			InitArrayBUQ(XParam, XModel.blocks, (T)XParam.fs_gw, XModel.gw.fs);
 
-		if (!XForcing.Sy_gw.inputfile.empty())
+		if (XForcing.Sy_gw.nx > 0)
 			interp2BUQ(XParam, XModel.blocks, XForcing.Sy_gw, XModel.gw.Sy);
 		else
 			InitArrayBUQ(XParam, XModel.blocks, (T)XParam.Sy_gw, XModel.gw.Sy);
 
-		if (!XForcing.zb_gw.inputfile.empty())
+		if (XForcing.zb_gw.nx > 0)
 			interp2BUQ(XParam, XModel.blocks, XForcing.zb_gw, XModel.gw.zb);
 		else
 			InitArrayBUQ(XParam, XModel.blocks, (T)XParam.Aquifer_Depth, XModel.gw.zb);
 
-		if (!XForcing.zs_gw_init.inputfile.empty())
+		if (XForcing.zs_gw_init.nx > 0)
 			interp2BUQ(XParam, XModel.blocks, XForcing.zs_gw_init, XModel.gw.zs);
 		else if (!std::isnan(XParam.hgw_init))
 			InitArrayBUQ(XParam, XModel.blocks, (T)XParam.hgw_init, XModel.gw.zs);
