@@ -3,7 +3,7 @@ BG_Flood has been designed to handle a very large number of river injection with
 
 # The problem
 
-In a naive implementation the model loops through all the river injection, each kernels are launched in serial for each river. with the kernel launch, the whole GPU is then held up for updating a few cells for each rivers at a time. This is simple, it is safe when multiple river affect the same cells but extremely inefficient when you have hundreds of injections.
+In a naive implementation the model loops through all the river injection, each kernels are launched in serial for each river. With the kernel launch, the whole GPU is then held up for updating a few cells for each rivers at a time. This is simple, it is safe when multiple river affect the same cells but extremely inefficient when you have hundreds of injections.
 
 
 ## Yes this is an issue

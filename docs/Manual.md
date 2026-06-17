@@ -117,7 +117,7 @@ The base (or reference) resolution is specified by `dx. By default it is the sam
 
 BG_Flood can build a refine mesh. In this case `dx` is the resolution of the reference level of refinement (level 0). Level 1 of refinement has a resolution of `0.5*dx`, level 2 is `0.25*dx`, level -1 is `2*dx` etc...
 
-BG_Flood will automatically calculationate the topography values at each mesh nodes from the DEM. This step can require interpolation (when DEM is coarser or out of phase with the DEM) or averaging (when the mesh is coarser than the DEM).
+BG_Flood will automatically calculate the topography values at each mesh nodes from the DEM. This step can require interpolation (when DEM is coarser or out of phase with the DEM) or averaging (when the mesh is coarser than the DEM).
 !!! danger "Beware of aliasing"
   interpolating and averaging can lead to aliasing so 
  
@@ -313,7 +313,7 @@ By default, the variables outputs are the one listed in the following paragraph:
 
 
 #### Mean/averaged output between output steps
-This is for averaging variables in between output steps, useful for mean tidal flow calculationation that averages out vortices. The average time is `outtimestep`.
+This is for averaging variables in between output steps, useful for mean tidal flow calculation that averages out vortices. The average time is `outtimestep`.
 
 | Parameter                 | Definition          |     Unit         |
 | ------------------------ |:----------------:|---------------------:|

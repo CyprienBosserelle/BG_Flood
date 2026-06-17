@@ -29,7 +29,7 @@ There is a test for the solver as part of `test=1` note this is only tested for 
 
 
 # Validation 
-Bwlow are a series of validation of the solver for rain-on-grid, dam break and tsunami.
+Below are a series of validation of the solver for rain-on-grid, dam break and tsunami.
 
 ## Rain on grid validation
 ### Simple mass-conservation test
