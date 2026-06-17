@@ -5187,7 +5187,7 @@ template <class T> int TestAIObnd(Param XParam, Model<T> XModel, Model<T> XModel
 	return modelgood;
 }
 
-template <class T> int TestGWmodel(T zs)
+template <class T> bool TestGWmodel(T zs)
 {
 	//
 	Param XParam;
