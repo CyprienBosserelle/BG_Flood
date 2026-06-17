@@ -1,0 +1,47 @@
+```
+################
+## My BG_Flood simple rain model
+#################
+
+# Port Charles stress test 
+
+##########
+# DEM
+##########
+
+dem = PortCharles_DEM.nc?z
+
+##########
+# Domain
+##########
+
+dx = 32.0;
+
+##########
+# Forcing
+##########
+
+rain = rain.txt
+
+##########
+# Roughness
+##########
+
+frictionmodel = 1
+
+roughness = 0.04
+
+
+##########
+# output
+##########
+
+engine = 5
+
+vmax=16.0
+
+endtime = 36000.0
+outputtimestep = 600.00;
+outvars = hmax, zsmax, hUmax,h,zs,u,v,Umax;
+
+outfile = StressTest_Port_Charles.nc

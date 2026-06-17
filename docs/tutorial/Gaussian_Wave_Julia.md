@@ -16,7 +16,7 @@ Using Julia: See section below with the hotstart file.
 In any case you can pick up the file in the example folder.
 
 ## Hortstart
-We want to setup a bump in the water level centered in the middle of the bathy. IN the example below this is done using Julia, but it should be easily done in Matlab or Python. Note that the script below also generates a bathymetry file.
+We want to setup a bump in the water level centred in the middle of the bathy. IN the example below this is done using Julia, but it should be easily done in Matlab or Python. Note that the script below also generates a bathymetry file.
 
 ``` julia
 
@@ -112,7 +112,7 @@ Output parameters:
     outfile=Gauss_demo.nc
     outvars=zb,uu,vv,zs,vort;
     
-    # Outpout a single txt file with all the model steps at the nearest node to location x=0.0, y=-4.0
+    # Output a single txt file with all the model steps at the nearest node to location x=0.0, y=-4.0
     # This file will contain 5 column: time,zs,hh,uu,vv
     TSOfile=Southside.txt;
     TSnode=0.0,-4.0;

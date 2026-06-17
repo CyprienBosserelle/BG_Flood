@@ -2,7 +2,7 @@
 
 
 ### Intro
-This is a basic but common test to verify the integrity of the model equations. This test is also good to show different type of boundaries reflect waves. 
+This is a basic but common test to verify the integrity of the model equations. This test is also good to show different type of boundaries reflect waves.
 ### Goal
 * Check that the solution produces symmetrical results
 * Test hotstart condition
@@ -10,7 +10,7 @@ This is a basic but common test to verify the integrity of the model equations. 
 
 ### Settings
 #### You will need:
-* Flat bottom bathymetry file. (See below) 
+* Flat bottom bathymetry file. (See below)
 * Hotstart file. here only water level is needed to hotstart the water surface (zs)
 
 #### Bathy
@@ -71,7 +71,7 @@ Model behaves similar to other codes and ca reproduce the bulk of the tsunami wa
 skill assessment:
 **Single precision**
 
-| ------------- | RMS error (m) | Will-corr | BSS | 
+| ------------- | RMS error (m) | Will-corr | BSS |
 | ------------- |:-------------:|  --------:| -----:|
 | Gauge 1 | 0.003391 | 0.978040 | 0.910979 |
 | Gauge 2 | 0.003735 | 0.965899 | 0.870943 |
@@ -79,7 +79,7 @@ skill assessment:
 
 **Double precision**
 
-| ------------- | RMS error (m) | Will-corr | BSS | 
+| ------------- | RMS error (m) | Will-corr | BSS |
 | ------------- |:-------------:|  --------:| -----:|
 | Gauge 1 | 0.003391 | 0.978039 | 0.910981 |
 | Gauge 2 | 0.003733 | 0.965948 | 0.871093 |
@@ -111,4 +111,3 @@ skill assessment:
 ## 2010 Maule tsunami propagation
 
 ## Nadi 2012 flood
-

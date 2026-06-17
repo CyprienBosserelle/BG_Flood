@@ -73,7 +73,7 @@ This is a relatively small model so we can force the netcdf variable to be saved
 
     smallnc=0
 
-Sepcify the model duration, output timestep and output file name and variables
+Specify the model duration, output timestep and output file name and variables
 
     endtime=1800
     outtimestep=10
@@ -117,7 +117,7 @@ Using Julia: See section below with the hotstart file.
 In any case you can pick up the file in the example folder.
 
 ## Hortstart
-We want to setup a bump in the water level centered in the middle of the bathy. IN the example below this is done using Julia, but it should be easily done in Matlab or Python. Note that the script below also generates a bathymetry file.
+We want to setup a bump in the water level centred in the middle of the bathy. IN the example below this is done using Julia, but it should be easily done in Matlab or Python. Note that the script below also generates a bathymetry file.
 
 
 
@@ -210,7 +210,7 @@ Output parameters:
     outfile=Gauss_demo.nc
     outvars=zb,uu,vv,zs,vort;
     
-    # Outpout a single txt file with all the model steps at the nearest node to location x=0.0, y=-4.0
+    # Output a single txt file with all the model steps at the nearest node to location x=0.0, y=-4.0
     # This file will contain 5 column: time,zs,hh,uu,vv
     TSOfile=Southside.txt;
     TSnode=0.0,-4.0;
@@ -226,13 +226,13 @@ Plot Southside.txt in your favorite tool.
 This tutorial is the next stat from the Gaussian wave. Here we produce a realistic tsunami and let it propagate across the Pacific.
 
 ## Bathy and domain definition
-The bathymetry file we are using was extracted from the GEBCO gobal bathymetry using GMT command grdcut / grdsample. This section needs a tutorial of its own. Here in the `BG_param.txt` we specify the file name and that it is a spherical model domain.
+The bathymetry file we are using was extracted from the GEBCO global bathymetry using GMT command grdcut / grdsample. This section needs a tutorial of its own. Here in the `BG_param.txt` we specify the file name and that it is a spherical model domain.
 
     # Bathymetry file
     bathy = Tpac_big.asc;
     spherical = 1;
 
-The file covers a bigger area than we want to use for the simulation so we restict the domain:
+The file covers a bigger area than we want to use for the simulation so we restrict the domain:
 
     ymin=-78.0
     ymax=14.32
@@ -270,7 +270,7 @@ In the previous tutorial you have seen how different boundary type let's wave th
 
 ## Things to try
 * Try changing the model domain and resolution. What happens if part of the domain is outside of the area covered by the bathymetry?
-* Try outputing a time series near Christchurch
+* Try outputting a time series near Christchurch
   
 # River + Rain = Waikanae example
 Here we setup a model of the Waikanae Catchment (on the Kapiti Coast in New Zealand) force the tide on one of the open boundary 

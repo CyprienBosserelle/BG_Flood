@@ -320,7 +320,7 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop, Model<T>& XModel
 
 	}
 	*/
-	if (XLoop.nextoutputtime - XLoop.totaltime <= XLoop.dt * tiny)
+	if (XLoop.nextoutputtime - XLoop.totaltime <= max(XLoop.dt * tiny,0.0))
 	{
 		if (XParam.GPUDEVICE >= 0)
 		{

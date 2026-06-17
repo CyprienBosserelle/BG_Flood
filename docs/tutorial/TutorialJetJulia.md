@@ -33,7 +33,7 @@ Below is a Julia script to make the bathymetry.
     cmap = grd2cpt(G);      # Compute a colormap with the grid's data range
     grdimage(G, lw=:thinnest, color=cmap, fmt=:png, show=true)
 
-    gmtwrite("bathy.asc", G; id="ef");
+    gmtwrite("bathy.nc", G);
 ```
 
 The result is a grid domain looking like this:
@@ -64,32 +64,24 @@ First it is good practice to document your parameter file:
     ## Jet demo
     # CB 04/05/2019
 ```
-Then specify the bathymetry file to use. We will use the entire domain and resolution of the file so no need for other parameter for specifying the domain.
+Then specify the bathymetry file to use and in the case of netcdf file you need to specify the variable (here "z"). We will use the entire domain and resolution of the file so no need for other parameter for specifying the domain.
 ``` text
-    bathy=bathy.asc
+    bathy=bathy.nc?z
 ```
-Specify the parameter theta to control the numerical diffusion of the model. but first let's leave it to the default.
-``` txt
-    theta=1.3;
-```
-This is a relatively small model so we can force the netcdf variable to be saved as floats.
-``` txt
-    smallnc=0
-```
-Sepcify the model duration, output timestep and output file name and variables
+
+
+Specify the model duration, output timestep and output file name and variables
 ``` txt
     endtime=1800
     outtimestep=10
     outfile=Jet_demo.nc
     outvars=zb,uu,vv,zs,vort;
 ```
-Specify absorbing boundaries for left and right (There is a wal at the top and bottom so no need to specify any boundary there).
+Specify absorbing boundaries (type 3) for left and right (There is a wall at the top and bottom so no need to specify any boundary there).
 ``` txt
-    right = 3; # Absorbing bnd
-    rightbndfile = right.bnd
+    right = right.bnd,3;
 
-    left=3; # Absorbing bnd
-    leftbndfile = left.txt
+    left = left.txt,3;
 ```
 
 ## Run the model
