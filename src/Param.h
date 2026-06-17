@@ -24,10 +24,17 @@ public:
 	double Cd = 0.002; // Wind drag coefficient
 	double il = 0.0; //Initial Loss value (if constant)
 	double cl = 0.0; //Continuous Loss value (if constant)
+
+	double K_gw = 0.0; // Hydraulic conductivity (m/s)
+	double fs_gw = 0.0; // Saturated infiltration rate (m/s)
+	double Sy_gw = 0.05; // Specific yield
+	double Aquifer_Depth = 10.0; // Aquifer depth (m)
+	double hgw_init = nan(""); // Initial groundwater elevation (m)
 	bool windforcing = false; //not working yet
 	bool atmpforcing = false;
 	bool rainforcing = false;
 	bool infiltration = false;
+	bool groundwater = false;
 
 	bool conserveElevation = false; //Switch to force the conservation of zs instead of h at the interface between coarse and fine blocks
 	bool wetdryfix = true; // Switch to remove wet/dry instability (i.e. true reoves instability and false leaves the model as is)

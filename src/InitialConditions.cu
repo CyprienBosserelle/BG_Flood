@@ -114,6 +114,55 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 	}
 
 	//=====================================
+	// Initialise groundwater parameters map
+	if (XParam.groundwater)
+	{
+		log("\tInitializing groundwater parameters");
+		if (XForcing.K_gw.nx > 0)
+			interp2BUQ(XParam, XModel.blocks, XForcing.K_gw, XModel.gw.K);
+		else
+			InitArrayBUQ(XParam, XModel.blocks, (T)XParam.K_gw, XModel.gw.K);
+
+		if (XForcing.fs_gw.nx > 0)
+			interp2BUQ(XParam, XModel.blocks, XForcing.fs_gw, XModel.gw.fs);
+		else
+			InitArrayBUQ(XParam, XModel.blocks, (T)XParam.fs_gw, XModel.gw.fs);
+
+		if (XForcing.Sy_gw.nx > 0)
+			interp2BUQ(XParam, XModel.blocks, XForcing.Sy_gw, XModel.gw.Sy);
+		else
+			InitArrayBUQ(XParam, XModel.blocks, (T)XParam.Sy_gw, XModel.gw.Sy);
+
+		if (XForcing.zb_gw.nx > 0)
+			interp2BUQ(XParam, XModel.blocks, XForcing.zb_gw, XModel.gw.zb);
+		else
+			InitArrayBUQ(XParam, XModel.blocks, (T)XParam.Aquifer_Depth, XModel.gw.zb);
+
+		if (XForcing.zs_gw_init.nx > 0)
+			interp2BUQ(XParam, XModel.blocks, XForcing.zs_gw_init, XModel.gw.zs);
+		else if (!std::isnan(XParam.hgw_init))
+			InitArrayBUQ(XParam, XModel.blocks, (T)XParam.hgw_init, XModel.gw.zs);
+		else
+		{
+			// Default: hgw = zb (saturated to the surface)
+			Copy2CartCPU(XParam.nblk, XParam.blksize, XModel.gw.zs, XModel.zb);
+		}
+
+		Inith(XParam, XModel.blocks, XModel.gw.h, XModel.gw.zs, XModel.gw.zb);
+
+		// Initialise fluxes to 0
+		InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.gw.Qx);
+		InitArrayBUQ(XParam, XModel.blocks, T(0.0), XModel.gw.Qy);
+
+		// Set edges for all groundwater parameters
+		setedges(XParam, XModel.blocks, XModel.gw.K);
+		setedges(XParam, XModel.blocks, XModel.gw.fs);
+		setedges(XParam, XModel.blocks, XModel.gw.Sy);
+		setedges(XParam, XModel.blocks, XModel.gw.zb);
+		setedges(XParam, XModel.blocks, XModel.gw.h);
+	}
+
+	//=====================================
 	// Initialize output variables
 	initoutput(XParam, XModel);
 
@@ -891,6 +940,31 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.OutputVarMap["twet"] = XModel.wettime;
 	XModel.Outvarlongname["twet"] = "time since the cell has been wet";
 	XModel.Outvarunits["twet"] = "s";
+
+	XModel.OutputVarMap["K_gw"] = XModel.gw.K;
+	XModel.Outvarlongname["K_gw"] = "Groundwater hydraulic conductivity";
+	XModel.Outvarunits["K_gw"] = "m s-1";
+
+	XModel.OutputVarMap["fs_gw"] = XModel.gw.fs;
+	XModel.Outvarlongname["fs_gw"] = "Saturated infiltration rate";
+	XModel.Outvarunits["fs_gw"] = "m s-1";
+
+	XModel.OutputVarMap["Sy_gw"] = XModel.gw.Sy;
+	XModel.Outvarlongname["Sy_gw"] = "Specific yield";
+	XModel.Outvarunits["Sy_gw"] = "dimensionless";
+
+	XModel.OutputVarMap["zb_gw"] = XModel.gw.zb;
+	XModel.Outvarlongname["zb_gw"] = "Aquifer bed elevation above datum ";
+	XModel.Outvarunits["zb_gw"] = "m";
+
+	XModel.OutputVarMap["zs_gw"] = XModel.gw.zs;
+	XModel.Outvarlongname["zs_gw"] = "Aquifer water surface elevation above datum ";
+	XModel.Outvarunits["zs_gw"] = "m";
+
+	XModel.OutputVarMap["h_gw"] = XModel.gw.h;
+	XModel.Outvarlongname["h_gw"] = "Aquifer thickness ";
+	XModel.Outvarunits["h_gw"] = "m";
+
 	//XModel.OutputVarMap["vort"] = XModel.vort;
 }
 

@@ -110,7 +110,12 @@ jobs:
         run: |
           sed -i 's/test = 14/test = 15/' BG_param.txt
           ./BG_Flood
-          ./BG_Flood BG_param_test15.txt
+          
+      - name: running test 16, Test on Groundwater input
+        run: |
+          sed -i 's/test = 15/test = 16/' BG_param.txt
+          ./BG_Flood
+          
        ##   var=$(ncdump -v h_P0 Test15_zoom2.nc)
        ## if: echo ${{ ${#var} == 7 }}
 

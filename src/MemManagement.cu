@@ -294,6 +294,18 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		AllocateCPU(nblk, blksize, XModel.hgw);
 	}
 
+	if (XParam.groundwater)
+	{
+		AllocateCPU(nblk, blksize, XModel.gw.h);
+		AllocateCPU(nblk, blksize, XModel.gw.zs);
+		AllocateCPU(nblk, blksize, XModel.gw.K);
+		AllocateCPU(nblk, blksize, XModel.gw.fs);
+		AllocateCPU(nblk, blksize, XModel.gw.Sy);
+		AllocateCPU(nblk, blksize, XModel.gw.zb);
+		AllocateCPU(nblk, blksize, XModel.gw.Qx);
+		AllocateCPU(nblk, blksize, XModel.gw.Qy);
+	}
+
 	if (XParam.outmax)
 	{
 		AllocateCPU(nblk, blksize, XModel.evmax);
@@ -540,7 +552,18 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		ReallocArray(nblk, blksize, XModel.il);
 		ReallocArray(nblk, blksize, XModel.cl);
 		ReallocArray(nblk, blksize, XModel.hgw);
+	}
 
+	if (XParam.groundwater)
+	{
+		ReallocArray(nblk, blksize, XModel.gw.K);
+		ReallocArray(nblk, blksize, XModel.gw.fs);
+		ReallocArray(nblk, blksize, XModel.gw.Sy);
+		ReallocArray(nblk, blksize, XModel.gw.zb);
+		ReallocArray(nblk, blksize, XModel.gw.zs);
+		ReallocArray(nblk, blksize, XModel.gw.h);
+		ReallocArray(nblk, blksize, XModel.gw.Qx);
+		ReallocArray(nblk, blksize, XModel.gw.Qy);
 	}
 
 	if (XParam.outmax)
@@ -858,6 +881,18 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		AllocateGPU(nblk, blksize, XModel.il);
 		AllocateGPU(nblk, blksize, XModel.cl);
 		AllocateGPU(nblk, blksize, XModel.hgw);
+	}
+
+	if (XParam.groundwater)
+	{
+		AllocateGPU(nblk, blksize, XModel.gw.h);
+		AllocateGPU(nblk, blksize, XModel.gw.zs);
+		AllocateGPU(nblk, blksize, XModel.gw.K);
+		AllocateGPU(nblk, blksize, XModel.gw.fs);
+		AllocateGPU(nblk, blksize, XModel.gw.Sy);
+		AllocateGPU(nblk, blksize, XModel.gw.zb);
+		AllocateGPU(nblk, blksize, XModel.gw.Qx);
+		AllocateGPU(nblk, blksize, XModel.gw.Qy);
 	}
 
 	if (XParam.outmax)
