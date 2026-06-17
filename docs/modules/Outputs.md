@@ -37,7 +37,7 @@ Averaged variable are always reset at every output.
 
 
 # output times
-BG_Flood will always output model's initial condition and last step. In between you can output every time interval: e.g.  `outputtimestep = 36.0;` to get every 36s since the satrt of the simulation till the end. 
+BG_Flood will always output model's initial condition and last step. In between you can output every time interval: e.g.  `outputtimestep = 36.0;` to get every 36s since the start of the simulation till the end. 
 
  or specify desired times: e.g.  `Toutput=5.5,0|2.2|4,3.0` will output at 0.0, 2.2s, 3.0, 4.0, 5.5s, after the reference time. The first and last number are seen as second after after the reference time and the 3 numbers separated by `|` are understood as a range.
 
