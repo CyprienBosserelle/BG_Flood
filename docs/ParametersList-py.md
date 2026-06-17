@@ -97,7 +97,7 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 ### Netcdf parameters
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
-|smallnc|smallnc| 1|Short integer conversion for netcdf outputs. 1: save as short integer for the netcdf file, if 0 then save all variables as float|
+|smallnc|smallnc| 0|Short integer conversion for netcdf outputs. 1: save as short integer for the netcdf file, if 0 then save all variables as float|
 |scalefactor|scalefactor| 0.01f|Scale factor used for the short integer conversion for netcdf outputs. This follow the COARDS convention.|
 |addoffset|addoffset| 0.0f|Offset add during the short integer conversion for netcdf outputs (follow the COARDS convention)|
 
