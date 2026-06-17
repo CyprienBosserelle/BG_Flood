@@ -52,11 +52,33 @@ means output from  2020-01-01T00:00:00 every 1 hour till 2020-01-01T12:00:00 and
 
 When simulating very large domain it is useful to ouput only area of interest. This can be done with output zones:
 
+`outzone=MyZoneNameb.nc,x1b,x2b,y1b,y2b;`
+
+alternatively you can specify what timeyou want to save for that zone:
+
+`outzone=zoomed.nc,5.3,5.4,0.5,0.8, 3600:360:7200;`
+
+where `x1b,x2b,y1b,y2b` are the bounding box coordinate of the output area. 
+
+Note that The output will not cut a modelling block so the output area may be larger than specified in the outzone.
 
 
 # Additional parameters
+* `smallnc` when true (default is false) the variable in the netcdf file are shifted and scaled to short integers making the output very small. `scalefactor` and `addoffset` parameters controls the scaling to short integer.
 
+* `outishift` and `outjshift` Will allow you to shift the output by 1 cell to see the values in the ghost cells (default is 0 but values can only be -1, 1 or 0)
+
+* `savebyblk` makes the model write a single block at a time. this is normally the best way to save to the disk. On some computers the overhead cost of the netcdf write function is way higher. in those case it is way faster to save an entire level at once in some configuration this will require a huge amount of memory. In that ccase consider using a outzone.  
+
+* `crs_ref` BG_Flood automatically copies
 
 # Timeseries Output
-`TSnodesout=Offshore.txt,xloc,yloc;`
+BG_Flood allow users to extract timeseries out of the model:
 
+`TSnodesout=OutputTSfile.txt,xloc,yloc;`
+
+where `OutputTSfile.txt` is the file where the data will be saved, `xloc,yloc` are the coordinates off the location for the output.
+
+The user cannot specify when/how often to output. instead you get all the time steps for that location. Intermnally the model copies the data to a GPU buffer that is flushed to the CPU and later to the file either at the same time as saving a map output or when the buffer is full.
+
+Timeseries output are only available for evolving parameters of the hydrodynamic part of the model: `zs`, `h`, `u` and `v`.
