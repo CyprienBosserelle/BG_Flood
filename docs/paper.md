@@ -86,7 +86,7 @@ The utility and scalability of `BG_Flood` have been demonstrated through several
 
 ## National-Scale Hazard Assessments
 
-`BG_Flood` served as the core hydrodynamic flood model for the "Mā te haumaru o te wai" (Flood Resilience Aotearoa) programme [@harang2026]. This programme produced the first publicly available, nationally consistent flood inundation hazard and risk assessment for Aotearoa New Zealand. The project deployed `BG_Flood` within a semi-automated workflow covering 256 floodplains, demonstrating the model's capacity for "headless" command-line operation and its ability to ingest large-scale inputs, including high-resolution LiDAR-derived Digital Elevation Models (DEMs), flow hydrographs for hundreds of rivers, and spatially and temporally varying rainfall from synthetic storms.
+`BG_Flood` served as the core hydrodynamic flood model for the "Mā te haumaru o te wai" (Flood Resilience Aotearoa) programme [@harang2026]. This programme produced the first publicly available, nationally consistent flood inundation hazard and risk assessment for Aotearoa New Zealand. The project deployed `BG_Flood` within a semi-automated workflow covering 256 flood plains, demonstrating the model's capacity for "headless" command-line operation and its ability to ingest large-scale inputs, including high-resolution LiDAR-derived Digital Elevation Models (DEMs), flow hydrographs for hundreds of rivers, and spatially and temporally varying rainfall from synthetic storms.
 
 ![Variable-resolution mesh and inundation depth for the Karamea River Floodplain used in the "Mā te haumaru o te wai" programme.](BG_Flood_Paper_fig1.png)
 

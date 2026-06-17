@@ -3,7 +3,7 @@ BG_Flood has been designed to handle a very large number of river injection with
 
 # The problem
 
-In a naive implementation the model loops through all the river injection, each kernels are launched in serial for each river. whith the kernel launch, the whole GPU is then held up for updating a few cells for each rivers at a time. This is simple, it is safe when multiple river affect the same cells but extremely inefficient when you have hundreds of injections.
+In a naive implementation the model loops through all the river injection, each kernels are launched in serial for each river. With the kernel launch, the whole GPU is then held up for updating a few cells for each rivers at a time. This is simple, it is safe when multiple river affect the same cells but extremely inefficient when you have hundreds of injections.
 
 
 ## Yes this is an issue
@@ -21,7 +21,7 @@ For example, in a crude test model, the runtime for 675 river is 10x than for ea
 This is a classic GPU problem when you need to flatten a loop to make it work efficiently. This is not so trivial because BG_Flood needs to retain its ability to inject multiple rivers at the same place without creating a race issue (when 2 or more processes try to add a value at the same cell). Multiple river at the same location often occur in BG_Flood if the river discharges are obtained from a hydrological model. However, Most river injection are in blocks distant from each other so some flattening can happen.
 
 ## More details
-There is still a iteration loop for the maximum number of river per block but each iteration is flattened and memory efficient wher only affected blocks are called in the kernel and as many river as unique blocks are called at once.
+There is still a iteration loop for the maximum number of river per block but each iteration is flattened and memory efficient where only affected blocks are called in the kernel and as many river as unique blocks are called at once.
 
 
 # Results

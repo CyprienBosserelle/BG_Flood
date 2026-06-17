@@ -214,7 +214,7 @@ To run BG_Flood simply launch the executable by double click or via a terminal.
 
 ### Screen log and file log
 
-After launching BG_Flood you should see a bunch of info scrollin on the screen. an almost identical amount of information is generated in a `BG_log.txt` file. This should be your go-to file for info when things do go as planned. if there is an error you should get your clues here. My screen shows this:
+After launching BG_Flood you should see a bunch of info scrolling on the screen. an almost identical amount of information is generated in a `BG_log.txt` file. This should be your go-to file for info when things do go as planned. if there is an error you should get your clues here. My screen shows this:
 
 ```
 #################################
@@ -290,4 +290,4 @@ gmt grdconvert maxflood.nc -Gmaxflood.tif=gd:GTIFF
 
 ### What's with the variable name and `_P0`
 
-BG_Flood can handle variable grid size. This is tricky can be annoying to handle in Netcdf format. One way is to save the data in a unstructured format but that would not be easy to visualise and manipulate. Instead we save each level of refinment in a separate variable with it's own grid. that way each level of refinement is a raster in itself and can be stacked with other level of refinment allowing the display of the true grid as a stack of regular grids. Clever... but that requires multiple output variable for the same model variable. the simplest way is to extend the model variable name with its level of refinment `_P0` is level 0, `_P1` is level 1, `_N1` is level -1 etc... 
+BG_Flood can handle variable grid size. This is tricky can be annoying to handle in Netcdf format. One way is to save the data in a unstructured format but that would not be easy to visualise and manipulate. Instead we save each level of refinement in a separate variable with it's own grid. that way each level of refinement is a raster in itself and can be stacked with other level of refinement allowing the display of the true grid as a stack of regular grids. Clever... but that requires multiple output variable for the same model variable. the simplest way is to extend the model variable name with its level of refinement `_P0` is level 0, `_P1` is level 1, `_N1` is level -1 etc...

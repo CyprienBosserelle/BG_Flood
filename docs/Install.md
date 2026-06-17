@@ -48,7 +48,7 @@ sudo apt-get install libnetcdf-dev
 !!! note
     Make sure the GPU driver being used is the Nvidia driver!
 
-Do a quick comand line test to see if nvcc (CUDA compiler) is available from here.
+Do a quick command line test to see if nvcc (CUDA compiler) is available from here.
 
 If not, you may need to modify the cuda path in the makefile (line 155) :
 ```{bash}

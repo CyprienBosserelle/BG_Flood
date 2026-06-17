@@ -2,13 +2,13 @@
 This tutorial is the next stat from the Gaussian wave. Here we produce a realistic tsunami and let it propagate across the Pacific.
 
 ## Bathy and domain definition
-The bathymetry file we are using was extracted from the GEBCO gobal bathymetry using GMT command grdcut / grdsample. This section needs a tutorial of its own. Here in the `BG_param.txt` we specify the file name and that it is a spherical model domain.
+The bathymetry file we are using was extracted from the GEBCO global bathymetry using GMT command grdcut / grdsample. This section needs a tutorial of its own. Here in the `BG_param.txt` we specify the file name and that it is a spherical model domain.
 ``` txt title="BG_param.txt"
     # Bathymetry file
     bathy = Tpac_big.asc;
     spherical = 1;
 ```
-The file covers a bigger area than we want to use for the simulation so we restict the domain:
+The file covers a bigger area than we want to use for the simulation so we restrict the domain:
 ``` txt
     ymin=-78.0
     ymax=14.32
@@ -47,5 +47,5 @@ In the previous tutorial you have seen how different boundary type let's wave th
 
 ## Things to try
 * Try changing the model domain and resolution. What happens if part of the domain is outside of the area covered by the bathymetry?
-* Try outputing a time series near Christchurch
+* Try outputting a time series near Christchurch
 

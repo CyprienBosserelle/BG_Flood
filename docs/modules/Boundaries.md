@@ -3,7 +3,7 @@ Making sure you understand boundaries is critical to make a better model.
 
 when specifying boumndary you need to specify where is your boundary, what type of boundary you want (see __type__ below) and water level you want to specify.
 
-Boundaries are applied to the open side of all block that have a face with no neighbour. Selecting blocks to applie a boundary is through a polygon.
+Boundaries are applied to the open side of all block that have a face with no neighbour. Selecting blocks to apply a boundary is through a polygon.
 
 # usage
 
@@ -58,11 +58,11 @@ For simple rectangular domains, it is not always practical to specify a polygon 
 
 
 ## Area of interest bnd
-In complex domain (e.g. a catchment outline) it may not be very productive to specify a boundary segment. by you may still want to ontrol what happens there. 
+In complex domain (e.g. a catchment outline) it may not be very productive to specify a boundary segment. by you may still want to control what happens there.
 `aoibnd = bndtype` allow the user to specify the type of bnd for the blocks that do not fall in any boundary segments. if specifying type 2 or 3 the water level will be forced by the `zsinit` value.
 
-## Overlaping boundary segments
-When specifying boundary segment they may overlap. In this case the order of the given bndseg matters. The last bndseg will be assigned to overlapped blocks. Internally to the model, each bndseg operation is independent and for a given block will be overriden by any subsequent call. 
+## Overlapping boundary segments
+When specifying boundary segment they may overlap. In this case the order of the given bndseg matters. The last bndseg will be assigned to overlapped blocks. Internally to the model, each bndseg operation is independent and for a given block will be overridden by any subsequent call.
 
 
 # Bnd Type details
@@ -72,15 +72,15 @@ Normal flux to the wall will be set to 0.0. This is very reflective but does not
 
 
 ## Neumann
-Normal flux to the boundary will be assigned the same value as the oposite face of the cell. This will let water through but is still relatively reflective. Critically, water can leak back in the model.
+Normal flux to the boundary will be assigned the same value as the opposite face of the cell. This will let water through but is still relatively reflective. Critically, water can leak back in the model.
 
 Because it leaks, it shouldn't be used at rivers but are usually OK for ocean next to an absorbing boundary.
 
 ## Dirichlet
-Dirichlet boundary requires a specified water level timeseries and calculates the flux at the boundary to enforce it. This is the prefered boundary when specifying tsunami and sharp changes in water level but will reflect off incoming waves. It can also trap eddies and cause instabilities.
+Dirichlet boundary requires a specified water level timeseries and calculates the flux at the boundary to enforce it. This is the preferred boundary when specifying tsunami and sharp changes in water level but will reflect off incoming waves. It can also trap eddies and cause instabilities.
 
 ## Absorbing
-absorbing boundary is the prefered type of boundary for most applications. It requires a specified water level timeseries but is generally very stable and does not reflect incoming waves and eddies. Users can control (somewhat) the timescale of the absorbing capabilities by modifying the relaxation time and filtering time. default values are:
+absorbing boundary is the preferred type of boundary for most applications. It requires a specified water level timeseries but is generally very stable and does not reflect incoming waves and eddies. Users can control (somewhat) the timescale of the absorbing capabilities by modifying the relaxation time and filtering time. default values are:
 
 ```
 bndrelaxtime = 3600.0;
@@ -98,7 +98,7 @@ When cold-starting a model it may be desirable to slowly transition from initial
 
 ## zsoffset
 
-`zsoffset` paramter is useful to automatically shift all imput water level by a given offset. This can be used for sea-level rise scenario or for changing datum when water level and DEM are kept is separate datums.
+`zsoffset` parameter is useful to automatically shift all input water level by a given offset. This can be used for sea-level rise scenario or for changing datum when water level and DEM are kept is separate datums.
 
 >Note that zsoffset only applies to water levels in forcing and initial condition. it does not apply to DEM or other elevations.
 

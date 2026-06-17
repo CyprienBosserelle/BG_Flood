@@ -5,7 +5,7 @@ BG_Flood simple infiltration module is often a limitation when simulating inunda
 
 Groundwater simulation is a difficult endeavour because sparse information lead to large uncertainties in the forcing of the model. In addition, groundwater processes often operate at much larger time-scale than inundation timescale. 
 
-Hence the groundwater module of BG_Flood is not intended as a state of the art groundwater model but instead as a very simple module that allow to account for basic interaction between groundwater,surface water. This module in intended for the shallow part of teh groundwater and ignores the complex 3d natyure of groundwater flow. 
+Hence the groundwater module of BG_Flood is not intended as a state of the art groundwater model but instead as a very simple module that allow to account for basic interaction between groundwater,surface water. This module in intended for the shallow part of the groundwater and ignores the complex 3d natyure of groundwater flow.
 
 ### Simple depth-averaged boussinesq groundwater model
 This groundwater module simulates 2D transient water table dynamics within an unconfined aquifer by solving the linearized Boussinesq equation. It couples vertical surface infiltration (the source term) with lateral Darcy routing to track how groundwater mounds grow under localized recharge basins and subsequently decay or flatten out across the simulation grid over time.
@@ -78,7 +78,7 @@ with `river.tmp` looking like this:
 ```
 
 ## Results and comparison
-Results are excellent. At the center of the injection, the model and analytical solution are virtually indistinguishable. 
+Results are excellent. At the centre of the injection, the model and analytical solution are virtually indistinguishable.
 <img width="702" height="477" alt="image" src="https://github.com/user-attachments/assets/a9be09d3-9909-4b6e-a0d6-c1f44e418349" />
 
 Where the model and solution start to deviate are near the boundary condition or after a long time where bnd are influencing the results.

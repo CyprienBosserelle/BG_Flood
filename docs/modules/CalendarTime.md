@@ -5,7 +5,7 @@ You can use datetime string as input for TXT files as ```yyyy-mm-ddTHH:MM:SS``` 
 
 
  
-> Note the ```T``` is the key in BGFlood for identifying if whether the input is a float (old format) or a datetime string. 
+> Note the ```T``` is the key in BGFlood for identifying whether the input is a float (old format) or a datetime string.
 
 You can still use the "old" float format. 
 
@@ -21,7 +21,7 @@ While the model doesn't need a reference time, it is preferable/good practice to
 
 
 > IMPORTANT: 
-> While you can let BG_Flood guess, it is recomended to set `starttime` and `endtime` to avoid surprises`
+> While you can let BG_Flood guess, it is recommended to set `starttime` and `endtime` to avoid surprises`
 
 # Also for outputs
 User can use `Toutput` instead of `outputtimestep` for range or single value(s) as long as they are separated by a `,`. Multiple ranges can be given and a mix of single values and range.
