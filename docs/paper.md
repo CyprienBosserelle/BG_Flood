@@ -23,6 +23,7 @@ authors:
     orcid: 0000-0002-5906-213X
     affiliation: 1
   - name: Emily Lane
+    equal-contrib: true
     orcid: 0000-0002-9261-6640
     affiliation: 1
   - name: Joe Pelmard
