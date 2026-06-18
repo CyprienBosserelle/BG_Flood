@@ -1,8 +1,6 @@
 name: Draft PDF
 on:
   push:
-    on:
-  push:
     paths:
       - docs/paper.md
       - docs/paper.bib
