@@ -61,7 +61,7 @@ The model has been validated against standard academic benchmarks [@bosserelle20
 
 # Software design 
 
-`BG_Flood` is a GPU-native hydrodynamic model engineered to facilitate high-performance environmental simulations. The model prioritises computational efficiency and ease of use, providing a modern framework for simulating complex flows across varying spatial scales. BG_Flood was designed for inundation simulation from a range of processes useful for Tsunami, rainfall, river and storm-surge driven inundation
+`BG_Flood` is a GPU-native hydrodynamic model engineered to facilitate high-performance environmental simulations. The model prioritises computational efficiency and ease of use, providing a modern framework for simulating complex flows across varying spatial scales. BG_Flood was designed for inundation simulation from a range of processes useful for Tsunami, rainfall, river and storm-surge driven inundation.
 
 ## Numerical Framework and Performance
 
@@ -87,7 +87,7 @@ Developed by domain scientists to address a wide range of inundation hazard proc
 
 All the features are available at runtime and are orchestrated by internal flags in the model parameter.
 
-# Research impact
+# Research impact statement
 
 The utility and scalability of `BG_Flood` have been demonstrated through several high-impact research initiatives, most notably in the development of nationally consistent flood hazard frameworks.
 
