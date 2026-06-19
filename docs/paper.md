@@ -52,17 +52,16 @@ Inundation hazard assessment and forecasting rely heavily on physics-based simul
 
 Capturing this cascade of spatial and temporal scales typically requires unstructured or adaptive variable-resolution meshes. Unstructured mesh generation can frequently become a bottleneck, relying heavily on manual user intervention and lacking the flexibility to adapt dynamically as a simulation progresses. In contrast, variable-resolution grids can be generated with minimal manual overhead and can potentially adapt during runtime. While variable-resolution grids allow users to transition iteratively from coarse, rapid prototypes to high-fidelity models, this flexibility traditionally incurs substantial computational overhead. For large-scale assessments, total execution runtime remains the primary constraint on either the maximum achievable grid resolution or the spatial extent of the modelling domain.
 
-# Statement of field
-While some GPU-compatible variable-resolution mesh codes exist to address this performance gap, they often lack the accessible, streamlined interfaces required for rapid, automated model development. `BG_Flood` addresses this gap by providing a GPU-native hydrodynamic model with a highly clean and efficient interface. It automates mesh generation and provides a flexible framework that allows users to rapidly deploy both simplified configurations and highly complex inundation models. By bridging the gap between high-performance "research-grade" high-computing code and user-friendly open-source software, `BG_Flood` enables efficient, large-scale inundation modelling that is accessible to the broader flood hazard community.
+# State of field
+Some GPU-compatible and or variable-resolution mesh inundation software exist to address this performance gap. Basilisk model is designed for quad-tree grids and includes GPU capability but the interface, while extremely flexible, require coding to run the model. Tuflow also support quad-tree and GPU capability but is not open-source. LISFLOOD-FP 8.2 can be linked to an adaptive mesh, GPU capable solver at compile time but is only available for non-commercial use. Other research code are available to demonstrate the capability but often lack the accessible, streamlined interfaces required for rapid, automated model development or are limited in the process they can simulate. `BG_Flood` addresses this gap by providing a GPU-native hydrodynamic model with a highly clean and efficient interface. It automates mesh generation and provides a flexible framework that allows users to rapidly deploy both simplified configurations and highly complex inundation models. By bridging the gap between high-performance "research-grade" high-computing code and user-friendly open-source software, `BG_Flood` enables efficient, large-scale inundation modelling that is accessible to the broader inundation hazard community.
 
 The model has been validated against standard academic benchmarks [@bosserelle2021bgflood] and real-world extreme events, including the 2009 Samoa tsunami [@bosserelle2020effects] and the 2023 Ex-Tropical Cyclone Gabrielle [@pelmard2026regional]. Full details on usage and validation cases are available in the official online documentation.
 
 
 
+# Software design 
 
-# Software design and key Features
-
-`BG_Flood` is a GPU-native hydrodynamic model engineered to facilitate high-performance environmental simulations. The model prioritises computational efficiency and ease of use, providing a modern framework for simulating complex flows across varying spatial scales. BG_Flood was designed for 
+`BG_Flood` is a GPU-native hydrodynamic model engineered to facilitate high-performance environmental simulations. The model prioritises computational efficiency and ease of use, providing a modern framework for simulating complex flows across varying spatial scales. BG_Flood was designed for inundation simulation from a range of processes useful for Tsunami, rainfall, river and storm-surge driven inundation
 
 ## Numerical Framework and Performance
 
@@ -88,13 +87,13 @@ Developed by domain scientists to address a wide range of inundation hazard proc
 
 All the features are available at runtime and are orchestrated by internal flags in the model parameter.
 
-# Research impact and applications
+# Research impact
 
 The utility and scalability of `BG_Flood` have been demonstrated through several high-impact research initiatives, most notably in the development of nationally consistent flood hazard frameworks.
 
 ## National-Scale Hazard Assessments
 
-`BG_Flood` served as the core hydrodynamic flood model for the "Mā te haumaru o te wai" (Flood Resilience Aotearoa) programme [@harang2026]. This programme produced the first publicly available, nationally consistent flood inundation hazard and risk assessment for Aotearoa New Zealand. The project deployed `BG_Flood` within a semi-automated workflow covering 256 flood plains, demonstrating the model's capacity for "headless" command-line operation and its ability to ingest large-scale inputs, including high-resolution LiDAR-derived Digital Elevation Models (DEMs), flow hydrographs for hundreds of rivers, and spatially and temporally varying rainfall from synthetic storms.
+`BG_Flood` served as the core hydrodynamic inundation model for the "Mā te haumaru o te wai" (Flood Resilience Aotearoa) programme [@harang2026]. This programme produced the first publicly available, nationally consistent inundation hazard and risk assessment for Aotearoa New Zealand. The project deployed `BG_Flood` within a semi-automated workflow covering 256 flood plains, demonstrating the model's capacity for "headless" command-line operation and its ability to ingest large-scale inputs, including high-resolution LiDAR-derived Digital Elevation Models (DEMs), flow hydrographs for hundreds of rivers, and spatially and temporally varying rainfall from synthetic storms.
 
 ![Variable-resolution mesh and inundation depth for the Karamea River Floodplain used in the "Mā te haumaru o te wai" programme.](BG_Flood_Paper_fig1.png)
 
@@ -104,7 +103,7 @@ Rapid post-event simulations provide critical operational intelligence for emerg
 
 ## Data Generation for Machine Learning
 
-`BG_Flood` is actively utilised to generate extensive training catalogues of synthetic storm scenarios. These high-fidelity hydrodynamic outputs were used to train Machine Learning (Random Forest) emulators, creating highly efficient surrogate models capable of predicting local flood depths in mere seconds. This highlights the model's value not just as a standalone simulation tool, but as a robust data factory for the next generation of real-time rapid flood forecasting frameworks [@pozo2026].
+`BG_Flood` is actively utilised to generate extensive training catalogues of synthetic storm scenarios. These high-fidelity hydrodynamic outputs were used to train Machine Learning (Random Forest) emulators, creating highly efficient surrogate models capable of predicting local inundation depths in mere seconds. This highlights the model's value not just as a standalone simulation tool, but as a robust data factory for the next generation of real-time rapid inundation forecasting frameworks [@pozo2026].
 
 
 # Acknowledgements
