@@ -1,0 +1,80 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structEvolvingMLP" kind="struct" language="C++" prot="public">
+    <compoundname>EvolvingMLP</compoundname>
+    <includes refid="Arrays_8h" local="no">Arrays.h</includes>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structEvolvingMLP_1ac095fb4347e19c9eb2347b137ad26400" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* EvolvingMLP&lt; T &gt;::h</definition>
+        <argsstring></argsstring>
+        <name>h</name>
+        <qualifiedname>EvolvingMLP::h</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Water depth </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="87" column="3" bodyfile="src/Arrays.h" bodystart="87" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structEvolvingMLP_1a037883ad83a8634643b2f2932c0b5d90" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* EvolvingMLP&lt; T &gt;::u</definition>
+        <argsstring></argsstring>
+        <name>u</name>
+        <qualifiedname>EvolvingMLP::u</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Velocity u </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="89" column="3" bodyfile="src/Arrays.h" bodystart="89" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structEvolvingMLP_1a4e50d441866e65aecf6e65c8ec67509a" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* EvolvingMLP&lt; T &gt;::v</definition>
+        <argsstring></argsstring>
+        <name>v</name>
+        <qualifiedname>EvolvingMLP::v</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Velocity v </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="91" column="3" bodyfile="src/Arrays.h" bodystart="91" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+<para>Structure holding evolving variables (no z relative variables). </para>
+    </briefdescription>
+    <detaileddescription>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+    </detaileddescription>
+    <location file="src/Arrays.h" line="84" column="1" bodyfile="src/Arrays.h" bodystart="85" bodyend="92"/>
+    <listofallmembers>
+      <member refid="structEvolvingMLP_1ac095fb4347e19c9eb2347b137ad26400" prot="public" virt="non-virtual"><scope>EvolvingMLP</scope><name>h</name></member>
+      <member refid="structEvolvingMLP_1a037883ad83a8634643b2f2932c0b5d90" prot="public" virt="non-virtual"><scope>EvolvingMLP</scope><name>u</name></member>
+      <member refid="structEvolvingMLP_1a4e50d441866e65aecf6e65c8ec67509a" prot="public" virt="non-virtual"><scope>EvolvingMLP</scope><name>v</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

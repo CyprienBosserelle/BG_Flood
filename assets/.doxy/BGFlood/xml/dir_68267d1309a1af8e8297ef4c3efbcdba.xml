@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="dir_68267d1309a1af8e8297ef4c3efbcdba" kind="dir">
+    <compoundname>src</compoundname>
+    <innerfile refid="Adaptation_8cu">Adaptation.cu</innerfile>
+    <innerfile refid="Adaptation_8h">Adaptation.h</innerfile>
+    <innerfile refid="AdaptCriteria_8cu">AdaptCriteria.cu</innerfile>
+    <innerfile refid="AdaptCriteria_8h">AdaptCriteria.h</innerfile>
+    <innerfile refid="Advection_8cu">Advection.cu</innerfile>
+    <innerfile refid="Advection_8h">Advection.h</innerfile>
+    <innerfile refid="Arrays_8h">Arrays.h</innerfile>
+    <innerfile refid="BG__Flood_8cu">BG_Flood.cu</innerfile>
+    <innerfile refid="BG__Flood_8h">BG_Flood.h</innerfile>
+    <innerfile refid="Boundary_8cu">Boundary.cu</innerfile>
+    <innerfile refid="Boundary_8h">Boundary.h</innerfile>
+    <innerfile refid="ConserveElevation_8cu">ConserveElevation.cu</innerfile>
+    <innerfile refid="ConserveElevation_8h">ConserveElevation.h</innerfile>
+    <innerfile refid="FlowCPU_8cu">FlowCPU.cu</innerfile>
+    <innerfile refid="FlowCPU_8h">FlowCPU.h</innerfile>
+    <innerfile refid="FlowGPU_8cu">FlowGPU.cu</innerfile>
+    <innerfile refid="FlowGPU_8h">FlowGPU.h</innerfile>
+    <innerfile refid="FlowMLGPU_8cu">FlowMLGPU.cu</innerfile>
+    <innerfile refid="FlowMLGPU_8h">FlowMLGPU.h</innerfile>
+    <innerfile refid="Forcing_8h">Forcing.h</innerfile>
+    <innerfile refid="Friction_8cu">Friction.cu</innerfile>
+    <innerfile refid="Friction_8h">Friction.h</innerfile>
+    <innerfile refid="General_8h">General.h</innerfile>
+    <innerfile refid="Gradients_8cu">Gradients.cu</innerfile>
+    <innerfile refid="Gradients_8h">Gradients.h</innerfile>
+    <innerfile refid="GridManip_8cu">GridManip.cu</innerfile>
+    <innerfile refid="GridManip_8h">GridManip.h</innerfile>
+    <innerfile refid="Halo_8cu">Halo.cu</innerfile>
+    <innerfile refid="Halo_8h">Halo.h</innerfile>
+    <innerfile refid="InitEvolv_8cu">InitEvolv.cu</innerfile>
+    <innerfile refid="InitEvolv_8h">InitEvolv.h</innerfile>
+    <innerfile refid="InitialConditions_8cu">InitialConditions.cu</innerfile>
+    <innerfile refid="InitialConditions_8h">InitialConditions.h</innerfile>
+    <innerfile refid="Input_8h">Input.h</innerfile>
+    <innerfile refid="Kurganov_8cu">Kurganov.cu</innerfile>
+    <innerfile refid="Kurganov_8h">Kurganov.h</innerfile>
+    <innerfile refid="Mainloop_8cu">Mainloop.cu</innerfile>
+    <innerfile refid="Mainloop_8h">Mainloop.h</innerfile>
+    <innerfile refid="Meanmax_8cu">Meanmax.cu</innerfile>
+    <innerfile refid="Meanmax_8h">Meanmax.h</innerfile>
+    <innerfile refid="MemManagement_8cu">MemManagement.cu</innerfile>
+    <innerfile refid="MemManagement_8h">MemManagement.h</innerfile>
+    <innerfile refid="Mesh_8cu">Mesh.cu</innerfile>
+    <innerfile refid="Mesh_8h">Mesh.h</innerfile>
+    <innerfile refid="Multilayer_8cu">Multilayer.cu</innerfile>
+    <innerfile refid="Multilayer_8h">Multilayer.h</innerfile>
+    <innerfile refid="Param_8h">Param.h</innerfile>
+    <innerfile refid="Poly_8cu">Poly.cu</innerfile>
+    <innerfile refid="Poly_8h">Poly.h</innerfile>
+    <innerfile refid="Read__netcdf_8cu">Read_netcdf.cu</innerfile>
+    <innerfile refid="Read__netcdf_8h">Read_netcdf.h</innerfile>
+    <innerfile refid="ReadForcing_8cu">ReadForcing.cu</innerfile>
+    <innerfile refid="ReadForcing_8h">ReadForcing.h</innerfile>
+    <innerfile refid="ReadInput_8cu">ReadInput.cu</innerfile>
+    <innerfile refid="ReadInput_8h">ReadInput.h</innerfile>
+    <innerfile refid="Reimann_8cu">Reimann.cu</innerfile>
+    <innerfile refid="Reimann_8h">Reimann.h</innerfile>
+    <innerfile refid="Setup__GPU_8cu">Setup_GPU.cu</innerfile>
+    <innerfile refid="Setup__GPU_8h">Setup_GPU.h</innerfile>
+    <innerfile refid="Spherical_8cu">Spherical.cu</innerfile>
+    <innerfile refid="Spherical_8h">Spherical.h</innerfile>
+    <innerfile refid="Testing_8cu">Testing.cu</innerfile>
+    <innerfile refid="Testing_8h">Testing.h</innerfile>
+    <innerfile refid="Updateforcing_8cu">Updateforcing.cu</innerfile>
+    <innerfile refid="Updateforcing_8h">Updateforcing.h</innerfile>
+    <innerfile refid="utctime_8cu">utctime.cu</innerfile>
+    <innerfile refid="utctime_8h">utctime.h</innerfile>
+    <innerfile refid="Util__CPU_8cu">Util_CPU.cu</innerfile>
+    <innerfile refid="Util__CPU_8h">Util_CPU.h</innerfile>
+    <innerfile refid="Write__netcdf_8cu">Write_netcdf.cu</innerfile>
+    <innerfile refid="Write__netcdf_8h">Write_netcdf.h</innerfile>
+    <innerfile refid="Write__txtlog_8cpp">Write_txtlog.cpp</innerfile>
+    <innerfile refid="Write__txtlog_8h">Write_txtlog.h</innerfile>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/"/>
+  </compounddef>
+</doxygen>

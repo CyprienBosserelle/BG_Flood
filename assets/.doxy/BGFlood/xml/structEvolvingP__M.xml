@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structEvolvingP__M" kind="struct" language="C++" prot="public">
+    <compoundname>EvolvingP_M</compoundname>
+    <basecompoundref refid="structEvolvingP" prot="public" virt="non-virtual">EvolvingP&lt; T &gt;</basecompoundref>
+    <includes refid="Arrays_8h" local="no">Arrays.h</includes>
+    <templateparamlist>
+      <param>
+        <type>class T</type>
+      </param>
+    </templateparamlist>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structEvolvingP__M_1a891d6a871e958248012300329e4e059d" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* EvolvingP_M&lt; T &gt;::U</definition>
+        <argsstring></argsstring>
+        <name>U</name>
+        <qualifiedname>EvolvingP_M::U</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Norm of the velocity </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="103" column="3" bodyfile="src/Arrays.h" bodystart="103" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structEvolvingP__M_1a80e2af7b2832148bcda71cb72c239945" prot="public" static="no" mutable="no">
+        <type>T *</type>
+        <definition>T* EvolvingP_M&lt; T &gt;::hU</definition>
+        <argsstring></argsstring>
+        <name>hU</name>
+        <qualifiedname>EvolvingP_M::hU</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+<para>Product of water depth and velocity norm </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Arrays.h" line="105" column="3" bodyfile="src/Arrays.h" bodystart="105" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+<para>Structure for mean/max evolving variables, inherits from <ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>. </para>
+    </briefdescription>
+    <detaileddescription>
+<para><parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="2">
+        <label>EvolvingP&lt; T &gt;</label>
+        <link refid="structEvolvingP"/>
+      </node>
+      <node id="1">
+        <label>EvolvingP_M&lt; T &gt;</label>
+        <link refid="structEvolvingP__M"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>EvolvingP&lt; T &gt;</label>
+        <link refid="structEvolvingP"/>
+      </node>
+      <node id="1">
+        <label>EvolvingP_M&lt; T &gt;</label>
+        <link refid="structEvolvingP__M"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="src/Arrays.h" line="100" column="1" bodyfile="src/Arrays.h" bodystart="101" bodyend="106"/>
+    <listofallmembers>
+      <member refid="structEvolvingP_1a350d5a1cef103428b6f3292acf5f7dd9" prot="public" virt="non-virtual"><scope>EvolvingP_M</scope><name>h</name></member>
+      <member refid="structEvolvingP__M_1a80e2af7b2832148bcda71cb72c239945" prot="public" virt="non-virtual"><scope>EvolvingP_M</scope><name>hU</name></member>
+      <member refid="structEvolvingP__M_1a891d6a871e958248012300329e4e059d" prot="public" virt="non-virtual"><scope>EvolvingP_M</scope><name>U</name></member>
+      <member refid="structEvolvingP_1addf0f1e2e0672ff7d32890c1867d1586" prot="public" virt="non-virtual"><scope>EvolvingP_M</scope><name>u</name></member>
+      <member refid="structEvolvingP_1a5f61fdbd33ae88a62d35dd5235d8f375" prot="public" virt="non-virtual"><scope>EvolvingP_M</scope><name>v</name></member>
+      <member refid="structEvolvingP_1ad46731077e87059e9409024374f47639" prot="public" virt="non-virtual"><scope>EvolvingP_M</scope><name>zs</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
