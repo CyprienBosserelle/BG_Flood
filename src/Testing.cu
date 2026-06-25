@@ -4,6 +4,7 @@
 
 
 
+
 /**
  * @brief Wrapping function for all the inbuilt test
  * This function is the entry point to other function below.
@@ -24,7 +25,7 @@
  * Test 13 Multi bathy and roughness map input
  * Test 14 Test AOI bnds aswall to start with
  * Test 15 Flexible times reading
-
+ * Test 16 Test Culverts
 
  * Test 99 Run all the test with test number < 99.
 
@@ -39,6 +40,7 @@
  * @param XModel_g Device model data structure
  * @return true if all the tests passed
  */
+
 template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
 {
 
@@ -64,20 +66,20 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			log("\t ### Gaussian wave on Cartesian grid ###");
 			//set gpu is -1 for cpu test
 
-			bumptest = GaussianHumptest(0.1, -1, false);
+			bumptest = GaussianHumptest(0.1, -1, false,2);
 			result = bumptest ? "successful" : "failed";
-			log("\t\tCPU test: " + result);
+			log("\t\tCPU test: " + result + " for engine = 2");
 
 			// If original XParam tried to use GPU we try also
 			if (XParam.GPUDEVICE >= 0)
 			{
-				bumptestGPU = GaussianHumptest(0.1, XParam.GPUDEVICE, false);
+				bumptestGPU = GaussianHumptest(0.1, XParam.GPUDEVICE, false, XParam.engine);
 				result = bumptestGPU ? "successful" : "failed";
-				log("\t\tGPU test: " + result);
+				log("\t\tGPU test: " + result + " for engine = " + std::to_string(XParam.engine));
 
 				if (!bumptestGPU)
 				{
-					bumptestComp = GaussianHumptest(0.1, XParam.GPUDEVICE, true);
+					bumptestComp = GaussianHumptest(0.1, XParam.GPUDEVICE, true, XParam.engine);
 				}
 			}
 			isfailed = ((bumptest == true) && (bumptestGPU == true)) ? false : true;
@@ -114,7 +116,12 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 			{
 				bool GPUvsCPUtest;
 				log("\t### Gaussian wave on Cartesian grid: CPU vs GPU ###");
-				GPUvsCPUtest = GaussianHumptest(0.1, XParam.GPUDEVICE, true);
+				if (XParam.engine == 5)
+				{
+					log("\t CPU vs GPU only woks for engine 1 and 2 switching to 1");
+					XParam.engine = 1;
+				}
+				GPUvsCPUtest = GaussianHumptest(0.1, XParam.GPUDEVICE, true, XParam.engine);
 				result = GPUvsCPUtest ? "successful" : "failed";
 				log("\t\tCPU vs GPU test: " + result);
 				isfailed = (!GPUvsCPUtest || isfailed) ? true : false;
@@ -342,7 +349,38 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 
 		}
 
+  if (mytest == 16)
+	{
+		/* Test 16 is to test the different types of culverts
+			Test1: Culvert with pump (limited by pump/culvert discharge and water availability)
+			Test2: One way culvert (limited by water head)
+			Test3: 2-way culverts
+			Test4: Culvert with energy dissipation
+		*/
+		//bool Culvert_type1;
+		//log("\t### Test of the different culvert types ###");
 
+		//Culvert_type1 = TestCulvert(0, 0, 0); //GPU, Culvert_type, 
+		//result = Culvert_type1 ? "successful" : "failed";
+		//log("\t\t ##### \n");
+		//log("\t\t ##### Culvert type1, (with pump) test : " + result + "\n");
+		//log("\t\t ##### \n");
+		//isfailed = (!Culvert_type1 || isfailed) ? true : false;
+
+		bool Inletcontrol, outletcontrol;
+		Inletcontrol = TestCulvertInletControl(1);
+		result = Inletcontrol ? "successful" : "failed";
+		log("\t\tCulvert test inlet controlled test : " + result);
+
+		outletcontrol = TestCulvertOutletControl(1);
+		result = outletcontrol ? "successful" : "failed";
+		log("\t\tCulvert test outlet controlled test : " + result);
+
+		result = (outletcontrol & Inletcontrol) ? "successful" : "failed";
+		log("\t\tCulvert test : " + result);
+
+
+	}
 
 	if (mytest == 993)
 	{
@@ -352,8 +390,10 @@ template <class T> bool Testing(Param XParam, Forcing<float> XForcing, Model<T> 
 
 	if (mytest == 900)
 	{
-		GaussianHumptest(0.1, XParam.GPUDEVICE, false);
+		GaussianHumptest(0.1, XParam.GPUDEVICE, false, XParam.engine);
 	}
+
+	
 
 		if (mytest == 994)
 		{
@@ -402,6 +442,7 @@ template bool Testing<float>(Param XParam, Forcing<float> XForcing, Model<float>
 template bool Testing<double>(Param XParam, Forcing<float> XForcing, Model<double> XModel, Model<double> XModel_g);
 
 
+
 /**! \fn bool GaussianHumptest(T zsnit, int gpu, bool compare)
  * @brief Gaussian hump propagation test
  *
@@ -415,7 +456,8 @@ template bool Testing<double>(Param XParam, Forcing<float> XForcing, Model<doubl
  * @param compare If true, compare GPU and CPU results (GPU required)
  * @return true if the test passed (results within 1e-6 of reference values)
  */
-template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
+template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare, int engine)
+
 {
 	log("#####");
 	// this is a preplica of the tutorial case for Basilisk
@@ -424,19 +466,53 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	T x, y, delta;
 	T cc = T(0.05);// Match the 200 in chracteristic radius used in Basilisk  1/(2*cc^2)=200
 
-	//XParam.engine = 2;
+	
 
 	T a = T(1.0); //Gaussian wave amplitude
 
 	// Verification data
 	// This is a transect across iy=15:16:127 at ix=127 (or vice versa because the solution is symetrical)
 	// These values are based on single precision output from Netcdf file so are only accurate to 10-7 
-	//double ZsVerifKurganov[8] = { 0.100000000023, 0.100000063119, 0.100110376004, 0.195039970749, 0.136739044168, 0.0848024805994, 0.066275833049, 0.0637058445888 };
+	double ZsVerifKurganov[8] = { 0.100000000023, 0.100000063119, 0.100110376004, 0.195039970749, 0.136739044168, 0.0848024805994, 0.066275833049, 0.0637058445888 };
 	//double ZsVerification[8] = { 0.100000008904, 0.187920326216, 0.152329657390, 0.117710230042, 0.0828616638138, 0.0483274739972, 0.0321501737555, 0.0307609731288 };
+	//double ZsVerification[8] = { 0.100000008904, 0.187920326216, 0.152329657390, 0.117710230042, 0.0828616638138, 0.0483274739972, 0.0321501737555, 0.0307609731288 };
+	double ZsVerifML[8] = { 0.100000000067, 0.100000115531, 0.100133955622, 0.191131915213, 0.134547876957, 0.0854242010962, 0.066553872453, 0.0638724233535 };
 	double ZsVerifButtinger[8] = { 0.100000000023, 0.100000063119, 0.100093580546, 0.195088199869, 0.136767978925, 0.0850706353898, 0.0663028448129, 0.063727949607 };
 
 
+	double ZsVerif[8];
 
+	XParam.engine = engine;
+
+	if (XParam.engine >= 3 && XParam.engine <= 4)
+	{
+		XParam.engine = 2;
+	}
+	if (gpu == -1 && XParam.engine == 5 )
+	{
+		gpu = 0;// i.e. no CPU version for engine 5
+	}
+
+
+	if (XParam.engine == 1)
+	{
+		for (int i = 0; i < 8; i++) {
+			ZsVerif[i] = ZsVerifButtinger[i];
+		}
+	}
+	else if (XParam.engine == 2)
+	{
+		for (int i = 0; i < 8; i++) {
+			ZsVerif[i] = ZsVerifKurganov[i];
+		}
+	}
+	else if (XParam.engine == 5)
+	{
+		XParam.eps = 0.00001;
+		for (int i = 0; i < 8; i++) {
+			ZsVerif[i] = ZsVerifML[i];
+		}
+	}
 
 	// initialise domain and required resolution
 	XParam.dx = 1.0 / ((1 << 8));
@@ -469,16 +545,16 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	// Enforece GPU/CPU
 	XParam.GPUDEVICE = gpu;
 
-	std::string outvi[18] = { "zb","h","zs","u","v","Fqux","Fqvx","Fquy","Fqvy", "Fhu", "Fhv", "dh", "dhu", "dhv", "ho", "vo", "uo", "cf" };
+	/*std::string outvi[18] = { "zb","h","zs","u","v" };
 
 	std::vector<std::string> outv;
 
 	for (int nv = 0; nv < 18; nv++)
 	{
 		outv.push_back(outvi[nv]);
-	}
-
-	XParam.outvars = outv;
+	}*/
+	std::vector<std::string> outv = { "zb", "h", "zs", "u", "v" };
+	XParam.outvars = { "zb","h","zs","u","v" };
 
 	// create Model setup
 	Model<T> XModel;
@@ -594,7 +670,7 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 		{
 			if (XParam.engine == 5)
 			{
-				FlowMLGPU(XParam, XLoop, XForcing, XModel_g);
+				FlowMLGPU(XParam, XLoop_g, XForcing, XModel_g);
 			}
 			else
 			{
@@ -663,14 +739,14 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 
 				int n = memloc(XParam, ix, iy, ib);
 
-				diff = abs(T(XModel.evolv.zs[n]) - ZsVerifButtinger[iv]);
+				diff = abs(T(XModel.evolv.zs[n]) - ZsVerif[iv]);
 
 
 
 				if (diff > 1e-6)//Tolerance is 1e-6 or 1e-7/1e-8??
 				{
 
-					printf("ib=%d, ix=%d, iy=%d; simulated=%f; expected=%f; diff=%e\n", ib, ix, iy, XModel.evolv.zs[n], ZsVerifButtinger[iv], diff);
+					printf("ib=%d, ix=%d, iy=%d; simulated=%f; expected=%f; diff=%e\n", ib, ix, iy, XModel.evolv.zs[n], ZsVerif[iv], diff);
 					modelgood = false;
 					creatncfileBUQ(XParam, XModel.blocks);
 					defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, "zs", 3, XModel.evolv.zs, XModel.blocks.outZone[0]);
@@ -689,8 +765,8 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare)
 	log("#####");
 	return modelgood;
 }
-template bool GaussianHumptest<float>(float zsnit, int gpu, bool compare);
-template bool GaussianHumptest<double>(double zsnit, int gpu, bool compare);
+template bool GaussianHumptest<float>(float zsnit, int gpu, bool compare, int engine);
+template bool GaussianHumptest<double>(double zsnit, int gpu, bool compare, int engine);
 
 /** ! \fn bool Rivertest(T zsnit, int gpu)
  * @brief River inflow mass conservation test
@@ -4805,6 +4881,630 @@ template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario)
 
 	return result;
 }
+
+
+//TestCulvert(int gpu, T ref, int scenario)
+/*! \fn
+*
+* This function creates bathy and param files and tests different configurations of culverts*
+*/
+ bool TestCulvertInletControl(int gpu)
+{
+	log("#####");
+	// this is a preplica of the tutorial case for Basilisk
+	Param XParam;
+	Forcing<float> XForcing;
+	Model<float> XModel;
+	Model<float> XModel_g;
+	StaticForcingP<float> bathy;
+
+	XForcing.Bathy.push_back(bathy);
+
+	// initialise forcing bathymetry to 0
+	XForcing.Bathy[0].xo = 0;
+	XForcing.Bathy[0].yo = 0;
+
+	XForcing.Bathy[0].xmax = 200.0;
+	XForcing.Bathy[0].ymax = 200.0;
+	XForcing.Bathy[0].nx = 201;
+	XForcing.Bathy[0].ny = 201;
+
+	XForcing.Bathy[0].dx = 1.0;
+	XForcing.Bathy[0].dy = 1.0;
+
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+
+			if (i<100)
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.609600f;
+			}
+			else if (i<106)
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 5.0f;
+			}
+			else
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.0f;
+			}
+		}
+	}
+
+	//xmin = 50.0;
+	//xmax = 150.0;
+	//ymin = 80.0
+	//ymax = 120.0
+	//dx = 3.0;
+	
+	XParam.dx = 3.0;
+	XParam.xo = 50.0;
+	XParam.xmax = 150.0;
+	XParam.yo = 80.0;
+	XParam.ymax = 120.0;
+
+	//zsinit = 1.8288;
+	XParam.zsinit = 1.8288;
+
+	XParam.endtime = 3000;
+	XParam.totaltime = 0.0;
+	XParam.outputtimestep = 1000.0;
+	XParam.outfile = "TestCulvertInletControl.nc";
+
+	//culvert = 2, 90.0, 100.0, 120.48, 100.0, 3.048, 1.0, 1, 0.024
+	Culvert myculvert;
+	myculvert.type = 2;
+	myculvert.x1 = 90.0;
+	myculvert.y1 = 100;
+	myculvert.x2 = 120.48;
+	myculvert.y2 = 100;
+	myculvert.width = 3.048;
+	myculvert.n = 0.024;
+
+	XForcing.culverts.push_back(myculvert);
+	float Q = 20.5297;
+
+
+	//Create a temporary file with river fluxes
+	std::ofstream river_file(
+		"testriver.tmp", std::ios_base::out | std::ios_base::trunc);
+	river_file << "0.0 " + std::to_string(Q) << std::endl;
+	river_file << "360000.0 " + std::to_string(Q) << std::endl;
+	river_file.close(); //destructor implicitly does it
+
+	River thisriver;
+	thisriver.Riverflowfile = "testriver.tmp";
+	thisriver.xstart = 60.0;
+	thisriver.xend = 88.0;
+	thisriver.ystart =80.0;
+	thisriver.yend = 120.0;
+
+	XForcing.rivers.push_back(thisriver);
+
+
+
+	float rightlev = 1.8288;
+
+	//Create a temporary file with river fluxes
+	std::ofstream bnd_file(
+		"bnd_Steadylevell.tmp", std::ios_base::out | std::ios_base::trunc);
+	bnd_file << "0.0 " + std::to_string(rightlev) << std::endl;
+	bnd_file << "360000.0 " + std::to_string(rightlev) << std::endl;
+	bnd_file.close(); //destructor implicitly does it
+
+	bndsegment bnd;
+
+	bnd.type = 2;
+	bnd.inputfile = "bnd_Steadylevell.tmp";
+	bnd.on = true;
+	bnd.polyfile = "right";
+	bnd.uniform == 1;
+
+	XForcing.bndseg.push_back(bnd);
+
+	
+
+	checkparamsanity(XParam, XForcing);
+	XForcing.bndseg[0].data = readINfileUNI(XForcing.bndseg[0].inputfile, XParam.reftime);
+
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile, XParam.reftime);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	MainLoop(XParam, XForcing, XModel, XModel_g);
+
+	if (XParam.GPUDEVICE >= 0)
+	{
+		
+		CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap["zs"], XModel_g.OutputVarMap["zs"], XParam.nblkmem* XParam.blksize * sizeof(float), cudaMemcpyDeviceToHost));
+		
+	}
+
+	float headwater;
+
+	int i = memloc(XParam, 0, 0, 0);
+	headwater = XModel.evolv.zs[i];
+
+	bool result = false;
+	float eps = 0.1;
+	// IL is expected here to be value when dry and 0 where wet at the begining of the computation
+	if ((abs(headwater - 3.6) < eps))
+	{
+		result = true;
+	}
+	
+
+	//river = steadyflowExc1.txt, 60.0, 88.0, 80.0, 120.0
+	// 
+	
+	//right = 2, steadylevelExc1.txt
+	//aoibnd = 0;
+
+	return result;
+}
+
+bool TestCulvertOutletControl(int gpu)
+{
+	log("#####");
+	// this is a preplica of the tutorial case for Basilisk
+	Param XParam;
+	Forcing<float> XForcing;
+	Model<float> XModel;
+	Model<float> XModel_g;
+	StaticForcingP<float> bathy;
+
+	XForcing.Bathy.push_back(bathy);
+
+	// initialise forcing bathymetry to 0
+	XForcing.Bathy[0].xo = 0;
+	XForcing.Bathy[0].yo = 0;
+
+	XForcing.Bathy[0].xmax = 200.0;
+	XForcing.Bathy[0].ymax = 200.0;
+	XForcing.Bathy[0].nx = 201;
+	XForcing.Bathy[0].ny = 201;
+
+	XForcing.Bathy[0].dx = 1.0;
+	XForcing.Bathy[0].dy = 1.0;
+
+	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
+
+	AllocateCPU(XForcing.Bathy[0].nx, XForcing.Bathy[0].ny, XForcing.Bathy[0].val);
+
+	for (int j = 0; j < XForcing.Bathy[0].ny; j++)
+	{
+		for (int i = 0; i < XForcing.Bathy[0].nx; i++)
+		{
+
+			if (i < 100)
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.0;
+			}
+			else if (i < 106)
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 5.0f;
+			}
+			else
+			{
+				XForcing.Bathy[0].val[i + j * XForcing.Bathy[0].nx] = 0.0f;
+			}
+		}
+	}
+
+	//xmin = 50.0;
+	//xmax = 150.0;
+	//ymin = 80.0
+	//ymax = 120.0
+	//dx = 3.0;
+
+	XParam.dx = 1.0;
+	XParam.xo = 80.0;
+	XParam.xmax = 120.0;
+	XParam.yo = 90.0;
+	XParam.ymax = 110.0;
+
+	//zsinit = 1.8288;
+	XParam.zsinit = 1.524;
+
+	XParam.endtime = 3000;
+	XParam.totaltime = 0.0;
+	XParam.outputtimestep = 1000.0;
+	XParam.outfile = "TestCulvertoutletControl.nc";
+
+	//culvert = 2, 90.0, 100.0, 120.48, 100.0, 3.048, 1.0, 1, 0.024
+	Culvert myculvert;
+	myculvert.type = 2;
+	myculvert.x1 = 96.0;
+	myculvert.y1 = 100;
+	myculvert.x2 = 111.24;
+	myculvert.y2 = 100;
+	myculvert.width = 1.2192;
+	myculvert.n = 0.012;
+
+	XForcing.culverts.push_back(myculvert);
+	float Q = 3.53961;
+
+
+	//Create a temporary file with river fluxes
+	std::ofstream river_file(
+		"testriver.tmp", std::ios_base::out | std::ios_base::trunc);
+	river_file << "0.0 " + std::to_string(Q) << std::endl;
+	river_file << "360000.0 " + std::to_string(Q) << std::endl;
+	river_file.close(); //destructor implicitly does it
+
+	River thisriver;
+	thisriver.Riverflowfile = "testriver.tmp";
+	thisriver.xstart = 80.0;
+	thisriver.xend = 95.0;
+	thisriver.ystart = 90.0;
+	thisriver.yend = 110.0;
+
+	XForcing.rivers.push_back(thisriver);
+
+
+
+	float rightlev = 1.524;
+
+	//Create a temporary file with river fluxes
+	std::ofstream bnd_file(
+		"bnd_Steadylevell.tmp", std::ios_base::out | std::ios_base::trunc);
+	bnd_file << "0.0 " + std::to_string(rightlev) << std::endl;
+	bnd_file << "360000.0 " + std::to_string(rightlev) << std::endl;
+	bnd_file.close(); //destructor implicitly does it
+
+	bndsegment bnd;
+
+	bnd.type = 3;
+	bnd.inputfile = "bnd_Steadylevell.tmp";
+	bnd.on = true;
+	bnd.polyfile = "right";
+	bnd.uniform == 1;
+
+	XForcing.bndseg.push_back(bnd);
+
+
+
+	checkparamsanity(XParam, XForcing);
+	XForcing.bndseg[0].data = readINfileUNI(XForcing.bndseg[0].inputfile, XParam.reftime);
+
+	XForcing.rivers[0].flowinput = readFlowfile(XForcing.rivers[0].Riverflowfile, XParam.reftime);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	MainLoop(XParam, XForcing, XModel, XModel_g);
+
+	if (XParam.GPUDEVICE >= 0)
+	{
+
+		CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap["zs"], XModel_g.OutputVarMap["zs"], XParam.nblkmem * XParam.blksize * sizeof(float), cudaMemcpyDeviceToHost));
+
+	}
+
+	float headwater,tailwater;
+
+	int iin = memloc(XParam, XForcing.culverts[0].ix1, XForcing.culverts[0].iy1, XForcing.culverts[0].block1);
+	int iout = memloc(XParam, XForcing.culverts[0].ix2, XForcing.culverts[0].iy2, XForcing.culverts[0].block2);
+
+	headwater = XModel.evolv.zs[iin];
+	tailwater = XModel.evolv.zs[iout];
+
+	bool result = false;
+	float eps = 0.1;
+	// IL is expected here to be value when dry and 0 where wet at the begining of the computation
+	if ((abs(headwater - 2.13) < eps))
+	{
+		result = true;
+	}
+	else
+	{
+		printf("\nFailed Outlet control\n HW = %f; TW = %f\n", headwater, tailwater);
+	}
+
+
+	//river = steadyflowExc1.txt, 60.0, 88.0, 80.0, 120.0
+	// 
+
+	//right = 2, steadylevelExc1.txt
+	//aoibnd = 0;
+
+	return result;
+
+}
+
+template <class T> bool TestCulvert(int gpu, T ref, int scenario)
+{
+	T Z0 = ref + 0.0;
+	T Z1 = ref + 0.2;
+	T R0 = 0.000001;
+	T R1 = 0.1;
+	T eps;
+	int NX = 21;
+	int NY = 21;
+	double* xz;
+	double* yz;
+	double* map;
+	Param XParam;
+	Forcing<float> XForcing;
+	Model<float> XModel;
+	Model<float> XModel_g;
+	char* name_file_R1;
+
+
+	//Creation of a Bathy file
+
+	xz = (double*)malloc(sizeof(double) * NX);
+	yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = -10.0 + 1 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -10.0 + 1 * j; }
+
+	map = (double*)malloc(sizeof(double) * NY * NX);
+
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			if ((yz[j]) < 0.0)
+			{
+				map[j * NX + i] = 0.0; // Z0;
+			}
+			else
+			{
+				map[j * NX + i] = 0.2; // Z1;
+			}
+			if (abs(yz[j]) < 2.1)
+			{
+				map[j * NX + i] = 1.0;
+			}
+		}
+	}
+	create2dnc("Z_map.nc", NX, NY, xz, yz, map, "z");
+
+	//Creation of a smaller Bathy file
+
+	//xz = (double*)malloc(sizeof(double) * NX);
+	//yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = 0.0 + 0.5 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -10.0 + 0.5 * j; }
+
+	//map = (double*)malloc(sizeof(double) * NY * NX);
+
+	/*
+
+	//Creation of a roughness file
+	//xz = (double*)malloc(sizeof(double) * NX);
+	//yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = -1.0 + 0.1 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -1.0 + 0.1 * j; }
+
+	//map = (double*)malloc(sizeof(double) * NY * NX);
+
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			map[j * NX + i] = R0;
+		}
+	}
+	create2dnc("R0_map.nc", NX, NY, xz, yz, map, "z0");
+
+	//Creation of a smaller Roughness file
+	//xz = (double*)malloc(sizeof(double) * NX);
+	//yz = (double*)malloc(sizeof(double) * NY);
+	for (int i = 0; i < NX; i++) { xz[i] = 0.0 + 0.05 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = 0.0 + 0.05 * j; }
+
+	//map = (double*)malloc(sizeof(double) * NY * NX);
+
+	//Create the Losses forcing:
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			map[j * NX + i] = R1;
+		}
+	}
+	if (scenario < 0.5)
+	{
+		name_file_R1 = "R1_map.nc";
+	}
+	else
+	{
+		name_file_R1 = "1R_map.nc";
+	}
+	create2dnc(name_file_R1, NX, NY, xz, yz, map, "z0");
+
+
+	*/
+
+
+	//Creation of a refinement file
+	for (int i = 0; i < NX; i++) { xz[i] = -10.0 + 1.0 * i; }
+	for (int j = 0; j < NY; j++) { yz[j] = -10.0 + 1.0 * j; }
+
+	//map = (double*)malloc(sizeof(double) * NY * NX);
+
+	for (int j = 0; j < NY; j++)
+	{
+		for (int i = 0; i < NX; i++)
+		{
+			map[j * NX + i] = 0;
+			if ((abs(xz[i]) < 5.0) && (abs(yz[j]) < 5.0))
+			{
+				map[j * NX + i] = 1;
+			}
+		}
+	}
+	create2dnc("refinement.nc", NX, NY, xz, yz, map, "z");
+
+	// Creation of a rain fall file
+	std::ofstream rain_file(
+		"rainTest16.txt", std::ios_base::out | std::ios_base::trunc);
+	rain_file << "0.000000\t10.00" << std::endl;
+	rain_file << "1000.000\t10.00" << std::endl;
+	rain_file.close();
+
+	// Creation of BG_param_test16.txt file
+	std::ofstream param_file(
+		"BG_param_test16.txt", std::ios_base::out | std::ios_base::trunc);
+	//Add Bathymetries to the file
+	param_file << "bathy = Z_map.nc?z ;" << std::endl;
+	//Add Roughness to the file
+	/*if (scenario > 1.5)
+	{
+		R1 = 3.56;
+		param_file << "cfmap = " << R1 << std::endl;
+		R0 = 3.56;
+	}
+	else
+	{
+		param_file << "cfmap = R0_map.nc?z0 ;" << std::endl;
+		param_file << "cfmap = " << name_file_R1 << "?z0 ;" << std::endl;
+	}
+	*/
+	//param_file << "cfmap = R1_map.nc?z0 ;" << std::endl;
+	param_file << "frictionmodel=1 ;" << std::endl;
+	//Add refinement to the file
+	param_file << "Adaptation = Targetlevel,refinement.nc?z ;" << std::endl;
+	param_file << "initlevel = 0; " << std::endl;
+	param_file << "maxlevel = 1; " << std::endl;
+	param_file << "minlevel = 0; " << std::endl;
+	//Add River forcing
+	param_file << "rainfile = rainTest16.txt ;" << std::endl;
+	//Add endtime and outputvar
+	param_file << "endtime = 10.0 ;" << std::endl;
+	param_file << "outvars = zs,h,u,v,zb,cf;" << std::endl;
+	param_file << "dx = 0.1;" << std::endl;
+	param_file << "zsinit = 0.0;" << std::endl;
+	param_file << "smallnc = 0;" << std::endl;
+	param_file << "doubleprecision = 1;" << std::endl;
+
+	param_file.close();
+
+	//read param file
+	Readparamfile(XParam, XForcing, "BG_param_test16.txt"); // "BG_param_test13.txt");
+
+	//readforcing
+	readforcing(XParam, XForcing);
+
+	checkparamsanity(XParam, XForcing);
+
+	InitMesh(XParam, XForcing, XModel);
+
+	InitialConditions(XParam, XForcing, XModel);
+
+	InitialAdaptation(XParam, XForcing, XModel);
+
+	SetupGPU(XParam, XModel, XForcing, XModel_g);
+
+	// Run first full step (i.e. 2 half steps)
+
+	//Loop<T> XLoop = InitLoop(XParam, XModel);
+	MainLoop(XParam, XForcing, XModel, XModel_g);
+
+	//if XModel.cf[0]
+	//	XModel.zb
+
+	T maxz = T(-1.0) * std::numeric_limits<float>::max();
+	T minz = std::numeric_limits<float>::max();
+	T maxr = T(-1.0) * std::numeric_limits<float>::max();
+	T minr = std::numeric_limits<float>::max();
+
+
+	printf("min float=%f\n", std::numeric_limits<float>::min());
+	/*
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XModel.blocks.active[ibl];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+				maxz = max(maxz, abs(XModel.zb[i]));
+				minz = min(minz, abs(XModel.zb[i]));
+				maxr = max(maxr, abs(XModel.cf[i]));
+				minr = min(minr, abs(XModel.cf[i]));
+			}
+		}
+	}
+	*/
+	bool result = false;
+	eps = 0.0000001;
+
+	if ((abs(maxz - Z1) < eps) && (abs(maxr - R1) < eps) && (abs(minz - Z0) < eps) && (abs(minr - R0) < eps))
+	{
+		result = true;
+	}
+	printf("\t\n");
+	printf("\t\tZ max forced : %f, Z max obs :  %f\n ", Z1, maxz);
+	printf("\t\tR max forced :  %f, R max obs:  %f\n", R1, maxr);
+	printf("\t\tZ min forced :  %f, Z min obs:  %f\n", Z0, minz);
+	printf("\t\tR min forced : %f, R min obs : %f\n ", R0, minr);
+	/*
+	if (scenario > 2.5)
+	{
+		T maxil = T(-1.0) * std::numeric_limits<float>::max();
+		T minil = std::numeric_limits<float>::max();
+		T maxcl = T(-1.0) * std::numeric_limits<float>::max();
+		T mincl = std::numeric_limits<float>::max();
+
+
+		//printf("min float=%f\n", std::numeric_limits<float>::min());
+
+		for (int ibl = 0; ibl < XParam.nblk; ibl++)
+		{
+			int ib = XModel.blocks.active[ibl];
+			for (int iy = 0; iy < XParam.blkwidth; iy++)
+			{
+				for (int ix = 0; ix < XParam.blkwidth; ix++)
+				{
+					int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+
+					maxil = max(maxil, abs(XModel.il[i]));
+					minil = min(minil, abs(XModel.il[i]));
+					maxcl = max(maxcl, abs(XModel.cl[i]));
+					mincl = min(mincl, abs(XModel.cl[i]));
+				}
+			}
+		}
+
+		bool result = false;
+		eps = 0.0000001;
+		// IL is expected here to be value when dry and 0 where wet at the begining of the computation
+//		if ((abs(maxil - IL) < eps) && (abs(maxcl - CL) < eps) && (abs(minil - T(0.0)) < eps) && (abs(mincl - CL) < eps))
+//		{
+//			result = true;
+//		}
+	}
+	*/
+	return result;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

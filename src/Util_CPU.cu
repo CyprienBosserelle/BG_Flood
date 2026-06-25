@@ -114,6 +114,7 @@ double interptime(double next, double prev, double timenext, double time)
  * @brief Bilinear interpolation within a rectangle.
  * Bilinear interpolation within a rectangle defined by (x1, y1) and (x2, y2).
  * The values at the corners of the rectangle are q11, q12, q21, and q22.
+ * q11 is Bottom Left q12 is top left q21 is bottom right and q22 is top right
  * The function returns the interpolated value at the point (x, y).	
  * @param q11 Value at (x1, y1)
  * @param q12 Value at (x1, y2)

@@ -18,6 +18,7 @@
 template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcing, Model<T> &XModel);
 
 template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model<T> &XModel);
+template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Model<T>& XModel);
 template<class T> void Initmaparray(Model<T> &XModel);
 template <class T> void initoutput(Param &XParam, Model<T>& XModel);
 void InitTSOutput(Param XParam);
