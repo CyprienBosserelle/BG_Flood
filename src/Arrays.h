@@ -334,6 +334,11 @@ struct Model
 
 	//GroundWater elevation (due to the accumulation of water by infiltration during the simulation)
 	T* hgw;
+
+	/** Implicit solver arrays */
+	T* rhs;
+	T* diag;
+	T* zs_scratch;
 	
 	// Used for external forcing too
 	// May need a better placeholder

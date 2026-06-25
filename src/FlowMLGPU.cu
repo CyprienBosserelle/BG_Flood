@@ -144,8 +144,15 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	
 	// Acceleration
 	// Pressure
-	pressureML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	if (XParam.engine == 6)
+	{
+		solve_implicit_barotropic(XParam, XLoop, XModel);
+	}
+	else
+	{
+		pressureML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
 
 	// Check hu/hv
 	CheckadvecMLY << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);

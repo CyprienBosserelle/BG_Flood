@@ -42,7 +42,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		// Core engine
 		if (XParam.GPUDEVICE >= 0)
 		{
-			if (XParam.engine == 5)
+			if (XParam.engine == 5 || XParam.engine == 6)
 			{
 				FlowMLGPU(XParam, XLoop, XForcing, XModel_g);
 			}
