@@ -209,7 +209,7 @@ Param readparamstr(std::string line, Param param)
 		}
 		if (!foo)
 		{
-			param.engine = std:stoi(parametervalue);
+			param.engine = std::stoi(parametervalue);
 		}
 	}
 	///////////////////////////////////////////////////////
