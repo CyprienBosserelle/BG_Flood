@@ -209,7 +209,7 @@ Param readparamstr(std::string line, Param param)
 		}
 		if (!foo)
 		{
-			param.engine = std::stoi(parametervalue);
+			param.engine = std:stoi(parametervalue);
 		}
 	}
 	///////////////////////////////////////////////////////
@@ -1474,7 +1474,8 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	// Engine checks
 	if (XParam.engine == 5)
 	{
-		XParam.CFL = utils::min(XParam.CFL, 0.5);
+		XParam.CFL = utils::max(XParam.CFL, 0.5);
+		XParam.wetdryfix = false;
 		//XParam.eps = 0.0000000001;
 	}
 
