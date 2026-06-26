@@ -3,14 +3,22 @@
 #include "FlowGPU.h"
 #include "Halo.h"
 
+#if __CUDA_ARCH__ < 600
+__device__ double atomicAdd(double* address, double val)
+{
+    unsigned long long int* address_as_ull = (unsigned long long int*)address;
+    unsigned long long int old = *address_as_ull, assumed;
+    do {
+        assumed = old;
+        old = atomicCAS(address_as_ull, assumed,
+                        __double_as_longlong(val + __longlong_as_double(assumed)));
+    } while (assumed != old);
+    return __longlong_as_double(old);
+}
+#endif
+
 /**
  * @brief Setup the linear system for the semi-implicit barotropic solver.
- *
- * Based on the theta-scheme:
- * H^{n+1} - theta^2 * dt^2 * g * div(H^n * grad(H^{n+1})) = H^n - dt * div(U^n) + theta * (1 - theta) * dt^2 * g * div(H^n * grad(H^n))
- *
- * rhs = eta^n - dt * div(U^n) + theta * (1 - theta) * dt * dt * div(g * H^n * grad(eta^n))
- * diag = 1 + theta^2 * dt^2 * g * sum(H_face / delta^2)
  */
 template <class T>
 __global__ void setup_implicit_barotropic_system(
@@ -41,23 +49,17 @@ __global__ void setup_implicit_barotropic_system(
         cmv = calcCM(T(XParam.Radius), delta, ybo, iy);
     }
 
-    // Explicit part of the divergence of fluxes (U = h * u)
     T divU = (XFlux.hu[iright] - XFlux.hu[i]) / (delta * cmu) +
              (XFlux.hv[itop] - XFlux.hv[i]) / (delta * cmv);
 
-    // Explicit part of the divergence of (g * H * grad(eta))
-    // div(g*H*grad(eta)) = (hau[i] - hau[iright]) / delta
     T divG = (XFlux.hau[i] - XFlux.hau[iright]) / (delta * cmu) +
              (XFlux.hav[i] - XFlux.hav[itop]) / (delta * cmv);
 
     rhs[i] = XEv.zs[i] - dt * divU + theta * (T(1.0) - theta) * dt * dt * divG;
 
-    // Diagonal elements
-    // A_ii = 1 + theta^2 * dt^2 * g * sum(H_face / delta^2)
     T coeff_x = theta * theta * dt * dt * g / (delta * delta * cmu * cmu);
     T coeff_y = theta * theta * dt * dt * g / (delta * delta * cmv * cmv);
 
-    // XFlux.hfu[i] is H_face (fmu * hff)
     diag[i] = T(1.0) + coeff_x * (XFlux.hfu[iright] + XFlux.hfu[i]) +
                        coeff_y * (XFlux.hfv[itop] + XFlux.hfv[i]);
 }
@@ -70,8 +72,8 @@ __global__ void solve_implicit_eta_iteration(
     T* dst_eta, T* src_eta, T* rhs, T* diag, Param XParam, BlockP<T> XBlock,
     FluxMLP<T> XFlux, T dt, T* diff_sum)
 {
-    extern __shared__ char shared_mem[];
-    T* s_diff = (T*)shared_mem;
+    // Use fixed size shared memory for max possible block size (e.g., 16x16 = 256)
+    __shared__ T s_diff[256];
 
     int halowidth = XParam.halowidth;
     int blkmemwidth = blockDim.x + halowidth * 2;
@@ -107,14 +109,14 @@ __global__ void solve_implicit_eta_iteration(
                 coeff_y * (XFlux.hfv[itop] * src_eta[itop] + XFlux.hfv[i] * src_eta[ibot]);
 
     T new_val = (rhs[i] + sum_off) / diag[i];
-    T diff = (T)fabs(new_val - src_eta[i]);
+    T diff = fabs(new_val - src_eta[i]);
 
     dst_eta[i] = new_val;
 
-    // Block-level reduction
     s_diff[tid] = diff;
     __syncthreads();
 
+    // Reduction in shared memory
     for (unsigned int s = (blockDim.x * blockDim.y) / 2; s > 0; s >>= 1) {
         if (tid < s) {
             s_diff[tid] += s_diff[tid + s];
@@ -161,19 +163,15 @@ __global__ void project_implicit_velocities(
         cmv = calcCM(T(XParam.Radius), delta, ybo, iy);
     }
 
-    // Centered gradient of eta^{n+1}
     T detadx_new = (eta_new[iright] - eta_new[ileft]) / (T(2.0) * delta * cmu);
     T detady_new = (eta_new[itop] - eta_new[ibot]) / (T(2.0) * delta * cmv);
 
-    // Centered gradient of eta^n
     T detadx_old = (eta_old[iright] - eta_old[ileft]) / (T(2.0) * delta * cmu);
     T detady_old = (eta_old[itop] - eta_old[ibot]) / (T(2.0) * delta * cmv);
 
-    // Momentum update: u^{n+1} = u^n - dt * g * grad( (1-theta)*eta^n + theta*eta^{n+1} )
     XEv.u[i] -= dt * g * ((T(1.0) - theta) * detadx_old + theta * detadx_new);
     XEv.v[i] -= dt * g * ((T(1.0) - theta) * detady_old + theta * detady_new);
 
-    // Update thickness and elevation
     XEv.h[i] = max(T(0.0), eta_new[i] - zb[i]);
     XEv.zs[i] = eta_new[i];
 
@@ -191,38 +189,32 @@ void solve_implicit_barotropic(Param& XParam, Loop<T>& XLoop, Model<T>& XModel)
 
     T dt = T(XLoop.dt);
 
-    // Save eta^n for the projection step and RHS calculation
     CUDA_CHECK(cudaMemcpy(XModel.evolv_o.zs, XModel.evolv.zs,
                          XParam.nblkmem * XParam.blksize * sizeof(T),
                          cudaMemcpyDeviceToDevice));
 
-    // 1. Construct the Linear Matrix System
     setup_implicit_barotropic_system<<<gridDim, blockDim>>>(
         XModel.rhs, XModel.diag, XParam, XModel.blocks,
         XModel.evolv, XModel.fluxml, dt
     );
     CUDA_CHECK(cudaDeviceSynchronize());
 
-    // 2. Iteratively Invert the System via Double-Buffer Swapping
     T* src_eta = XModel.evolv.zs;
     T* dst_eta = XModel.zs_scratch;
 
     T h_diff_sum;
     T* d_diff_sum = XModel.time.arrmax;
 
-    size_t sharedMemSize = blockDim.x * blockDim.y * sizeof(T);
-
     for (int iter = 0; iter < XParam.mg_max_iter; ++iter) {
         reset_var<<<1, 1>>>(0, XModel.blocks.active, T(0.0), d_diff_sum);
 
-        solve_implicit_eta_iteration<<<gridDim, blockDim, sharedMemSize>>>(
+        solve_implicit_eta_iteration<<<gridDim, blockDim>>>(
             dst_eta, src_eta, XModel.rhs, XModel.diag, XParam, XModel.blocks,
             XModel.fluxml, dt, d_diff_sum
         );
         CUDA_CHECK(cudaDeviceSynchronize());
 
         CUDA_CHECK(cudaMemcpy(&h_diff_sum, d_diff_sum, sizeof(T), cudaMemcpyDeviceToHost));
-        // Normalize by number of blocks * block size (total grid points)
         if (h_diff_sum / (XParam.nblk * XParam.blkwidth * XParam.blkwidth) < XParam.mg_tol) {
             src_eta = dst_eta;
             break;
@@ -241,7 +233,6 @@ void solve_implicit_barotropic(Param& XParam, Loop<T>& XLoop, Model<T>& XModel)
                              cudaMemcpyDeviceToDevice));
     }
 
-    // 3. Project Solutions back to the Layer Arrays
     project_implicit_velocities<<<gridDim, blockDim>>>(
         XModel.evolv, XModel.evolv.zs, XModel.evolv_o.zs, XModel.zb, XParam, XModel.blocks, XModel.fluxml, dt
     );
