@@ -4,7 +4,7 @@
 #include "Halo.h"
 
 // #if __CUDA_ARCH__ < 600
-__device__ double atomicAddC(double* address, double val)
+template <class T> __device__ double atomicAddC(T* address, T val)
 {
     unsigned long long int* address_as_ull = (unsigned long long int*)address;
     unsigned long long int old = *address_as_ull, assumed;
