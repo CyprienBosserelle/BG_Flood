@@ -8,6 +8,7 @@
 #include "Util_CPU.h"
 #include "MemManagement.h"
 #include "Multilayer.h"
+#include "Implicit.h"
 #include "FlowGPU.h"
 #include "Advection.h"
 
