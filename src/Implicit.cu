@@ -4,17 +4,17 @@
 #include "Halo.h"
 
 // #if __CUDA_ARCH__ < 600
-// __device__ double atomicAdd(double* address, double val)
-// {
-//     unsigned long long int* address_as_ull = (unsigned long long int*)address;
-//     unsigned long long int old = *address_as_ull, assumed;
-//     do {
-//         assumed = old;
-//         old = atomicCAS(address_as_ull, assumed,
-//                         __double_as_longlong(val + __longlong_as_double(assumed)));
-//     } while (assumed != old);
-//     return __longlong_as_double(old);
-// }
+__device__ double atomicAddC(double* address, double val)
+{
+    unsigned long long int* address_as_ull = (unsigned long long int*)address;
+    unsigned long long int old = *address_as_ull, assumed;
+    do {
+        assumed = old;
+        old = atomicCAS(address_as_ull, assumed,
+                        __double_as_longlong(val + __longlong_as_double(assumed)));
+    } while (assumed != old);
+    return __longlong_as_double(old);
+}
 // #endif
 
 /**
@@ -125,7 +125,7 @@ __global__ void solve_implicit_eta_iteration(
     }
 
     if (tid == 0) {
-        atomicAdd(diff_sum, s_diff[0]);
+        atomicAddC(diff_sum, s_diff[0]);
     }
 }
 
