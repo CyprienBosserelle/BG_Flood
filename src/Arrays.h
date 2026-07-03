@@ -149,6 +149,14 @@ struct FluxMLP
 	T* hau;
 	/** h*a flux in v-direction */
 	T* hav;
+	/** alpha_eta in x-direction */
+	T* alpha_x;
+	/** alpha_eta in y-direction */
+	T* alpha_y;
+	/** su in x-direction */
+	T* su_x;
+	/** su in y-direction */
+	T* su_y;
 	/** Flux of u in x-direction */
 	T* Fux;
 	/** Flux of v in y-direction */
@@ -337,8 +345,6 @@ struct Model
 
 	/** Implicit solver arrays */
 	T* rhs;
-	T* diag;
-	T* zs_scratch;
 	
 	// Used for external forcing too
 	// May need a better placeholder
