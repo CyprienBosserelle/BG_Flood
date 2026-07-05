@@ -1,7 +1,4 @@
 #include "Implicit.h"
-#include "Multilayer.h"
-#include "FlowGPU.h"
-#include "Halo.h"
 
 // Define SharedMemory helper to avoid alignment issues (mirroring Advection.cu)
 template<class T>
@@ -36,8 +33,8 @@ struct SharedMemory<double>
     }
 };
 
-#if __CUDA_ARCH__ < 600
-__device__ double atomicAdd(double* address, double val)
+//#if __CUDA_ARCH__ < 600
+__device__ double atomicAddC(double* address, double val)
 {
     unsigned long long int* address_as_ull = (unsigned long long int*)address;
     unsigned long long int old = *address_as_ull, assumed;
@@ -48,7 +45,73 @@ __device__ double atomicAdd(double* address, double val)
     } while (assumed != old);
     return __longlong_as_double(old);
 }
-#endif
+//#endif
+
+// /**
+//  * @brief Multigrid relaxation function (Red-Black Gauss-Seidel)
+//  */
+// template <class T>
+// __global__ void relaxHydro(Param XParam,T* eta, T* rhs)
+// {
+
+//     int halowidth = XParam.halowidth;
+// 	int blkmemwidth = blockDim.y + halowidth * 2;
+// 	//unsigned int blksize = blkmemwidth * blkmemwidth;
+// 	int ix = threadIdx.x;
+// 	int iy = threadIdx.y;
+// 	int ibl = blockIdx.x;
+// 	int ib = XBlock.active[ibl];
+
+// 	int lev = XBlock.level[ib];
+
+//     int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+//     T epsi = nextafter(T(1.0), T(2.0)) - T(1.0);
+// 	T eps = T(XParam.eps);// +epsi;
+// 	T dry = eps;
+// 	T delta = calcres(T(XParam.delta), lev);
+// 	T g = T(XParam.g);
+// 	T CFL = T(XParam.CFL);
+
+//     T CFL_H=1e40;
+//     bool rigid = false;
+
+//     T cmu = T(1.0);
+// 	T cmv = T(1.0);
+
+// 	if (XParam.spherical)
+// 	{
+// 		T ybo = T(XParam.yo + XBlock.yo[ib]);
+
+// 		cmu = calcCM(T(XParam.Radius), delta, ybo, iy);
+// 		cmv = calcCM(T(XParam.Radius), delta, ybo, iy);
+
+// 	}
+
+//     double d = rigid ? 0.0 : - cmu*Delta;
+//     double n = - cmu*Delta*rhs_eta[i];
+
+//     eta[i]=T(0.0);
+
+
+// }
+
+// template <class T>
+// __global__ void residualHydro()
+// {
+//     int halowidth = XParam.halowidth;
+// 	int blkmemwidth = blockDim.y + halowidth * 2;
+// 	//unsigned int blksize = blkmemwidth * blkmemwidth;
+// 	int ix = threadIdx.x;
+// 	int iy = threadIdx.y;
+// 	int ibl = blockIdx.x;
+// 	int ib = XBlock.active[ibl];
+
+// 	int lev = XBlock.level[ib];
+
+//     int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+// }
+
 
 /**
  * @brief Multigrid relaxation function (Red-Black Gauss-Seidel)
@@ -117,7 +180,7 @@ __global__ void relax_implicit_eta(
     }
 
     if (tid == 0) {
-        atomicAdd(diff_sum, s_diff[0]);
+        atomicAddC(diff_sum, s_diff[0]);
     }
 }
 
