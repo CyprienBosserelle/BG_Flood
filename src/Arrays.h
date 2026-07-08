@@ -103,6 +103,8 @@ struct EvolvingP_M : public EvolvingP<T>
 	T* U;
 	/** Product of water depth and velocity norm */
 	T* hU;
+	/** Product of water depth and velocity squared */
+	T* hUU;
 };
 
 /**
@@ -190,7 +192,7 @@ struct maskinfo
 	int nblk = 0; //number of blocks where this bnd applies
 
 	int* blks; // array of block where bnd applies 
-	// 8 digit binary where 1 is a mask and 0 is not a mask with the first digit represent the left bottom side the rest is clockwise (i.e.left-bot left-top, top-left, top-right, right-top, right-bot, bot-right, bot-left)
+	// 8 digit binary where 1 is a mask and 0 is not a mask with the first digit represent the left bottom side the rest is clockwise (i.e.left-bot left-top, top-left, top-right, right-top, right-bo[...]
 	int* side; // e.g. 11000000 for the entire left side being a mask
 
 	int type = 0;
@@ -282,7 +284,6 @@ struct RiverBlk
 {
 	std::vector<int> block;
 };
-
 
 
 
