@@ -1,0 +1,1917 @@
+
+
+# File Boundary.cu
+
+[**File List**](files.md) **>** [**src**](dir_68267d1309a1af8e8297ef4c3efbcdba.md) **>** [**Boundary.cu**](Boundary_8cu.md)
+
+[Go to the documentation of this file](Boundary_8cu.md)
+
+
+```C++
+#include "Boundary.h"
+
+
+template <class T> void Flowbnd(Param XParam, Loop<T> &XLoop, BlockP<T> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<T> XEv)
+{
+    dim3 blockDim(XParam.blkwidth, 1, 1);
+    dim3 gridDimBBND(side.nblk, 1, 1);
+
+    T* un, * ut;
+
+    double itime=0.0;
+
+    std::vector<double> zsbndleft;
+    std::vector<double> uubndleft;
+    std::vector<double> vvbndleft;
+
+    if (side.isright == 0)
+    {
+        //top or bottom
+        un = XEv.v; //u normal to boundary
+        ut = XEv.u; //u tangent to boundary
+    }
+    else
+    {
+        un = XEv.u;
+        ut = XEv.v;
+    }
+
+    if (side.on)
+    {
+        int SLstepinbnd = 1;
+        
+        double difft = side.data[SLstepinbnd].time - XLoop.totaltime;
+        while (difft < 0.0)
+        {
+            SLstepinbnd++;
+            difft = side.data[SLstepinbnd].time - XLoop.totaltime;
+        }
+        
+        itime = SLstepinbnd - 1.0 + (XLoop.totaltime - side.data[SLstepinbnd - 1].time) / (side.data[SLstepinbnd].time - side.data[SLstepinbnd - 1].time);
+
+        
+        for (int n = 0; n < side.data[SLstepinbnd].wlevs.size(); n++)
+        {
+            zsbndleft.push_back(interptime(side.data[SLstepinbnd].wlevs[n], side.data[SLstepinbnd - 1].wlevs[n], side.data[SLstepinbnd].time - side.data[SLstepinbnd - 1].time, XLoop.totaltime - side.data[SLstepinbnd - 1].time));
+
+        }
+        // Repeat for u and v only if needed (otherwise values may not exist!)
+        if (side.type == 4)
+        {
+            for (int n = 0; n < side.data[SLstepinbnd].uuvel.size(); n++)
+            {
+                uubndleft.push_back(interptime(side.data[SLstepinbnd].uuvel[n], side.data[SLstepinbnd - 1].uuvel[n], side.data[SLstepinbnd].time - side.data[SLstepinbnd - 1].time, XLoop.totaltime - side.data[SLstepinbnd - 1].time));
+
+            }
+            for (int n = 0; n < side.data[SLstepinbnd].vvvel.size(); n++)
+            {
+                vvbndleft.push_back(interptime(side.data[SLstepinbnd].vvvel[n], side.data[SLstepinbnd - 1].vvvel[n], side.data[SLstepinbnd].time - side.data[SLstepinbnd - 1].time, XLoop.totaltime - side.data[SLstepinbnd - 1].time));
+
+            }
+        }
+
+
+    }
+    if (XParam.GPUDEVICE >= 0)
+    {
+        bndGPU <<< gridDimBBND, blockDim, 0 >>> (XParam, side, XBlock, Atmp, T(itime), XEv.zs, XEv.h, un, ut);
+        CUDA_CHECK(cudaDeviceSynchronize());
+    }
+    else
+    {
+        bndCPU(XParam, side, XBlock, zsbndleft, uubndleft, vvbndleft, Atmp, XEv.zs, XEv.h, un, ut);
+    }
+
+
+
+}
+template void Flowbnd<float>(Param XParam, Loop<float>& XLoop, BlockP<float> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<float> XEv);
+template void Flowbnd<double>(Param XParam, Loop<double>& XLoop, BlockP<double> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<double> XEv);
+
+template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxP<T> XFlux)
+{
+    dim3 blockDim(XParam.blkwidth, 1, 1);
+    dim3 gridDimBBNDLeft(bndseg.left.nblk, 1, 1);
+    dim3 gridDimBBNDRight(bndseg.right.nblk, 1, 1);
+    dim3 gridDimBBNDTop(bndseg.top.nblk, 1, 1);
+    dim3 gridDimBBNDBot(bndseg.bot.nblk, 1, 1);
+
+    double zsbnd = 0.0;
+    if (!std::isnan(XParam.zsinit)) // apply specified zsinit
+    {
+        zsbnd = XParam.zsinit;
+    }
+    // Warning this above is not ideal but sufficient for fail safe of testing if someone specifies initial conditions and no boundary for a type 3 they should be in trouble
+    T taper=T(1.0);
+    if (bndseg.on)
+    {
+        if (XParam.bndtaper > 0.0)
+        {
+            taper = min((totaltime - XParam.inittime) / XParam.bndtaper, 1.0);
+        }
+
+        if (bndseg.uniform)
+        {
+            int SLstepinbnd = 1;
+
+            double difft = bndseg.data[SLstepinbnd].time - totaltime;
+            while (difft < 0.0)
+            {
+                SLstepinbnd++;
+                difft = bndseg.data[SLstepinbnd].time - totaltime;
+            }
+
+            //itime = SLstepinbnd - 1.0 + (totaltime - bndseg.data[SLstepinbnd - 1].time) / (bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time);
+            zsbnd = interptime(bndseg.data[SLstepinbnd].wspeed, bndseg.data[SLstepinbnd - 1].wspeed, bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time, totaltime - bndseg.data[SLstepinbnd - 1].time);
+
+
+            
+        }
+        else
+        {
+            // Nothing. it is already done in update forcing
+        }
+        
+    }
+
+    if (bndseg.type != 1)
+    {
+        if (XParam.GPUDEVICE >= 0)
+        {
+            //if (bndseg.left.nblk > 0)
+            {
+                //Left
+                //template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, float zsbnd, T * zs, T * h, T * un, T * ut, T * Fh, T * Fq, T * Ss)
+                //bndFluxGPUSide <<< gridDimBBND, blockDim, 0 >>> (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), XEv.zs, XEv.h, un, ut, Fh, Fq, S);
+                bndFluxGPUSide <<< gridDimBBNDLeft, blockDim, 0 >>> (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+                CUDA_CHECK(cudaDeviceSynchronize());
+            }
+            //if (bndseg.right.nblk > 0)
+            {
+                //Right
+                bndFluxGPUSide <<< gridDimBBNDRight, blockDim, 0 >>> (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+                CUDA_CHECK(cudaDeviceSynchronize());
+            }
+            //if (bndseg.top.nblk > 0)
+            {
+                //top
+                bndFluxGPUSide <<< gridDimBBNDTop, blockDim, 0 >>> (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+                CUDA_CHECK(cudaDeviceSynchronize());
+            }
+            //if (bndseg.bot.nblk > 0)
+            {
+                //bot
+                bndFluxGPUSide <<< gridDimBBNDBot, blockDim, 0 >>> (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+                CUDA_CHECK(cudaDeviceSynchronize());
+            }
+        }
+        else
+        {
+            bndFluxGPUSideCPU(XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+            bndFluxGPUSideCPU(XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+            bndFluxGPUSideCPU(XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+            bndFluxGPUSideCPU(XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+
+
+        }
+    }
+}
+template void FlowbndFlux<float>(Param XParam,  double totaltime, BlockP<float> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<float> XEv, FluxP<float> XFlux);
+template void FlowbndFlux<double>(Param XParam, double totaltime, BlockP<double> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<double> XEv, FluxP<double> XFlux);
+
+template <class T> void FlowbndFluxML(Param XParam, double totaltime, BlockP<T> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxMLP<T> XFlux)
+{
+    dim3 blockDim(XParam.blkwidth, 1, 1);
+    dim3 gridDimBBNDLeft(bndseg.left.nblk, 1, 1);
+    dim3 gridDimBBNDRight(bndseg.right.nblk, 1, 1);
+    dim3 gridDimBBNDTop(bndseg.top.nblk, 1, 1);
+    dim3 gridDimBBNDBot(bndseg.bot.nblk, 1, 1);
+
+    double zsbnd = 0.0;
+    if (!std::isnan(XParam.zsinit)) // apply specified zsinit
+    {
+        zsbnd = XParam.zsinit;
+    }
+    // Warning this above is not ideal but sufficient for fail safe of testing if someone specifies initial conditions and no boundary for a type 3 they should be in trouble
+    T taper = T(1.0);
+    if (bndseg.on)
+    {
+        if (bndseg.uniform)
+        {
+            int SLstepinbnd = 1;
+
+            double difft = bndseg.data[SLstepinbnd].time - totaltime;
+            while (difft < 0.0)
+            {
+                SLstepinbnd++;
+                difft = bndseg.data[SLstepinbnd].time - totaltime;
+            }
+
+            //itime = SLstepinbnd - 1.0 + (totaltime - bndseg.data[SLstepinbnd - 1].time) / (bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time);
+            zsbnd = interptime(bndseg.data[SLstepinbnd].wspeed, bndseg.data[SLstepinbnd - 1].wspeed, bndseg.data[SLstepinbnd].time - bndseg.data[SLstepinbnd - 1].time, totaltime - bndseg.data[SLstepinbnd - 1].time);
+
+
+            if (XParam.bndtaper > 0.0)
+            {
+                taper = min(totaltime / XParam.bndtaper, 1.0);
+            }
+        }
+        else
+        {
+            // Nothing. it is already done in update forcing
+        }
+
+    }
+
+    if (bndseg.type != 1)
+    {
+        if (XParam.GPUDEVICE >= 0)
+        {
+            //if (bndseg.left.nblk > 0)
+            {
+                //Left
+                bndFluxGPUSide << < gridDimBBNDLeft, blockDim, 0 >> > (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.hu, XFlux.hfu, XFlux.hau);
+                CUDA_CHECK(cudaDeviceSynchronize());
+            }
+            //if (bndseg.right.nblk > 0)
+            {
+                //Right
+                bndFluxGPUSide << < gridDimBBNDRight, blockDim, 0 >> > (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.hu, XFlux.hfu, XFlux.hau);
+                CUDA_CHECK(cudaDeviceSynchronize());
+            }
+            //if (bndseg.top.nblk > 0)
+            {
+                //top
+                bndFluxGPUSide << < gridDimBBNDTop, blockDim, 0 >> > (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.hv, XFlux.hfv, XFlux.hav);
+                CUDA_CHECK(cudaDeviceSynchronize());
+            }
+            //if (bndseg.bot.nblk > 0)
+            {
+                //bot
+                bndFluxGPUSide << < gridDimBBNDBot, blockDim, 0 >> > (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.hv, XFlux.hfv, XFlux.hfv);
+                CUDA_CHECK(cudaDeviceSynchronize());
+            }
+        }
+        else
+        {
+            //bndFluxGPUSideCPU(XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+            //bndFluxGPUSideCPU(XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fhu, XFlux.Fqux, XFlux.Su);
+            //bndFluxGPUSideCPU(XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+            //bndFluxGPUSideCPU(XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fhv, XFlux.Fqvy, XFlux.Sv);
+
+
+        }
+    }
+}
+template void FlowbndFluxML<float>(Param XParam, double totaltime, BlockP<float> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<float> XEv, FluxMLP<float> XFlux);
+template void FlowbndFluxML<double>(Param XParam, double totaltime, BlockP<double> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<double> XEv, FluxMLP<double> XFlux);
+
+template <class T> void FlowbndFluxold(Param XParam, double totaltime, BlockP<T> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxP<T> XFlux)
+{
+    dim3 blockDim(XParam.blkwidth, 1, 1);
+    dim3 gridDimBBND(side.nblk, 1, 1);
+
+    T* un, * ut, * Fh, * Fq, * S;
+
+
+    double itime = 0.0;
+    if (side.on)
+    {
+        int SLstepinbnd = 1;
+
+        double difft = side.data[SLstepinbnd].time - totaltime;
+        while (difft < 0.0)
+        {
+            SLstepinbnd++;
+            difft = side.data[SLstepinbnd].time - totaltime;
+        }
+
+        itime = SLstepinbnd - 1.0 + (totaltime - side.data[SLstepinbnd - 1].time) / (side.data[SLstepinbnd].time - side.data[SLstepinbnd - 1].time);
+
+    }
+
+
+    if (side.isright == 0)
+    {
+        //top or bottom
+        un = XEv.v; //u normal to boundary
+        ut = XEv.u; //u tangent to boundary
+    }
+    else
+    {
+        un = XEv.u;
+        ut = XEv.v;
+    }
+
+    if (side.isright == 0) // top or bottom
+    {
+        Fh = XFlux.Fhv;
+        Fq = XFlux.Fqvy;
+        S = XFlux.Sv;
+    }
+    else
+    {
+        Fh = XFlux.Fhu;
+        Fq = XFlux.Fqux;
+        S = XFlux.Su;
+    }
+
+    if (XParam.GPUDEVICE >= 0)
+    {
+        //bndFluxGPU <<< gridDimBBND, blockDim, 0 >>> (XParam, side, XBlock, Atmp, float(itime), XEv.zs, XEv.h, un, ut, Fh, Fq, S);
+        //CUDA_CHECK(cudaDeviceSynchronize());
+    }
+    else
+    {
+        //bndFluxCPU(XParam, side, XBlock, zsbndleft, uubndleft, vvbndleft, Atmp, XEv.zs, XEv.h, un, ut);
+    }
+}
+template void FlowbndFluxold<float>(Param XParam, double totaltime, BlockP<float> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<float> XEv, FluxP<float> XFlux);
+template void FlowbndFluxold<double>(Param XParam, double totaltime, BlockP<double> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<double> XEv, FluxP<double> XFlux);
+
+template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, int type, float zsbnd, T taper, T* zs, T* h, T* un, T* ut, T* Fh, T* Fq, T* Ss)
+{
+    //
+
+    int halowidth = XParam.halowidth;
+    int blkmemwidth = blockDim.x + halowidth * 2;
+    //unsigned int blksize = blkmemwidth * blkmemwidth;
+
+    int ibl = blockIdx.x;
+    int ix, iy;
+    
+
+    int iq = ibl * XParam.blkwidth + threadIdx.x;
+
+    int ib = side.blk_g[ibl];
+    int lev = XBlock.level[ib];
+
+
+    T delta = calcres(T(XParam.dx), lev);
+
+    if (side.isright == 0)
+    {
+        ix = threadIdx.x;
+        iy = side.istop < 0 ? 0 : (blockDim.x);
+        //itx = (xx - XParam.xo) / (XParam.xmax - XParam.xo) * side.nbnd;
+    }
+    else
+    {
+        iy = threadIdx.x;
+        ix = side.isright < 0 ? 0 : (blockDim.x);
+        //itx = (yy - XParam.yo) / (XParam.ymax - XParam.yo) * side.nbnd;
+    }
+
+    T sign = T(side.isright) + T(side.istop);
+    int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+
+    T xx, yy;
+
+    xx = XBlock.xo[ib] + ix * delta;
+    yy = XBlock.yo[ib] + iy * delta;
+
+
+    T zsatm = T(0.0);
+
+    if (XParam.atmpforcing)
+    {
+        float atmpi;
+
+        atmpi = interpDyn2BUQ(XParam.xo + xx, XParam.yo + yy, Atmp.GPU);
+        zsatm = -1.0 * (atmpi - XParam.Paref) * XParam.Pa2m;
+    }
+    if (!uniform)
+    {
+
+
+        zsbnd = interpDyn2BUQ(XParam.xo + xx, XParam.yo + yy, Zsmap.GPU);
+    }
+
+    
+    
+    zsbnd = zsbnd + XParam.zsoffset;
+    
+
+    int inside = Inside(halowidth, blkmemwidth, side.isright, side.istop, ix, iy, ib);
+
+    //T zsbnd;
+    T unbnd = T(0.0);
+    T utbnd = T(0.0);
+
+    T zsinside, hinside, uninside, utinside,zsi;
+    T F, G, S;
+    T qmean;
+
+    zsi = zs[i];
+    zsinside = zs[inside];
+    hinside = h[inside];
+    uninside = un[inside];
+    utinside = ut[inside];
+
+    T zsX = (zsbnd + zsatm - 0.5 * (zsi + zsinside)) * taper + 0.5 * (zsi + zsinside);
+
+    qmean = side.qmean_g[iq];
+
+    
+    if (side.isright < 0 || side.istop < 0) //left or bottom
+    {
+        F = Fh[i];
+        G = Fq[i];
+        S = Ss[inside];
+    }
+    else
+    {
+        F = Fh[i];
+        G = Ss[i];
+        S = Fq[inside];
+    }
+    
+    T factime = min(T(XParam.dt / XParam.bndfiltertime), T(1.0));
+    T facrel =  T(1.0) - min(T(XParam.dt / XParam.bndrelaxtime), T(1.0));
+
+
+
+
+    if (type == 0) // No Flux
+    {
+        //noslipbnd(zsinside, hinside, unnew, utnew, zsnew, hnew);
+        //noslipbndQ(F, G, S);
+        
+        
+        noslipbndQ(F, G, S);//noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
+    
+    }
+    else if (type == 2)
+    {
+        if (h[i] > XParam.eps || zsX > zsi)
+        {
+            //
+            Dirichlet1Q(T(XParam.g), sign, zsX, zsinside, hinside, uninside, F);
+        }
+        else
+        {
+            noslipbndQ(F, G, S);
+            qmean = T(0.0);
+        }
+    }
+    else if (type == 3)
+    {
+        if (h[i] > XParam.eps || zsX > zsi )
+        {
+            ABS1DQ(T(XParam.g), sign, factime, facrel, zsi, zsX, zsinside, h[i], qmean, F, G, S);
+            //qmean = T(0.0);
+        }
+        else
+        {
+            noslipbndQ(F, G, S);
+            qmean = T(0.0);
+        }
+        side.qmean_g[iq] = qmean;
+    }
+    
+
+    // write the results
+
+    if (side.isright < 0 || side.istop < 0) // left or bottom
+    {
+        Fh[i]=F;
+        Fq[i]=G;
+        Ss[inside]=S;
+    }
+    else
+    {
+        Fh[i] = F;
+        Ss[i] = G;
+        Fq[inside] = S;
+    }
+    
+
+    
+
+
+
+
+}
+
+
+template <class T> void bndFluxGPUSideCPU(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, int type, float zsbnd, T taper, T* zs, T* h, T* un, T* ut, T* Fh, T* Fq, T* Ss)
+{
+    int halowidth = XParam.halowidth;
+    int blkmemwidth = XParam.blkmemwidth;
+    //unsigned int blksize = blkmemwidth * blkmemwidth;
+
+    for (int ibl = 0; ibl < side.nblk; ibl++)
+    {
+
+        int ib = side.blk[ibl];
+        int lev = XBlock.level[ib];
+        
+        T delta = calcres(T(XParam.dx), lev);
+
+        for (int tx = 0; tx < XParam.blkwidth; tx++)
+        {
+            int ix, iy;
+
+            T xx, yy;
+            if (side.isright == 0)
+            {
+                ix = tx;
+                iy = side.istop < 0 ? 0 : (XParam.blkwidth);
+                //itx = (xx - XParam.xo) / (XParam.xmax - XParam.xo) * side.nbnd;
+            }
+            else
+            {
+                iy = tx;
+                ix = side.isright < 0 ? 0 : (XParam.blkwidth);
+                //itx = (yy - XParam.yo) / (XParam.ymax - XParam.yo) * side.nbnd;
+            }
+            xx = XBlock.xo[ib] + ix * delta;
+            yy = XBlock.yo[ib] + iy * delta;
+
+            T sign = T(side.isright) + T(side.istop);
+            int iq = ibl * XParam.blkwidth + tx;
+
+
+            T zsatm = T(0.0);
+            T atmpi = T(0.0);
+
+            if (XParam.atmpforcing)
+            {
+                if (Atmp.uniform)
+                {
+                    atmpi = T(Atmp.nowvalue);
+                }
+                else
+                {
+                    atmpi = interp2BUQ(XParam.xo + xx, XParam.yo + yy, Atmp);
+                }
+                zsatm = -(atmpi - (T)XParam.Paref) * (T)XParam.Pa2m;
+            }
+            if (!uniform)
+            {
+
+
+                zsbnd = interp2BUQ(XParam.xo + xx, XParam.yo + yy, Zsmap);
+            }
+
+            
+            zsbnd = zsbnd + XParam.zsoffset;
+            
+
+            int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+            int inside = Inside(halowidth, blkmemwidth, side.isright, side.istop, ix, iy, ib);
+
+            //T zsbnd;
+            T unbnd = T(0.0);
+            T utbnd = T(0.0);
+
+            T zsinside, hinside, uninside, utinside, zsi;
+            T F, G, S;
+            T qmean;
+
+            zsi = zs[i];
+            zsinside = zs[inside];
+            hinside = h[inside];
+            uninside = un[inside];
+            utinside = ut[inside];
+
+            T zsX = (zsbnd + zsatm - 0.5 * (zsi + zsinside)) * taper + 0.5 * (zsi + zsinside);
+
+            qmean = side.qmean[iq];
+
+
+            if (side.isright < 0 || side.istop < 0) //left or bottom
+            {
+                F = Fh[i];
+                G = Fq[i];
+                S = Ss[inside];
+            }
+            else
+            {
+                F = Fh[i];
+                G = Ss[i];
+                S = Fq[inside];
+            }
+
+            T factime = min(T(XParam.dt / XParam.bndfiltertime), T(1.0));
+            T facrel = T(1.0) - min(T(XParam.dt / XParam.bndrelaxtime), T(1.0));
+            if (type == 0) // No Flux
+            {
+                //noslipbnd(zsinside, hinside, unnew, utnew, zsnew, hnew);
+                //noslipbndQ(F, G, S);
+
+
+                noslipbndQ(F, G, S);//noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
+
+            }
+            else if (type == 3)
+            {
+                if (h[i] > XParam.eps || zsX > zsi)
+                {
+                    ABS1DQ(T(XParam.g), sign, factime, facrel, zsi, zsX, zsinside, h[i], qmean, F, G, S);
+                    //qmean = T(0.0);
+                }
+                else
+                {
+                    noslipbndQ(F, G, S);
+                    qmean = T(0.0);
+                }
+                side.qmean[iq] = qmean;
+            }
+            else if (type == 2)
+            {
+                if (h[i] > XParam.eps || zsX > zsi)
+                {
+                    //ABS1DQ(T(XParam.g), sign, factime, facrel, zsi, zsX, zsinside, h[i], qmean, F, G, S);
+                    //qmean = T(0.0);
+                    Dirichlet1Q(T(XParam.g), sign, zsX, zsinside, hinside, uninside, F);
+                }
+                else
+                {
+                    noslipbndQ(F, G, S);
+                    qmean = T(0.0);
+                }
+                side.qmean[iq] = qmean;
+            }
+
+
+            // write the results
+
+            if (side.isright < 0 || side.istop < 0) // left or bottom
+            {
+                Fh[i] = F;
+                Fq[i] = G;
+                Ss[inside] = S;
+            }
+            else
+            {
+                Fh[i] = F;
+                Ss[i] = G;
+                Fq[inside] = S;
+            }
+        }
+    }
+
+}
+
+template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T> XBlock, DynForcingP<float> Atmp, float itime, T* zs, T* h, T* un, T* ut)
+{
+    //
+
+    unsigned int halowidth = XParam.halowidth;
+    unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+    //unsigned int blksize = blkmemwidth * blkmemwidth;
+    
+    unsigned int ibl = blockIdx.x;
+    unsigned int ix, iy;
+    float itx;
+
+    int ib = side.blks_g[ibl];
+    int lev = XBlock.level[ib];
+
+
+    T delta = calcres(T(XParam.dx), lev);
+
+    if (side.isright == 0)
+    {
+        ix = threadIdx.x;
+        iy = side.istop < 0 ? 0 : (blockDim.x - 1);
+        //itx = (xx - XParam.xo) / (XParam.xmax - XParam.xo) * side.nbnd;
+    }
+    else
+    {
+        iy = threadIdx.x;
+        ix = side.isright < 0 ? 0 : (blockDim.x - 1);
+        //itx = (yy - XParam.yo) / (XParam.ymax - XParam.yo) * side.nbnd;
+    }
+
+    T sign = T(side.isright) + T(side.istop);
+    int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+    
+    T xx, yy;
+
+    xx = XBlock.xo[ib] + ix * delta;
+    yy = XBlock.yo[ib] + iy * delta;
+
+    if (side.isright == 0)
+    {
+        itx = (xx) / (XParam.xmax - XParam.xo) * side.nbnd;
+    }
+    else
+    {
+        itx = (yy) / (XParam.ymax - XParam.yo) * side.nbnd;
+    }
+
+    T zsatm = T(0.0);
+
+    if (XParam.atmpforcing)
+    {
+        float atmpi;
+
+        atmpi = interpDyn2BUQ(XParam.xo + xx, XParam.yo + yy, Atmp.GPU);
+        zsatm = -1.0 * (atmpi - XParam.Paref) * XParam.Pa2m;
+    }
+
+    int inside= Inside(halowidth, blkmemwidth, side.isright, side.istop, ix, iy, ib);
+            
+    T unnew, utnew, hnew, zsnew;
+    T uninside, utinside, hinside, zsinside;
+    T zsbnd;
+    T unbnd = T(0.0);
+    T utbnd = T(0.0);
+
+    unnew = un[i];
+    utnew = ut[i];
+    hnew = h[i];
+    zsnew = zs[i];
+
+    zsinside = zs[inside];
+    hinside = h[inside];
+    uninside = un[inside];
+    utinside = ut[inside];
+
+    if (side.on)
+    {
+        
+        zsbnd = tex2D<float>(side.GPU.WLS.tex, itime + 0.5f, itx + 0.5f) + zsatm;
+
+        if (side.type == 4)
+        {
+            //un is V (top or bot bnd) or U (left or right bnd) depending on which side it's dealing with (same for ut)
+            unbnd = side.isright == 0 ? tex2D<float>(side.GPU.Vvel.tex, itime + 0.5f, itx + 0.5f) : tex2D<float>(side.GPU.Uvel.tex, itime + 0.5f, itx + 0.5f);
+            utbnd = side.isright == 0 ? tex2D<float>(side.GPU.Uvel.tex, itime + 0.5f, itx + 0.5f) : tex2D<float>(side.GPU.Vvel.tex, itime + 0.5f, itx + 0.5f);
+
+        }
+        
+    }
+
+    if (side.type == 0) // No slip == no friction wall
+    {
+        //noslipbnd(zsinside, hinside, unnew, utnew, zsnew, hnew);
+    }
+    else if (side.type == 1) // neumann type
+    {
+        // Nothing to do here?
+    }
+    else if (side.type == 2)
+    {
+        Dirichlet1D(T(XParam.g), sign, zsbnd, zsinside, hinside, uninside, unnew, utnew, zsnew, hnew);
+    }
+    else if (side.type == 3 )
+    {
+        if (hnew > XParam.eps && hinside > XParam.eps)
+        {
+            //ABS1D(T(XParam.g), sign, zsbnd, zsinside, hinside, utinside, unbnd, unnew, utnew, zsnew, hnew);
+            //printf("No boundary!\n");
+        }
+    }
+    else if (side.type == 4)
+    {
+        
+        ABS1D(T(XParam.g), sign, zsbnd, zsinside, hinside, utbnd, unbnd, unnew, utnew, zsnew, hnew);
+    }
+    
+    un[i] = unnew;
+    ut[i] = utnew;
+    h[i] = hnew;
+    zs[i] = zsnew;
+}
+template __global__ void bndGPU<float>(Param XParam, bndparam side, BlockP<float> XBlock, DynForcingP<float> Atmp, float itime, float* zs, float* h, float* un, float* ut);
+template __global__ void bndGPU<double>(Param XParam, bndparam side, BlockP<double> XBlock, DynForcingP<float> Atmp, float itime, double* zs, double* h, double* un, double* ut);
+
+template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, DynForcingP<float> Atmp, T* zs, T* h, T* un, T* ut)
+{
+    //
+    unsigned int halowidth = XParam.halowidth;
+    unsigned int blkmemwidth = XParam.blkmemwidth;
+    //unsigned int blksize = blkmemwidth * blkmemwidth;
+
+    for (int ibl = 0; ibl < side.nblk; ibl++)
+    {
+
+        int ib = side.blks[ibl];
+        int lev = XBlock.level[ib];
+        int nbnd = side.nbnd;
+        T delta = calcres(T(XParam.dx), lev);
+
+        for (int tx = 0; tx < XParam.blkwidth; tx++)
+        {
+            unsigned int ix, iy;
+            double itx;
+            T xx, yy;
+            if (side.isright == 0)
+            {
+                ix = tx;
+                iy = side.istop < 0 ? 0 : (XParam.blkwidth - 1);
+                //itx = (xx - XParam.xo) / (XParam.xmax - XParam.xo) * side.nbnd;
+            }
+            else
+            {
+                iy = tx;
+                ix = side.isright < 0 ? 0 : (XParam.blkwidth - 1);
+                //itx = (yy - XParam.yo) / (XParam.ymax - XParam.yo) * side.nbnd;
+            }
+            xx = XBlock.xo[ib] + ix * delta;
+            yy = XBlock.yo[ib] + iy * delta;
+
+            T sign = T(side.isright) + T(side.istop);
+
+            if (side.isright == 0)
+            {
+                itx = (xx) / (XParam.xmax - XParam.xo) * side.nbnd;
+            }
+            else
+            {
+                itx = (yy) / (XParam.ymax - XParam.yo) * side.nbnd;
+            }
+
+            T zsatm = T(0.0);
+            T atmpi = T(0.0);
+
+            if (XParam.atmpforcing)
+            {
+                if (Atmp.uniform)
+                {
+                    atmpi = T(Atmp.nowvalue);
+                }
+                else
+                {
+                    atmpi = interp2BUQ(XParam.xo + xx, XParam.yo + yy, Atmp);
+                }
+                zsatm = -(atmpi - (T)XParam.Paref) * (T)XParam.Pa2m;
+            }
+
+
+            int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+            int inside = Inside(halowidth, blkmemwidth, side.isright, side.istop, ix, iy, ib);
+
+            T unnew, utnew, hnew, zsnew;
+            T uninside, utinside, hinside, zsinside;
+            T zsbnd;
+            T unbnd = T(0.0);
+            T utbnd = T(0.0);
+
+            unnew = un[i];
+            utnew = ut[i];
+            hnew = h[i];
+            zsnew = zs[i];
+
+            zsinside = zs[inside];
+            hinside = h[inside];
+            uninside = un[inside];
+            utinside = ut[inside];
+
+            if (side.on)
+            {
+                int iprev = utils::max(int(floor(itx * (side.nbnd - 1))), 0);//min(max((int)ceil(itx / (1 / (side.nbnd - 1))), 0), (int)side.nbnd() - 2);
+                int inext = iprev + 1;
+
+                if (side.nbnd == 1)
+                {
+                    zsbnd = zsbndvec[0] + zsatm;
+                    if (side.type == 4)
+                    {
+                        unbnd = side.isright == 0 ? vvbndvec[0] : uubndvec[0];
+                        utbnd = side.isright == 0 ? uubndvec[0] : vvbndvec[0];
+                    }
+                }
+                else
+                {
+
+                    // here interp time is used to interpolate to the right node rather than in time...//
+                    zsbnd = T(interptime(zsbndvec[inext], zsbndvec[iprev], 1.0, itx * (nbnd - 1) - iprev)) + zsatm;
+
+                    if (side.type == 4)
+                    {
+                        unbnd = side.isright == 0 ? T(interptime(vvbndvec[inext], vvbndvec[iprev], 1.0, itx * (nbnd - 1) - iprev)) : T(interptime(uubndvec[inext], uubndvec[iprev], 1.0, itx * (nbnd - 1) - iprev));
+                        utbnd = side.isright == 0 ? T(interptime(uubndvec[inext], uubndvec[iprev], 1.0, itx * (nbnd - 1) - iprev)) : T(interptime(vvbndvec[inext], vvbndvec[iprev], 1.0, itx * (nbnd - 1) - iprev));
+                    }
+                }
+
+
+
+            }
+
+            if (side.type == 0) // No slip == no friction wall
+            {
+                noslipbnd(zsinside, hinside, unnew, utnew, zsnew, hnew);
+            }
+            else if (side.type == 1) // neumann type
+            {
+                // Nothing to do here?
+            }
+            else if (side.type == 2)
+            {
+                Dirichlet1D(T(XParam.g), sign, zsbnd, zsinside, hinside, uninside, unnew, utnew, zsnew, hnew);
+                
+            }
+            else if (side.type == 3)
+            {
+                if (hnew > XParam.eps && hinside > XParam.eps)
+                {
+                    ABS1D(T(XParam.g), sign, zsbnd, zsinside, hinside, utinside, unbnd, unnew, utnew, zsnew, hnew);
+                }
+            }
+            else if (side.type == 4)
+            {
+
+                ABS1D(T(XParam.g), sign, zsbnd, zsinside, hinside, utbnd, unbnd, unnew, utnew, zsnew, hnew);
+            }
+
+            un[i] = unnew;
+            ut[i] = utnew;
+            h[i] = hnew;
+            zs[i] = zsnew;
+        }
+    }
+}
+template __host__ void bndCPU<float>(Param XParam, bndparam side, BlockP<float> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, DynForcingP<float> Atmp, float* zs, float* h, float* un, float* ut);
+template __host__ void bndCPU<double>(Param XParam, bndparam side, BlockP<double> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, DynForcingP<float> Atmp, double* zs, double* h, double* un, double* ut);
+
+
+// function to apply bnd at the boundary with masked blocked
+// here a wall is applied in the halo 
+template <class T> __host__ void maskbnd(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T*zb)
+{
+    unsigned int halowidth = XParam.halowidth;
+    unsigned int blkmemwidth = XParam.blkmemwidth;
+    //unsigned int blksize = blkmemwidth * blkmemwidth;
+    int isright,istop;
+    
+    T zsinside,zsnew,hnew,vnew,unew,zbnew;
+
+    bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
+
+
+    for (int ibl = 0; ibl <XBlock.mask.nblk ; ibl++)
+    {
+
+        int ib = XBlock.mask.blks[ibl];
+        int lev = XBlock.level[ib];
+        T delta = calcres(T(XParam.dx), lev);
+
+        // find where the mask applies
+        //
+        findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+        //leftside
+        if (isleftbot | islefttop )//?
+        {
+            isright = -1;
+            istop = 0;
+                    
+            int ix = -1;
+
+            int yst = isleftbot ? 0 : ftoi(XParam.blkwidth * 0.5);
+            int ynd = islefttop ? XParam.blkwidth : ftoi(XParam.blkwidth * 0.5);
+
+            for (int iy = yst; iy < ynd; iy++)
+            {
+                int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+                int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+                zsinside = Xev.zs[inside];
+                unew = Xev.u[i];
+                vnew = Xev.v[i];
+                zsnew = Xev.zs[i];
+                hnew = Xev.h[i];
+                zbnew = zb[i];
+
+                halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+                
+                Xev.u[i]=unew;
+                Xev.v[i]=vnew;
+                Xev.zs[i]=zsnew;
+                Xev.h[i]=hnew;
+                zb[i]=zbnew;
+
+            }
+
+        }
+        //topside
+        if (istopleft | istopright)//?
+        {
+            isright = 0;
+            istop = 1;
+
+            int iy = XParam.blkwidth;
+
+            int xst = istopleft ? 0 : ftoi(XParam.blkwidth * 0.5);
+            int xnd = istopright ? XParam.blkwidth : ftoi(XParam.blkwidth * 0.5);
+
+            for (int ix = xst; ix < xnd; ix++)
+            {
+                int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+                int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+                zsinside = Xev.zs[inside];
+                unew = Xev.u[i];
+                vnew = Xev.v[i];
+                zsnew = Xev.zs[i];
+                hnew = Xev.h[i];
+                zbnew = zb[i];
+
+                halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+
+                Xev.u[i] = unew;
+                Xev.v[i] = vnew;
+                Xev.zs[i] = zsnew;
+                Xev.h[i] = hnew;
+                zb[i] = zbnew;
+
+            }
+
+        }
+        //rightside
+        if (isrighttop | isrightbot)//?
+        {
+            isright = 1;
+            istop = 0;
+
+            int ix = XParam.blkwidth;
+
+            int yst = isrightbot ? 0 : ftoi(XParam.blkwidth * 0.5);
+            int ynd = isrighttop ? XParam.blkwidth : ftoi(XParam.blkwidth * 0.5);
+
+            for (int iy = yst; iy < ynd; iy++)
+            {
+                int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+                int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+                zsinside = Xev.zs[inside];
+                unew = Xev.u[i];
+                vnew = Xev.v[i];
+                zsnew = Xev.zs[i];
+                hnew = Xev.h[i];
+                zbnew = zb[i];
+
+                halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+
+                Xev.u[i] = unew;
+                Xev.v[i] = vnew;
+                Xev.zs[i] = zsnew;
+                Xev.h[i] = hnew;
+                zb[i] = zbnew;
+
+            }
+
+        }
+        
+        //botside
+        if (isbotright | isbotleft)//?
+        {
+            isright = 0;
+            istop = -1;
+
+            int iy = -1;
+
+            int xst = isbotleft ? 0 : ftoi(XParam.blkwidth * 0.5);
+            int xnd = isbotright ? XParam.blkwidth :ftoi( XParam.blkwidth * 0.5);
+
+            for (int ix = xst; ix < xnd; ix++)
+            {
+                int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+                int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+                zsinside = Xev.zs[inside];
+                unew = Xev.u[i];
+                vnew = Xev.v[i];
+                zsnew = Xev.zs[i];
+                hnew = Xev.h[i];
+                zbnew = zb[i];
+
+                halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+
+                Xev.u[i] = unew;
+                Xev.v[i] = vnew;
+                Xev.zs[i] = zsnew;
+                Xev.h[i] = hnew;
+                zb[i] = zbnew;
+
+            }
+
+        }
+        
+
+
+    }
+}
+template __host__ void maskbnd<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
+template __host__ void maskbnd<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
+
+//For the GPU version we apply 4 separate global function in the hope to increase occupancy
+template <class T> __global__ void maskbndGPUleft(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
+{
+    unsigned int halowidth = XParam.halowidth;
+    unsigned int blkmemwidth = XParam.blkmemwidth;
+    //unsigned int blksize = blkmemwidth * blkmemwidth;
+    int ibl = blockIdx.x;
+    if (ibl < XBlock.mask.nblk)
+    {
+        int ix, iy;
+
+        int isright, istop;
+
+        T zsinside, zsnew, hnew, vnew, unew, zbnew;
+        T hinside;
+
+        bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
+
+        int ib = XBlock.mask.blks[ibl];
+        //
+        findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+        //leftside
+        if (isleftbot | islefttop)//?
+        {
+            isright = -1;
+            istop = 0;
+
+            ix = -1;
+            iy = threadIdx.x;
+            int yst = isleftbot ? 0 : XParam.blkwidth * 0.5;
+            int ynd = islefttop ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
+            if (iy >= yst && iy < ynd)
+            {
+                int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+                int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+
+                zsinside = Xev.zs[inside];
+                hinside = Xev.h[inside];
+
+                unew = Xev.u[i];
+                vnew = Xev.v[i];
+                zsnew = Xev.zs[i];
+                hnew = Xev.h[i];
+                zbnew = zb[i];
+
+
+                //halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+                //noslipbnd(zsinside, hinside, unew, vnew, zsnew, hnew);
+
+
+                Xev.u[i] = unew;
+                Xev.v[i] = vnew;
+                Xev.zs[i] = zsnew;
+                Xev.h[i] = hnew;
+                zb[i] = zbnew;
+
+
+            }
+
+        }
+    }
+
+}
+template __global__ void maskbndGPUleft<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
+template __global__ void maskbndGPUleft<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
+
+
+template <class T> __global__ void maskbndGPUFluxleft(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, FluxP<T> Flux)
+{
+    unsigned int halowidth = XParam.halowidth;
+    unsigned int blkmemwidth = XParam.blkmemwidth;
+    //unsigned int blksize = blkmemwidth * blkmemwidth;
+    int ibl = blockIdx.x;
+    if (ibl < XBlock.mask.nblk)
+    {
+        int ix, iy;
+
+        int isright, istop;
+
+        //T zsinside, zsnew, hnew, vnew, unew, zbnew;
+        //T hinside;
+
+        bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
+
+        int ib = XBlock.mask.blks[ibl];
+        //
+        findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+        //leftside
+        if (isleftbot | islefttop)//?
+        {
+            isright = -1;
+            istop = 0;
+
+            ix = -1;
+            iy = threadIdx.x;
+            int yst = isleftbot ? 0 : XParam.blkwidth * 0.5;
+            int ynd = islefttop ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
+            if (iy >= yst && iy < ynd)
+            {
+                int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+                int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+                T zsinside = Xev.zs[inside];
+                T zsi = Xev.zs[i];
+                T hinside = Xev.h[i];
+
+                T zsbnd = T(0.0);
+                T qmean = T(0.0);
+                T factime = min(T(XParam.dt / 60.0), T(1.0));
+                T facrel = T(1.0) - min(T(XParam.dt / 3600.0), T(1.0));
+                if (XParam.aoibnd == 0)
+                {
+                    noslipbndQ(Flux.Fhu[inside], Flux.Fqux[i], Flux.Su[inside]); //noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
+                }
+                //ABS1DQ(T g, T sign, T factime, T facrel, T zs, T zsbnd, T zsinside, T h, T & qmean, T & q, T & G, T & S)
+                //ABS1DQ(T g, T sign, T factime, T facrel, T zs, T zsbnd, T zsinside, T h, T & qmean, T & q, T & G, T & S)
+                if (XParam.aoibnd == 3)
+                {
+                    if (hinside > XParam.eps)
+                    {
+                        ABS1DQ(T(XParam.g), T(-1.0), factime, facrel, zsi, zsbnd, zsinside, hinside, qmean, Flux.Fhu[inside], Flux.Fqux[i], Flux.Su[inside]);
+                    }
+                    else
+                    {
+                        noslipbndQ(Flux.Fhu[inside], Flux.Fqux[i], Flux.Su[inside]);
+                    }
+                }
+
+
+
+            }
+
+        }
+    }
+
+}
+template __global__ void maskbndGPUFluxleft<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, FluxP<float> Flux);
+template __global__ void maskbndGPUFluxleft<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, FluxP<double> Flux);
+
+
+template <class T> __global__ void maskbndGPUtop(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
+{
+    unsigned int halowidth = XParam.halowidth;
+    unsigned int blkmemwidth = XParam.blkmemwidth;
+    //unsigned int blksize = blkmemwidth * blkmemwidth;
+    int ibl = blockIdx.x;
+    if (ibl < XBlock.mask.nblk)
+    {
+        int ix, iy;
+
+        int isright, istop;
+
+        T zsinside, zsnew, hnew, vnew, unew, zbnew;
+        T hinside;
+        bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
+
+        int ib = XBlock.mask.blks[ibl];
+        //
+        findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+        if (istopleft | istopright)//?
+        {
+            isright = 0;
+            istop = 1;
+
+            iy = XParam.blkwidth;
+            ix = threadIdx.x;
+
+            int xst = istopleft ? 0 : XParam.blkwidth * 0.5;
+            int xnd = istopright ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
+            if (ix >= xst && ix < xnd)
+            {
+                int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+                int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+
+                zsinside = Xev.zs[inside];
+                hinside = Xev.h[inside];
+                unew = Xev.u[i];
+                vnew = Xev.v[i];
+                zsnew = Xev.zs[i];
+                hnew = Xev.h[i];
+                zbnew = zb[i];
+
+                //halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+                //noslipbnd(zsinside, hinside, vnew, unew, zsnew, hnew);
+
+                Xev.u[i] = unew;
+                Xev.v[i] = vnew;
+                Xev.zs[i] = zsnew;
+                Xev.h[i] = hnew;
+                zb[i] = zbnew;
+
+
+            }
+        }
+    }
+}
+template __global__ void maskbndGPUtop<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
+template __global__ void maskbndGPUtop<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
+
+template <class T> __global__ void maskbndGPUFluxtop(Param XParam, BlockP<T> XBlock,  FluxP<T> Flux)
+{
+    unsigned int halowidth = XParam.halowidth;
+    unsigned int blkmemwidth = XParam.blkmemwidth;
+    //unsigned int blksize = blkmemwidth * blkmemwidth;
+    int ibl = blockIdx.x;
+    if (ibl < XBlock.mask.nblk)
+    {
+        int ix, iy;
+
+        int isright, istop;
+
+        T hinside;
+        bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
+
+        int ib = XBlock.mask.blks[ibl];
+        //
+        findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+        if (istopleft | istopright)//?
+        {
+            isright = 0;
+            istop = 1;
+
+            iy = XParam.blkwidth;
+            ix = threadIdx.x;
+
+            int xst = istopleft ? 0 : XParam.blkwidth * 0.5;
+            int xnd = istopright ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
+            if (ix >= xst && ix < xnd)
+            {
+                int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+                int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+                
+                noslipbndQ(Flux.Fhv[i], Flux.Sv[i], Flux.Fqvy[inside]); //noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
+                
+
+
+            }
+        }
+    }
+}
+template __global__ void maskbndGPUFluxtop<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
+template __global__ void maskbndGPUFluxtop<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
+
+template <class T> __global__ void maskbndGPUright(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
+{
+    unsigned int halowidth = XParam.halowidth;
+    unsigned int blkmemwidth = XParam.blkmemwidth;
+    //unsigned int blksize = blkmemwidth * blkmemwidth;
+    int ibl = blockIdx.x;
+    if (ibl < XBlock.mask.nblk)
+    {
+        int ix, iy;
+
+        int isright, istop;
+
+        T zsinside, zsnew, hnew, vnew, unew, zbnew;
+        T hinside;
+        bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
+
+        int ib = XBlock.mask.blks[ibl];
+        //
+        findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+        if (isrighttop | isrightbot)//?
+        {
+            isright = 1;
+            istop = 0;
+
+            ix = XParam.blkwidth;
+
+            iy = threadIdx.x;
+
+            int yst = isrightbot ? 0 : XParam.blkwidth * 0.5;
+            int ynd = isrighttop ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
+            if (iy >= yst && iy < ynd)
+            {
+                int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+                int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+
+                zsinside = Xev.zs[inside];
+                hinside = Xev.h[inside];
+                unew = Xev.u[i];
+                vnew = Xev.v[i];
+                zsnew = Xev.zs[i];
+                hnew = Xev.h[i];
+                zbnew = zb[i];
+
+                //halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+                //noslipbnd(zsinside, hinside, unew, vnew, zsnew, hnew);
+
+                Xev.u[i] = unew;
+                Xev.v[i] = vnew;
+                Xev.zs[i] = zsnew;
+                Xev.h[i] = hnew;
+                zb[i] = zbnew;
+
+
+            }
+        }
+    }
+}
+template __global__ void maskbndGPUright<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
+template __global__ void maskbndGPUright<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
+
+
+template <class T> __global__ void maskbndGPUFluxright(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
+{
+    unsigned int halowidth = XParam.halowidth;
+    unsigned int blkmemwidth = XParam.blkmemwidth;
+    //unsigned int blksize = blkmemwidth * blkmemwidth;
+    int ibl = blockIdx.x;
+    if (ibl < XBlock.mask.nblk)
+    {
+        int ix, iy;
+
+        int isright, istop;
+
+        //T zsinside, zsnew, hnew, vnew, unew, zbnew;
+        //T hinside;
+        bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
+
+        int ib = XBlock.mask.blks[ibl];
+        //
+        findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+        if (isrighttop | isrightbot)//?
+        {
+            isright = 1;
+            istop = 0;
+
+            ix = XParam.blkwidth;
+
+            iy = threadIdx.x;
+
+            int yst = isrightbot ? 0 : XParam.blkwidth * 0.5;
+            int ynd = isrighttop ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
+            if (iy >= yst && iy < ynd)
+            {
+                int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+                int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+                
+                noslipbndQ(Flux.Fhu[i], Flux.Su[i], Flux.Fqux[inside]); //noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
+
+                
+
+            }
+        }
+    }
+}
+template __global__ void maskbndGPUFluxright<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
+template __global__ void maskbndGPUFluxright<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
+
+template <class T> __global__ void maskbndGPUbot(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, T* zb)
+{
+    unsigned int halowidth = XParam.halowidth;
+    unsigned int blkmemwidth = XParam.blkmemwidth;
+    //unsigned int blksize = blkmemwidth * blkmemwidth;
+    int ibl = blockIdx.x;
+    if (ibl < XBlock.mask.nblk)
+    {
+        int ix, iy;
+
+        int isright, istop;
+
+        T zsinside, zsnew, hnew, vnew, unew, zbnew;
+        T hinside;
+        bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
+
+        int ib = XBlock.mask.blks[ibl];
+        //
+        findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+        if (isbotright | isbotleft)//?
+        {
+            isright = 0;
+            istop = -1;
+
+
+            iy = -1;
+            ix = threadIdx.x;
+            int xst = isbotleft ? 0 : XParam.blkwidth * 0.5;
+            int xnd = isbotright ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
+
+            if (ix >= xst && ix < xnd)
+            {
+                int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+                int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+
+                zsinside = Xev.zs[inside];
+                hinside = Xev.h[inside];
+
+                unew = Xev.u[i];
+                vnew = Xev.v[i];
+                zsnew = Xev.zs[i];
+                hnew = Xev.h[i];
+                zbnew = zb[i];
+
+                //halowall(zsinside, unew, vnew, zsnew, hnew, zbnew);
+                //noslipbnd(zsinside, hinside, vnew, unew, zsnew, hnew);
+
+                Xev.u[i] = unew;
+                Xev.v[i] = vnew;
+                Xev.zs[i] = zsnew;
+                Xev.h[i] = hnew;
+                zb[i] = zbnew;
+
+            }
+
+        }
+    }
+}
+template __global__ void maskbndGPUbot<float>(Param XParam, BlockP<float> XBlock, EvolvingP<float> Xev, float* zb);
+template __global__ void maskbndGPUbot<double>(Param XParam, BlockP<double> XBlock, EvolvingP<double> Xev, double* zb);
+
+template <class T> __global__ void maskbndGPUFluxbot(Param XParam, BlockP<T> XBlock, FluxP<T> Flux)
+{
+    unsigned int halowidth = XParam.halowidth;
+    unsigned int blkmemwidth = XParam.blkmemwidth;
+    //unsigned int blksize = blkmemwidth * blkmemwidth;
+    int ibl = blockIdx.x;
+    if (ibl < XBlock.mask.nblk)
+    {
+        int ix, iy;
+
+        int isright, istop;
+
+        T zsinside, zsnew, hnew, vnew, unew, zbnew;
+        T hinside;
+        bool isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft;
+
+        int ib = XBlock.mask.blks[ibl];
+        //
+        findmaskside(XBlock.mask.side[ibl], isleftbot, islefttop, istopleft, istopright, isrighttop, isrightbot, isbotright, isbotleft);
+
+        if (isbotright | isbotleft)//?
+        {
+            isright = 0;
+            istop = -1;
+
+
+            iy = 0;
+            ix = threadIdx.x;
+            int xst = isbotleft ? 0 : XParam.blkwidth * 0.5;
+            int xnd = isbotright ? XParam.blkwidth : XParam.blkwidth * 0.5;
+
+
+            if (ix >= xst && ix < xnd)
+            {
+                int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+                int inside = Inside(halowidth, blkmemwidth, isright, istop, ix, iy, ib);
+
+                noslipbndQ(Flux.Fhv[inside], Flux.Fqvy[i], Flux.Sv[inside]); //noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
+
+            }
+
+        }
+    }
+}
+template __global__ void maskbndGPUFluxbot<float>(Param XParam, BlockP<float> XBlock, FluxP<float> Flux);
+template __global__ void maskbndGPUFluxbot<double>(Param XParam, BlockP<double> XBlock, FluxP<double> Flux);
+
+__device__ __host__ void findmaskside(int side, bool &isleftbot, bool& islefttop, bool& istopleft, bool& istopright, bool& isrighttop, bool& isrightbot, bool& isbotright, bool& isbotleft)
+{
+    int lb = 0b10000000;
+    int lt = 0b01000000;
+    int tl = 0b00100000;
+    int tr = 0b00010000;
+    int rt = 0b00001000;
+    int rb = 0b00000100;
+    int br = 0b00000010;
+    int bl = 0b00000001;
+    
+    isleftbot = (side & lb) == lb;
+    islefttop = (side & lt) == lt;
+
+    istopleft = (side & tl) == tl;
+    istopright = (side & tr) == tr;
+
+    isrighttop = (side & rt) == rt;
+    isrightbot = (side & rb) == rb;
+
+    isbotright = (side & br) == br;
+    isbotleft = (side & bl) == bl;
+}
+
+
+template <class T> __device__ __host__ void halowall(T zsinside, T& un, T& ut, T& zs, T& h,T&zb)
+{
+    // This function is used to make a wall on the halo to act as a wall
+    // It may be more suitable/stable than the noslip as a wall boundary
+    un = T(0.0);
+    zs = zsinside;
+    ut = T(0.0);
+    h = T(0.0);
+    zb = zsinside;
+
+}
+
+
+template <class T> __device__ __host__ void noslipbnd(T zsinside,T hinside,T &un, T &ut,T &zs, T &h)
+{
+    // Basic no slip bnd hs no normal velocity and leaves tanegtial velocity alone (maybe needs a wall friction added to it?)
+    // 
+    un = T(0.0);
+    zs = zsinside;
+    //ut[i] = ut[inside];//=0.0?
+    h = hinside;//=0.0?
+
+}
+
+template <class T> __device__ __host__ void noslipbndQ(T& F, T& G, T& S)
+{
+    // Basic no slip bnd hs no normal velocity and leaves tanegtial velocity alone (maybe needs a wall friction added to it?)
+    // 
+    F = T(0.0);
+    S = G;
+
+}
+
+
+template <class T> __device__ __host__ void ABS1D(T g, T sign, T zsbnd, T zsinside, T hinside, T utbnd,T unbnd, T& un, T& ut, T& zs, T& h)
+{
+    //Absorbing 1D boundary
+    //When nesting unbnd is read from file. when unbnd is not known assume 0. or the mean of un over a certain time 
+    // For utbnd use utinside if no utbnd are known 
+    un= sign * sqrt(g / h) * (zsinside - zsbnd) + T(unbnd);
+    zs = zsinside;
+    ut = T(utbnd);//ut[inside];
+    h = hinside;
+}
+
+template <class T> __device__ __host__ void ABS1DQ(T g, T sign, T factime,T facrel,T zs, T zsbnd, T zsinside, T h, T& qmean, T& q, T& G, T& S)
+{
+    //Absorbing 1D boundary
+    //When nesting unbnd is read from file. when unbnd is not known assume 0. or the mean of un over a certain time 
+    // For utbnd use utinside if no utbnd are known 
+
+    
+    
+    qmean = h < T(0.01) ? T(0.0) : factime* q + facrel * (T(1.0) - factime) * qmean;
+    //qmean = factime * q + facrel * (T(1.0) - factime) * qmean;
+
+    T un;
+    T zn = max(zsbnd, (zs - h));
+
+    T hn = max(h, T(0.0001));
+    
+
+    // Below should be hinside ? or h at Flux bnd?
+    // What if h is 0? then q and qmean should be 0
+    //un = sign * sqrt(g / h) * (T(2.0)*(zs - zsbnd) - (zsinside - zsbnd));
+    //un = sign* sqrt(g / h)* (T(2.0) * zs - zsinside - zsbnd);
+    un = sign * sqrt(g / hn) * (zs-zn);
+    //un = sign* sqrt(g / h)* (zs + zsinside - T(2.0) * zsbnd);
+    //zs = zsinside;
+    //zs = zsinside;
+    //ut = T(utbnd);//ut[inside];
+    //h = hinside;
+
+    q = un * hn + qmean;
+
+    //S = G;
+    //G = S-q;
+
+
+}
+
+template <class T> __device__ __host__ void Dirichlet1D(T g, T sign, T zsbnd, T zsinside, T hinside,  T uninside, T& un, T& ut, T& zs, T& h)
+{
+    // Is this even the right formulation?.
+    // I don't really like this formulation. while a bit less dissipative then abs1D with 0 unbnd (but worse if forcing uniside with 0) it is very reflective an not stable  
+    T zbinside = zsinside - hinside;
+    un = sign * T(2.0) * (sqrt(g * max(hinside, T(0.0))) - sqrt(g * max(zsbnd - zbinside, T(0.0)))) + uninside;
+    ut = T(0.0);
+    zs = zsinside;
+    //ut[i] = ut[inside];
+    h = hinside;
+}
+
+template <class T> __device__ __host__ void Dirichlet1Q(T g, T sign, T zsbnd, T zsinside, T hinside, T uninside, T& q)
+{
+    // Is this even the right formulation?.
+    // I don't really like this formulation. while a bit less dissipative then abs1D with 0 unbnd (but worse if forcing uniside with 0) it is very reflective an not stable  
+    T zbinside = zsinside - hinside;
+    T un = sign * T(2.0) * (sqrt(g * max(hinside, T(0.0))) - sqrt(g * max(zsbnd - zbinside, T(0.0)))) + uninside;
+    T ut = T(0.0);
+    //zs = zsinside;
+    //ut[i] = ut[inside];
+    //h = hinside;
+
+    q = un * hinside;
+}
+
+
+
+/*
+template <class T> __global__ void ABS1D(int halowidth,int isright, int istop, int nbnd, T g, T dx, T xo, T yo, T xmax, T ymax, T itime, cudaTextureObject_t texZsBND, int* bndblck, int* level, T* blockxo, T* blockyo, T* zs, T* zb, T* h, T* un, T* ut)
+{
+
+    
+
+    T xx, yy;
+    
+    T  sign, umean;
+    float itx;
+
+    sign = T(isright) + T(istop);
+
+
+
+
+    //int xplus;
+    //float hhi;
+    float zsbnd;
+    T zsinside;
+    T levdx= calcres(dx, level[ib]);
+    xx = blockxo[ib] + ix * levdx;
+    yy = blockyo[ib] + iy * levdx;
+
+
+    if (isright == 0) //leftside
+    {
+        
+        itx = (xx - xo) / (xmax - xo) * (nbnd - 1);
+    }
+    else 
+    {
+        
+        itx = (yy - yo) / (ymax - yo) * (nbnd - 1);
+    }
+    
+
+    umean = T(0.0);
+    zsbnd = tex2D(texZsBND, itime + 0.5f, itx + 0.5f);// textures use pixel registration so index of 0 is actually located at 0.5...
+
+    if (isbnd(isright, istop, blockDim.x, ix, iy) && zsbnd > zb[i])
+    {
+        
+        zsinside = zs[inside];
+        
+        un[i] = sign * sqrt(g / h[i]) * (zsinside - zsbnd) + umean;
+        zs[i] = zsinside;
+        ut[i] = ut[inside];
+        h[i] = h[inside];
+    }
+}
+
+
+template <class T> __host__ void ABS1D(Param XParam, std::vector<double> zsbndvec, int isright, int istop, int nbnd, T itime, BlockP<T> XBlock, int * bndblk, T* zs, T* zb, T* h, T* un, T* ut)
+{
+
+    for (int ibl = 0; ibl < XParam.nblk; ibl++)
+    {
+        //printf("bl=%d\tblockxo[bl]=%f\tblockyo[bl]=%f\n", bl, blockxo[bl], blockyo[bl]);
+        int ib = bndblk[ibl];
+
+
+        for (int iy = 0; iy < XParam.blkwidth; iy++)
+        {
+            for (int ix = 0; ix < XParam.blkwidth; ix++)
+            {
+
+                int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+                int inside = Inside(XParam.halowidth, XParam.blkmemwidth, isright, istop, ix, iy, ib);
+
+                // left bnd: isrigit = -1; istop=0;
+                // right bnd: isright = 1; istop=0;
+                // bottom bnd: isright = 0; istop=-1;
+                // top bnd: isright = 0; istop=1;
+
+                T xx, yy;
+
+                T  sign, umean;
+                float itx;
+
+                sign = T(isright) + T(istop);
+
+
+
+
+                //int xplus;
+                //float hhi;
+                float zsbnd;
+                T zsinside;
+                T levdx = calcres(dx, XBlock.level[ib]);
+                xx = XBlock.xo[ib] + ix * levdx;
+                yy = XBlock.yo[ib] + iy * levdx;
+                int nbnd = zsbndvec.size();
+
+                if (isright == 0) //leftside
+                {
+
+                    itx = (xx - XParam.xo) / (XParam.xmax - XParam.xo) * (nbnd - 1);
+                }
+                else
+                {
+
+                    itx = (yy - XParam.yo) / (XParam.ymax - XParam.yo) * (nbnd - 1);
+                }
+
+
+                umean = T(0.0);
+
+                if (zsbndvec.size() == 1)
+                {
+                    zsbnd = zsbndvec[0];
+                }
+                else
+                {
+                    int iprev = utils::max(utils::min((int)floor(itx),nbnd-2),0);//utils::min(utils::max((int)ceil(itx / (1 / (zsbndvec.size() - 1))), 0), (int)zsbndvec.size() - 2);
+                    int inext = iprev + 1;
+                    // here interp time is used to interpolate to the right node rather than in time...
+                    zsbnd = interptime(zsbndvec[inext], zsbndvec[iprev], 1.0, (itx - iprev));
+                }
+
+                if (isbnd(isright, istop, blockDim.x, ix, iy) && zsbnd > zb[i])
+                {
+
+                    zsinside = zs[inside];
+
+                    un[i] = sign * sqrt(XParam.g / h[i]) * (zsinside - zsbnd) + umean;
+                    zs[i] = zsinside;
+                    ut[i] = ut[inside];
+                    h[i] = h[inside];
+                }
+            }
+        }
+    }
+}
+*/
+
+__host__ __device__ int Inside(int halowidth, int blkmemwidth, int isright, int istop,int ix,int iy, int ib)
+{
+    //int bnd, bnd_c;
+    int inside;
+
+    if (isright < 0)
+    {
+        inside = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
+        //bnd_c = 0;
+        //bnd = ix;
+
+    }
+    else if (isright > 0)
+    {
+        inside = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
+        //bnd_c = blockDim.x - 1;
+        //bnd = ix;
+
+    }
+    else if (istop < 0)//isright must be ==0!
+    {
+        inside = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
+        //bnd_c = 0;
+        //bnd = iy;
+
+    }
+    else // istop ==1 && isright ==0
+    {
+        inside = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
+        //bnd_c = blockDim.y - 1;
+        //bnd = iy;
+
+    }
+    return inside;
+}
+
+
+__host__ __device__ bool isbnd(int isright, int istop, int blkwidth, int ix, int iy)
+{
+    int bnd, bnd_c;
+    //int inside;
+
+    if (isright < 0 || istop < 0)
+    {
+        bnd_c = 0;
+    }
+    else
+    {
+        bnd_c = blkwidth - 1;
+    }
+
+    if (isright == 0)
+    {
+        bnd = iy;
+    }
+    else
+    {
+        bnd = ix;
+    }
+
+
+    return (bnd == bnd_c);
+}
+```
+
+

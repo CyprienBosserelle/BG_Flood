@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classbndsegmentside" kind="class" language="C++" prot="public">
+    <compoundname>bndsegmentside</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classbndsegmentside_1a0880f2333002376364a12d2005221ed8" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int bndsegmentside::nblk</definition>
+        <argsstring></argsstring>
+        <name>nblk</name>
+        <qualifiedname>bndsegmentside::nblk</qualifiedname>
+        <initializer>=0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="108" column="5" bodyfile="src/Forcing.h" bodystart="108" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegmentside_1a9e80290d7d8df09143075b8532c100de" prot="public" static="no" mutable="no">
+        <type>int *</type>
+        <definition>int* bndsegmentside::blk</definition>
+        <argsstring></argsstring>
+        <name>blk</name>
+        <qualifiedname>bndsegmentside::blk</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="109" column="5" bodyfile="src/Forcing.h" bodystart="109" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegmentside_1ac3ffb1bd3954066ce88f903d7edb750e" prot="public" static="no" mutable="no">
+        <type>int *</type>
+        <definition>int* bndsegmentside::blk_g</definition>
+        <argsstring></argsstring>
+        <name>blk_g</name>
+        <qualifiedname>bndsegmentside::blk_g</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="110" column="5" bodyfile="src/Forcing.h" bodystart="110" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegmentside_1a2fbf9bf90ca7c3c19886f1709de66795" prot="public" static="no" mutable="no">
+        <type>float *</type>
+        <definition>float* bndsegmentside::qmean</definition>
+        <argsstring></argsstring>
+        <name>qmean</name>
+        <qualifiedname>bndsegmentside::qmean</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="111" column="7" bodyfile="src/Forcing.h" bodystart="111" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegmentside_1ab79ac54fb4405bbb064364de3d706413" prot="public" static="no" mutable="no">
+        <type>float *</type>
+        <definition>float* bndsegmentside::qmean_g</definition>
+        <argsstring></argsstring>
+        <name>qmean_g</name>
+        <qualifiedname>bndsegmentside::qmean_g</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="112" column="7" bodyfile="src/Forcing.h" bodystart="112" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegmentside_1a0cd0b77b2f0b217cbe73a31776c0791a" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int bndsegmentside::isright</definition>
+        <argsstring></argsstring>
+        <name>isright</name>
+        <qualifiedname>bndsegmentside::isright</qualifiedname>
+        <initializer>= 0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="113" column="5" bodyfile="src/Forcing.h" bodystart="113" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classbndsegmentside_1acd6847b5276ad634bd8ef8dc69cde42b" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int bndsegmentside::istop</definition>
+        <argsstring></argsstring>
+        <name>istop</name>
+        <qualifiedname>bndsegmentside::istop</qualifiedname>
+        <initializer>= 0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="114" column="5" bodyfile="src/Forcing.h" bodystart="114" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/Forcing.h" line="106" column="1" bodyfile="src/Forcing.h" bodystart="106" bodyend="117"/>
+    <listofallmembers>
+      <member refid="classbndsegmentside_1a9e80290d7d8df09143075b8532c100de" prot="public" virt="non-virtual"><scope>bndsegmentside</scope><name>blk</name></member>
+      <member refid="classbndsegmentside_1ac3ffb1bd3954066ce88f903d7edb750e" prot="public" virt="non-virtual"><scope>bndsegmentside</scope><name>blk_g</name></member>
+      <member refid="classbndsegmentside_1a0cd0b77b2f0b217cbe73a31776c0791a" prot="public" virt="non-virtual"><scope>bndsegmentside</scope><name>isright</name></member>
+      <member refid="classbndsegmentside_1acd6847b5276ad634bd8ef8dc69cde42b" prot="public" virt="non-virtual"><scope>bndsegmentside</scope><name>istop</name></member>
+      <member refid="classbndsegmentside_1a0880f2333002376364a12d2005221ed8" prot="public" virt="non-virtual"><scope>bndsegmentside</scope><name>nblk</name></member>
+      <member refid="classbndsegmentside_1a2fbf9bf90ca7c3c19886f1709de66795" prot="public" virt="non-virtual"><scope>bndsegmentside</scope><name>qmean</name></member>
+      <member refid="classbndsegmentside_1ab79ac54fb4405bbb064364de3d706413" prot="public" virt="non-virtual"><scope>bndsegmentside</scope><name>qmean_g</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

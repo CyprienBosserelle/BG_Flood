@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classTSoutnode" kind="class" language="C++" prot="public">
+    <compoundname>TSoutnode</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classTSoutnode_1a434d7ea22563524ac49b6b31f9334e24" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int TSoutnode::i</definition>
+        <argsstring></argsstring>
+        <name>i</name>
+        <qualifiedname>TSoutnode::i</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="10" column="5" bodyfile="src/Input.h" bodystart="10" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classTSoutnode_1af0537db80bb9c91da37e56dc464b6bf1" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int TSoutnode::j</definition>
+        <argsstring></argsstring>
+        <name>j</name>
+        <qualifiedname>TSoutnode::j</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="10" column="7" bodyfile="src/Input.h" bodystart="10" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classTSoutnode_1a86c5f562ca53f47ce89cd07b9f6ae1c1" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int TSoutnode::block</definition>
+        <argsstring></argsstring>
+        <name>block</name>
+        <qualifiedname>TSoutnode::block</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="10" column="9" bodyfile="src/Input.h" bodystart="10" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classTSoutnode_1a464526a1a11edfdd069c2905cec66032" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double TSoutnode::x</definition>
+        <argsstring></argsstring>
+        <name>x</name>
+        <qualifiedname>TSoutnode::x</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="11" column="8" bodyfile="src/Input.h" bodystart="11" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classTSoutnode_1a9df044818d356490dc6365bf1ca0a09e" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double TSoutnode::y</definition>
+        <argsstring></argsstring>
+        <name>y</name>
+        <qualifiedname>TSoutnode::y</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="11" column="10" bodyfile="src/Input.h" bodystart="11" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classTSoutnode_1a7f4f271ec30b0902bfb1a6039ff6475f" prot="public" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string TSoutnode::outname</definition>
+        <argsstring></argsstring>
+        <name>outname</name>
+        <qualifiedname>TSoutnode::outname</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Input.h" line="12" column="13" bodyfile="src/Input.h" bodystart="12" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/Input.h" line="8" column="1" bodyfile="src/Input.h" bodystart="8" bodyend="13"/>
+    <listofallmembers>
+      <member refid="classTSoutnode_1a86c5f562ca53f47ce89cd07b9f6ae1c1" prot="public" virt="non-virtual"><scope>TSoutnode</scope><name>block</name></member>
+      <member refid="classTSoutnode_1a434d7ea22563524ac49b6b31f9334e24" prot="public" virt="non-virtual"><scope>TSoutnode</scope><name>i</name></member>
+      <member refid="classTSoutnode_1af0537db80bb9c91da37e56dc464b6bf1" prot="public" virt="non-virtual"><scope>TSoutnode</scope><name>j</name></member>
+      <member refid="classTSoutnode_1a7f4f271ec30b0902bfb1a6039ff6475f" prot="public" virt="non-virtual"><scope>TSoutnode</scope><name>outname</name></member>
+      <member refid="classTSoutnode_1a464526a1a11edfdd069c2905cec66032" prot="public" virt="non-virtual"><scope>TSoutnode</scope><name>x</name></member>
+      <member refid="classTSoutnode_1a9df044818d356490dc6365bf1ca0a09e" prot="public" virt="non-virtual"><scope>TSoutnode</scope><name>y</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

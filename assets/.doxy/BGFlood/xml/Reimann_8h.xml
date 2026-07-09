@@ -1,0 +1,1324 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="Reimann_8h" kind="file" language="C++">
+    <compoundname>Reimann.h</compoundname>
+    <includes refid="General_8h" local="yes">General.h</includes>
+    <includes refid="Param_8h" local="yes">Param.h</includes>
+    <includes refid="Arrays_8h" local="yes">Arrays.h</includes>
+    <includes refid="Forcing_8h" local="yes">Forcing.h</includes>
+    <includes refid="MemManagement_8h" local="yes">MemManagement.h</includes>
+    <includes refid="Util__CPU_8h" local="yes">Util_CPU.h</includes>
+    <includedby refid="FlowCPU_8h" local="yes">src/FlowCPU.h</includedby>
+    <includedby refid="FlowGPU_8h" local="yes">src/FlowGPU.h</includedby>
+    <includedby refid="Reimann_8cu" local="yes">src/Reimann.cu</includedby>
+    <incdepgraph>
+      <node id="24">
+        <label>Arrays.h</label>
+        <link refid="Arrays_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="34">
+        <label>Boundary.h</label>
+        <link refid="Boundary_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+      </node>
+      <node id="46">
+        <label>ConserveElevation.h</label>
+        <link refid="ConserveElevation_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>Forcing.h</label>
+        <link refid="Forcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>General.h</label>
+        <link refid="General_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+      </node>
+      <node id="43">
+        <label>Gradients.h</label>
+        <link refid="Gradients_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>GridManip.h</label>
+        <link refid="GridManip_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>Halo.h</label>
+        <link refid="Halo_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="46" relation="include">
+        </childnode>
+      </node>
+      <node id="37">
+        <label>InitEvolv.h</label>
+        <link refid="InitEvolv_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+      </node>
+      <node id="36">
+        <label>InitialConditions.h</label>
+        <link refid="InitialConditions_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>Input.h</label>
+        <link refid="Input_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="45">
+        <label>Kurganov.h</label>
+        <link refid="Kurganov_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>MemManagement.h</label>
+        <link refid="MemManagement_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>Mesh.h</label>
+        <link refid="Mesh_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+      </node>
+      <node id="22">
+        <label>Param.h</label>
+        <link refid="Param_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="33">
+        <label>Poly.h</label>
+        <link refid="Poly_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+      </node>
+      <node id="41">
+        <label>ReadForcing.h</label>
+        <link refid="ReadForcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+      </node>
+      <node id="39">
+        <label>ReadInput.h</label>
+        <link refid="ReadInput_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+      </node>
+      <node id="38">
+        <label>Read_netcdf.h</label>
+        <link refid="Read__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/Reimann.h</label>
+        <link refid="Reimann_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>Setup_GPU.h</label>
+        <link refid="Setup__GPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+      </node>
+      <node id="44">
+        <label>Spherical.h</label>
+        <link refid="Spherical_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+      </node>
+      <node id="35">
+        <label>Updateforcing.h</label>
+        <link refid="Updateforcing_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>Util_CPU.h</label>
+        <link refid="Util__CPU_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="42">
+        <label>Write_netcdf.h</label>
+        <link refid="Write__netcdf_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="29">
+        <label>Write_txtlog.h</label>
+        <link refid="Write__txtlog_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="40">
+        <label>utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+      </node>
+      <node id="15">
+        <label>algorithm</label>
+      </node>
+      <node id="9">
+        <label>chrono</label>
+      </node>
+      <node id="8">
+        <label>cmath</label>
+      </node>
+      <node id="10">
+        <label>ctime</label>
+      </node>
+      <node id="3">
+        <label>cuda_runtime.h</label>
+      </node>
+      <node id="4">
+        <label>device_launch_parameters.h</label>
+      </node>
+      <node id="18">
+        <label>fstream</label>
+      </node>
+      <node id="17">
+        <label>iomanip</label>
+      </node>
+      <node id="16">
+        <label>iostream</label>
+      </node>
+      <node id="20">
+        <label>limits</label>
+      </node>
+      <node id="13">
+        <label>map</label>
+      </node>
+      <node id="7">
+        <label>math.h</label>
+      </node>
+      <node id="14">
+        <label>netcdf.h</label>
+      </node>
+      <node id="19">
+        <label>sstream</label>
+      </node>
+      <node id="5">
+        <label>stdio.h</label>
+      </node>
+      <node id="6">
+        <label>stdlib.h</label>
+      </node>
+      <node id="11">
+        <label>string</label>
+      </node>
+      <node id="21">
+        <label>thread</label>
+      </node>
+      <node id="12">
+        <label>vector</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="6">
+        <label>src/Adaptation.h</label>
+        <link refid="Adaptation_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="4">
+        <label>src/BG_Flood.h</label>
+        <link refid="BG__Flood_8h_source"/>
+      </node>
+      <node id="2">
+        <label>src/FlowCPU.h</label>
+        <link refid="FlowCPU_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="7">
+        <label>src/FlowGPU.h</label>
+        <link refid="FlowGPU_8h_source"/>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="8">
+        <label>src/FlowMLGPU.h</label>
+        <link refid="FlowMLGPU_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>src/Mainloop.h</label>
+        <link refid="Mainloop_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+      </node>
+      <node id="9">
+        <label>src/Meanmax.h</label>
+        <link refid="Meanmax_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/Reimann.h</label>
+        <link refid="Reimann_8h"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+      </node>
+      <node id="5">
+        <label>src/Testing.h</label>
+        <link refid="Testing_8h_source"/>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="Reimann_8h_1a705147ee3e9d8b9606e8a4903ea70790" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void UpdateButtingerXGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; XEv, GradientsP&lt; T &gt; XGrad, FluxP&lt; T &gt; XFlux, T *dtmax, T *zb)</argsstring>
+        <name>UpdateButtingerXGPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type><ref refid="structGradientsP" kindref="compound">GradientsP</ref>&lt; T &gt;</type>
+          <declname>XGrad</declname>
+        </param>
+        <param>
+          <type><ref refid="structFluxP" kindref="compound">FluxP</ref>&lt; T &gt;</type>
+          <declname>XFlux</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dtmax</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>&quot;Adaptive&quot; second-order hydrostatic reconstruction. GPU version for the X-axis </para>
+        </briefdescription>
+        <detaileddescription>
+<sect2 id="Reimann_8h_1autotoc_md38">
+<title>Description</title>
+<para>This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019). This reconstruction is safe for steep slopes with thin water depth and is well-balanced, conserving &quot;lake-at-rest&quot; states.</para>
+<para>For optimising the code on CPU and GPU there are 4 versions of this function: X or Y and CPU or GPU</para>
+</sect2>
+<sect2 id="Reimann_8h_1autotoc_md39">
+<title>Where does this come from:</title>
+<para>This scheme was adapted/modified from the Basilisk / B-Flood source code. I (CypB) changed the zr and zl term back to the Audusse type reconstruction <ulink url="http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h">http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h</ulink></para>
+</sect2>
+<sect2 id="Reimann_8h_1autotoc_md40">
+<title>Reference:</title>
+<para>Kirstetter, G., Delestre, O., Lagree, P.-Y., Popinet, S., and Josserand, C.: B-flood 1.0: an open-source Saint-Venant model for flash flood simulation using adaptive refinement, Geosci. <ref refid="structModel" kindref="compound">Model</ref> Dev. Discuss. [preprint], <ulink url="https://doi.org/10.5194/gmd-2021-15">https://doi.org/10.5194/gmd-2021-15</ulink>, in review, 2021.* Buttinger-Kreuzhuber, A., Horvath, Z., Noelle, S., Bloschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional structured grids over abrupt topography, Advances in water resources, 127, 89-108, 2019.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the evolving variables </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XGrad</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the gradients of the evolving variables </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XFlux</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the fluxes to be updated </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dtmax</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the maximum allowable time step for each cell </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array containing the bed elevation </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type, either float or double </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This function is designed to be run on the GPU and should be launched with a grid and block configuration that matches the number of blocks and block size. </para>
+</simplesect>
+</para>
+</sect2>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Reimann.h" line="11" column="29" bodyfile="src/Reimann.cu" bodystart="32" bodyend="192" declfile="src/Reimann.h" declline="11" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Reimann_8h_1a2e2941a269f627e7a1b2345a7fce7b27" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ void</type>
+        <definition>__host__ void UpdateButtingerXCPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; XEv, GradientsP&lt; T &gt; XGrad, FluxP&lt; T &gt; XFlux, T *dtmax, T *zb)</argsstring>
+        <name>UpdateButtingerXCPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type><ref refid="structGradientsP" kindref="compound">GradientsP</ref>&lt; T &gt;</type>
+          <declname>XGrad</declname>
+        </param>
+        <param>
+          <type><ref refid="structFluxP" kindref="compound">FluxP</ref>&lt; T &gt;</type>
+          <declname>XFlux</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dtmax</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>&quot;Adaptive&quot; second-order hydrostatic reconstruction. CPU version for the X-axis </para>
+        </briefdescription>
+        <detaileddescription>
+<sect2 id="Reimann_8h_1autotoc_md41">
+<title>Description</title>
+<para>This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019). This reconstruction is safe for steep slopes with thin water depth and is well-balanced, conserving &quot;lake-at-rest&quot; states.</para>
+<para>For optimizing the code on CPU and GPU, there are 4 versions of this function: X or Y and CPU or GPU. </para>
+</sect2>
+<sect2 id="Reimann_8h_1autotoc_md42">
+<title>Where does this come from:</title>
+<para>This scheme was adapted/modified from the Basilisk / B-Flood source code. I (CypB) changed the zr and zl term back to the Audusse type reconstruction <ulink url="http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h">http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h</ulink></para>
+<para>Reference:<itemizedlist>
+<listitem><para>Buttinger-Kreuzhuber, A., Horvath, Z., Noelle, S., Bloschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional structured grids over abrupt topography, Advances in water resources, 127, 89-108, 2019.</para>
+</listitem><listitem><para>Kirstetter, G., Delestre, O., Lagree, P.-Y., Popinet, S., and Josserand, C.: B-flood 1.0: an open-source Saint-Venant model for flash flood simulation using adaptive refinement, Geosci. <ref refid="structModel" kindref="compound">Model</ref> Dev. Discuss. [preprint], <ulink url="https://doi.org/10.5194/gmd-2021-15">https://doi.org/10.5194/gmd-2021-15</ulink>, in review, 2021. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the evolving variables </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XGrad</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the gradients of the evolving variables </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XFlux</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the fluxes to be updated </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dtmax</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the maximum allowable time step for each cell </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array containing the bed elevation </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type, either float or double </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This function is designed to be run on the CPU and should be called within a loop over all blocks. </para>
+</simplesect>
+</para>
+</listitem></itemizedlist>
+</para>
+</sect2>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Reimann.h" line="12" column="27" bodyfile="src/Reimann.cu" bodystart="223" bodyend="396" declfile="src/Reimann.h" declline="12" declcolumn="27"/>
+      </memberdef>
+      <memberdef kind="function" id="Reimann_8h_1a74d9e88f683b468fd5ddddf12a293621" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__global__ void</type>
+        <definition>__global__ void UpdateButtingerYGPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; XEv, GradientsP&lt; T &gt; XGrad, FluxP&lt; T &gt; XFlux, T *dtmax, T *zb)</argsstring>
+        <name>UpdateButtingerYGPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type><ref refid="structGradientsP" kindref="compound">GradientsP</ref>&lt; T &gt;</type>
+          <declname>XGrad</declname>
+        </param>
+        <param>
+          <type><ref refid="structFluxP" kindref="compound">FluxP</ref>&lt; T &gt;</type>
+          <declname>XFlux</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dtmax</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>&quot;Adaptive&quot; second-order hydrostatic reconstruction. GPU version for the Y-axis </para>
+        </briefdescription>
+        <detaileddescription>
+<sect2 id="Reimann_8h_1autotoc_md43">
+<title>Description</title>
+<para>This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019). This reconstruction is safe for steep slope with thin water depth and is well-balanced meaning that it conserve the &quot;lake-at-rest&quot; states.</para>
+<para>For optimising the code on CPU and GPU there are 4 versions of this function: X or Y and CPU or GPU</para>
+</sect2>
+<sect2 id="Reimann_8h_1autotoc_md44">
+<title>Where does this come from:</title>
+<para>This scheme was adapted/modified from the Basilisk / B-Flood source code. I (CypB) changed the zr and zl term back to the Audusse type reconstruction <ulink url="http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h">http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h</ulink></para>
+<para>Reference: Kirstetter, G., Delestre, O., Lagree, P.-Y., Popinet, S., and Josserand, C.: B-flood 1.0: an open-source Saint-Venant model for flash flood simulation using adaptive refinement, Geosci. <ref refid="structModel" kindref="compound">Model</ref> Dev. Discuss. [preprint], <ulink url="https://doi.org/10.5194/gmd-2021-15">https://doi.org/10.5194/gmd-2021-15</ulink>, in review, 2021.* Buttinger-Kreuzhuber, A., Horvath, Z., Noelle, S., Bloschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional structured grids over abrupt topography, Advances in water resources, 127, 89-108, 2019. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the evolving variables </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XGrad</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the gradients of the evolving variables </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XFlux</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the fluxes to be updated </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dtmax</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the maximum allowable time step for each cell </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array containing the bed elevation </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type, either float or double </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This function is designed to be run on the GPU and should be launched with a grid and block configuration that matches the number of blocks and block size. </para>
+</simplesect>
+</para>
+</sect2>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Reimann.h" line="13" column="29" bodyfile="src/Reimann.cu" bodystart="428" bodyend="588" declfile="src/Reimann.h" declline="13" declcolumn="29"/>
+      </memberdef>
+      <memberdef kind="function" id="Reimann_8h_1a91240b6e5cc2a5a99990a4ec6dba80a9" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ void</type>
+        <definition>__host__ void UpdateButtingerYCPU</definition>
+        <argsstring>(Param XParam, BlockP&lt; T &gt; XBlock, EvolvingP&lt; T &gt; XEv, GradientsP&lt; T &gt; XGrad, FluxP&lt; T &gt; XFlux, T *dtmax, T *zb)</argsstring>
+        <name>UpdateButtingerYCPU</name>
+        <param>
+          <type><ref refid="classParam" kindref="compound">Param</ref></type>
+          <declname>XParam</declname>
+        </param>
+        <param>
+          <type><ref refid="structBlockP" kindref="compound">BlockP</ref>&lt; T &gt;</type>
+          <declname>XBlock</declname>
+        </param>
+        <param>
+          <type><ref refid="structEvolvingP" kindref="compound">EvolvingP</ref>&lt; T &gt;</type>
+          <declname>XEv</declname>
+        </param>
+        <param>
+          <type><ref refid="structGradientsP" kindref="compound">GradientsP</ref>&lt; T &gt;</type>
+          <declname>XGrad</declname>
+        </param>
+        <param>
+          <type><ref refid="structFluxP" kindref="compound">FluxP</ref>&lt; T &gt;</type>
+          <declname>XFlux</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>dtmax</declname>
+        </param>
+        <param>
+          <type>T *</type>
+          <declname>zb</declname>
+        </param>
+        <briefdescription>
+<para>&quot;Adaptive&quot; second-order hydrostatic reconstruction. CPU version for the Y-axis </para>
+        </briefdescription>
+        <detaileddescription>
+<sect2 id="Reimann_8h_1autotoc_md45">
+<title>Description</title>
+<para>This function computes the flux term at the cell interface using the hydrostatic reconstruction from Buttinger et al (2019). This reconstruction is safe for steep slope with thin water depth and is well-balanced meaning that it conserve the &quot;lake-at-rest&quot; states.</para>
+<para>For optimising the code on CPU and GPU there are 4 versions of this function: X or Y and CPU or GPU</para>
+</sect2>
+<sect2 id="Reimann_8h_1autotoc_md46">
+<title>Where does this come from:</title>
+<para>This scheme was adapted/modified from the Basilisk / B-Flood source code. I (CypB) changed the zr and zl term back to the Audusse type reconstruction <ulink url="http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h">http://basilisk.fr/sandbox/b-flood/saint-venant-topo.h</ulink></para>
+<para>Reference: Kirstetter, G., Delestre, O., Lagree, P.-Y., Popinet, S., and Josserand, C.: B-flood 1.0: an open-source Saint-Venant model for flash flood simulation using adaptive refinement, Geosci. <ref refid="structModel" kindref="compound">Model</ref> Dev. Discuss. [preprint], <ulink url="https://doi.org/10.5194/gmd-2021-15">https://doi.org/10.5194/gmd-2021-15</ulink>, in review, 2021.* Buttinger-Kreuzhuber, A., Horvath, Z., Noelle, S., Bloschl, G., and Waser, J.: A fast second-order shallow water scheme on two-dimensional structured grids over abrupt topography, Advances in water resources, 127, 89-108, 2019. <parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>XParam</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the simulation parameters </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XBlock</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the block information </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XEv</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the evolving variables </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XGrad</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the gradients of the evolving variables </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>XFlux</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Structure containing the fluxes to be updated </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>dtmax</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array to store the maximum allowable time step for each cell </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>zb</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Array containing the bed elevation </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type, either float or double </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This function is designed to be run on the CPU and should be called within a loop over all blocks. </para>
+</simplesect>
+</para>
+</sect2>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Reimann.h" line="14" column="27" bodyfile="src/Reimann.cu" bodystart="620" bodyend="797" declfile="src/Reimann.h" declline="14" declcolumn="27"/>
+      </memberdef>
+      <memberdef kind="function" id="Reimann_8h_1a470a128c79ccbb65a5ce45ccd9d3dcd2" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ __device__ T</type>
+        <definition>__host__ __device__ T hllc</definition>
+        <argsstring>(T g, T delta, T epsi, T CFL, T cm, T fm, T hm, T hp, T um, T up, T &amp;fh, T &amp;fq)</argsstring>
+        <name>hllc</name>
+        <param>
+          <type>T</type>
+          <declname>g</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>delta</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>epsi</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>CFL</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>cm</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>fm</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>hm</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>hp</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>um</declname>
+        </param>
+        <param>
+          <type>T</type>
+          <declname>up</declname>
+        </param>
+        <param>
+          <type>T &amp;</type>
+          <declname>fh</declname>
+        </param>
+        <param>
+          <type>T &amp;</type>
+          <declname>fq</declname>
+        </param>
+        <briefdescription>
+<para>Calculate the Harten-Lax-van Leer-contact (HLLC) flux. </para>
+        </briefdescription>
+        <detaileddescription>
+<sect2 id="Reimann_8h_1autotoc_md47">
+<title>Description</title>
+<para>This an implementation of the HLLC solver.</para>
+</sect2>
+<sect2 id="Reimann_8h_1autotoc_md48">
+<title>Where does this come from:</title>
+<para>This scheme was adapted/modified from the Basilisk source code. <ulink url="http://basilisk.fr/src/riemann.h">http://basilisk.fr/src/riemann.h</ulink></para>
+<para>Reference: (Basilisk reference the scheme from Kurganov reference below) Kurganov, A., &amp; Levy, D. (2002). Central-upwind schemes for the Saint-Venant system. Mathematical Modelling and Numerical Analysis, 36(3), 397-425.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>g</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Gravitational acceleration </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>delta</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Grid resolution at the current level </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>epsi</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Small number to prevent division by zero </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>CFL</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Courant-Friedrichs-Lewy number for stability condition </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>cm</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Metric term for spherical coordinates (1.0 for Cartesian) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>fm</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Metric term for spherical coordinates (1.0 for Cartesian) </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>hm</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Water depth on the left side of the interface </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>hp</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Water depth on the right side of the interface </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>um</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Velocity in the x-direction on the left side of the interface </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>up</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Velocity in the x-direction on the right side of the interface </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>fh</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Reference to store the computed flux for water depth </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>fq</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Reference to store the computed flux for momentum </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The maximum allowable time step based on the wave speeds and CFL condition </para>
+</simplesect>
+<parameterlist kind="templateparam"><parameteritem>
+<parameternamelist>
+<parametername>T</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type, either float or double </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="note"><para>This function is designed to be run on both CPU and GPU. </para>
+</simplesect>
+</para>
+</sect2>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Reimann.h" line="15" column="35" bodyfile="src/Reimann.cu" bodystart="838" bodyend="876" declfile="src/Reimann.h" declline="15" declcolumn="35"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="preprocessor">#ifndef<sp/>REIMANN_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>REIMANN_H</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;General.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Param.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Arrays.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Forcing.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;MemManagement.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;Util_CPU.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>UpdateButtingerXGPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/><ref refid="structGradientsP" kindref="compound">GradientsP&lt;T&gt;</ref><sp/>XGrad,<sp/><ref refid="structFluxP" kindref="compound">FluxP&lt;T&gt;</ref><sp/>XFlux,<sp/>T*<sp/>dtmax,<sp/>T*<sp/>zb);</highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>UpdateButtingerXCPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/><ref refid="structGradientsP" kindref="compound">GradientsP&lt;T&gt;</ref><sp/>XGrad,<sp/><ref refid="structFluxP" kindref="compound">FluxP&lt;T&gt;</ref><sp/>XFlux,<sp/>T*<sp/>dtmax,<sp/>T*<sp/>zb);</highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__global__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>UpdateButtingerYGPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/><ref refid="structGradientsP" kindref="compound">GradientsP&lt;T&gt;</ref><sp/>XGrad,<sp/><ref refid="structFluxP" kindref="compound">FluxP&lt;T&gt;</ref><sp/>XFlux,<sp/>T*<sp/>dtmax,<sp/>T*<sp/>zb);</highlight></codeline>
+<codeline lineno="14"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>UpdateButtingerYCPU(<ref refid="classParam" kindref="compound">Param</ref><sp/>XParam,<sp/><ref refid="structBlockP" kindref="compound">BlockP&lt;T&gt;</ref><sp/>XBlock,<sp/><ref refid="structEvolvingP" kindref="compound">EvolvingP&lt;T&gt;</ref><sp/>XEv,<sp/><ref refid="structGradientsP" kindref="compound">GradientsP&lt;T&gt;</ref><sp/>XGrad,<sp/><ref refid="structFluxP" kindref="compound">FluxP&lt;T&gt;</ref><sp/>XFlux,<sp/>T*<sp/>dtmax,<sp/>T*<sp/>zb);</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"></highlight><highlight class="keyword">template</highlight><highlight class="normal"><sp/>&lt;</highlight><highlight class="keyword">class</highlight><highlight class="normal"><sp/>T&gt;<sp/>__host__<sp/>__device__<sp/>T<sp/>hllc(T<sp/>g,<sp/>T<sp/>delta,<sp/>T<sp/>epsi,<sp/>T<sp/>CFL,<sp/>T<sp/>cm,<sp/>T<sp/>fm,<sp/>T<sp/>hm,<sp/>T<sp/>hp,<sp/>T<sp/>um,<sp/>T<sp/>up,<sp/>T&amp;<sp/>fh,<sp/>T&amp;<sp/>fq);</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"></highlight><highlight class="preprocessor">#endif</highlight></codeline>
+    </programlisting>
+    <location file="src/Reimann.h"/>
+  </compounddef>
+</doxygen>

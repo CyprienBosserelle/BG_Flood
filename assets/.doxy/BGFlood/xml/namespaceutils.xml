@@ -1,0 +1,487 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="namespaceutils" kind="namespace" language="C++">
+    <compoundname>utils</compoundname>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="Util__CPU_8cu_1a73741d59af8a4d9511715aca4540bd72" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ __device__ T</type>
+        <definition>__host__ __device__ T utils::sq</definition>
+        <argsstring>(T a)</argsstring>
+        <name>sq</name>
+        <qualifiedname>utils::sq</qualifiedname>
+        <param>
+          <type>T</type>
+          <declname>a</declname>
+        </param>
+        <briefdescription>
+<para>Generic squaring function. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>! </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="31" column="35" bodyfile="src/Util_CPU.cu" bodystart="31" bodyend="33" declfile="src/Util_CPU.h" declline="9" declcolumn="35"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1aeba68c7a52d2689b740394f49c278ed8" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ __device__ const T &amp;</type>
+        <definition>__host__ __device__ const T &amp; utils::max</definition>
+        <argsstring>(const T &amp;a, const T &amp;b)</argsstring>
+        <name>max</name>
+        <qualifiedname>utils::max</qualifiedname>
+        <param>
+          <type>const T &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>const T &amp;</type>
+          <declname>b</declname>
+        </param>
+        <briefdescription>
+<para>Generic max function. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>! </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="38" column="41" bodyfile="src/Util_CPU.cu" bodystart="38" bodyend="40" declfile="src/Util_CPU.h" declline="10" declcolumn="41"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1a735e525aa0ca6cf818f4823385086077" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ __device__ const T &amp;</type>
+        <definition>__host__ __device__ const T &amp; utils::min</definition>
+        <argsstring>(const T &amp;a, const T &amp;b)</argsstring>
+        <name>min</name>
+        <qualifiedname>utils::min</qualifiedname>
+        <param>
+          <type>const T &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>const T &amp;</type>
+          <declname>b</declname>
+        </param>
+        <briefdescription>
+<para>Generic min function. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>! </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="45" column="41" bodyfile="src/Util_CPU.cu" bodystart="45" bodyend="47" declfile="src/Util_CPU.h" declline="11" declcolumn="41"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1a456a3278339bdb99a60c931be5d52201" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ __device__ const T &amp;</type>
+        <definition>__host__ __device__ const T &amp; utils::nearest</definition>
+        <argsstring>(const T &amp;a, const T &amp;b, const T &amp;c)</argsstring>
+        <name>nearest</name>
+        <qualifiedname>utils::nearest</qualifiedname>
+        <param>
+          <type>const T &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>const T &amp;</type>
+          <declname>b</declname>
+        </param>
+        <param>
+          <type>const T &amp;</type>
+          <declname>c</declname>
+        </param>
+        <briefdescription>
+<para>Generic nearest value function to a given value c. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>! </para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="52" column="45" bodyfile="src/Util_CPU.cu" bodystart="52" bodyend="54" declfile="src/Util_CPU.h" declline="12" declcolumn="41"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1a7bd61f57a391fd97c9ba8d7b91d80632" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <templateparamlist>
+          <param>
+            <type>class T</type>
+          </param>
+        </templateparamlist>
+        <type>__host__ __device__ const T &amp;</type>
+        <definition>__host__ __device__ const T &amp; utils::nearest</definition>
+        <argsstring>(const T &amp;a, const T &amp;b)</argsstring>
+        <name>nearest</name>
+        <qualifiedname>utils::nearest</qualifiedname>
+        <param>
+          <type>const T &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>const T &amp;</type>
+          <declname>b</declname>
+        </param>
+        <briefdescription>
+<para>Generic nearest value function to 0.0 between 2 parameter. </para>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="58" column="41" bodyfile="src/Util_CPU.cu" bodystart="58" bodyend="60" declfile="src/Util_CPU.h" declline="13" declcolumn="41"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1a139d8785b9f6a0fb2ccdc89e4e9a5ac6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ const int &amp;</type>
+        <definition>template __host__ __device__ const int &amp; utils::min&lt; int &gt;</definition>
+        <argsstring>(const int &amp;a, const int &amp;b)</argsstring>
+        <name>min&lt; int &gt;</name>
+        <qualifiedname>utils::min&lt; int &gt;</qualifiedname>
+        <param>
+          <type>const int &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>const int &amp;</type>
+          <declname>b</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="67" column="36" declfile="src/Util_CPU.cu" declline="67" declcolumn="36"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1abc073fb38c080185b4e7af6a560a7b04" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ const float &amp;</type>
+        <definition>template __host__ __device__ const float &amp; utils::min&lt; float &gt;</definition>
+        <argsstring>(const float &amp;a, const float &amp;b)</argsstring>
+        <name>min&lt; float &gt;</name>
+        <qualifiedname>utils::min&lt; float &gt;</qualifiedname>
+        <param>
+          <type>const float &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>const float &amp;</type>
+          <declname>b</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="68" column="36" declfile="src/Util_CPU.cu" declline="68" declcolumn="36"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1a044697aca79e4cd89ea8ea3b77532419" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ const double &amp;</type>
+        <definition>template __host__ __device__ const double &amp; utils::min&lt; double &gt;</definition>
+        <argsstring>(const double &amp;a, const double &amp;b)</argsstring>
+        <name>min&lt; double &gt;</name>
+        <qualifiedname>utils::min&lt; double &gt;</qualifiedname>
+        <param>
+          <type>const double &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>const double &amp;</type>
+          <declname>b</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="69" column="36" declfile="src/Util_CPU.cu" declline="69" declcolumn="36"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1af286c1ae5f7df9b5c386c5042a157094" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ const int &amp;</type>
+        <definition>template __host__ __device__ const int &amp; utils::max&lt; int &gt;</definition>
+        <argsstring>(const int &amp;a, const int &amp;b)</argsstring>
+        <name>max&lt; int &gt;</name>
+        <qualifiedname>utils::max&lt; int &gt;</qualifiedname>
+        <param>
+          <type>const int &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>const int &amp;</type>
+          <declname>b</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="71" column="36" declfile="src/Util_CPU.cu" declline="71" declcolumn="36"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1ac80ff45f84999835fc3399e891457291" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ const float &amp;</type>
+        <definition>template __host__ __device__ const float &amp; utils::max&lt; float &gt;</definition>
+        <argsstring>(const float &amp;a, const float &amp;b)</argsstring>
+        <name>max&lt; float &gt;</name>
+        <qualifiedname>utils::max&lt; float &gt;</qualifiedname>
+        <param>
+          <type>const float &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>const float &amp;</type>
+          <declname>b</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="72" column="36" declfile="src/Util_CPU.cu" declline="72" declcolumn="36"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1a8c83aa0c48aca2e4702e6617f94bb19a" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ const double &amp;</type>
+        <definition>template __host__ __device__ const double &amp; utils::max&lt; double &gt;</definition>
+        <argsstring>(const double &amp;a, const double &amp;b)</argsstring>
+        <name>max&lt; double &gt;</name>
+        <qualifiedname>utils::max&lt; double &gt;</qualifiedname>
+        <param>
+          <type>const double &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>const double &amp;</type>
+          <declname>b</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="73" column="36" declfile="src/Util_CPU.cu" declline="73" declcolumn="36"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1a48d3af50e3996ff1137ca4298df9979d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template int __host__ __device__</type>
+        <definition>template int __host__ __device__ utils::sq&lt; int &gt;</definition>
+        <argsstring>(int a)</argsstring>
+        <name>sq&lt; int &gt;</name>
+        <qualifiedname>utils::sq&lt; int &gt;</qualifiedname>
+        <param>
+          <type>int</type>
+          <declname>a</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="75" column="23" declfile="src/Util_CPU.cu" declline="75" declcolumn="23"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1ab0cf5e89ddeb4ea57325ef8e6b8769b3" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template float __host__ __device__</type>
+        <definition>template float __host__ __device__ utils::sq&lt; float &gt;</definition>
+        <argsstring>(float a)</argsstring>
+        <name>sq&lt; float &gt;</name>
+        <qualifiedname>utils::sq&lt; float &gt;</qualifiedname>
+        <param>
+          <type>float</type>
+          <declname>a</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="76" column="25" declfile="src/Util_CPU.cu" declline="76" declcolumn="25"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1a1719c5a5fa8e539f98a0c2a4b04c832b" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template double __host__ __device__</type>
+        <definition>template double __host__ __device__ utils::sq&lt; double &gt;</definition>
+        <argsstring>(double a)</argsstring>
+        <name>sq&lt; double &gt;</name>
+        <qualifiedname>utils::sq&lt; double &gt;</qualifiedname>
+        <param>
+          <type>double</type>
+          <declname>a</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="77" column="26" declfile="src/Util_CPU.cu" declline="77" declcolumn="26"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1abc52fcb9a1dfe67944488261c4444932" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ const int &amp;</type>
+        <definition>template __host__ __device__ const int &amp; utils::nearest&lt; int &gt;</definition>
+        <argsstring>(const int &amp;a, const int &amp;b, const int &amp;c)</argsstring>
+        <name>nearest&lt; int &gt;</name>
+        <qualifiedname>utils::nearest&lt; int &gt;</qualifiedname>
+        <param>
+          <type>const int &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>const int &amp;</type>
+          <declname>b</declname>
+        </param>
+        <param>
+          <type>const int &amp;</type>
+          <declname>c</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="79" column="36" declfile="src/Util_CPU.cu" declline="79" declcolumn="36"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1a008deca729457da477386eee3cb44be0" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ const float &amp;</type>
+        <definition>template __host__ __device__ const float &amp; utils::nearest&lt; float &gt;</definition>
+        <argsstring>(const float &amp;a, const float &amp;b, const float &amp;c)</argsstring>
+        <name>nearest&lt; float &gt;</name>
+        <qualifiedname>utils::nearest&lt; float &gt;</qualifiedname>
+        <param>
+          <type>const float &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>const float &amp;</type>
+          <declname>b</declname>
+        </param>
+        <param>
+          <type>const float &amp;</type>
+          <declname>c</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="80" column="36" declfile="src/Util_CPU.cu" declline="80" declcolumn="36"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1a2a9f1ba543c6b732098480eec423261c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ const double &amp;</type>
+        <definition>template __host__ __device__ const double &amp; utils::nearest&lt; double &gt;</definition>
+        <argsstring>(const double &amp;a, const double &amp;b, const double &amp;c)</argsstring>
+        <name>nearest&lt; double &gt;</name>
+        <qualifiedname>utils::nearest&lt; double &gt;</qualifiedname>
+        <param>
+          <type>const double &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>const double &amp;</type>
+          <declname>b</declname>
+        </param>
+        <param>
+          <type>const double &amp;</type>
+          <declname>c</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="81" column="36" declfile="src/Util_CPU.cu" declline="81" declcolumn="36"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1a666347a2f147280f6246fad3c6f525e6" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ const int &amp;</type>
+        <definition>template __host__ __device__ const int &amp; utils::nearest&lt; int &gt;</definition>
+        <argsstring>(const int &amp;a, const int &amp;b)</argsstring>
+        <name>nearest&lt; int &gt;</name>
+        <qualifiedname>utils::nearest&lt; int &gt;</qualifiedname>
+        <param>
+          <type>const int &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>const int &amp;</type>
+          <declname>b</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="83" column="36" declfile="src/Util_CPU.cu" declline="83" declcolumn="36"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1ab885a832886aae1d98b15c358ef54514" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ const float &amp;</type>
+        <definition>template __host__ __device__ const float &amp; utils::nearest&lt; float &gt;</definition>
+        <argsstring>(const float &amp;a, const float &amp;b)</argsstring>
+        <name>nearest&lt; float &gt;</name>
+        <qualifiedname>utils::nearest&lt; float &gt;</qualifiedname>
+        <param>
+          <type>const float &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>const float &amp;</type>
+          <declname>b</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="84" column="36" declfile="src/Util_CPU.cu" declline="84" declcolumn="36"/>
+      </memberdef>
+      <memberdef kind="function" id="Util__CPU_8cu_1a44e5e2c0c65d872948ab89dde1d23f8d" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>template __host__ __device__ const double &amp;</type>
+        <definition>template __host__ __device__ const double &amp; utils::nearest&lt; double &gt;</definition>
+        <argsstring>(const double &amp;a, const double &amp;b)</argsstring>
+        <name>nearest&lt; double &gt;</name>
+        <qualifiedname>utils::nearest&lt; double &gt;</qualifiedname>
+        <param>
+          <type>const double &amp;</type>
+          <declname>a</declname>
+        </param>
+        <param>
+          <type>const double &amp;</type>
+          <declname>b</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Util_CPU.cu" line="85" column="36" declfile="src/Util_CPU.cu" declline="85" declcolumn="36"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/Util_CPU.cu" line="27" column="1"/>
+  </compounddef>
+</doxygen>
