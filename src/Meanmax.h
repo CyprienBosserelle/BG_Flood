@@ -22,6 +22,7 @@ template <class T> __global__ void addUandhU_GPU(Param XParam, BlockP<T> XBlock,
 template <class T> __global__ void max_varGPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Var);
 template <class T> __global__ void max_Norm_GPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Var1, T* Var2);
 template <class T> __global__ void max_hU_GPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Var1, T* Var2, T* Var3);
+template <class T> __global__ void max_hUU_GPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* Var1, T* Var2, T* Var3);
 template <class T> __global__ void addwettime_GPU(Param XParam, BlockP<T> XBlock, T* wett, T* h, T thresold, T time);
 
 // End of global definition
