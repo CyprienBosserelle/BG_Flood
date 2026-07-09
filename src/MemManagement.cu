@@ -127,7 +127,7 @@ template void AllocateCPU<int>(int nx, int ny, int *&zs, int *&h, int *&u, int *
  * @param U Array to allocate
  * @param hU Array to allocate
  */
-template <class T> __host__ void AllocateCPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v, T*& U, T*& hU)
+template <class T> __host__ void AllocateCPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v, T*& U, T*& hU, T*& hUU)
 {
 
 	AllocateCPU(nx, ny, zs);
@@ -136,11 +136,12 @@ template <class T> __host__ void AllocateCPU(int nx, int ny, T*& zs, T*& h, T*& 
 	AllocateCPU(nx, ny, v);
 	AllocateCPU(nx, ny, U);
 	AllocateCPU(nx, ny, hU);
+	AllocateCPU(nx, ny, hUU);
 }
 
-template void AllocateCPU<double>(int nx, int ny, double*& zs, double*& h, double*& u, double*& v, double*& U, double*& hU);
-template void AllocateCPU<float>(int nx, int ny, float*& zs, float*& h, float*& u, float*& v, float*& U, float*& hU);
-template void AllocateCPU<int>(int nx, int ny, int*& zs, int*& h, int*& u, int*& v, int*& U, int*& hU);
+template void AllocateCPU<double>(int nx, int ny, double*& zs, double*& h, double*& u, double*& v, double*& U, double*& hU, double*& hUU);
+template void AllocateCPU<float>(int nx, int ny, float*& zs, float*& h, float*& u, float*& v, float*& U, float*& hU, float*& hUU);
+template void AllocateCPU<int>(int nx, int ny, int*& zs, int*& h, int*& u, int*& v, int*& U, int*& hU, int*& hUU);
 
 /**
  * @brief Allocate memory for gradient arrays on the CPU.
@@ -191,7 +192,7 @@ template <class T> void AllocateCPU(int nblk, int blksize, EvolvingP<T> & Ev)
  */
 template <class T> void AllocateCPU(int nblk, int blksize, EvolvingP_M<T>& Ev)
 {
-	AllocateCPU(nblk, blksize, Ev.h, Ev.zs, Ev.u, Ev.v, Ev.U, Ev.hU);
+	AllocateCPU(nblk, blksize, Ev.h, Ev.zs, Ev.u, Ev.v, Ev.U, Ev.hU, Ev.hUU);
 
 }
 
@@ -415,7 +416,7 @@ template void ReallocArray<double>(int nblk, int blksize, double*& zs, double*& 
  * @param U Array to reallocate
  * @param hU Array to reallocate
  */
-template <class T> void ReallocArray(int nblk, int blksize, T*& zs, T*& h, T*& u, T*& v, T*& U, T*& hU)
+template <class T> void ReallocArray(int nblk, int blksize, T*& zs, T*& h, T*& u, T*& v, T*& U, T*& hU, T*& hUU)
 {
 	//
 
@@ -425,12 +426,13 @@ template <class T> void ReallocArray(int nblk, int blksize, T*& zs, T*& h, T*& u
 	ReallocArray(nblk, blksize, v);
 	ReallocArray(nblk, blksize, U);
 	ReallocArray(nblk, blksize, hU);
+	ReallocArray(nblk, blksize, hUU);
 	//return nblkmem
 }
 
-template void ReallocArray<int>(int nblk, int blksize, int* & zs, int*& h, int*& u, int*& v, int*& U, int*& hU);
-template void ReallocArray<float>(int nblk, int blksize, float* & zs, float*& h, float*& u, float*& v, float*& U, float*& hU);
-template void ReallocArray<double>(int nblk, int blksize, double* & zs, double*& h, double*& u, double*& v, double*& U, double*& hU);
+template void ReallocArray<int>(int nblk, int blksize, int* & zs, int*& h, int*& u, int*& v, int*& U, int*& hU, int*& hUU);
+template void ReallocArray<float>(int nblk, int blksize, float* & zs, float*& h, float*& u, float*& v, float*& U, float*& hU, float*& hUU);
+template void ReallocArray<double>(int nblk, int blksize, double* & zs, double*& h, double*& u, double*& v, double*& U, double*& hU, double*& hUU);
 
 /**
  * @brief Reallocate memory for evolving variables structure.
@@ -461,7 +463,7 @@ template void ReallocArray<double>(int nblk, int blksize, EvolvingP<double>& Ev)
  */
 template <class T> void ReallocArray(int nblk, int blksize, EvolvingP_M<T>& Ev)
 {
-	ReallocArray(nblk, blksize, Ev.zs, Ev.h, Ev.u, Ev.v, Ev.U, Ev.hU);
+	ReallocArray(nblk, blksize, Ev.zs, Ev.h, Ev.u, Ev.v, Ev.U, Ev.hU, Ev.hUU);
 }
 template void ReallocArray<float>(int nblk, int blksize, EvolvingP_M<float>& Ev);
 template void ReallocArray<double>(int nblk, int blksize, EvolvingP_M<double>& Ev);
@@ -720,7 +722,7 @@ template void AllocateGPU<int>(int nx, int ny, int*& zs, int*& h, int*& u, int*&
  * @param U Device pointer output
  * @param hU Device pointer output
  */
-template <class T> void AllocateGPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v, T*& U, T*& hU)
+template <class T> void AllocateGPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v, T*& U, T*& hU, T*& hUU)
 {
 
 	AllocateGPU(nx, ny, zs);
@@ -729,11 +731,12 @@ template <class T> void AllocateGPU(int nx, int ny, T*& zs, T*& h, T*& u, T*& v,
 	AllocateGPU(nx, ny, v);
 	AllocateGPU(nx, ny, U);
 	AllocateGPU(nx, ny, hU);
+	AllocateGPU(nx, ny, hUU);
 
 }
-template void AllocateGPU<double>(int nx, int ny, double*& zs, double*& h, double*& u, double*& v, double*& U, double*& hU);
-template void AllocateGPU<float>(int nx, int ny, float*& zs, float*& h, float*& u, float*& v, float*& U, float*& hU);
-template void AllocateGPU<int>(int nx, int ny, int*& zs, int*& h, int*& u, int*& v, int*& U, int*& hU);
+template void AllocateGPU<double>(int nx, int ny, double*& zs, double*& h, double*& u, double*& v, double*& U, double*& hU, double*& hUU);
+template void AllocateGPU<float>(int nx, int ny, float*& zs, float*& h, float*& u, float*& v, float*& U, float*& hU, float*& hUU);
+template void AllocateGPU<int>(int nx, int ny, int*& zs, int*& h, int*& u, int*& v, int*& U, int*& hU, int*& hUU);
 
 /**
  * @brief Allocate memory on the GPU for gradient arrays.
@@ -783,7 +786,7 @@ template <class T> void AllocateGPU(int nblk, int blksize, EvolvingP<T>& Ev)
  */
 template <class T> void AllocateGPU(int nblk, int blksize, EvolvingP_M<T>& Ev)
 {
-	AllocateGPU(nblk, blksize, Ev.h, Ev.zs, Ev.u, Ev.v, Ev.U, Ev.hU);
+	AllocateGPU(nblk, blksize, Ev.h, Ev.zs, Ev.u, Ev.v, Ev.U, Ev.hU, Ev.hUU);
 }
 
 /**
