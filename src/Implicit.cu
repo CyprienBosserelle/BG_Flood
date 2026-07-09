@@ -47,6 +47,64 @@ template <class T> __device__ double atomicAddC(T* address, T val)
 }
 //#endif
 
+#include "Implicit.h"
+
+// ---------------------------------------------------------------------------
+// 1. Face coefficient assembly:  alpha_face = -(theta_H*dt)^2 * hf_face
+//    (equivalent of implicit.h's alpha_eta.x[] += hf.x[]; alpha_eta.x[] *= C)
+// ---------------------------------------------------------------------------
+template <class T> __global__ void assemble_alpha_kernel(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux,T dt)
+{
+    int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+
+    int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+    
+
+    T C = -(XParam.theta_H * dt) * (XParam.theta_H * dt);
+
+    
+    XFlux.alpha_x[id] = C * XFlux.hfx[i];   // face at west side of (ix,iy)
+    XFlux.alpha_y[id] = C * XFlux.hfy[i];   // face at south side of (ix,iy)
+}
+
+// ---------------------------------------------------------------------------
+// 2. RHS assembly:  rhs_eta = eta_n - dt * div(F_star)
+//    (equivalent of implicit.h's rhs_eta[] = eta[] - dt*(su.x[1]-su.x[])/Delta ...)
+// ---------------------------------------------------------------------------
+template <class T> __global__ void assemble_rhs_kernel(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux)
+{
+    int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+	int lev = XBlock.level[ib];
+
+    int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+    int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
+    int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
+
+    T delta = calcres(T(XParam.delta), lev);
+
+    T divF = (XFlux.hu[iright] - XFlux.hu[i]) / (delta*cmu)
+                + (XFlux.hv[itop] - XFlux.hv[i]) / (delta*cmv);
+
+    XFlux.rhs_eta[i] = XFlux.eta_n[i] - dt * divF;
+}
+
+
 // /**
 //  * @brief Multigrid relaxation function (Red-Black Gauss-Seidel)
 //  */
