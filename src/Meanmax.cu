@@ -26,7 +26,7 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 			addavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmean.zs, XModel_g.evolv.zs);
 			addavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmean.u, XModel_g.evolv.u);
 			addavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmean.v, XModel_g.evolv.v);
-			addUandhU_GPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evolv.h, XModel_g.evolv.u, XModel_g.evolv.v, XModel_g.evmean.U, XModel_g.evmean.hU);
+			addUandhU_GPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evolv.h, XModel_g.evolv.u, XModel_g.evolv.v, XModel_g.evmean.U, XModel_g.evmean.hU, XModel_g.evmean.hUU);
 
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
@@ -37,7 +37,7 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 			addavg_varCPU(XParam, XModel.blocks, XModel.evmean.zs, XModel.evolv.zs);
 			addavg_varCPU(XParam, XModel.blocks, XModel.evmean.u, XModel.evolv.u);
 			addavg_varCPU(XParam, XModel.blocks, XModel.evmean.v, XModel.evolv.v);
-			addUandhU_CPU(XParam, XModel.blocks, XModel.evolv.h, XModel.evolv.u, XModel.evolv.v, XModel.evmean.U, XModel.evmean.hU);
+			addUandhU_CPU(XParam, XModel.blocks, XModel.evolv.h, XModel.evolv.u, XModel.evolv.v, XModel.evmean.U, XModel.evmean.hU, XModel.evmean.hUU);
 
 		}
 
@@ -55,6 +55,7 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 				divavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.v);
 				divavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.U);
 				divavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.hU);
+				divavg_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, T(XLoop.nstep), XModel_g.evmean.hUU);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			else
@@ -65,6 +66,7 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 				divavg_varCPU(XParam, XModel.blocks, T(XLoop.nstep), XModel.evmean.v);
 				divavg_varCPU(XParam, XModel.blocks, T(XLoop.nstep), XModel.evmean.U);
 				divavg_varCPU(XParam, XModel.blocks, T(XLoop.nstep), XModel.evmean.hU);
+				divavg_varCPU(XParam, XModel.blocks, T(XLoop.nstep), XModel.evmean.hUU);
 			}
 
 			//XLoop.nstep will be reset after a save to the disk which occurs in a different function
@@ -81,6 +83,7 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 			max_varGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.v, XModel_g.evolv.v);
 			max_Norm_GPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.U, XModel_g.evolv.u, XModel_g.evolv.v);
 			max_hU_GPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.hU, XModel_g.evolv.h, XModel_g.evolv.u, XModel_g.evolv.v);
+			max_hUU_GPU <<< gridDim, blockDim, 0 >>> (XParam, XModel_g.blocks, XModel_g.evmax.hUU, XModel_g.evolv.h, XModel_g.evolv.u, XModel_g.evolv.v);
 			CUDA_CHECK(cudaDeviceSynchronize());
 		}
 		else
@@ -91,6 +94,7 @@ template <class T> void Calcmeanmax(Param XParam, Loop<T>& XLoop, Model<T> XMode
 			max_varCPU(XParam, XModel.blocks, XModel.evmax.v, XModel.evolv.v);
 			max_Norm_CPU(XParam, XModel.blocks, XModel.evmax.U, XModel.evolv.u, XModel.evolv.v);
 			max_hU_CPU(XParam, XModel.blocks, XModel.evmax.hU, XModel.evolv.h, XModel.evolv.u, XModel.evolv.v);
+			max_hUU_CPU(XParam, XModel.blocks, XModel.evmax.hUU, XModel.evolv.h, XModel.evolv.u, XModel.evolv.v);
 		}
 	}
 	if (XParam.outtwet)
@@ -224,6 +228,8 @@ template <class T> void resetmaxGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBloc
 	CUDA_CHECK(cudaDeviceSynchronize());
 	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.hU);
 	CUDA_CHECK(cudaDeviceSynchronize());
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, XLoop.hugenegval, XEv.hUU);
+	CUDA_CHECK(cudaDeviceSynchronize());
 
 }
 
@@ -248,6 +254,7 @@ template <class T> void resetmaxCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBloc
 	InitArrayBUQ(XParam, XBlock, XLoop.hugenegval, XEv.v);
 	InitArrayBUQ(XParam, XBlock, XLoop.hugenegval, XEv.U);
 	InitArrayBUQ(XParam, XBlock, XLoop.hugenegval, XEv.hU);
+	InitArrayBUQ(XParam, XBlock, XLoop.hugenegval, XEv.hUU);
 
 }
 
@@ -272,6 +279,7 @@ template <class T> void resetmeanCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlo
 	InitArrayBUQ(XParam, XBlock, T(0.0), XEv.v);
 	InitArrayBUQ(XParam, XBlock, T(0.0), XEv.U);
 	InitArrayBUQ(XParam, XBlock, T(0.0), XEv.hU);
+	InitArrayBUQ(XParam, XBlock, T(0.0), XEv.hUU);
 
 }
 template void resetmeanCPU<float>(Param XParam, Loop<float> XLoop, BlockP<float> XBlock, EvolvingP_M<float>& XEv);
@@ -299,6 +307,7 @@ template <class T> void resetmeanGPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlo
 	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, T(0.0), XEv.v);
 	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, T(0.0), XEv.U);
 	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, T(0.0), XEv.hU);
+	reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XBlock.active, T(0.0), XEv.hUU);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
@@ -483,7 +492,7 @@ template <class T> __host__ void divavg_varCPU(Param XParam, BlockP<T> XBlock, T
  * @param U Output velocity magnitude array
  * @param hU Output hU product array
  */
-template <class T> __global__ void addUandhU_GPU(Param XParam, BlockP<T> XBlock, T * h, T * u, T * v, T* U, T* hU)
+template <class T> __global__ void addUandhU_GPU(Param XParam, BlockP<T> XBlock, T * h, T * u, T * v, T* U, T* hU, T* hUU)
 {
 	unsigned int halowidth = XParam.halowidth;
 	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
@@ -497,6 +506,7 @@ template <class T> __global__ void addUandhU_GPU(Param XParam, BlockP<T> XBlock,
 
 	U[i] = sqrt((u[i] * u[i]) + (v[i] * v[i]));
 	hU[i] = h[i] * U[i];
+	hUU[i] = h[i] * U[i] * U[i];
 
 }
 
@@ -514,7 +524,7 @@ template <class T> __global__ void addUandhU_GPU(Param XParam, BlockP<T> XBlock,
  * @param U Output velocity magnitude array
  * @param hU Output hU product array
  */
-template <class T> __host__ void addUandhU_CPU(Param XParam, BlockP<T> XBlock, T* h, T* u, T* v, T* U, T* hU)
+template <class T> __host__ void addUandhU_CPU(Param XParam, BlockP<T> XBlock, T* h, T* u, T* v, T* U, T* hU, T* hUU)
 {
 	int ib, n;
 	for (int ibl = 0; ibl < XParam.nblk; ibl++)
@@ -529,6 +539,7 @@ template <class T> __host__ void addUandhU_CPU(Param XParam, BlockP<T> XBlock, T
 
 				U[i] = sqrt((u[i] * u[i]) + (v[i] * v[i]));
 				hU[i] = h[i] * U[i];
+				hUU[i] = h[i] * U[i] * U[i];
 			}
 		}
 	}
@@ -620,6 +631,24 @@ template <class T> __global__ void max_hU_GPU(Param XParam, BlockP<T> XBlock, T*
 
 	Var_hU = h[i] * sqrt((u[i]*u[i])+(v[i]*v[i]));
 	Varmax[i] = max(Varmax[i], Var_hU);
+
+}
+
+template <class T> __global__ void max_hUU_GPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* h, T* u, T* v)
+{
+	T Var_hUU;
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.y + halowidth * 2;
+
+	unsigned int ix = threadIdx.x;
+	unsigned int iy = threadIdx.y;
+	unsigned int ibl = blockIdx.x;
+	unsigned int ib = XBlock.active[ibl];
+
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+	Var_hUU = h[i] * (u[i]*u[i] + v[i]*v[i]);
+	Varmax[i] = max(Varmax[i], Var_hUU);
 
 }
 
@@ -721,6 +750,26 @@ template <class T> __host__ void max_hU_CPU(Param XParam, BlockP<T> XBlock, T* V
 
 }
 
+template <class T> __host__ void max_hUU_CPU(Param XParam, BlockP<T> XBlock, T* Varmax, T* h, T* u, T* v)
+{
+	int ib, n;
+	T Var_hUU;
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		ib = XBlock.active[ibl];
+
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				int i = memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib);
+				Var_hUU = h[i] * (u[i] * u[i] + v[i] * v[i]);
+				Varmax[i] = utils::max(Varmax[i], Var_hUU);
+			}
+		}
+	}
+
+}
 /**
  * @brief CUDA kernel to accumulate wet duration for each cell.
  *
