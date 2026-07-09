@@ -277,24 +277,24 @@ template <class T> __global__ void UpdateButtingerWDXGPU(Param XParam, BlockP<T>
 
 		// Treatment of Wet/dry faces to eliminate non-monotnous face conditions
 		// Condition on z and zf
-		// if ( (zn < zi) && (zl > zr) ){
-		// 	zA = zr;
-		// } else if ( (zn > zi) && (zl < zr) ){
-		// 	zA = zl;
-		// } else {
-		// 	//define the Audusse terms
-		// 	zA = max(zr, zl);
-		// }
-		
-		// Condition on z, eta and zf
-		if ( (zn < zi) && (etan < etai) && (zl > zr) ){
+		if ( (zn < zi) && (zl > zr) ){
 			zA = zr;
-		} else if ( (zn > zi) && (etan > etai) && (zl < zr) ){
+		} else if ( (zn > zi) && (zl < zr) ){
 			zA = zl;
 		} else {
 			//define the Audusse terms
 			zA = max(zr, zl);
 		}
+		
+		// Condition on z, eta and zf
+		// if ( (zn < zi) && (etan < etai) && (zl > zr) ){
+		// 	zA = zr;
+		// } else if ( (zn > zi) && (etan > etai) && (zl < zr) ){
+		// 	zA = zl;
+		// } else {
+		// 	//define the Audusse terms
+		// 	zA = max(zr, zl);
+		// }
 
 		// zA = max(zr, zl);
 
@@ -866,24 +866,24 @@ template <class T> __global__ void UpdateButtingerWDYGPU(Param XParam, BlockP<T>
 
 		// Treatment of Wet/dry faces to eliminate non-monotnous face conditions
 		// Condition on z and zf
-		// if ( (zn < zi) && (zl > zr) ){
-		// 	zA = zr;
-		// } else if ( (zn > zi) && (zl < zr) ){
-		// 	zA = zl;
-		// } else {
-		// 	//define the Audusse terms
-		// 	zA = max(zr, zl);
-		// }
-
-		// Condition on z, eta and zf
-		if ( (zn < zi) && (etan < etai) && (zl > zr) ){
+		if ( (zn < zi) && (zl > zr) ){
 			zA = zr;
-		} else if ( (zn > zi) && (etan > etai) && (zl < zr) ){
+		} else if ( (zn > zi) && (zl < zr) ){
 			zA = zl;
 		} else {
 			//define the Audusse terms
 			zA = max(zr, zl);
 		}
+
+		// Condition on z, eta and zf
+		// if ( (zn < zi) && (etan < etai) && (zl > zr) ){
+		// 	zA = zr;
+		// } else if ( (zn > zi) && (etan > etai) && (zl < zr) ){
+		// 	zA = zl;
+		// } else {
+		// 	//define the Audusse terms
+		// 	zA = max(zr, zl);
+		// }
 
 		// zA = max(zr, zl);
 
