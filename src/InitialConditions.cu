@@ -677,6 +677,16 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.Outvarstdname["hUmax"] = "maximum_depth_velocity";
 	XModel.Outvarunits["hUmax"] = "m2 s-1";
 
+	XModel.OutputVarMap["hUUmean"] = XModel.evmean.hUU;
+	XModel.Outvarlongname["hUUmean"] = "Mean depth times velocity squared since last output";
+	XModel.Outvarstdname["hUUmean"] = "mean_depth_velocity_squared";
+	XModel.Outvarunits["hUUmean"] = "m3 s-2";
+
+	XModel.OutputVarMap["hUUmax"] = XModel.evmax.hUU;
+	XModel.Outvarlongname["hUUmax"] = "Maximum depth times velocity squared since simulation start";
+	XModel.Outvarstdname["hUUmax"] = "maximum_depth_velocity_squared";
+	XModel.Outvarunits["hUUmax"] = "m3 s-2";
+
 	//others
 
 	XModel.OutputVarMap["uo"] = XModel.evolv_o.u;
