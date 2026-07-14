@@ -47,7 +47,7 @@ template <class T> __device__ double atomicAddC(T* address, T val)
 }
 //#endif
 
-#include "Implicit.h"
+
 
 // ---------------------------------------------------------------------------
 // 1. Face coefficient assembly:  alpha_face = -(theta_H*dt)^2 * hf_face
@@ -104,6 +104,114 @@ template <class T> __global__ void assemble_rhs_kernel(Param XParam, BlockP<T> X
     XFlux.rhs_eta[i] = XFlux.eta_n[i] - dt * divF;
 }
 
+__global__ void matvec_kernel(Param XParam, BlockP<T> XBlock,T* x, T* Ax, FluxMLP<T> XFlux)
+{
+    int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+    double dx = XParam.delta;
+
+    int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);
+    int idxm = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);   // west neighbour
+    int idxp = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);   // east neighbour
+    int idym = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);   // south neighbour
+    int idyp = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);   // north neighbour
+
+    //int idxp_face = memloc(ix + 1, iy, ib);  // alpha_x stored at west face of (ix+1,iy) == east face of (ix,iy)
+    //int idyp_face = memloc(ix, iy + 1, ib);
+
+    double axW = XFlux.alpha_x[id];         // west face coeff of (ix,iy)
+    double axE = XFlux.alpha_x[idxp];  // east face coeff of (ix,iy)
+    double ayS = XFlux.alpha_y[id];
+    double ayN = XFlux.alpha_y[idyp];
+
+    double lap = axW * (x[idxm] - x[id]) - axE * (x[id] - x[idxp])
+               + ayS * (x[idym] - x[id]) - ayN * (x[id] - x[idyp]);
+    // NOTE the sign pattern mirrors relax_hydro's a_baro(eta,0)-a_baro(eta,1)
+    // construction; double-check against your face convention.
+
+    double invdx2 = 1.0 / (dx * dx);
+    Ax[id] = x[id] - XParam.g * invdx2 * lap;
+}
+
+
+// ---------------------------------------------------------------------------
+// 4. Jacobi preconditioner setup:  diagInv = 1 / (1 + (G/dx^2)*sum |alpha_face|)
+// ---------------------------------------------------------------------------
+__global__ void jacobi_diag_kernel(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux)
+{
+    int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+    double dx = XParam.delta;
+
+    int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);
+    int idxp = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
+    int idyp = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
+
+    double axW = -XFlux.alpha_x[id];          // note: alpha <= 0, so -alpha >= 0
+    double axE = -XFlux.alpha_x[idxp_face];
+    double ayS = -XFlux.alpha_y[id];
+    double ayN = -XFlux.alpha_y[idyp_face];
+
+    double invdx2 = 1.0 / (dx * dx);
+    double diag = 1.0 + XParam.g * invdx2 * (axW + axE + ayS + ayN);
+
+    XFlux.diagInv[id] = 1.0 / diag;
+}
+
+__global__ void jacobi_apply_kernel(Param XParam, BlockP<T> XBlock, double*  r, double*  z, double* diagInv)
+{
+    int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+    int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);
+    z[id] = r[id] * diagInv[id];
+}
+
+// ---------------------------------------------------------------------------
+// 5. Simple vector kernels: axpy-style updates
+// ---------------------------------------------------------------------------
+__global__ void axpy_kernel(Param XParam, BlockP<T> XBlock, double* y, const double* x, double a)
+{
+    int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+    int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);
+    y[id] += a * x[id];
+}
+
+__global__ void xpby_kernel(Param XParam, BlockP<T> XBlock, double* p, const double* z, double beta)
+{
+    int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+    int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);
+    p[id] = z[id] + beta * p[id];
+}
 
 // /**
 //  * @brief Multigrid relaxation function (Red-Black Gauss-Seidel)

@@ -392,3 +392,107 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 template void FlowMLGPU<float>(Param XParam, Loop<float>& XLoop, Forcing<float> XForcing, Model<float> XModel);
 template void FlowMLGPU<double>(Param XParam, Loop<double>& XLoop, Forcing<float> XForcing, Model<double> XModel);
 
+
+//template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
+void solveImplicit(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
+{
+	//ImplicitCtx& ctx, double tol = 1e-5, int maxIter = 100
+	double tol = 1e-5;
+	int maxIter = 100
+   	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+	// for flux reconstruction the loop overlap the right(or top for the y direction) halo
+	dim3 blockDimKX(XParam.blkwidth + XParam.halowidth, XParam.blkwidth, 1);
+	dim3 blockDimKY(XParam.blkwidth, XParam.blkwidth + XParam.halowidth, 1);
+
+	// Fill halo for Fu and Fv
+	dim3 blockDimHaloLR(1, XParam.blkwidth, 1);
+	//dim3 blockDimHaloBT(16, 1, 1);
+	dim3 gridDimHaloLR(XParam.nblk, 1, 1);
+
+	dim3 blockDimHaloBT(XParam.blkwidth, 1, 1);
+	dim3 gridDimHaloBT(XParam.nblk , 1, 1);
+
+	int n = XParam.nblk * XParam.blkmemsize;// 
+
+    // --- Assemble coefficients & RHS (once per outer timestep) ---
+	//assemble_alpha_kernel(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux,T dt)
+    assemble_alpha_kernel<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.fluxml,dt);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+    // Fill halo
+	HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.alpha_x);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPUBMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.alpha_y);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPULMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.alpha_x);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPUTMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.alpha_y);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+    assemble_rhs_kernel<<<blocks, threads>>>(Param, XModel.blocks,XModel.fluxml);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+    jacobi_diag_kernel<<<blocks, threads>>>(Param, XModel.blocks,XModel.fluxml);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+    // --- Initial guess: warm-start from eta_n (copy already done by caller) ---
+     // Fill halo
+	HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.eta_n);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPULMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.eta_n);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPUBMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.eta_n);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPUTMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.eta_n);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+    matvec_kernel<<<blocks, threads>>>(XParam, XModel.blocks, XModel.fluxml.eta_n, XModel.fluxml.Ap, XModel.fluxml);   // Ap = A(eta0)
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+    // r = rhs_eta - A(eta0)   (keep rhs_eta untouched, write into ctx.r)
+    cudaMemcpy(XModel.fluxml.r, XModel.fluxml.rhs_eta, n * sizeof(double), cudaMemcpyDeviceToDevice);
+    axpy_kernel<<<blocks, threads>>>(XParam, XModel.blocks,XModel.fluxml.r, XModel.fluxml.Ap, -1.0);   // r += -1.0 * Ap
+
+    jacobi_apply_kernel<<<blocks, threads>>>(XModel.fluxml.r, XModel.fluxml.z, XModel.fluxml.diagInv);
+    cudaMemcpy(XModel.fluxml.p, XModel.fluxml.z, n * sizeof(double), cudaMemcpyDeviceToDevice);
+
+    double rz_old = reduceDot(ctx.r, ctx.z, n);
+
+    for (int iter = 0; iter < maxIter; ++iter)
+    {
+        haloExchange(ctx.p, ctx);
+        matvec_kernel<<<blocks, threads>>>(ctx.p, ctx.Ap, ctx);
+
+        double pAp  = reduceDot(ctx.p, ctx.Ap, n);
+        double alpha = rz_old / pAp;
+
+        axpy_kernel<<<blocks, threads>>>(ctx.eta_n, ctx.p, alpha, ctx);   // eta += alpha*p
+        axpy_kernel<<<blocks, threads>>>(ctx.r,     ctx.Ap, -alpha, ctx); // r   -= alpha*Ap
+
+        double resNorm = reduceAbsMax(ctx.r, n);
+        if (resNorm < tol) break;
+
+        jacobi_apply_kernel<<<blocks, threads>>>(ctx.r, ctx.z, ctx.diagInv, ctx);
+        double rz_new = reduceDot(ctx.r, ctx.z, n);
+        double beta = rz_new / rz_old;
+
+        xpby_kernel<<<blocks, threads>>>(ctx.p, ctx.z, beta, ctx);
+        rz_old = rz_new;
+    }
+
+    // ctx.eta_n now holds eta^{n+1}. Caller reconstructs theta_H*(hu)^{n+1}
+    // exactly as in implicit.h's `pressure` event:
+    //   hu.x[] = theta_H*(hf.x[]*uf.x[] + dt*ha.x[]) - dt*ha.x[]
+    // using the freshly solved eta for ha.x[] = hf.x[]*a_baro(eta,0), then
+    // pass that into your existing advect()-equivalent for the remaining
+    // theta_H*dt portion (mirrors why implicit.h scales by theta_H there:
+    // the (1-theta_H)*dt advection was already done in half_advection).
+}
+
