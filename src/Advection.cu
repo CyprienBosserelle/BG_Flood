@@ -621,7 +621,78 @@ template <class T> __host__ T CalctimestepGPU(Param XParam,Loop<T> XLoop, BlockP
 template __host__ float CalctimestepGPU<float>(Param XParam,Loop<float> XLoop, BlockP<float> XBlock, TimeP<float> XTime);
 template __host__ double CalctimestepGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, TimeP<double> XTime);
 
+template <class T> __host__ reducedot(Param XParam,Loop<T> XLoop, BlockP<T> XBlock, T*a, T*b)
+{
+	T* dummy;
+	AllocateCPU(32, 1, dummy);
 
+	// densify dtmax (i.e. remove empty block and halo that may sit in the middle of the memory structure)
+	int s = XParam.nblk * (XParam.blkwidth* XParam.blkwidth); // Not blksize wich includes Halo
+
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+
+	densify <<< gridDim, blockDim, 0 >>>(XParam, XBlock, XTime.dtmax, XTime.arrmin);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	
+
+	CUDA_CHECK(cudaMemcpy(XTime.dtmax, XTime.arrmin, s * sizeof(T), cudaMemcpyDeviceToDevice));
+
+
+	//GPU Harris reduction #3. 8.3x reduction #0  Note #7 if a lot faster
+	// This was successfully tested with a range of grid size
+	//reducemax3 <<<gridDimLine, blockDimLine, 64*sizeof(float) >>>(dtmax_g, arrmax_g, nx*ny)
+	
+	int maxThreads = 256;
+	int threads = (s < maxThreads * 2) ? nextPow2((s + 1) / 2) : maxThreads;
+	int blocks = (s + (threads * 2 - 1)) / (threads * 2);
+	int smemSize = (threads <= 32) ? 2 * threads * sizeof(T) : threads * sizeof(T);
+	dim3 blockDimLine(threads, 1, 1);
+	dim3 gridDimLine(blocks, 1, 1);
+
+	
+	reducemin3 <<<gridDimLine, blockDimLine, smemSize >>> (XTime.dtmax, XTime.arrmin, s);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+	s = gridDimLine.x;
+	while (s > 1)//cpuFinalThreshold
+	{
+		threads = (s < maxThreads * 2) ? nextPow2((s + 1) / 2) : maxThreads;
+		blocks = (s + (threads * 2 - 1)) / (threads * 2);
+
+		smemSize = (threads <= 32) ? 2 * threads * sizeof(T) : threads * sizeof(T);
+
+		dim3 blockDimLineS(threads, 1, 1);
+		dim3 gridDimLineS(blocks, 1, 1);
+
+		CUDA_CHECK(cudaMemcpy(XTime.dtmax, XTime.arrmin, s * sizeof(T), cudaMemcpyDeviceToDevice));
+
+		reducemin3 <<<gridDimLineS, blockDimLineS, smemSize >>> (XTime.dtmax, XTime.arrmin, s);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		s = (s + (threads * 2 - 1)) / (threads * 2);
+	}
+
+
+	CUDA_CHECK(cudaMemcpy(dummy, XTime.arrmin, 32 * sizeof(T), cudaMemcpyDeviceToHost)); // replace 32 by word here?
+
+	if (dummy[0] > (1.5 * XLoop.dtmax))
+	{
+		dummy[0] = T(1.5 * XLoop.dtmax);
+	}
+
+	if (ceil((XLoop.nextoutputtime - XLoop.totaltime) / dummy[0]) > 0.0)
+	{
+		dummy[0] = T((XLoop.nextoutputtime - XLoop.totaltime) / ceil((XLoop.nextoutputtime - XLoop.totaltime) / dummy[0]));
+	}
+
+
+	return dummy[0];
+
+	free(dummy);
+}
 
 
 /**
@@ -664,8 +735,32 @@ template <class T> __global__ void reducemin3(T* g_idata, T* g_odata, unsigned i
 	if (tid == 0) g_odata[blockIdx.x] = myMin;
 }
 
+// ---------------------------------------------------------------------
+// Subsequent passes: plain sum reduction over a contiguous buffer
+// (the partial sums produced by the previous pass). Same technique,
+// just without the a[]*b[] multiply.
+// ---------------------------------------------------------------------
+__global__ void sumReduce3(const double* __restrict__ g_idata,
+                            double* __restrict__ g_odata,
+                            unsigned int n)
+{
+    extern __shared__ double sdata[];
 
-/**
+    unsigned int tid = threadIdx.x;
+    unsigned int i   = blockIdx.x * blockDim.x + threadIdx.x;
+
+    sdata[tid] = (i < n) ? g_idata[i] : 0.0;
+    __syncthreads();
+
+    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1)
+    {
+        if (tid < s)
+            sdata[tid] += sdata[tid + s];
+        __syncthreads();
+    }
+
+    if (tid == 0) g_odata[blockIdx.x] = sdata[0];
+}/**
  * @brief GPU kernel to copy and densify data from block memory to output array.
  * @tparam T Data type
  * @param XParam Model parameters
