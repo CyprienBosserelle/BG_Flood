@@ -213,6 +213,193 @@ __global__ void xpby_kernel(Param XParam, BlockP<T> XBlock, double* p, const dou
     p[id] = z[id] + beta * p[id];
 }
 
+inline double half_advection_dt(Param XParam,double dt)
+{
+    return (1.0 - XParam.theta_H) * XParam.dt;
+}
+
+// foreach_face() body, x-direction. Call once with (ix,iy) swapped / hu_y etc.
+// for the y-direction pass (mirrors Basilisk's foreach_dimension()).
+__global__ void acceleration_facex(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux,EvolvingP<T> XEv,T dt)
+{
+    int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+    int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);   // this face, "i=0" position
+    int idm  = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);//memloc(ix - 1, iy, ib);   // cell to the west ("i-1")
+
+    T theta_H = XParam.theta_H;
+
+    T eps = XParam.eps;
+
+    double C = -(theta_H * dt) * (theta_H * dt);
+
+    double ax = theta_H * a_baro(XFlux.eta_r[idm], XFlux.eta_r[id], g);   // a_baro(eta_r,0)
+
+    double hl = XEv.h[idm] > eps ? XEv.h[idm] : 0.0;
+    double hr = XEv.h[id]  > eps ? XEv.h[id]  : 0.0;
+    double uf = (hl > 0.0 || hr > 0.0) ? (hl * XEv.u[idm] + hr * XEv.u[id]) / (hl + hr) : 0.0;
+
+    double hu_new = (1.0 - theta_H) * (XFlux.hu[id] + dt * XFlux.hfu[id] * ax)
+                   + theta_H * XFlux.hfu[id] * uf;
+    hu_new += dt * (theta_H * XFlux.hau[id] - XFlux.hfu[id] * ax);
+
+    XFlux.hau[id] -= XFlux.hfu[id] * ax;
+    XFlux.hu[id]  = hu_new;
+
+    XFlux.su[id]        = XFlux.hu[id];          // single layer: su.x[] += hu.x[] with su.x[] init 0
+    XFlux.alpha_x[id] = C * XFlux.hfu[id];       // single layer: alpha_eta.x[] += hf.x[]; then *= C
+}
+
+__global__ void acceleration_facey(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux,EvolvingP<T> XEv,T dt)
+{
+    int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+    int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);   // this face, "i=0" position
+    int idm  = memloc(halowidth, blkmemwidth, ix , iy -1, ib);//memloc(ix - 1, iy, ib);   // cell to the west ("i-1")
+
+    T theta_H = XParam.theta_H;
+
+    T eps = XParam.eps;
+
+    double C = -(theta_H * dt) * (theta_H * dt);
+
+    double ax = theta_H * a_baro(XFlux.eta_r[idm], XFlux.eta_r[id], g);   // a_baro(eta_r,0)
+
+    double hl = XEv.h[idm] > eps ? XEv.h[idm] : 0.0;
+    double hr = XEv.h[id]  > eps ? XEv.h[id]  : 0.0;
+    double uf = (hl > 0.0 || hr > 0.0) ? (hl * XEv.v[idm] + hr * XEv.v[id]) / (hl + hr) : 0.0;
+
+    double hu_new = (1.0 - theta_H) * (XFlux.hv[id] + dt * XFlux.hfv[id] * ax)
+                   + theta_H * XFlux.hfv[id] * uf;
+    hu_new += dt * (theta_H * XFlux.hav[id] - XFlux.hfv[id] * ax);
+
+    XFlux.hav[id] -= XFlux.hfv[id] * ax;
+    XFlux.hv[id]  = hu_new;
+
+    XFlux.sv[id]        = XFlux.hv[id];          // single layer: su.x[] += hu.x[] with su.x[] init 0
+    XFlux.alpha_y[id] = C * XFlux.hfv[id];       // single layer: alpha_eta.x[] += hf.x[]; then *= C
+}
+
+__global__ void acceleration_rhs(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, EvolvingP<T> XEv, T dt)
+{
+    int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+
+    int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);//memloc(ix,     iy,     ib);
+    int idxp = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);//memloc(ix + 1, iy,     ib);   // su.x[1]
+    int idyp = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);//memloc(ix,     iy + 1, ib);   // su.y[1]
+
+    double rhs = XParam.rigid ? 0.0 : XEv.eta[id];
+    rhs -= dt * (XFlux.su[idxp] - f.su[id]) / XParam.Delta;
+    rhs -= dt * (XFlux.sv[idyp] - f.sv[id]) / XParam.Delta;
+    XFlux.rhs_eta[id] = rhs;
+}
+
+__global__ void matvec_facefieldx(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, EvolvingP<T> XEv)
+{
+   int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+    int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);//memloc(ix,     iy, ib);
+    int idm = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);//memloc(ix - 1, iy, ib);
+
+    T abaro = XParam.g * (XEv.zs[idm] - XEv.zs[id]) / XParam.Delta;
+
+    XFlux.g_x[id] = XFlux.alpha_x[id] * a_baro;   // a_baro(eta,0)
+}
+
+__global__ void matvec_facefieldy(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, EvolvingP<T> XEv)
+{
+   int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+    int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);//memloc(ix,     iy, ib);
+    int idm = memloc(halowidth, blkmemwidth, ix, iy-1, ib);//memloc(ix - 1, iy, ib);
+
+    T abaro = XParam.g * (XEv.zs[idm] - XEv.zs[id]) / XParam.Delta;
+
+    XFlux.g_y[id] = XFlux.alpha_y[id] * a_baro;   // a_baro(eta,0)
+}
+
+__global__ void matvec_apply(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux,T* __restrict__ eta,T* __restrict__ Aeta, const T* __restrict__ g_x, const T* __restrict__ g_y)
+{
+     int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+    int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);
+    int idxp = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);//memloc(ix + 1, iy,     ib);
+    int idyp = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);//memloc(ix,     iy + 1, ib);
+
+    double Ax = XParam.rigid ? 0.0 : eta[id];
+    Ax -= (g_x[idxp] - g_x[id]) / XParam.Delta;
+    Ax -= (g_y[idyp] - g_y[id]) / XParam.Delta;
+    Aeta[id] = Ax;
+}
+
+// ----------------------------------------------------------------------
+// Jacobi preconditioner: diag(A) obtained by differentiating A(eta)[]
+// w.r.t. eta[] itself (this is what Basilisk's diagonalize(eta) macro
+// does automatically inside relax_hydro -- here it's written out by hand):
+//
+//   d(A)/d(eta[]) = 1 - (G/Delta^2)*(alpha_eta.x[0]+alpha_eta.x[1]
+//                                    +alpha_eta.y[0]+alpha_eta.y[1])
+// ----------------------------------------------------------------------
+__global__ void jacobi_diag(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux)
+{
+    int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+    int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);
+    int idxp = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);//memloc(ix + 1, iy,     ib);
+    int idyp = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);//memloc(ix,     iy + 1, ib);
+
+
+    double sumAlpha = XFlux.alpha_x[id] + XFlux.alpha_x[idxp]
+                     + XFlux.alpha_y[id] + XFlux.alpha_y[idyp];
+    // alpha_eta <= 0, so this correctly increases the diagonal:
+    double diag = (XParam.rigid ? 0.0 : 1.0) - (XParam.g / (XParam.Delta * XParam.Delta)) * sumAlpha;
+    XFlux.diagInv[id] = 1.0 / diag;
+}
+
+
 // /**
 //  * @brief Multigrid relaxation function (Red-Black Gauss-Seidel)
 //  */
@@ -279,224 +466,224 @@ __global__ void xpby_kernel(Param XParam, BlockP<T> XBlock, double* p, const dou
 // }
 
 
-/**
- * @brief Multigrid relaxation function (Red-Black Gauss-Seidel)
- */
-template <class T>
-__global__ void relax_implicit_eta(
-    T* eta, T* rhs, T* alpha_x, T* alpha_y, Param XParam, BlockP<T> XBlock,
-    int parity, T* diff_sum)
-{
-    T* s_diff = SharedMemory<T>();
+// /**
+//  * @brief Multigrid relaxation function (Red-Black Gauss-Seidel)
+//  */
+// template <class T>
+// __global__ void relax_implicit_eta(
+//     T* eta, T* rhs, T* alpha_x, T* alpha_y, Param XParam, BlockP<T> XBlock,
+//     int parity, T* diff_sum)
+// {
+//     T* s_diff = SharedMemory<T>();
 
-    int halowidth = XParam.halowidth;
-    int blkmemwidth = blockDim.x + halowidth * 2;
-    int ix = threadIdx.x;
-    int iy = threadIdx.y;
-    int tid = iy * blockDim.x + ix;
+//     int halowidth = XParam.halowidth;
+//     int blkmemwidth = blockDim.x + halowidth * 2;
+//     int ix = threadIdx.x;
+//     int iy = threadIdx.y;
+//     int tid = iy * blockDim.x + ix;
 
-    int ibl = blockIdx.x;
-    int ib = XBlock.active[ibl];
-    int lev = XBlock.level[ib];
-    T delta = calcres(T(XParam.delta), lev);
+//     int ibl = blockIdx.x;
+//     int ib = XBlock.active[ibl];
+//     int lev = XBlock.level[ib];
+//     T delta = calcres(T(XParam.delta), lev);
 
-    int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+//     int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 
-    T diff = T(0.0);
+//     T diff = T(0.0);
 
-    if ((ix + iy) % 2 == parity) {
-        int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
-        int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
-        int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
-        int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
+//     if ((ix + iy) % 2 == parity) {
+//         int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
+//         int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
+//         int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
+//         int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
 
-        T cmu = T(1.0);
-        T cmv = T(1.0);
-        if (XParam.spherical) {
-            T ybo = T(XParam.yo + XBlock.yo[ib]);
-            cmu = calcCM(T(XParam.Radius), delta, ybo, iy);
-            cmv = calcCM(T(XParam.Radius), delta, ybo, iy);
-        }
+//         T cmu = T(1.0);
+//         T cmv = T(1.0);
+//         if (XParam.spherical) {
+//             T ybo = T(XParam.yo + XBlock.yo[ib]);
+//             cmu = calcCM(T(XParam.Radius), delta, ybo, iy);
+//             cmv = calcCM(T(XParam.Radius), delta, ybo, iy);
+//         }
 
-        T d2 = delta * delta;
-        T n = rhs[i];
-        T d = T(1.0); // beta = 1
+//         T d2 = delta * delta;
+//         T n = rhs[i];
+//         T d = T(1.0); // beta = 1
 
-        n -= (alpha_x[iright] * eta[iright] + alpha_x[i] * eta[ileft]) / (d2 * cmu * cmu);
-        n -= (alpha_y[itop] * eta[itop] + alpha_y[i] * eta[ibot]) / (d2 * cmv * cmv);
+//         n -= (alpha_x[iright] * eta[iright] + alpha_x[i] * eta[ileft]) / (d2 * cmu * cmu);
+//         n -= (alpha_y[itop] * eta[itop] + alpha_y[i] * eta[ibot]) / (d2 * cmv * cmv);
 
-        d -= (alpha_x[iright] + alpha_x[i]) / (d2 * cmu * cmu);
-        d -= (alpha_y[itop] + alpha_y[i]) / (d2 * cmv * cmv);
+//         d -= (alpha_x[iright] + alpha_x[i]) / (d2 * cmu * cmu);
+//         d -= (alpha_y[itop] + alpha_y[i]) / (d2 * cmv * cmv);
 
-        T old_val = eta[i];
-        T new_val = n / d;
-        eta[i] = new_val;
-        diff = (T)fabs(new_val - old_val);
-    }
+//         T old_val = eta[i];
+//         T new_val = n / d;
+//         eta[i] = new_val;
+//         diff = (T)fabs(new_val - old_val);
+//     }
 
-    // Shared memory reduction for convergence monitoring
-    s_diff[tid] = diff;
-    __syncthreads();
+//     // Shared memory reduction for convergence monitoring
+//     s_diff[tid] = diff;
+//     __syncthreads();
 
-    for (unsigned int s = (blockDim.x * blockDim.y) / 2; s > 0; s >>= 1) {
-        if (tid < s) {
-            s_diff[tid] += s_diff[tid + s];
-        }
-        __syncthreads();
-    }
+//     for (unsigned int s = (blockDim.x * blockDim.y) / 2; s > 0; s >>= 1) {
+//         if (tid < s) {
+//             s_diff[tid] += s_diff[tid + s];
+//         }
+//         __syncthreads();
+//     }
 
-    if (tid == 0) {
-        atomicAddC(diff_sum, s_diff[0]);
-    }
-}
+//     if (tid == 0) {
+//         atomicAddC(diff_sum, s_diff[0]);
+//     }
+// }
 
-template <class T>
-__global__ void compute_implicit_face_data(
-    T* alpha_x, T* alpha_y, T* su_x, T* su_y, Param XParam, BlockP<T> XBlock,
-    EvolvingP<T> XEv, FluxMLP<T> XFlux, T dt)
-{
-    int halowidth = XParam.halowidth;
-    int blkmemwidth = blockDim.x + halowidth * 2;
-    int ix = threadIdx.x;
-    int iy = threadIdx.y;
-    int ibl = blockIdx.x;
-    int ib = XBlock.active[ibl];
-    int lev = XBlock.level[ib];
-    T delta = calcres(T(XParam.delta), lev);
-    T g = T(XParam.g);
-    T theta = T(XParam.theta_imp);
-    T C = - theta * theta * dt * dt * g;
+// template <class T>
+// __global__ void compute_implicit_face_data(
+//     T* alpha_x, T* alpha_y, T* su_x, T* su_y, Param XParam, BlockP<T> XBlock,
+//     EvolvingP<T> XEv, FluxMLP<T> XFlux, T dt)
+// {
+//     int halowidth = XParam.halowidth;
+//     int blkmemwidth = blockDim.x + halowidth * 2;
+//     int ix = threadIdx.x;
+//     int iy = threadIdx.y;
+//     int ibl = blockIdx.x;
+//     int ib = XBlock.active[ibl];
+//     int lev = XBlock.level[ib];
+//     T delta = calcres(T(XParam.delta), lev);
+//     T g = T(XParam.g);
+//     T theta = T(XParam.theta_imp);
+//     T C = - theta * theta * dt * dt * g;
 
-    int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+//     int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 
-    alpha_x[i] = XFlux.hfu[i] * C;
-    alpha_y[i] = XFlux.hfv[i] * C;
+//     alpha_x[i] = XFlux.hfu[i] * C;
+//     alpha_y[i] = XFlux.hfv[i] * C;
 
-    su_x[i] = XFlux.hu[i] + theta * (T(1.0) - theta) * dt * XFlux.hau[i];
-    su_y[i] = XFlux.hv[i] + theta * (T(1.0) - theta) * dt * XFlux.hav[i];
-}
+//     su_x[i] = XFlux.hu[i] + theta * (T(1.0) - theta) * dt * XFlux.hau[i];
+//     su_y[i] = XFlux.hv[i] + theta * (T(1.0) - theta) * dt * XFlux.hav[i];
+// }
 
-template <class T>
-__global__ void compute_implicit_rhs(
-    T* rhs, T* su_x, T* su_y, Param XParam, BlockP<T> XBlock,
-    EvolvingP<T> XEv, T dt)
-{
-    int halowidth = XParam.halowidth;
-    int blkmemwidth = blockDim.x + halowidth * 2;
-    int ix = threadIdx.x;
-    int iy = threadIdx.y;
-    int ibl = blockIdx.x;
-    int ib = XBlock.active[ibl];
-    int lev = XBlock.level[ib];
-    T delta = calcres(T(XParam.delta), lev);
+// template <class T>
+// __global__ void compute_implicit_rhs(
+//     T* rhs, T* su_x, T* su_y, Param XParam, BlockP<T> XBlock,
+//     EvolvingP<T> XEv, T dt)
+// {
+//     int halowidth = XParam.halowidth;
+//     int blkmemwidth = blockDim.x + halowidth * 2;
+//     int ix = threadIdx.x;
+//     int iy = threadIdx.y;
+//     int ibl = blockIdx.x;
+//     int ib = XBlock.active[ibl];
+//     int lev = XBlock.level[ib];
+//     T delta = calcres(T(XParam.delta), lev);
 
-    int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-    int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
-    int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
+//     int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+//     int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
+//     int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
 
-    T cmu = T(1.0);
-    T cmv = T(1.0);
-    if (XParam.spherical) {
-        T ybo = T(XParam.yo + XBlock.yo[ib]);
-        cmu = calcCM(T(XParam.Radius), delta, ybo, iy);
-        cmv = calcCM(T(XParam.Radius), delta, ybo, iy);
-    }
+//     T cmu = T(1.0);
+//     T cmv = T(1.0);
+//     if (XParam.spherical) {
+//         T ybo = T(XParam.yo + XBlock.yo[ib]);
+//         cmu = calcCM(T(XParam.Radius), delta, ybo, iy);
+//         cmv = calcCM(T(XParam.Radius), delta, ybo, iy);
+//     }
 
-    rhs[i] = XEv.zs[i] - dt * ( (su_x[iright] - su_x[i]) / (delta * cmu) + (su_y[itop] - su_y[i]) / (delta * cmv) );
-}
+//     rhs[i] = XEv.zs[i] - dt * ( (su_x[iright] - su_x[i]) / (delta * cmu) + (su_y[itop] - su_y[i]) / (delta * cmv) );
+// }
 
-template <class T>
-__global__ void project_implicit_velocities(
-    EvolvingP<T> XEv, T* eta_new, T* zb, Param XParam, BlockP<T> XBlock, T dt)
-{
-    int halowidth = XParam.halowidth;
-    int blkmemwidth = blockDim.x + halowidth * 2;
-    int ix = threadIdx.x;
-    int iy = threadIdx.y;
-    int ibl = blockIdx.x;
-    int ib = XBlock.active[ibl];
-    int lev = XBlock.level[ib];
-    T delta = calcres(T(XParam.delta), lev);
-    T theta = T(XParam.theta_imp);
-    T g = T(XParam.g);
-    T eps = T(XParam.eps);
+// template <class T>
+// __global__ void project_implicit_velocities(
+//     EvolvingP<T> XEv, T* eta_new, T* zb, Param XParam, BlockP<T> XBlock, T dt)
+// {
+//     int halowidth = XParam.halowidth;
+//     int blkmemwidth = blockDim.x + halowidth * 2;
+//     int ix = threadIdx.x;
+//     int iy = threadIdx.y;
+//     int ibl = blockIdx.x;
+//     int ib = XBlock.active[ibl];
+//     int lev = XBlock.level[ib];
+//     T delta = calcres(T(XParam.delta), lev);
+//     T theta = T(XParam.theta_imp);
+//     T g = T(XParam.g);
+//     T eps = T(XParam.eps);
 
-    int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-    int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
-    int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
-    int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
-    int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
+//     int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+//     int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
+//     int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
+//     int ibot = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
+//     int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
 
-    T cmu = T(1.0);
-    T cmv = T(1.0);
-    if (XParam.spherical) {
-        T ybo = T(XParam.yo + XBlock.yo[ib]);
-        cmu = calcCM(T(XParam.Radius), delta, ybo, iy);
-        cmv = calcCM(T(XParam.Radius), delta, ybo, iy);
-    }
+//     T cmu = T(1.0);
+//     T cmv = T(1.0);
+//     if (XParam.spherical) {
+//         T ybo = T(XParam.yo + XBlock.yo[ib]);
+//         cmu = calcCM(T(XParam.Radius), delta, ybo, iy);
+//         cmv = calcCM(T(XParam.Radius), delta, ybo, iy);
+//     }
 
-    T detadx = (eta_new[iright] - eta_new[ileft]) / (T(2.0) * delta * cmu);
-    T detady = (eta_new[itop] - eta_new[ibot]) / (T(2.0) * delta * cmv);
+//     T detadx = (eta_new[iright] - eta_new[ileft]) / (T(2.0) * delta * cmu);
+//     T detady = (eta_new[itop] - eta_new[ibot]) / (T(2.0) * delta * cmv);
 
-    XEv.u[i] -= theta * dt * g * detadx;
-    XEv.v[i] -= theta * dt * g * detady;
+//     XEv.u[i] -= theta * dt * g * detadx;
+//     XEv.v[i] -= theta * dt * g * detady;
 
-    XEv.h[i] = max(T(0.0), eta_new[i] - zb[i]);
-    XEv.zs[i] = zb[i] + XEv.h[i];
+//     XEv.h[i] = max(T(0.0), eta_new[i] - zb[i]);
+//     XEv.zs[i] = zb[i] + XEv.h[i];
 
-    if (XEv.h[i] < eps) {
-        XEv.u[i] = T(0.0);
-        XEv.v[i] = T(0.0);
-    }
-}
+//     if (XEv.h[i] < eps) {
+//         XEv.u[i] = T(0.0);
+//         XEv.v[i] = T(0.0);
+//     }
+// }
 
-template <class T>
-void solve_implicit_barotropic(Param& XParam, Loop<T>& XLoop, Model<T>& XModel)
-{
-    dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
-    dim3 gridDim(XParam.nblk, 1, 1);
-    T dt = T(XLoop.dt);
+// template <class T>
+// void solve_implicit_barotropic(Param& XParam, Loop<T>& XLoop, Model<T>& XModel)
+// {
+//     dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+//     dim3 gridDim(XParam.nblk, 1, 1);
+//     T dt = T(XLoop.dt);
 
-    compute_implicit_face_data<<<gridDim, blockDim>>>(
-        XModel.fluxml.alpha_x, XModel.fluxml.alpha_y, XModel.fluxml.su_x, XModel.fluxml.su_y,
-        XParam, XModel.blocks, XModel.evolv, XModel.fluxml, dt
-    );
-    CUDA_CHECK(cudaDeviceSynchronize());
-    fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.alpha_x);
-    fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.alpha_y);
-    fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.su_x);
-    fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.su_y);
+//     compute_implicit_face_data<<<gridDim, blockDim>>>(
+//         XModel.fluxml.alpha_x, XModel.fluxml.alpha_y, XModel.fluxml.su_x, XModel.fluxml.su_y,
+//         XParam, XModel.blocks, XModel.evolv, XModel.fluxml, dt
+//     );
+//     CUDA_CHECK(cudaDeviceSynchronize());
+//     fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.alpha_x);
+//     fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.alpha_y);
+//     fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.su_x);
+//     fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.su_y);
 
-    compute_implicit_rhs<<<gridDim, blockDim>>>(
-        XModel.rhs, XModel.fluxml.su_x, XModel.fluxml.su_y, XParam, XModel.blocks, XModel.evolv, dt
-    );
-    CUDA_CHECK(cudaDeviceSynchronize());
+//     compute_implicit_rhs<<<gridDim, blockDim>>>(
+//         XModel.rhs, XModel.fluxml.su_x, XModel.fluxml.su_y, XParam, XModel.blocks, XModel.evolv, dt
+//     );
+//     CUDA_CHECK(cudaDeviceSynchronize());
 
-    T h_diff_sum;
-    T* d_diff_sum = XModel.time.arrmax;
-    int smemSize = blockDim.x * blockDim.y * sizeof(T);
+//     T h_diff_sum;
+//     T* d_diff_sum = XModel.time.arrmax;
+//     int smemSize = blockDim.x * blockDim.y * sizeof(T);
 
-    for (int iter = 0; iter < XParam.mg_max_iter; ++iter) {
-        // Correct reset of convergence buffer
-        reset_var<<<gridDim, blockDim>>>(XParam.halowidth, XModel.blocks.active, T(0.0), d_diff_sum);
-        CUDA_CHECK(cudaDeviceSynchronize());
+//     for (int iter = 0; iter < XParam.mg_max_iter; ++iter) {
+//         // Correct reset of convergence buffer
+//         reset_var<<<gridDim, blockDim>>>(XParam.halowidth, XModel.blocks.active, T(0.0), d_diff_sum);
+//         CUDA_CHECK(cudaDeviceSynchronize());
 
-        relax_implicit_eta<<<gridDim, blockDim, smemSize>>>(XModel.evolv.zs, XModel.rhs, XModel.fluxml.alpha_x, XModel.fluxml.alpha_y, XParam, XModel.blocks, 0, d_diff_sum);
-        CUDA_CHECK(cudaDeviceSynchronize());
-        fillHaloGPU(XParam, XModel.blocks, XModel.evolv.zs);
-        relax_implicit_eta<<<gridDim, blockDim, smemSize>>>(XModel.evolv.zs, XModel.rhs, XModel.fluxml.alpha_x, XModel.fluxml.alpha_y, XParam, XModel.blocks, 1, d_diff_sum);
-        CUDA_CHECK(cudaDeviceSynchronize());
-        fillHaloGPU(XParam, XModel.blocks, XModel.evolv.zs);
+//         relax_implicit_eta<<<gridDim, blockDim, smemSize>>>(XModel.evolv.zs, XModel.rhs, XModel.fluxml.alpha_x, XModel.fluxml.alpha_y, XParam, XModel.blocks, 0, d_diff_sum);
+//         CUDA_CHECK(cudaDeviceSynchronize());
+//         fillHaloGPU(XParam, XModel.blocks, XModel.evolv.zs);
+//         relax_implicit_eta<<<gridDim, blockDim, smemSize>>>(XModel.evolv.zs, XModel.rhs, XModel.fluxml.alpha_x, XModel.fluxml.alpha_y, XParam, XModel.blocks, 1, d_diff_sum);
+//         CUDA_CHECK(cudaDeviceSynchronize());
+//         fillHaloGPU(XParam, XModel.blocks, XModel.evolv.zs);
 
-        CUDA_CHECK(cudaMemcpy(&h_diff_sum, d_diff_sum, sizeof(T), cudaMemcpyDeviceToHost));
-        if (h_diff_sum / (XParam.nblk * XParam.blkwidth * XParam.blkwidth) < XParam.mg_tol) break;
-    }
+//         CUDA_CHECK(cudaMemcpy(&h_diff_sum, d_diff_sum, sizeof(T), cudaMemcpyDeviceToHost));
+//         if (h_diff_sum / (XParam.nblk * XParam.blkwidth * XParam.blkwidth) < XParam.mg_tol) break;
+//     }
 
-    project_implicit_velocities<<<gridDim, blockDim>>>(
-        XModel.evolv, XModel.evolv.zs, XModel.zb, XParam, XModel.blocks, dt
-    );
-    CUDA_CHECK(cudaDeviceSynchronize());
-}
+//     project_implicit_velocities<<<gridDim, blockDim>>>(
+//         XModel.evolv, XModel.evolv.zs, XModel.zb, XParam, XModel.blocks, dt
+//     );
+//     CUDA_CHECK(cudaDeviceSynchronize());
+// }
 
-template void solve_implicit_barotropic<float>(Param& XParam, Loop<float>& XLoop, Model<float>& XModel);
-template void solve_implicit_barotropic<double>(Param& XParam, Loop<double>& XLoop, Model<double>& XModel);
+// template void solve_implicit_barotropic<float>(Param& XParam, Loop<float>& XLoop, Model<float>& XModel);
+// template void solve_implicit_barotropic<double>(Param& XParam, Loop<double>& XLoop, Model<double>& XModel);
