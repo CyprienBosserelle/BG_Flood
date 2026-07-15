@@ -287,10 +287,12 @@ template <class T> __global__ void UpdateButtingerWDXGPU(Param XParam, BlockP<T>
 		// }
 		
 		// Condition on z, eta and zf
-		if ( (zn < zi) && (etan < etai) && (zl > zr) ){
+		//if ( (zn < zi) && (etan < etai) && (zl > zr) ){
+		if ( (zn < zi) && (etan < etai) && (hn < hi) && (zl > zr) ){
 			zA = zr;
-		} else if ( (zn > zi) && (etan > etai) && (zl < zr) ){
-			zA = zl;
+		//} else if ( (zn > zi) && (etan > etai) && (zl < zr) ){
+		} else if ( (zn > zi) && (etan > etai) && (hn > hi) && (zl < zr) ){
+            zA = zl;
 		} else {
 			//define the Audusse terms
 			zA = max(zr, zl);
@@ -876,9 +878,11 @@ template <class T> __global__ void UpdateButtingerWDYGPU(Param XParam, BlockP<T>
 		// }
 
 		// Condition on z, eta and zf
-		if ( (zn < zi) && (etan < etai) && (zl > zr) ){
+		//if ( (zn < zi) && (etan < etai) && (zl > zr) ){
+		if ( (zn < zi) && (etan < etai) && (hn < hi) && (zl > zr) ){
 			zA = zr;
-		} else if ( (zn > zi) && (etan > etai) && (zl < zr) ){
+		//} else if ( (zn > zi) && (etan > etai) && (zl < zr) ){
+		} else if ( (zn > zi) && (etan > etai) && (hn > hi) && (zl < zr) ){
 			zA = zl;
 		} else {
 			//define the Audusse terms
