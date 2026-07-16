@@ -400,6 +400,68 @@ __global__ void jacobi_diag(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux)
 }
 
 
+// foreach_face() flux-reconstruction block after the solve.
+__global__ void pressure_flux_reconstruction_facex(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, EvolvingP<T> XEv,T dt)
+{
+     int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+    int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);
+    int idm = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);//memloc(ix - 1, iy, ib);
+
+    T dry = XParam.eps;
+
+    T abaro = XParam.g * (eta[idm] - eta[id]) / XParam.Delta;
+
+    double ax = XParam.theta_H * abaro;   // a_baro(eta_r,0)
+    XFlux.hau[id] += XFlux.hfu[id] * ax;
+
+    double hl = XEv.h[idm] > dry ? XEv.h[idm] : 0.0;
+    double hr = XEv.h[id]  > dry ? XEv.h[id]  : 0.0;
+    double uf = (hl > 0.0 || hr > 0.0) ? (hl * XEv.u[idm] + hr * XEv.u[id]) / (hl + hr) : 0.0;
+
+    // NOTE: what's stored here is theta_H*(hu)^{n+1}, not the full flux --
+    // this is intentional (see implicit.h comment) because half_advection
+    // already applied (1-theta_H)*dt worth of advection, so hydro.h's own
+    // pressure event / advect() call only needs the remaining theta_H*dt.
+    XFlux.hu[id] = XParam.theta_H * (XFlux.hfu[id] * uf + dt * XFlux.hau[id]) - dt * XFlux.hau[id];
+}
+
+__global__ void pressure_flux_reconstruction_facey(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, EvolvingP<T> XEv,T dt)
+{
+     int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+    int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);
+    int idm = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);//memloc(ix - 1, iy, ib);
+
+    T dry = XParam.eps;
+
+    T abaro = XParam.g * (eta[idm] - eta[id]) / XParam.Delta;
+
+    double ax = XParam.theta_H * abaro;   // a_baro(eta_r,0)
+    XFlux.hav[id] += XFlux.hfv[id] * ax;
+
+    double hl = XEv.h[idm] > dry ? XEv.h[idm] : 0.0;
+    double hr = XEv.h[id]  > dry ? XEv.h[id]  : 0.0;
+    double uf = (hl > 0.0 || hr > 0.0) ? (hl * XEv.v[idm] + hr * XEv.v[id]) / (hl + hr) : 0.0;
+
+    // NOTE: what's stored here is theta_H*(hu)^{n+1}, not the full flux --
+    // this is intentional (see implicit.h comment) because half_advection
+    // already applied (1-theta_H)*dt worth of advection, so hydro.h's own
+    // pressure event / advect() call only needs the remaining theta_H*dt.
+    XFlux.hv[id] = XParam.theta_H * (XFlux.hfv[id] * uf + dt * XFlux.hav[id]) - dt * XFlux.hav[id];
+}
 // /**
 //  * @brief Multigrid relaxation function (Red-Black Gauss-Seidel)
 //  */
