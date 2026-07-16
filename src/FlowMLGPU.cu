@@ -139,198 +139,55 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hav);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	
+	// Half advection if implicit
+	if (XParam.implicit)//&& (theta_H < 1.)
+	{
+		//
+		T dt_thetaH = T((1 - XParam.theta_H) * XLoop.dt);
+		AdvecML( XParam, XLoop, XForcing, XModel, dt_thetaH);
+
+		//assemble_alpha_kernel<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.fluxml,dt);
+		acceleration_facex<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml,XModel.evolv, T(XLoop.dt))
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		acceleration_facey<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml,XModel.evolv, T(XLoop.dt))
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		acceleration_rhs<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml,XModel.evolv, T(XLoop.dt));
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		solveEtaPCG(XParam, XModel, T(XLoop.dt));
+
+		pressure_flux_reconstruction_facex<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml,XModel.evolv, T(XLoop.dt));
+		CUDA_CHECK(cudaDeviceSynchronize());
+		
+		pressure_flux_reconstruction_facey<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml,XModel.evolv, T(XLoop.dt));
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		
+		HaloFluxGPURMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hau);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		//HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hau);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+		//HaloFluxGPURMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hav);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
+		HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hav);
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+	}
 
 	
 	// Acceleration
 	// Pressure
-	if (XParam.engine == 6)
-	{
-		//solve_implicit_barotropic(XParam, XLoop, XModel);
-		solveImplicit(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
-	}
-	else
-	{
-		pressureML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
-		CUDA_CHECK(cudaDeviceSynchronize());
-	}
-
-	// Check hu/hv
-	CheckadvecMLY << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	CheckadvecMLX << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	// Fill halo u and v calc grd for u and v and fill halo for hu and hv
-	// 
-
-	fillHaloGPU(XParam, XModel.blocks, XModel.evolv.u);
-	fillHaloGPU(XParam, XModel.blocks, XModel.evolv.v);
-	/*
-	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hu);
-	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hv);
-
-	HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
-	CUDA_CHECK(cudaDeviceSynchronize());*/
-
-	//HaloFluxGPURMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
-	//CUDA_CHECK(cudaDeviceSynchronize());
-
-	HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	HaloFluxGPULMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
+	
+	pressureML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
-	//HaloFluxGPUBMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
-	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	HaloFluxGPURMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	//HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
-	//CUDA_CHECK(cudaDeviceSynchronize());
-
-	//HaloFluxGPULMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
-	//CUDA_CHECK(cudaDeviceSynchronize());
-
-	HaloFluxGPUBMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-
-	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
-	{
-		FlowbndFluxML(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
-	}
-	//HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
-	//CUDA_CHECK(cudaDeviceSynchronize());
-
-	//HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
-	//CUDA_CHECK(cudaDeviceSynchronize());
-
-	//HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
-	//CUDA_CHECK(cudaDeviceSynchronize());
-
-	//HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
-	//CUDA_CHECK(cudaDeviceSynchronize());
-
-	gradientSMC << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.evolv.u, XModel.grad.dudx, XModel.grad.dudy);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	gradientSMC << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.evolv.v, XModel.grad.dvdx, XModel.grad.dvdy);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-
-	/*fillHaloGPU(XParam, XModel.blocks, XModel.grad.dudx);
-	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dudy);
-	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dvdx);
-	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dvdy);*/
-
-
-	gradientHaloGPUnew(XParam, XModel.blocks, XModel.evolv.u, XModel.grad.dudx, XModel.grad.dudy);
-	gradientHaloGPUnew(XParam, XModel.blocks, XModel.evolv.v, XModel.grad.dvdx, XModel.grad.dvdy);
-
-	HaloFluxGPULMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.grad.dvdy);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	HaloFluxGPULMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.grad.dudy);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-
-	HaloFluxGPUBMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.grad.dudx);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	//HaloFluxGPURMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.grad.dvdy);
-	//CUDA_CHECK(cudaDeviceSynchronize());
-
-	//HaloFluxGPURMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.grad.dudy);
-	//CUDA_CHECK(cudaDeviceSynchronize());
-
-	//HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.grad.dudx);
-	//CUDA_CHECK(cudaDeviceSynchronize());
-
-	//HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.grad.dvdx);
-	//CUDA_CHECK(cudaDeviceSynchronize());
-
-	HaloFluxGPUBMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.grad.dvdx);
-	CUDA_CHECK(cudaDeviceSynchronize());
-	
-	fillCornersGPU <<< gridDim, blockDimHC, 0 >>> (XParam, XModel.blocks, XModel.fluxml.hu);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	fillCornersGPU << < gridDim, blockDimHC, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	fillCornersGPU << < gridDim, blockDimHC, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hfu);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	fillCornersGPU << < gridDim, blockDimHC, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hfv);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	/*fillCornersGPU << < gridDim, blockDimHC, 0 >> > (XParam, XModel.blocks, XModel.evolv.u);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	fillCornersGPU << < gridDim, blockDimHC, 0 >> > (XParam, XModel.blocks, XModel.evolv.v);
-	CUDA_CHECK(cudaDeviceSynchronize());*/
-	
-	//hv hfv u hu hfu v
-
-
-	
-	// Advection
-	AdvecFluxML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	
-
-	/*fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fux);
-	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fvx);
-	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fuy);
-	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fvy);*/
-
-	HaloFluxGPURMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fux);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fuy);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	HaloFluxGPURMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fvx);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fvy);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	
-	/*
-	refine_bilinearGPU(XParam, XModel.blocks, XModel.fluxml.Fux);
-	refine_bilinearGPU(XParam, XModel.blocks, XModel.fluxml.Fvx);
-	refine_bilinearGPU(XParam, XModel.blocks, XModel.fluxml.Fuy);
-	refine_bilinearGPU(XParam, XModel.blocks, XModel.fluxml.Fvy);
-	*/
-	/*
-	HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fux);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fvx);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fvy);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fuy);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	*/
-
-	AdvecEv << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.evolv, XModel.grad, XModel.fluxml);
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-
-	
+	AdvecML( XParam, XLoop,XModel,XForcing,T(XLoop.dt))
 
 
 	bottomfrictionGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.cf, XModel.evolv);
@@ -395,7 +252,7 @@ template void FlowMLGPU<double>(Param XParam, Loop<double>& XLoop, Forcing<float
 
 
 //template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
-void solveImplicit(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
+template <class T> void solveImplicit(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
 {
 	//ImplicitCtx& ctx, double tol = 1e-5, int maxIter = 100
 	double tol = 1e-5;
@@ -523,7 +380,207 @@ void solveImplicit(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<
     // the (1-theta_H)*dt advection was already done in half_advection).
 }
 
-void solveEtaPCG(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
+
+template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel,T dt)
+{
+
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+	// for flux reconstruction the loop overlap the right(or top for the y direction) halo
+	dim3 blockDimKX(XParam.blkwidth + XParam.halowidth, XParam.blkwidth, 1);
+	dim3 blockDimKY(XParam.blkwidth, XParam.blkwidth + XParam.halowidth, 1);
+
+	// For halo corners
+	dim3 blockDimHC(4, 1, 1);
+
+	// Fill halo for Fu and Fv
+	dim3 blockDimHaloLR(1, XParam.blkwidth, 1);
+	//dim3 blockDimHaloBT(16, 1, 1);
+	dim3 gridDimHaloLR(XParam.nblk, 1, 1);
+
+	dim3 blockDimHaloBT(XParam.blkwidth, 1, 1);
+	dim3 gridDimHaloBT(XParam.nblk , 1, 1);
+
+
+	// Check hu/hv
+	CheckadvecMLY << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, dt, XModel.evolv, XModel.grad, XModel.fluxml);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	CheckadvecMLX << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, dt, XModel.evolv, XModel.grad, XModel.fluxml);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	// Fill halo u and v calc grd for u and v and fill halo for hu and hv
+	// 
+
+	fillHaloGPU(XParam, XModel.blocks, XModel.evolv.u);
+	fillHaloGPU(XParam, XModel.blocks, XModel.evolv.v);
+	/*
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hu);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hv);
+
+	HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
+	CUDA_CHECK(cudaDeviceSynchronize());*/
+
+	//HaloFluxGPURMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPULMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	
+	//HaloFluxGPUBMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPURMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	//HaloFluxGPULMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPUBMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		FlowbndFluxML(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
+	}
+	//HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	//HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	//HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	//HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradientSMC << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.evolv.u, XModel.grad.dudx, XModel.grad.dudy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	gradientSMC << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.evolv.v, XModel.grad.dvdx, XModel.grad.dvdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	/*fillHaloGPU(XParam, XModel.blocks, XModel.grad.dudx);
+	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dudy);
+	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dvdx);
+	fillHaloGPU(XParam, XModel.blocks, XModel.grad.dvdy);*/
+
+
+	gradientHaloGPUnew(XParam, XModel.blocks, XModel.evolv.u, XModel.grad.dudx, XModel.grad.dudy);
+	gradientHaloGPUnew(XParam, XModel.blocks, XModel.evolv.v, XModel.grad.dvdx, XModel.grad.dvdy);
+
+	HaloFluxGPULMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.grad.dvdy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPULMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.grad.dudy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+
+	HaloFluxGPUBMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.grad.dudx);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	//HaloFluxGPURMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.grad.dvdy);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	//HaloFluxGPURMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.grad.dudy);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	//HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.grad.dudx);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	//HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.grad.dvdx);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPUBMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.grad.dvdx);
+	CUDA_CHECK(cudaDeviceSynchronize());
+	
+	fillCornersGPU <<< gridDim, blockDimHC, 0 >>> (XParam, XModel.blocks, XModel.fluxml.hu);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	fillCornersGPU << < gridDim, blockDimHC, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hv);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	fillCornersGPU << < gridDim, blockDimHC, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hfu);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	fillCornersGPU << < gridDim, blockDimHC, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hfv);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	/*fillCornersGPU << < gridDim, blockDimHC, 0 >> > (XParam, XModel.blocks, XModel.evolv.u);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	fillCornersGPU << < gridDim, blockDimHC, 0 >> > (XParam, XModel.blocks, XModel.evolv.v);
+	CUDA_CHECK(cudaDeviceSynchronize());*/
+	
+	//hv hfv u hu hfu v
+
+
+	
+	// Advection
+	AdvecFluxML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, dt, XModel.evolv, XModel.grad, XModel.fluxml);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	
+
+	/*fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fux);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fvx);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fuy);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.Fvy);*/
+
+	HaloFluxGPURMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fux);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fuy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPURMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fvx);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fvy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	
+	/*
+	refine_bilinearGPU(XParam, XModel.blocks, XModel.fluxml.Fux);
+	refine_bilinearGPU(XParam, XModel.blocks, XModel.fluxml.Fvx);
+	refine_bilinearGPU(XParam, XModel.blocks, XModel.fluxml.Fuy);
+	refine_bilinearGPU(XParam, XModel.blocks, XModel.fluxml.Fvy);
+	*/
+	/*
+	HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fux);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fvx);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fvy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPUBTnew << <gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fuy);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	*/
+
+	AdvecEv << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, dt, XModel.evolv, XModel.grad, XModel.fluxml);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+
+}
+
+
+template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 {
     double tol = 1e-5;
 	int maxIter = 100
@@ -547,12 +604,7 @@ void solveEtaPCG(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T>
 	// Could use zs instead of eta_r but that makes me feel more safe.
 	cudaMemcpy(XModel.fluxml.eta_r, XModel.evolv.zs, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
-	//assemble_alpha_kernel<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.fluxml,dt);
-	acceleration_facex<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.fluxml,XModel.evolv,XLoop.dt)
-	CUDA_CHECK(cudaDeviceSynchronize());
-
-	acceleration_facey<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.fluxml,XModel.evolv),XLoop.dt)
-	CUDA_CHECK(cudaDeviceSynchronize());
+	
 
     HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.alpha_x);
 	//CUDA_CHECK(cudaDeviceSynchronize());
@@ -675,5 +727,9 @@ void solveEtaPCG(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T>
         rz_old = rz_new;
     }
     // f.eta_r now holds eta_r^{n+1} (== eta^{n+1} unless rigid lid).
+
+
 }
+
+
 

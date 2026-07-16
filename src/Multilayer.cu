@@ -29,7 +29,7 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 	T g = T(XParam.g);
 	T CFL = T(XParam.CFL);
 
-	T CFL_H = CFL;// T(0.5); should be different in multi-layer
+	T CFL_H = XParam.implicit ? std::numeric_limits<T>::max() : CFL;// T(0.5); should be different in multi-layer
 
 	T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
 
@@ -152,7 +152,7 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 
 	T CFL = T(XParam.CFL);
 
-	T CFL_H = CFL;// T(0.5); Should be different in Multi layer
+	T CFL_H = XParam.implicit ? std::numeric_limits<T>::max() : CFL;// T(0.5); Should be different in Multi layer
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ibot = memloc(halowidth, blkmemwidth, ix, iy-1, ib);
