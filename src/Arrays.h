@@ -160,6 +160,9 @@ struct FluxMLP
 	T* Fuy;
 	/** Flux of v in x-direction */
 	T* Fvx;
+
+
+	
 };
 
 /**
@@ -193,7 +196,7 @@ struct FluxIMP
 	T* g_x; // Basilisk: g.x  (temporary face field in residual_hydro)
 	T* g_y;
 
-
+};
 
 /**
  * @brief Structure holding advance variables for time stepping.
