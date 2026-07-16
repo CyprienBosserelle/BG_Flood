@@ -239,7 +239,7 @@ __global__ void acceleration_facex(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFl
 
     double C = -(theta_H * dt) * (theta_H * dt);
 
-    double ax = theta_H * a_baro(XFlux.eta_r[idm], XFlux.eta_r[id], g);   // a_baro(eta_r,0)
+    double ax = theta_H * a_baro( XFlux.eta_r[idm],  XFlux.eta_r[id], g);   // a_baro(eta_r,0)
 
     double hl = XEv.h[idm] > eps ? XEv.h[idm] : 0.0;
     double hr = XEv.h[id]  > eps ? XEv.h[id]  : 0.0;
@@ -275,7 +275,7 @@ __global__ void acceleration_facey(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFl
 
     double C = -(theta_H * dt) * (theta_H * dt);
 
-    double ax = theta_H * a_baro(XFlux.eta_r[idm], XFlux.eta_r[id], g);   // a_baro(eta_r,0)
+    double ax = theta_H * a_baro( XFlux.eta_r[idm],  XFlux.eta_r[id], g);   // a_baro(eta_r,0)
 
     double hl = XEv.h[idm] > eps ? XEv.h[idm] : 0.0;
     double hr = XEv.h[id]  > eps ? XEv.h[id]  : 0.0;
@@ -307,13 +307,13 @@ __global__ void acceleration_rhs(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux
     int idxp = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);//memloc(ix + 1, iy,     ib);   // su.x[1]
     int idyp = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);//memloc(ix,     iy + 1, ib);   // su.y[1]
 
-    double rhs = XParam.rigid ? 0.0 : XEv.eta[id];
+    double rhs = XParam.rigid ? 0.0 : XFlux.eta_r[id];
     rhs -= dt * (XFlux.su[idxp] - f.su[id]) / XParam.Delta;
     rhs -= dt * (XFlux.sv[idyp] - f.sv[id]) / XParam.Delta;
     XFlux.rhs_eta[id] = rhs;
 }
 
-__global__ void matvec_facefieldx(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, EvolvingP<T> XEv)
+__global__ void matvec_facefieldx(Param XParam, BlockP<T> XBlock,T* eta,T* g_x,T*alpha_x)
 {
    int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -326,12 +326,12 @@ __global__ void matvec_facefieldx(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlu
     int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);//memloc(ix,     iy, ib);
     int idm = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);//memloc(ix - 1, iy, ib);
 
-    T abaro = XParam.g * (XEv.zs[idm] - XEv.zs[id]) / XParam.Delta;
+    T abaro = XParam.g * (eta[idm] - eta[id]) / XParam.Delta;
 
-    XFlux.g_x[id] = XFlux.alpha_x[id] * a_baro;   // a_baro(eta,0)
+    g_x[id] = alpha_x[id] * a_baro;   // a_baro(eta,0)
 }
 
-__global__ void matvec_facefieldy(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, EvolvingP<T> XEv)
+__global__ void matvec_facefieldy(Param XParam, BlockP<T> XBlock,T* eta,T* g_y,T*alpha_y)
 {
    int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -344,12 +344,12 @@ __global__ void matvec_facefieldy(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlu
     int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);//memloc(ix,     iy, ib);
     int idm = memloc(halowidth, blkmemwidth, ix, iy-1, ib);//memloc(ix - 1, iy, ib);
 
-    T abaro = XParam.g * (XEv.zs[idm] - XEv.zs[id]) / XParam.Delta;
+    T abaro = XParam.g * (eta[idm] - eta[id]) / XParam.Delta;
 
-    XFlux.g_y[id] = XFlux.alpha_y[id] * a_baro;   // a_baro(eta,0)
+    g_y[id] = alpha_y[id] * a_baro;   // a_baro(eta,0)
 }
 
-__global__ void matvec_apply(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux,T* __restrict__ eta,T* __restrict__ Aeta, const T* __restrict__ g_x, const T* __restrict__ g_y)
+__global__ void matvec_apply(Param XParam, BlockP<T> XBlock,T* __restrict__ eta,T* __restrict__ Aeta, const T* __restrict__ g_x, const T* __restrict__ g_y)
 {
      int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
