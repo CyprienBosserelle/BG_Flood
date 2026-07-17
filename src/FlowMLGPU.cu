@@ -256,7 +256,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 template void FlowMLGPU<float>(Param XParam, Loop<float>& XLoop, Forcing<float> XForcing, Model<float> XModel);
 template void FlowMLGPU<double>(Param XParam, Loop<double>& XLoop, Forcing<float> XForcing, Model<double> XModel);
 
-
+/*
 //template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
 template <class T> void solveImplicit(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
 {
@@ -385,7 +385,7 @@ template <class T> void solveImplicit(Param XParam, Loop<T>& XLoop, Forcing<floa
     // theta_H*dt portion (mirrors why implicit.h scales by theta_H there:
     // the (1-theta_H)*dt advection was already done in half_advection).
 }
-
+*/
 
 template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel,T dt)
 {
@@ -627,10 +627,10 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
     // --- initial residual: r = rhs_eta - A(eta_r) ---
     //haloExchange(f.eta_r, g);
 
-	matvec_facefieldx<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.evolv.zs,XModel.fluxml.g_x,XModel.fluxml.alpha_x)
+	matvec_facefieldx<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.evolv.zs,XModel.fluxml.g_x,XModel.fluxml.alpha_x);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	matvec_facefieldy<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.evolv.zs,XModel.fluxml.g_x,XModel.fluxml.alpha_x)
+	matvec_facefieldy<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.evolv.zs,XModel.fluxml.g_y,XModel.fluxml.alpha_y);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.g_x);
@@ -686,7 +686,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 		matvec_facefieldx<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.fluxml.p,XModel.fluxml.g_x,XModel.fluxml.alpha_x)
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		matvec_facefieldy<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.fluxml.p,XModel.fluxml.g_x,XModel.fluxml.alpha_x)
+		matvec_facefieldy<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.fluxml.p,XModel.fluxml.g_y,XModel.fluxml.alpha_y)
 		CUDA_CHECK(cudaDeviceSynchronize());
 
         //matvec_facefield<<<blocks, threads>>>(f.p, f.g_x, f.alpha_eta_x, g);
