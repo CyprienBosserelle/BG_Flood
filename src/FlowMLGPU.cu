@@ -151,10 +151,10 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 	
 		//assemble_alpha_kernel<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.fluxml,dt);
-		acceleration_facex<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluxml, XModel.fluximp, XModel.evolv, T(XLoop.dt))
+		acceleration_facex<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluxml, XModel.fluximp, XModel.evolv, T(XLoop.dt));
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		acceleration_facey<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluxml, XModel.fluximp, XModel.evolv, T(XLoop.dt))
+		acceleration_facey<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluxml, XModel.fluximp, XModel.evolv, T(XLoop.dt));
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		acceleration_rhs<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp, T(XLoop.dt));
@@ -584,6 +584,8 @@ template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 
 }
+template void AdvecML<float>(Param XParam, Loop<float>& XLoop, Forcing<float> XForcing, Model<float> XModel,float dt)
+template void AdvecML<double>(Param XParam, Loop<double>& XLoop, Forcing<float> XForcing, Model<double> XModel,double dt)
 
 
 template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
