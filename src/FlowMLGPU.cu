@@ -661,7 +661,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
 	cudaMemcpy(XModel.fluximp.p, XModel.fluximp.z, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
-    double rz_old = reducedot(XParam, XModel.blocks,XModel.fluximp.r, XModel.fluximp.z, XModel.fluximp.store);
+    T rz_old = reducedot(XParam, XModel.blocks,XModel.fluximp.r, XModel.fluximp.z, XModel.fluximp.store);
 
     for (int iter = 0; iter < maxIter; ++iter)
     {
@@ -701,8 +701,8 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
 
         //double pAp   = reduceDot(f.p, f.Ap, n);
-		double pAp   = reducedot(XParam, XModel.blocks, XModel.fluximp.p, XModel.fluximp.Ap, XModel.fluximp.store);
-        double alpha = rz_old / pAp;
+		T pAp   = reducedot(XParam, XModel.blocks, XModel.fluximp.p, XModel.fluximp.Ap, XModel.fluximp.store);
+        T alpha = rz_old / pAp;
 
         //vec_axpy<<<blocks1d, threads1d>>>(f.eta_r, f.p,  alpha, n);
         //vec_axpy<<<blocks1d, threads1d>>>(f.r,     f.Ap, -alpha, n);
@@ -723,8 +723,8 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	    CUDA_CHECK(cudaDeviceSynchronize());
 
         //double rz_new = reducedot(f.r, f.z, n);
-		double rz_new = reducedot(XParam, XModel.blocks,XModel.fluximp.r, XModel.fluximp.z, XModel.fluximp.store);
-        double beta = rz_new / rz_old;
+		T rz_new = reducedot(XParam, XModel.blocks,XModel.fluximp.r, XModel.fluximp.z, XModel.fluximp.store);
+        T beta = rz_new / rz_old;
 
 		///xpby_kernel(Param XParam, BlockP<T> XBlock, double* p, const double* z, double beta)
 		xpby_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.p, XModel.fluximp.z,beta);
