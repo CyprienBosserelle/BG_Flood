@@ -584,8 +584,8 @@ template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 
 }
-template void AdvecML<float>(Param XParam, Loop<float>& XLoop, Forcing<float> XForcing, Model<float> XModel,float dt)
-template void AdvecML<double>(Param XParam, Loop<double>& XLoop, Forcing<float> XForcing, Model<double> XModel,double dt)
+template void AdvecML<float>(Param XParam, Loop<float>& XLoop, Forcing<float> XForcing, Model<float> XModel,float dt);
+template void AdvecML<double>(Param XParam, Loop<double>& XLoop, Forcing<float> XForcing, Model<double> XModel,double dt);
 
 
 template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
