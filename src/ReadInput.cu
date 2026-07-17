@@ -410,7 +410,7 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
-	paramvec = {"theta_imp","thetaH","theta_H";
+	paramvec = {"theta_imp","thetaH","theta_H"};
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
@@ -424,7 +424,7 @@ Param readparamstr(std::string line, Param param)
 		param.max_iter = std::stoi(parametervalue);
 	}
 
-	paramvec = {"mg_tol","imp_tol","implicit_tolerance","tol","tolerance";
+	paramvec = {"mg_tol","imp_tol","implicit_tolerance","tol","tolerance"};
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
