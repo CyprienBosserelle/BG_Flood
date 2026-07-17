@@ -193,7 +193,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 
-	AdvecML( XParam, XLoop,XModel,XForcing,T(XLoop.dt))
+	AdvecML( XParam, XLoop,XModel,XForcing,T(XLoop.dt));
 
 
 	bottomfrictionGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, T(XLoop.dt), XModel.cf, XModel.evolv);
