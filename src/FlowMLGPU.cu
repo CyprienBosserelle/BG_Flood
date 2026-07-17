@@ -611,84 +611,84 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
 	
 
-    HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.alpha_x);
+    HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.alpha_x);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	HaloFluxGPUBMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.alpha_y);
+	HaloFluxGPUBMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.alpha_y);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	HaloFluxGPULMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.alpha_x);
+	HaloFluxGPULMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.alpha_x);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	HaloFluxGPUTMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.alpha_y);
+	HaloFluxGPUTMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.alpha_y);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-    jacobi_diag<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluxml);
+    jacobi_diag<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
     // --- initial residual: r = rhs_eta - A(eta_r) ---
     //haloExchange(f.eta_r, g);
 
-	matvec_facefieldx<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.evolv.zs,XModel.fluxml.g_x,XModel.fluxml.alpha_x);
+	matvec_facefieldx<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.evolv.zs,XModel.fluximp.g_x,XModel.fluximp.alpha_x);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	matvec_facefieldy<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.evolv.zs,XModel.fluxml.g_y,XModel.fluxml.alpha_y);
+	matvec_facefieldy<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.evolv.zs,XModel.fluximp.g_y,XModel.fluximp.alpha_y);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.g_x);
+	HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.g_x);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	HaloFluxGPUTMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.g_y);
+	HaloFluxGPUTMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.g_y);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
     //matvec_facefield<<<blocks, threads>>>(f.eta_r, f.g_x, f.alpha_eta_x, g);
     // matvec_facefield_y<<<...>>>(f.eta_r, f.g_y, f.alpha_eta_y, g);  (y-mirror)
-    matvec_apply<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.evolv.zs, XModel.fluxml.Ap, XModel.fluxml.g_x, XModel.fluxml.g_y);
+    matvec_apply<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.evolv.zs, XModel.fluximp.Ap, XModel.fluximp.g_x, XModel.fluximp.g_y);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
-    cudaMemcpy(XModel.fluxml.r, XModel.fluxml.rhs_eta, n * sizeof(T), cudaMemcpyDeviceToDevice);
+    cudaMemcpy(XModel.fluximp.r, XModel.fluximp.rhs_eta, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
 
     //vec_axpy<<<blocks1d, threads1d>>>(f.r, f.Ap, -1.0, n);
-	axpy_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml.r,XModel.fluxml.Ap,T(-1.0));
+	axpy_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.r, XModel.fluximp.Ap,T(-1.0));
 	CUDA_CHECK(cudaDeviceSynchronize());
 
     //vec_jacobi_apply<<<blocks1d, threads1d>>>(f.r, f.z, f.diagInv, n);
-	jacobi_apply_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml.r,XModel.fluxml.z,XModel.fluxml.diagInv);
+	jacobi_apply_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.r,XModel.fluximp.z,XModel.fluximp.diagInv);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
-	cudaMemcpy(XModel.fluxml.p, XModel.fluxml.z, n * sizeof(T), cudaMemcpyDeviceToDevice);
+	cudaMemcpy(XModel.fluximp.p, XModel.fluximp.z, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
-    double rz_old = reducedot(XParam, XModel.blocks,XModel.fluxml.r, XModel.fluxml.z, XModel.fluxml.store);
+    double rz_old = reducedot(XParam, XModel.blocks,XModel.fluximp.r, XModel.fluximp.z, XModel.fluximp.store);
 
     for (int iter = 0; iter < maxIter; ++iter)
     {
 		// Update Halo for eta_r
-		 HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.eta_r);
+		 HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
 		//CUDA_CHECK(cudaDeviceSynchronize());
 
-		HaloFluxGPUBMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.eta_r);
+		HaloFluxGPUBMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		HaloFluxGPULMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.eta_r);
+		HaloFluxGPULMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
 		//CUDA_CHECK(cudaDeviceSynchronize());
 
-		HaloFluxGPUTMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.eta_r);
+		HaloFluxGPUTMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-        HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.p);
+        HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.p);
 		//CUDA_CHECK(cudaDeviceSynchronize());
 
-		HaloFluxGPUBMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.p);
+		HaloFluxGPUBMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.p);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 
-		matvec_facefieldx<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml.p,XModel.fluxml.g_x,XModel.fluxml.alpha_x);
+		matvec_facefieldx<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.p, XModel.fluximp.g_x, XModel.fluximp.alpha_x);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		matvec_facefieldy<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml.p,XModel.fluxml.g_y,XModel.fluxml.alpha_y);
+		matvec_facefieldy<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.p, XModel.fluximp.g_y, XModel.fluximp.alpha_y);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
         //matvec_facefield<<<blocks, threads>>>(f.p, f.g_x, f.alpha_eta_x, g);
@@ -696,38 +696,38 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
         //matvec_apply<<<blocks, threads>>>(f.p, f.Ap, f.g_x, f.g_y, g);
 
-		matvec_apply<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml.p, XModel.fluxml.Ap, XModel.fluxml.g_x, XModel.fluxml.g_y);
+		matvec_apply<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluximp.p, XModel.fluximp.Ap, XModel.fluximp.g_x, XModel.fluximp.g_y);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 
         //double pAp   = reduceDot(f.p, f.Ap, n);
-		double pAp   = reducedot(XParam, XModel.blocks,XModel.fluxml.p, XModel.fluxml.Ap,XModel.fluxml.store);
+		double pAp   = reducedot(XParam, XModel.blocks, XModel.fluximp.p, XModel.fluximp.Ap, XModel.fluximp.store);
         double alpha = rz_old / pAp;
 
         //vec_axpy<<<blocks1d, threads1d>>>(f.eta_r, f.p,  alpha, n);
         //vec_axpy<<<blocks1d, threads1d>>>(f.r,     f.Ap, -alpha, n);
 
-		axpy_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluxml.eta_r,XModel.fluxml.p,alpha);
+		axpy_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.eta_r,XModel.fluximp.p,alpha);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		axpy_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluxml.r,XModel.fluxml.Ap,-alpha);
+		axpy_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.r,XModel.fluximp.Ap,-alpha);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
         //if (reduceAbsMax(f.r, n) < tolerance) break;
 
-		T maxerror=reduceAbsMax(XParam, XModel.blocks,XModel.fluxml.r,XModel.fluxml.store);
+		T maxerror=reduceAbsMax(XParam, XModel.blocks, XModel.fluximp.r, XModel.fluximp.store);
 		if (maxerror < tol) break;
 
        	// vec_jacobi_apply<<<blocks1d, threads1d>>>(f.r, f.z, f.diagInv, n);
-	    jacobi_apply_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml.r,XModel.fluxml.z,XModel.fluxml.diagInv);
+	    jacobi_apply_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.r,XModel.fluximp.z, XModel.fluximp.diagInv);
 	    CUDA_CHECK(cudaDeviceSynchronize());
 
         //double rz_new = reducedot(f.r, f.z, n);
-		double rz_new = reducedot(XParam, XModel.blocks,XModel.fluxml.r, XModel.fluxml.z,XModel.fluxml.store);
+		double rz_new = reducedot(XParam, XModel.blocks,XModel.fluximp.r, XModel.fluximp.z, XModel.fluximp.store);
         double beta = rz_new / rz_old;
 
 		///xpby_kernel(Param XParam, BlockP<T> XBlock, double* p, const double* z, double beta)
-		xpby_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml.p, XModel.fluxml.z,beta);
+		xpby_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.p, XModel.fluximp.z,beta);
         //vec_xpby<<<blocks1d, threads1d>>>(f.p, f.z, beta, n);
         rz_old = rz_new;
     }
