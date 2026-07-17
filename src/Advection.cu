@@ -621,7 +621,7 @@ template <class T> __host__ T CalctimestepGPU(Param XParam,Loop<T> XLoop, BlockP
 template __host__ float CalctimestepGPU<float>(Param XParam,Loop<float> XLoop, BlockP<float> XBlock, TimeP<float> XTime);
 template __host__ double CalctimestepGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, TimeP<double> XTime);
 
-template <class T> __host__ reducedot(Param XParam, BlockP<T> XBlock, T* a, T* b, T* store)
+template <class T> __host__ T reducedot(Param XParam, BlockP<T> XBlock, T* a, T* b, T* store)
 {
 	T* dummy;
 	AllocateCPU(32, 1, dummy);
@@ -691,7 +691,7 @@ template <class T> __host__ reducedot(Param XParam, BlockP<T> XBlock, T* a, T* b
 template __host__ float reducedot<float>(Param XParam, BlockP<float> XBlock, float* a, float* b, float* store);
 template __host__ double reducedot<double>(Param XParam, BlockP<double> XBlock, double* a, double* b, double* store);
 
-template <class T> __host__ reduceabsmax(Param XParam, BlockP<T> XBlock, T* a,T* store)
+template <class T> __host__ T reduceabsmax(Param XParam, BlockP<T> XBlock, T* a,T* store)
 {
 	T* dummy;
 	AllocateCPU(32, 1, dummy);
