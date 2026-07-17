@@ -14,6 +14,11 @@
 
 template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel);
 
+template <class T> void solveImplicit(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel);
+template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel,T dt);
+template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt);
+
+
 
 // End of global definition
 #endif
