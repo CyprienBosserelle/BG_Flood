@@ -803,12 +803,9 @@ template <class T> __global__ void reducemin3(T* g_idata, T* g_odata, unsigned i
 // Pass 1: fused a[i]*b[i], one thread per element, sequential-addressing
 // reduction down to one partial sum per block.
 // ---------------------------------------------------------------------
-__global__ void dotReduce3(const double* __restrict__ a,
-                            const double* __restrict__ b,
-                            double* __restrict__ g_odata,
-                            unsigned int n)
+template <class T> __global__ void dotReduce3(const T* __restrict__ a, const T* __restrict__ b, T* __restrict__ g_odata, unsigned int n)
 {
-    extern __shared__ double sdata[];
+    extern __shared__ T sdata[];
 
     unsigned int tid = threadIdx.x;
     unsigned int i   = blockIdx.x * blockDim.x + threadIdx.x;
@@ -837,11 +834,9 @@ __global__ void dotReduce3(const double* __restrict__ a,
 // (the partial sums produced by the previous pass). Same technique,
 // just without the a[]*b[] multiply.
 // ---------------------------------------------------------------------
-__global__ void sumReduce3(const double* __restrict__ g_idata,
-                            double* __restrict__ g_odata,
-                            unsigned int n)
+template <class T> __global__ void sumReduce3(const T* __restrict__ g_idata, T* __restrict__ g_odata, unsigned int n)
 {
-    extern __shared__ double sdata[];
+    extern __shared__ T sdata[];
 
     unsigned int tid = threadIdx.x;
     unsigned int i   = blockIdx.x * blockDim.x + threadIdx.x;
@@ -859,11 +854,9 @@ __global__ void sumReduce3(const double* __restrict__ g_idata,
     if (tid == 0) g_odata[blockIdx.x] = sdata[0];
 }
 
-__global__ void absmaxReduce3(const double* __restrict__ a,
-                               double* __restrict__ g_odata,
-                               unsigned int n)
+template <class T> __global__ void absmaxReduce3(const T* __restrict__ a, T* __restrict__ g_odata, unsigned int n)
 {
-    extern __shared__ double sdata[];
+    extern __shared__ T sdata[];
 
     unsigned int tid = threadIdx.x;
     unsigned int i   = blockIdx.x * blockDim.x + threadIdx.x;
@@ -883,11 +876,9 @@ __global__ void absmaxReduce3(const double* __restrict__ a,
     if (tid == 0) g_odata[blockIdx.x] = sdata[0];
 }
 
-__global__ void maxReduce3(const double* __restrict__ g_idata,
-                            double* __restrict__ g_odata,
-                            unsigned int n)
+template <class T> __global__ void maxReduce3(const T* __restrict__ g_idata, T* __restrict__ g_odata, unsigned int n)
 {
-    extern __shared__ double sdata[];
+    extern __shared__ T sdata[];
 
     unsigned int tid = threadIdx.x;
     unsigned int i   = blockIdx.x * blockDim.x + threadIdx.x;
