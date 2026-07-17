@@ -27,8 +27,8 @@ template <class T> __global__ void reducemin3(T* g_idata, T* g_odata, unsigned i
 template <class T> __global__ void densify(Param XParam, BlockP<T> XBlock, T* g_idata, T* g_odata);
 
 
-template <class T> __host__ reduceabsmax(Param XParam, BlockP<T> XBlock, T* a,T* store);
-template <class T> __host__ reducedot(Param XParam, BlockP<T> XBlock, T* a, T* b, T* store);
+template <class T> __host__ T reduceabsmax(Param XParam, BlockP<T> XBlock, T* a,T* store);
+template <class T> __host__ T reducedot(Param XParam, BlockP<T> XBlock, T* a, T* b, T* store);
 
 __global__ void dotReduce3(const double* __restrict__ a,const double* __restrict__ b, double* __restrict__ g_odata, unsigned int n);
 
