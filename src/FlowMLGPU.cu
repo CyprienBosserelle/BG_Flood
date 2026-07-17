@@ -590,8 +590,8 @@ template void AdvecML<double>(Param XParam, Loop<double>& XLoop, Forcing<float> 
 
 template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 {
-    double tol = 1e-5;
-	int maxIter = 100
+    double tol = XParam.mg_tol;//1e-5;
+	int maxIter = XParam.max_iter;//100
 
 	int n = XParam.blksize * XParam.nblk;
    	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
