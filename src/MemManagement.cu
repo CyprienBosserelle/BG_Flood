@@ -218,14 +218,22 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	AllocateCPU(nblk, blksize, XModel.grad.dzbdx);
 	AllocateCPU(nblk, blksize, XModel.grad.dzbdy);
-	if (XParam.engine == 5 || XParam.engine == 6)
+	if (XParam.engine == 5 )
 	{
 		AllocateCPU(nblk, blksize, XModel.fluxml.Fux, XModel.fluxml.Fvy, XModel.fluxml.Fuy, XModel.fluxml.Fvx);
 		AllocateCPU(nblk, blksize, XModel.fluxml.hfu, XModel.fluxml.hfv, XModel.fluxml.hu, XModel.fluxml.hv);
 		AllocateCPU(nblk, blksize, XModel.fluxml.hau);
 		AllocateCPU(nblk, blksize, XModel.fluxml.hav);
 
-		
+		if (XParam.implicit)
+		{
+			AllocateCPU(nblk, blksize, XModel.fluximp.rhs_eta, XModel.fluximp.eta_r, XModel.fluximp.r, XModel.fluximp.z);
+			AllocateCPU(nblk, blksize, XModel.fluximp.p, XModel.fluximp.Ap, XModel.fluximp.diagInv, XModel.fluximp.store);
+			AllocateCPU(nblk, blksize, XModel.fluximp.p, XModel.fluximp.Ap, XModel.fluximp.diagInv, XModel.fluximp.store);
+			AllocateCPU(nblk, blksize, XModel.fluximp.su, XModel.fluximp.sv, XModel.fluximp.alpha_x, XModel.fluximp.alpha_y);
+			AllocateCPU(nblk, blksize, XModel.fluximp.g_x);
+			AllocateCPU(nblk, blksize, XModel.fluximp.g_y);
+		}
 		
 	}
 	else
@@ -511,12 +519,22 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 	ReallocArray(nblk, blksize, XModel.grad.dzbdx);
 	ReallocArray(nblk, blksize, XModel.grad.dzbdy);
-	if (XParam.engine == 5 || XParam.engine == 6)
+	if (XParam.engine == 5 )
 	{
 		ReallocArray(nblk, blksize, XModel.fluxml.Fux, XModel.fluxml.Fvy, XModel.fluxml.Fuy, XModel.fluxml.Fvx);
 		ReallocArray(nblk, blksize, XModel.fluxml.hfu, XModel.fluxml.hfv, XModel.fluxml.hu, XModel.fluxml.hv);
 		ReallocArray(nblk, blksize, XModel.fluxml.hau);
 		ReallocArray(nblk, blksize, XModel.fluxml.hav);
+
+		if (XParam.implicit)
+		{
+			ReallocArray(nblk, blksize, XModel.fluximp.rhs_eta, XModel.fluximp.eta_r, XModel.fluximp.r, XModel.fluximp.z);
+			ReallocArray(nblk, blksize, XModel.fluximp.p, XModel.fluximp.Ap, XModel.fluximp.diagInv, XModel.fluximp.store);
+			ReallocArray(nblk, blksize, XModel.fluximp.p, XModel.fluximp.Ap, XModel.fluximp.diagInv, XModel.fluximp.store);
+			ReallocArray(nblk, blksize, XModel.fluximp.su, XModel.fluximp.sv, XModel.fluximp.alpha_x, XModel.fluximp.alpha_y);
+			ReallocArray(nblk, blksize, XModel.fluximp.g_x);
+			ReallocArray(nblk, blksize, XModel.fluximp.g_y);
+		}
 		
 	else
 	{

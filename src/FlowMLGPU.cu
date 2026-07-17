@@ -143,25 +143,29 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	if (XParam.implicit)//&& (theta_H < 1.)
 	{
 		//
+		int n = XParam.blksize * XParam.nblk;
 		T dt_thetaH = T((1 - XParam.theta_H) * XLoop.dt);
 		AdvecML( XParam, XLoop, XForcing, XModel, dt_thetaH);
 
+		cudaMemcpy(XModel.fluximp.eta_r, XModel.evolv.zs, n * sizeof(T), cudaMemcpyDeviceToDevice);
+
+	
 		//assemble_alpha_kernel<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.fluxml,dt);
-		acceleration_facex<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml,XModel.evolv, T(XLoop.dt))
+		acceleration_facex<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluxml, XModel.fluximp, XModel.evolv, T(XLoop.dt))
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		acceleration_facey<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml,XModel.evolv, T(XLoop.dt))
+		acceleration_facey<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluxml, XModel.fluximp, XModel.evolv, T(XLoop.dt))
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		acceleration_rhs<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml,XModel.evolv, T(XLoop.dt));
+		acceleration_rhs<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp, T(XLoop.dt));
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		solveEtaPCG(XParam, XModel, T(XLoop.dt));
 
-		pressure_flux_reconstruction_facex<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml,XModel.evolv, T(XLoop.dt));
+		pressure_flux_reconstruction_facex<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluxml, XModel.fluximp, XModel.evolv, T(XLoop.dt));
 		CUDA_CHECK(cudaDeviceSynchronize());
 		
-		pressure_flux_reconstruction_facey<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml,XModel.evolv, T(XLoop.dt));
+		pressure_flux_reconstruction_facey<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluxml, XModel.fluximp, XModel.evolv, T(XLoop.dt));
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		
@@ -176,6 +180,8 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 		HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hav);
 		CUDA_CHECK(cudaDeviceSynchronize());
+
+		cudaMemcpy(XModel.evolv.zs, XModel.fluximp.eta_r, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
 	}
 
@@ -255,8 +261,8 @@ template void FlowMLGPU<double>(Param XParam, Loop<double>& XLoop, Forcing<float
 template <class T> void solveImplicit(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
 {
 	//ImplicitCtx& ctx, double tol = 1e-5, int maxIter = 100
-	double tol = 1e-5;
-	int maxIter = 100
+	double tol = XParam.mg_tol;//1e-5;
+	int maxIter = XParam.max_iter;
    	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 	// for flux reconstruction the loop overlap the right(or top for the y direction) halo
@@ -600,9 +606,6 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	dim3 blockDimHaloBT(XParam.blkwidth, 1, 1);
 	dim3 gridDimHaloBT(XParam.nblk , 1, 1);
 
-
-	// Could use zs instead of eta_r but that makes me feel more safe.
-	cudaMemcpy(XModel.fluxml.eta_r, XModel.evolv.zs, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
 	
 

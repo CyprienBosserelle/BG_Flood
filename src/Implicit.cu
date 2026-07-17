@@ -220,7 +220,7 @@ template <class T> inline T half_advection_dt(Param XParam,T dt)
 
 // foreach_face() body, x-direction. Call once with (ix,iy) swapped / hu_y etc.
 // for the y-direction pass (mirrors Basilisk's foreach_dimension()).
-template <class T> __global__ void acceleration_facex(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux,EvolvingP<T> XEv,T dt)
+template <class T> __global__ void acceleration_facex(Param XParam, BlockP<T> XBlock, FluxMLP<T> XFlux, FluxIMP<T> XImp, EvolvingP<T> XEv,T dt)
 {
     int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -239,7 +239,7 @@ template <class T> __global__ void acceleration_facex(Param XParam, BlockP<T> XB
 
     T C = -(theta_H * dt) * (theta_H * dt);
 
-    T ax = theta_H * a_baro( XFlux.eta_r[idm],  XFlux.eta_r[id], g);   // a_baro(eta_r,0)
+    T ax = theta_H * a_baro( XImp.eta_r[idm],  XImp.eta_r[id], g);   // a_baro(eta_r,0)
 
     T hl = XEv.h[idm] > eps ? XEv.h[idm] : 0.0;
     T hr = XEv.h[id]  > eps ? XEv.h[id]  : 0.0;
@@ -252,11 +252,11 @@ template <class T> __global__ void acceleration_facex(Param XParam, BlockP<T> XB
     XFlux.hau[id] -= XFlux.hfu[id] * ax;
     XFlux.hu[id]  = hu_new;
 
-    XFlux.su[id]        = XFlux.hu[id];          // single layer: su.x[] += hu.x[] with su.x[] init 0
-    XFlux.alpha_x[id] = C * XFlux.hfu[id];       // single layer: alpha_eta.x[] += hf.x[]; then *= C
+    XImp.su[id]        = XFlux.hu[id];          // single layer: su.x[] += hu.x[] with su.x[] init 0
+    XImp.alpha_x[id] = C * XFlux.hfu[id];       // single layer: alpha_eta.x[] += hf.x[]; then *= C
 }
 
-template <class T> __global__ void acceleration_facey(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux,EvolvingP<T> XEv,T dt)
+template <class T> __global__ void acceleration_facey(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, FluxIMP<T> XImp, EvolvingP<T> XEv,T dt)
 {
     int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -275,7 +275,7 @@ template <class T> __global__ void acceleration_facey(Param XParam, BlockP<T> XB
 
     T C = -(theta_H * dt) * (theta_H * dt);
 
-    T ax = theta_H * a_baro( XFlux.eta_r[idm],  XFlux.eta_r[id], g);   // a_baro(eta_r,0)
+    T ax = theta_H * a_baro( XImp.eta_r[idm],  XImp.eta_r[id], g);   // a_baro(eta_r,0)
 
     T hl = XEv.h[idm] > eps ? XEv.h[idm] : T(0.0);
     T hr = XEv.h[id]  > eps ? XEv.h[id]  : T(0.0);
@@ -288,11 +288,11 @@ template <class T> __global__ void acceleration_facey(Param XParam, BlockP<T> XB
     XFlux.hav[id] -= XFlux.hfv[id] * ax;
     XFlux.hv[id]  = hu_new;
 
-    XFlux.sv[id]        = XFlux.hv[id];          // single layer: su.x[] += hu.x[] with su.x[] init 0
-    XFlux.alpha_y[id] = C * XFlux.hfv[id];       // single layer: alpha_eta.x[] += hf.x[]; then *= C
+    XImp.sv[id]        = XFlux.hv[id];          // single layer: su.x[] += hu.x[] with su.x[] init 0
+    XImp.alpha_y[id] = C * XFlux.hfv[id];       // single layer: alpha_eta.x[] += hf.x[]; then *= C
 }
 
-template <class T> __global__ void acceleration_rhs(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, EvolvingP<T> XEv, T dt)
+template <class T> __global__ void acceleration_rhs(Param XParam, BlockP<T> XBlock, FluxIMP<T> XImp, T dt)
 {
     int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -307,10 +307,10 @@ template <class T> __global__ void acceleration_rhs(Param XParam, BlockP<T> XBlo
     int idxp = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);//memloc(ix + 1, iy,     ib);   // su.x[1]
     int idyp = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);//memloc(ix,     iy + 1, ib);   // su.y[1]
 
-    T rhs = XParam.rigid ? T(0.0) : XFlux.eta_r[id];
-    rhs -= dt * (XFlux.su[idxp] - f.su[id]) / XParam.Delta;
-    rhs -= dt * (XFlux.sv[idyp] - f.sv[id]) / XParam.Delta;
-    XFlux.rhs_eta[id] = rhs;
+    T rhs = XParam.rigid ? T(0.0) : XImp.eta_r[id];
+    rhs -= dt * (XImp.su[idxp] - XImp.su[id]) / XParam.Delta;
+    rhs -= dt * (XImp.sv[idyp] - XImp.sv[id]) / XParam.Delta;
+    XImp.rhs_eta[id] = rhs;
 }
 
 template <class T> __global__ void matvec_facefieldx(Param XParam, BlockP<T> XBlock,T* eta,T* g_x,T*alpha_x)
@@ -377,7 +377,7 @@ template <class T> __global__ void matvec_apply(Param XParam, BlockP<T> XBlock,T
 //   d(A)/d(eta[]) = 1 - (G/Delta^2)*(alpha_eta.x[0]+alpha_eta.x[1]
 //                                    +alpha_eta.y[0]+alpha_eta.y[1])
 // ----------------------------------------------------------------------
-template <class T> __global__ void jacobi_diag(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux)
+template <class T> __global__ void jacobi_diag(Param XParam, BlockP<T> XBlock, FluxIMP<T> XImp)
 {
     int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -392,16 +392,16 @@ template <class T> __global__ void jacobi_diag(Param XParam, BlockP<T> XBlock,Fl
     int idyp = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);//memloc(ix,     iy + 1, ib);
 
 
-    T sumAlpha = XFlux.alpha_x[id] + XFlux.alpha_x[idxp]
-                     + XFlux.alpha_y[id] + XFlux.alpha_y[idyp];
+    T sumAlpha = XImp.alpha_x[id] + XImp.alpha_x[idxp]
+                     + XImp.alpha_y[id] + XImp.alpha_y[idyp];
     // alpha_eta <= 0, so this correctly increases the diagonal:
     T diag = (XParam.rigid ? 0.0 : 1.0) - (XParam.g / (XParam.Delta * XParam.Delta)) * sumAlpha;
-    XFlux.diagInv[id] = 1.0 / diag;
+    XImp.diagInv[id] = 1.0 / diag;
 }
 
 
 // foreach_face() flux-reconstruction block after the solve.
-template <class T> __global__ void pressure_flux_reconstruction_facex(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, EvolvingP<T> XEv,T dt)
+template <class T> __global__ void pressure_flux_reconstruction_facex(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, FluxIMP<T> XImp, EvolvingP<T> XEv,T dt)
 {
      int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -416,7 +416,7 @@ template <class T> __global__ void pressure_flux_reconstruction_facex(Param XPar
 
     T dry = XParam.eps;
 
-    T abaro = XParam.g * (eta[idm] - eta[id]) / XParam.Delta;
+    T abaro = XParam.g * (XImp.eta_r[idm] - XImp.eta_r[id]) / XParam.Delta;
 
     T ax = XParam.theta_H * abaro;   // a_baro(eta_r,0)
     XFlux.hau[id] += XFlux.hfu[id] * ax;
@@ -432,7 +432,7 @@ template <class T> __global__ void pressure_flux_reconstruction_facex(Param XPar
     XFlux.hu[id] = XParam.theta_H * (XFlux.hfu[id] * uf + dt * XFlux.hau[id]) - dt * XFlux.hau[id];
 }
 
-template <class T> __global__ void pressure_flux_reconstruction_facey(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, EvolvingP<T> XEv,T dt)
+template <class T> __global__ void pressure_flux_reconstruction_facey(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, FluxIMP<T> XImp, EvolvingP<T> XEv,T dt)
 {
      int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -447,7 +447,7 @@ template <class T> __global__ void pressure_flux_reconstruction_facey(Param XPar
 
     T dry = XParam.eps;
 
-    T abaro = XParam.g * (eta[idm] - eta[id]) / XParam.Delta;
+    T abaro = XParam.g * (XImp.eta_r[idm] - XImp.eta_r[id]) / XParam.Delta;
 
     T ax = XParam.theta_H * abaro;   // a_baro(eta_r,0)
     XFlux.hav[id] += XFlux.hfv[id] * ax;
