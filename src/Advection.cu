@@ -805,7 +805,7 @@ template <class T> __global__ void reducemin3(T* g_idata, T* g_odata, unsigned i
 // ---------------------------------------------------------------------
 template <class T> __global__ void dotReduce3(const T* __restrict__ a, const T* __restrict__ b, T* __restrict__ g_odata, unsigned int n)
 {
-    extern __shared__ T sdata[];
+    T* sdata = SharedMemory<T>();
 
     unsigned int tid = threadIdx.x;
     unsigned int i   = blockIdx.x * blockDim.x + threadIdx.x;
@@ -836,7 +836,7 @@ template <class T> __global__ void dotReduce3(const T* __restrict__ a, const T* 
 // ---------------------------------------------------------------------
 template <class T> __global__ void sumReduce3(const T* __restrict__ g_idata, T* __restrict__ g_odata, unsigned int n)
 {
-    extern __shared__ T sdata[];
+    T* sdata = SharedMemory<T>();
 
     unsigned int tid = threadIdx.x;
     unsigned int i   = blockIdx.x * blockDim.x + threadIdx.x;
@@ -856,7 +856,7 @@ template <class T> __global__ void sumReduce3(const T* __restrict__ g_idata, T* 
 
 template <class T> __global__ void absmaxReduce3(const T* __restrict__ a, T* __restrict__ g_odata, unsigned int n)
 {
-    extern __shared__ T sdata[];
+    T* sdata = SharedMemory<T>();
 
     unsigned int tid = threadIdx.x;
     unsigned int i   = blockIdx.x * blockDim.x + threadIdx.x;
@@ -878,7 +878,7 @@ template <class T> __global__ void absmaxReduce3(const T* __restrict__ a, T* __r
 
 template <class T> __global__ void maxReduce3(const T* __restrict__ g_idata, T* __restrict__ g_odata, unsigned int n)
 {
-    extern __shared__ T sdata[];
+    T* sdata = SharedMemory<T>();
 
     unsigned int tid = threadIdx.x;
     unsigned int i   = blockIdx.x * blockDim.x + threadIdx.x;
