@@ -198,20 +198,26 @@ Param readparamstr(std::string line, Param param)
 		
 		std::size_t found;
 		bool foo = false;
-		for (int ii = 0; ii < buttingerstr.size(); ii++)
+		if(!foo)
 		{
-			found = case_insensitive_compare(parametervalue, buttingerstr[ii]);// it needs to strictly compare
-			if (found == 0)
+			for (int ii = 0; ii < buttingerstr.size(); ii++)
 			{
-				param.engine = 1;
-				foo = true;
-			}
+				found = case_insensitive_compare(parametervalue, buttingerstr[ii]);// it needs to strictly compare
+				if (found == 0)
+				{
+					param.engine = 1;
+					foo = true;
+					break;
+				}
 
+			}
 		}
-		else
+		if(!foo)
 		{
 			param.engine = std::stoi(parametervalue);
+			foo = true;
 		}
+
 	}
 	///////////////////////////////////////////////////////
 	// Adaptation
