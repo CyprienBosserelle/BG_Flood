@@ -1,50 +1,50 @@
 #include "Implicit.h"
 
 // Define SharedMemory helper to avoid alignment issues (mirroring Advection.cu)
-template<class T>
-struct SharedMemory
-{
-    __device__ inline operator T* ()
-    {
-        extern __shared__ int __smem[];
-        return (T*)__smem;
-    }
+// template<class T>
+// struct SharedMemory
+// {
+//     __device__ inline operator T* ()
+//     {
+//         extern __shared__ int __smem[];
+//         return (T*)__smem;
+//     }
 
-    __device__ inline operator const T* () const
-    {
-        extern __shared__ int __smem[];
-        return (T*)__smem;
-    }
-};
+//     __device__ inline operator const T* () const
+//     {
+//         extern __shared__ int __smem[];
+//         return (T*)__smem;
+//     }
+// };
 
-template<>
-struct SharedMemory<double>
-{
-    __device__ inline operator double* ()
-    {
-        extern __shared__ double __smem_d[];
-        return (double*)__smem_d;
-    }
+// template<>
+// struct SharedMemory<double>
+// {
+//     __device__ inline operator double* ()
+//     {
+//         extern __shared__ double __smem_d[];
+//         return (double*)__smem_d;
+//     }
 
-    __device__ inline operator const double* () const
-    {
-        extern __shared__ double __smem_d[];
-        return (double*)__smem_d;
-    }
-};
+//     __device__ inline operator const double* () const
+//     {
+//         extern __shared__ double __smem_d[];
+//         return (double*)__smem_d;
+//     }
+// };
 
-//#if __CUDA_ARCH__ < 600
-template <class T> __device__ double atomicAddC(T* address, T val)
-{
-    unsigned long long int* address_as_ull = (unsigned long long int*)address;
-    unsigned long long int old = *address_as_ull, assumed;
-    do {
-        assumed = old;
-        old = atomicCAS(address_as_ull, assumed,
-                        __double_as_longlong(val + __longlong_as_double(assumed)));
-    } while (assumed != old);
-    return __longlong_as_double(old);
-}
+// //#if __CUDA_ARCH__ < 600
+// template <class T> __device__ double atomicAddC(T* address, T val)
+// {
+//     unsigned long long int* address_as_ull = (unsigned long long int*)address;
+//     unsigned long long int old = *address_as_ull, assumed;
+//     do {
+//         assumed = old;
+//         old = atomicCAS(address_as_ull, assumed,
+//                         __double_as_longlong(val + __longlong_as_double(assumed)));
+//     } while (assumed != old);
+//     return __longlong_as_double(old);
+// }
 //#endif
 
 
