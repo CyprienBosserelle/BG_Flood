@@ -535,7 +535,7 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 			ReallocArray(nblk, blksize, XModel.fluximp.g_x);
 			ReallocArray(nblk, blksize, XModel.fluximp.g_y);
 		}
-		
+	}	
 	else
 	{
 		ReallocArray(nblk, blksize, XModel.flux.Fhu, XModel.flux.Fhv, XModel.flux.Fqux, XModel.flux.Fquy);
