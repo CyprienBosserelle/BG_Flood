@@ -644,7 +644,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
     //matvec_facefield<<<blocks, threads>>>(f.eta_r, f.g_x, f.alpha_eta_x, g);
     // matvec_facefield_y<<<...>>>(f.eta_r, f.g_y, f.alpha_eta_y, g);  (y-mirror)
     matvec_apply<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.evolv.zs, XModel.fluxml.Ap, XModel.fluxml.g_x, XModel.fluxml.g_y);
-	CUDA_CHECK(cudaDeviceSynchronize())
+	CUDA_CHECK(cudaDeviceSynchronize());
 
 
     cudaMemcpy(XModel.fluxml.r, XModel.fluxml.rhs_eta, n * sizeof(T), cudaMemcpyDeviceToDevice);
@@ -652,11 +652,11 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
     //vec_axpy<<<blocks1d, threads1d>>>(f.r, f.Ap, -1.0, n);
 	axpy_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml.r,XModel.fluxml.Ap,T(-1.0));
-	CUDA_CHECK(cudaDeviceSynchronize())
+	CUDA_CHECK(cudaDeviceSynchronize());
 
     //vec_jacobi_apply<<<blocks1d, threads1d>>>(f.r, f.z, f.diagInv, n);
 	jacobi_apply_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml.r,XModel.fluxml.z,XModel.fluxml.diagInv);
-	CUDA_CHECK(cudaDeviceSynchronize())
+	CUDA_CHECK(cudaDeviceSynchronize());
 
 
 	cudaMemcpy(XModel.fluxml.p, XModel.fluxml.z, n * sizeof(T), cudaMemcpyDeviceToDevice);
@@ -697,7 +697,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
         //matvec_apply<<<blocks, threads>>>(f.p, f.Ap, f.g_x, f.g_y, g);
 
 		matvec_apply<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml.p, XModel.fluxml.Ap, XModel.fluxml.g_x, XModel.fluxml.g_y);
-		CUDA_CHECK(cudaDeviceSynchronize())
+		CUDA_CHECK(cudaDeviceSynchronize());
 
 
         //double pAp   = reduceDot(f.p, f.Ap, n);
@@ -708,10 +708,10 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
         //vec_axpy<<<blocks1d, threads1d>>>(f.r,     f.Ap, -alpha, n);
 
 		axpy_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluxml.eta_r,XModel.fluxml.p,alpha);
-		CUDA_CHECK(cudaDeviceSynchronize())
+		CUDA_CHECK(cudaDeviceSynchronize());
 
 		axpy_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluxml.r,XModel.fluxml.Ap,-alpha);
-		CUDA_CHECK(cudaDeviceSynchronize())
+		CUDA_CHECK(cudaDeviceSynchronize());
 
         //if (reduceAbsMax(f.r, n) < tolerance) break;
 
@@ -720,7 +720,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
        	// vec_jacobi_apply<<<blocks1d, threads1d>>>(f.r, f.z, f.diagInv, n);
 	    jacobi_apply_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluxml.r,XModel.fluxml.z,XModel.fluxml.diagInv);
-	    CUDA_CHECK(cudaDeviceSynchronize())
+	    CUDA_CHECK(cudaDeviceSynchronize());
 
         //double rz_new = reducedot(f.r, f.z, n);
 		double rz_new = reducedot(XParam, XModel.blocks,XModel.fluxml.r, XModel.fluxml.z,XModel.fluxml.store);
