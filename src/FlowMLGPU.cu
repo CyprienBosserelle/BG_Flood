@@ -715,7 +715,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
         //if (reduceAbsMax(f.r, n) < tolerance) break;
 
-		T maxerror=reduceAbsMax(XParam, XModel.blocks, XModel.fluximp.r, XModel.fluximp.store);
+		T maxerror=reduceabsmax(XParam, XModel.blocks, XModel.fluximp.r, XModel.fluximp.store);
 		if (maxerror < tol) break;
 
        	// vec_jacobi_apply<<<blocks1d, threads1d>>>(f.r, f.z, f.diagInv, n);
