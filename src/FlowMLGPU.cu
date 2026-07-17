@@ -685,10 +685,10 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 
-		matvec_facefieldx<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.fluxml.p,XModel.fluxml.g_x,XModel.fluxml.alpha_x)
+		matvec_facefieldx<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.fluxml.p,XModel.fluxml.g_x,XModel.fluxml.alpha_x);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		matvec_facefieldy<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.fluxml.p,XModel.fluxml.g_y,XModel.fluxml.alpha_y)
+		matvec_facefieldy<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.fluxml.p,XModel.fluxml.g_y,XModel.fluxml.alpha_y);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
         //matvec_facefield<<<blocks, threads>>>(f.p, f.g_x, f.alpha_eta_x, g);
