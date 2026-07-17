@@ -195,7 +195,7 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		std::vector<std::string> buttingerstr = { "b","butt","buttinger","1" };
-		std::vector<std::string> implicitstr = { "i","imp","implicit","6" };
+		
 		std::size_t found;
 		bool foo = false;
 		for (int ii = 0; ii < buttingerstr.size(); ii++)
@@ -208,17 +208,7 @@ Param readparamstr(std::string line, Param param)
 			}
 
 		}
-		for (int ii = 0; ii < implicitstr.size(); ii++)
-		{
-			found = case_insensitive_compare(parametervalue, implicitstr[ii]);// it needs to strictly compare
-			if (found == 0)
-			{
-				param.engine = 6;
-				foo = true;
-			}
-
-		}
-		if (!foo)
+		else
 		{
 			param.engine = std::stoi(parametervalue);
 		}
@@ -420,25 +410,34 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
-	parameterstr = "theta_imp";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = {"theta_imp","thetaH","theta_H";
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		param.theta_imp = std::stod(parametervalue);
+		param.theta_H = std::stod(parametervalue);
 	}
 
-	parameterstr = "mg_max_iter";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = {"mg_max_iter","maxiter","maximumiteration","max_iter"};
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		param.mg_max_iter = std::stoi(parametervalue);
+		param.max_iter = std::stoi(parametervalue);
 	}
 
-	parameterstr = "mg_tol";
-	parametervalue = findparameter(parameterstr, line);
+	paramvec = {"mg_tol","imp_tol","implicit_tolerance","tol","tolerance";
+	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
 		param.mg_tol = std::stod(parametervalue);
+	}
+
+	paramvec = { "imp","implicit" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		//
+		param.implicit = readparambool(parametervalue, param.implicit);
+
 	}
 
 	paramvec = { "outputtimestep","outtimestep","outputstep" };
@@ -1506,7 +1505,10 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	// Engine checks
 	if (XParam.engine == 5)
 	{
-		XParam.CFL = utils::max(XParam.CFL, 0.5);
+		if (!XParam.implicit)
+		{
+			XParam.CFL = utils::max(XParam.CFL, 0.5);
+		}
 		XParam.wetdryfix = false;
 		//XParam.eps = 0.0000000001;
 	}
