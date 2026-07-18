@@ -203,6 +203,8 @@ template <class T> __global__ void axpy_kernel(Param XParam, BlockP<T> XBlock, T
     int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);
     y[id] += a * x[id];
 }
+template __global__ void axpy_kernel<float>(Param XParam, BlockP<float> XBlock, float* y, const float* x, float a);
+template __global__ void axpy_kernel<double>(Param XParam, BlockP<double> XBlock, double* y, const double* x, double a);
 
 template <class T> __global__ void xpby_kernel(Param XParam, BlockP<T> XBlock, T* p, const T* z, T beta)
 {
@@ -217,6 +219,8 @@ template <class T> __global__ void xpby_kernel(Param XParam, BlockP<T> XBlock, T
     int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);
     p[id] = z[id] + beta * p[id];
 }
+template __global__ void xpby_kernel<float>(Param XParam, BlockP<float> XBlock, float* p, const float* z, float beta);
+template __global__ void xpby_kernel<double>(Param XParam, BlockP<double> XBlock, double* p, const double* z, double beta);
 
 template <class T> inline T half_advection_dt(Param XParam,T dt)
 {
