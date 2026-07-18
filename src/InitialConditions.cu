@@ -1066,6 +1066,24 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.Outvarlongname["twet"] = "time since the cell has been wet";
 	XModel.Outvarunits["twet"] = "s";
 	//XModel.OutputVarMap["vort"] = XModel.vort;
+
+	XModel.OutputVarMap["r_imp"] = XModel.fluximp.r;
+	XModel.Outvarlongname["r_imp"] = "r implicit";
+	XModel.Outvarunits["r_imp"] = " ";
+
+	XModel.OutputVarMap["z_imp"] = XModel.fluximp.z;
+	XModel.Outvarlongname["z_imp"] = "z implicit";
+	XModel.Outvarunits["z_imp"] = " ";
+
+	XModel.OutputVarMap["p_imp"] = XModel.fluximp.p;
+	XModel.Outvarlongname["p_imp"] = "p implicit";
+	XModel.Outvarunits["p_imp"] = " ";
+
+	XModel.OutputVarMap["Ap_imp"] = XModel.fluximp.Ap;
+	XModel.Outvarlongname["Ap_imp"] = "Ap implicit";
+	XModel.Outvarunits["Ap_imp"] = " ";
+
+
 }
 
 template void Initmaparray<float>(Model<float>& XModel);
