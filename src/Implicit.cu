@@ -186,6 +186,8 @@ template <class T> __global__ void jacobi_apply_kernel(Param XParam, BlockP<T> X
     int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);
     z[id] = r[id] * diagInv[id];
 }
+template __global__ void jacobi_apply_kernel<float>(Param XParam, BlockP<float> XBlock, float*  r, float*  z, float* diagInv);
+template __global__ void jacobi_apply_kernel<double>(Param XParam, BlockP<double> XBlock, double*  r, double*  z, double* diagInv);
 
 // ---------------------------------------------------------------------------
 // 5. Simple vector kernels: axpy-style updates
