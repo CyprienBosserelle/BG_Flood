@@ -97,7 +97,8 @@ template <class T> __global__ void assemble_rhs_kernel(Param XParam, BlockP<T> X
     int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
 
     T delta = calcres(T(XParam.delta), lev);
-    T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
+
+    T cm = T(1.0);//XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 
     T divF = (XFlux.hu[iright] - XFlux.hu[i]) / (delta*cm)
                 + (XFlux.hv[itop] - XFlux.hv[i]) / (delta*cm);
