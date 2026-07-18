@@ -560,7 +560,7 @@ Param readparamstr(std::string line, Param param)
 				"Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv",
 				"cf","Patm","datmpdx","datmpdy","il","cl","hgw",
 				"hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy",
-				"r_imp","p_imp","Ap_imp","z_imp"};
+				"r_imp","p_imp","Ap_imp","z_imp","gx_imp","gy_imp","alphax_imp","alphay_imp","eta_r","diagInv"};
 
 
 

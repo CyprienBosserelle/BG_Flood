@@ -1083,6 +1083,31 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.Outvarlongname["Ap_imp"] = "Ap implicit";
 	XModel.Outvarunits["Ap_imp"] = " ";
 
+	XModel.OutputVarMap["gx_imp"] = XModel.fluximp.g_x;
+	XModel.Outvarlongname["gx_imp"] = "g_x implicit";
+	XModel.Outvarunits["gx_imp"] = " ";
+
+	XModel.OutputVarMap["gy_imp"] = XModel.fluximp.g_y;
+	XModel.Outvarlongname["gy_imp"] = "g_y implicit";
+	XModel.Outvarunits["gy_imp"] = " ";
+
+	XModel.OutputVarMap["alphax_imp"] = XModel.fluximp.alpha_x;
+	XModel.Outvarlongname["alphax_imp"] = "alpha_x implicit";
+	XModel.Outvarunits["alphax_imp"] = " ";
+
+	XModel.OutputVarMap["alphay_imp"] = XModel.fluximp.alpha_y;
+	XModel.Outvarlongname["alphay_imp"] = "alpha_y implicit";
+	XModel.Outvarunits["alphay_imp"] = " ";
+
+	XModel.OutputVarMap["eta_r"] = XModel.fluximp.eta_r;
+	XModel.Outvarlongname["eta_r"] = "eta_r implicit";
+	XModel.Outvarunits["eta_r"] = " m";
+
+	XModel.OutputVarMap["diagInv"] = XModel.fluximp.diagInv;
+	XModel.Outvarlongname["diagInv"] = "diagInv implicit";
+	XModel.Outvarunits["diagInv"] = " ";
+	
+
 
 }
 
