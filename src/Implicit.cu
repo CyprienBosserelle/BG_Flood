@@ -261,6 +261,8 @@ template <class T> __global__ void acceleration_facex(Param XParam, BlockP<T> XB
     XImp.su[id]        = XFlux.hu[id];          // single layer: su.x[] += hu.x[] with su.x[] init 0
     XImp.alpha_x[id] = C * XFlux.hfu[id];       // single layer: alpha_eta.x[] += hf.x[]; then *= C
 }
+template __global__ void acceleration_facex<float>(Param XParam, BlockP<float> XBlock, FluxMLP<float> XFlux, FluxIMP<float> XImp, EvolvingP<float> XEv,float dt);
+template __global__ void acceleration_facex<double>(Param XParam, BlockP<double> XBlock, FluxMLP<double> XFlux, FluxIMP<double> XImp, EvolvingP<double> XEv,double dt);
 
 template <class T> __global__ void acceleration_facey(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, FluxIMP<T> XImp, EvolvingP<T> XEv,T dt)
 {
@@ -299,6 +301,9 @@ template <class T> __global__ void acceleration_facey(Param XParam, BlockP<T> XB
     XImp.sv[id]        = XFlux.hv[id];          // single layer: su.x[] += hu.x[] with su.x[] init 0
     XImp.alpha_y[id] = C * XFlux.hfv[id];       // single layer: alpha_eta.x[] += hf.x[]; then *= C
 }
+template __global__ void acceleration_facey<float>(Param XParam, BlockP<float> XBlock,FluxMLP<float> XFlux, FluxIMP<float> XImp, EvolvingP<float> XEv,float dt);
+template __global__ void acceleration_facey<double>(Param XParam, BlockP<double> XBlock,FluxMLP<double> XFlux, FluxIMP<double> XImp, EvolvingP<double> XEv,double dt);
+
 
 template <class T> __global__ void acceleration_rhs(Param XParam, BlockP<T> XBlock, FluxIMP<T> XImp, T dt)
 {
@@ -321,6 +326,8 @@ template <class T> __global__ void acceleration_rhs(Param XParam, BlockP<T> XBlo
     rhs -= dt * (XImp.sv[idyp] - XImp.sv[id]) / delta;
     XImp.rhs_eta[id] = rhs;
 }
+template __global__ void acceleration_rhs<float>(Param XParam, BlockP<float> XBlock, FluxIMP<float> XImp, float dt);
+template __global__ void acceleration_rhs<double>(Param XParam, BlockP<double> XBlock, FluxIMP<double> XImp, double dt);
 
 template <class T> __global__ void matvec_facefieldx(Param XParam, BlockP<T> XBlock,T* eta,T* g_x,T*alpha_x)
 {
@@ -342,6 +349,8 @@ template <class T> __global__ void matvec_facefieldx(Param XParam, BlockP<T> XBl
 
     g_x[id] = alpha_x[id] * a_baro;   // a_baro(eta,0)
 }
+template __global__ void matvec_facefieldx<float>(Param XParam, BlockP<float> XBlock,float* eta,float* g_x,float*alpha_x);
+template __global__ void matvec_facefieldx<double>(Param XParam, BlockP<double> XBlock,double* eta,double* g_x,double*alpha_x);
 
 template <class T> __global__ void matvec_facefieldy(Param XParam, BlockP<T> XBlock,T* eta,T* g_y,T*alpha_y)
 {
@@ -362,6 +371,8 @@ template <class T> __global__ void matvec_facefieldy(Param XParam, BlockP<T> XBl
 
     g_y[id] = alpha_y[id] * a_baro;   // a_baro(eta,0)
 }
+template __global__ void matvec_facefieldy<float>(Param XParam, BlockP<float> XBlock,float* eta,float* g_y,float*alpha_y);
+template __global__ void matvec_facefieldy<double>(Param XParam, BlockP<double> XBlock,double* eta,double* g_y,double*alpha_y);
 
 template <class T> __global__ void matvec_apply(Param XParam, BlockP<T> XBlock,T* __restrict__ eta,T* __restrict__ Aeta, const T* __restrict__ g_x, const T* __restrict__ g_y)
 {
@@ -384,6 +395,9 @@ template <class T> __global__ void matvec_apply(Param XParam, BlockP<T> XBlock,T
     Ax -= (g_y[idyp] - g_y[id]) / delta;
     Aeta[id] = Ax;
 }
+template __global__ void matvec_apply<float>(Param XParam, BlockP<float> XBlock,float* __restrict__ eta,float* __restrict__ Aeta, const float* __restrict__ g_x, const float* __restrict__ g_y);
+template __global__ void matvec_apply<double>(Param XParam, BlockP<double> XBlock,double* __restrict__ eta,double* __restrict__ Aeta, const double* __restrict__ g_x, const double* __restrict__ g_y);
+
 
 // ----------------------------------------------------------------------
 // Jacobi preconditioner: diag(A) obtained by differentiating A(eta)[]
@@ -419,7 +433,8 @@ template <class T> __global__ void jacobi_diag(Param XParam, BlockP<T> XBlock, F
     T diag = (XParam.rigid ? 0.0 : 1.0) - (g / (delta * delta)) * sumAlpha;
     XImp.diagInv[id] = 1.0 / diag;
 }
-
+template __global__ void jacobi_diag<float>(Param XParam, BlockP<float> XBlock, FluxIMP<float> XImp);
+template __global__ void jacobi_diag<double>(Param XParam, BlockP<double> XBlock, FluxIMP<double> XImp);
 
 // foreach_face() flux-reconstruction block after the solve.
 template <class T> __global__ void pressure_flux_reconstruction_facex(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, FluxIMP<T> XImp, EvolvingP<T> XEv,T dt)
@@ -455,6 +470,9 @@ template <class T> __global__ void pressure_flux_reconstruction_facex(Param XPar
     // pressure event / advect() call only needs the remaining theta_H*dt.
     XFlux.hu[id] = XParam.theta_H * (XFlux.hfu[id] * uf + dt * XFlux.hau[id]) - dt * XFlux.hau[id];
 }
+template __global__ void pressure_flux_reconstruction_facex<float>(Param XParam, BlockP<float> XBlock,FluxMLP<float> XFlux, FluxIMP<float> XImp, EvolvingP<float> XEv,float dt);
+template __global__ void pressure_flux_reconstruction_facex<double>(Param XParam, BlockP<double> XBlock,FluxMLP<double> XFlux, FluxIMP<double> XImp, EvolvingP<double> XEv,double dt);
+
 
 template <class T> __global__ void pressure_flux_reconstruction_facey(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, FluxIMP<T> XImp, EvolvingP<T> XEv,T dt)
 {
@@ -489,6 +507,10 @@ template <class T> __global__ void pressure_flux_reconstruction_facey(Param XPar
     // pressure event / advect() call only needs the remaining theta_H*dt.
     XFlux.hv[id] = XParam.theta_H * (XFlux.hfv[id] * uf + dt * XFlux.hav[id]) - dt * XFlux.hav[id];
 }
+template __global__ void pressure_flux_reconstruction_facey<float>(Param XParam, BlockP<float> XBlock,FluxMLP<float> XFlux, FluxIMP<float> XImp, EvolvingP<float> XEv,float dt);
+template __global__ void pressure_flux_reconstruction_facey<double>(Param XParam, BlockP<double> XBlock,FluxMLP<double> XFlux, FluxIMP<double> XImp, EvolvingP<double> XEv,double dt);
+
+
 // /**
 //  * @brief Multigrid relaxation function (Red-Black Gauss-Seidel)
 //  */
