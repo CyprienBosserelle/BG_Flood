@@ -252,7 +252,7 @@ template <class T> __global__ void acceleration_facex(Param XParam, BlockP<T> XB
     T delta = calcres(T(XParam.delta), lev);
 
     T C = -(theta_H * dt) * (theta_H * dt);
-    T a_baro = g * (XImp.eta_r[idm],  XImp.eta_r[id]) / delta;
+    T a_baro = g * (XImp.eta_r[idm] -  XImp.eta_r[id]) / delta;
     T ax = theta_H * a_baro;   // a_baro(eta_r,0)
 
     T hl = XEv.h[idm] > eps ? XEv.h[idm] : 0.0;
@@ -282,7 +282,7 @@ template <class T> __global__ void acceleration_facey(Param XParam, BlockP<T> XB
 	int ibl = blockIdx.x;
 	int ib = XBlock.active[ibl];
     int lev = XBlock.level[ib];
-    
+
     int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);   // this face, "i=0" position
     int idm  = memloc(halowidth, blkmemwidth, ix , iy -1, ib);//memloc(ix - 1, iy, ib);   // cell to the west ("i-1")
 
@@ -296,7 +296,7 @@ template <class T> __global__ void acceleration_facey(Param XParam, BlockP<T> XB
     T delta = calcres(T(XParam.delta), lev);
 
     T C = -(theta_H * dt) * (theta_H * dt);
-    T a_baro = g * (XImp.eta_r[idm],  XImp.eta_r[id]) / delta;
+    T a_baro = g * (XImp.eta_r[idm] -  XImp.eta_r[id]) / delta;
     T ax = theta_H * a_baro;   // a_baro(eta_r,0)
 
     T hl = XEv.h[idm] > eps ? XEv.h[idm] : T(0.0);
