@@ -248,8 +248,8 @@ template <class T> __global__ void acceleration_facex(Param XParam, BlockP<T> XB
     T g = XParam.g;
 
     T C = -(theta_H * dt) * (theta_H * dt);
-
-    T ax = theta_H * a_baro( XImp.eta_r[idm],  XImp.eta_r[id], g);   // a_baro(eta_r,0)
+    T a_baro = g * (XImp.eta_r[idm],  XImp.eta_r[id]) / delta;
+    T ax = theta_H * a_baro;   // a_baro(eta_r,0)
 
     T hl = XEv.h[idm] > eps ? XEv.h[idm] : 0.0;
     T hr = XEv.h[id]  > eps ? XEv.h[id]  : 0.0;
@@ -288,8 +288,8 @@ template <class T> __global__ void acceleration_facey(Param XParam, BlockP<T> XB
     T g = XParam.g;
 
     T C = -(theta_H * dt) * (theta_H * dt);
-
-    T ax = theta_H * a_baro( XImp.eta_r[idm],  XImp.eta_r[id], g);   // a_baro(eta_r,0)
+    T a_baro = g * (XImp.eta_r[idm],  XImp.eta_r[id]) / delta;
+    T ax = theta_H * a_baro;   // a_baro(eta_r,0)
 
     T hl = XEv.h[idm] > eps ? XEv.h[idm] : T(0.0);
     T hr = XEv.h[id]  > eps ? XEv.h[id]  : T(0.0);
