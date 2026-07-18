@@ -18,7 +18,7 @@ template <class T> inline T half_advection_dt(Param XParam,T dt);
 
 // Not really used but kept alive for now
 template <class T> __global__ void assemble_alpha_kernel(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux,T dt);
-template <class T> __global__ void assemble_rhs_kernel(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux);
+template <class T> __global__ void assemble_rhs_kernel(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, T dt);
 template <class T> __global__ void matvec_kernel(Param XParam, BlockP<T> XBlock,T* x, T* Ax, FluxMLP<T> XFlux);
 template <class T> __global__ void jacobi_diag_kernel(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux);
 template <class T> __global__ void jacobi_apply_kernel(Param XParam, BlockP<T> XBlock, T*  r, T*  z, T* diagInv);

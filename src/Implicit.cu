@@ -53,7 +53,7 @@
 // 1. Face coefficient assembly:  alpha_face = -(theta_H*dt)^2 * hf_face
 //    (equivalent of implicit.h's alpha_eta.x[] += hf.x[]; alpha_eta.x[] *= C)
 // ---------------------------------------------------------------------------
-template <class T> __global__ void assemble_alpha_kernel(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux,T dt)
+template <class T> __global__ void assemble_alpha_kernel(Param XParam, BlockP<T> XBlock,FluxIMP<T> XFlux,T dt)
 {
     int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -72,15 +72,15 @@ template <class T> __global__ void assemble_alpha_kernel(Param XParam, BlockP<T>
     T C = -(XParam.theta_H * dt) * (XParam.theta_H * dt);
 
     
-    XFlux.alpha_x[id] = C * XFlux.hfx[i];   // face at west side of (ix,iy)
-    XFlux.alpha_y[id] = C * XFlux.hfy[i];   // face at south side of (ix,iy)
+    XFlux.alpha_x[i] = C * XFlux.hfx[i];   // face at west side of (ix,iy)
+    XFlux.alpha_y[i] = C * XFlux.hfy[i];   // face at south side of (ix,iy)
 }
 
 // ---------------------------------------------------------------------------
 // 2. RHS assembly:  rhs_eta = eta_n - dt * div(F_star)
 //    (equivalent of implicit.h's rhs_eta[] = eta[] - dt*(su.x[1]-su.x[])/Delta ...)
 // ---------------------------------------------------------------------------
-template <class T> __global__ void assemble_rhs_kernel(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux)
+template <class T> __global__ void assemble_rhs_kernel(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux,T dt)
 {
     int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -97,9 +97,10 @@ template <class T> __global__ void assemble_rhs_kernel(Param XParam, BlockP<T> X
     int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
 
     T delta = calcres(T(XParam.delta), lev);
+    T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy) : T(1.0);
 
-    T divF = (XFlux.hu[iright] - XFlux.hu[i]) / (delta*cmu)
-                + (XFlux.hv[itop] - XFlux.hv[i]) / (delta*cmv);
+    T divF = (XFlux.hu[iright] - XFlux.hu[i]) / (delta*cm)
+                + (XFlux.hv[itop] - XFlux.hv[i]) / (delta*cm);
 
     XFlux.rhs_eta[i] = XFlux.eta_n[i] - dt * divF;
 }
@@ -113,7 +114,9 @@ template <class T> __global__ void matvec_kernel(Param XParam, BlockP<T> XBlock,
 	int iy = threadIdx.y;
 	int ibl = blockIdx.x;
 	int ib = XBlock.active[ibl];
-    T dx = XParam.delta;
+    //T delta = calcres(T(XParam.delta), lev);
+    int lev = XBlock.level[ib];
+    T dx = calcres(T(XParam.delta), lev);
 
     int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);
     int idxm = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);   // west neighbour
@@ -151,16 +154,17 @@ template <class T> __global__ void jacobi_diag_kernel(Param XParam, BlockP<T> XB
 	int iy = threadIdx.y;
 	int ibl = blockIdx.x;
 	int ib = XBlock.active[ibl];
-    T dx = XParam.delta;
+    int lev = XBlock.level[ib];
+    T dx = calcres(T(XParam.delta), lev);
 
     int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);
     int idxp = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
     int idyp = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
 
     T axW = -XFlux.alpha_x[id];          // note: alpha <= 0, so -alpha >= 0
-    T axE = -XFlux.alpha_x[idxp_face];
+    T axE = -XFlux.alpha_x[idxp];
     T ayS = -XFlux.alpha_y[id];
-    T ayN = -XFlux.alpha_y[idyp_face];
+    T ayN = -XFlux.alpha_y[idyp];
 
     T invdx2 = 1.0 / (dx * dx);
     T diag = 1.0 + XParam.g * invdx2 * (axW + axE + ayS + ayN);
@@ -236,6 +240,7 @@ template <class T> __global__ void acceleration_facex(Param XParam, BlockP<T> XB
     T theta_H = XParam.theta_H;
 
     T eps = XParam.eps;
+    T g = XParam.g;
 
     T C = -(theta_H * dt) * (theta_H * dt);
 
@@ -273,6 +278,8 @@ template <class T> __global__ void acceleration_facey(Param XParam, BlockP<T> XB
 
     T eps = XParam.eps;
 
+    T g = XParam.g;
+
     T C = -(theta_H * dt) * (theta_H * dt);
 
     T ax = theta_H * a_baro( XImp.eta_r[idm],  XImp.eta_r[id], g);   // a_baro(eta_r,0)
@@ -301,15 +308,16 @@ template <class T> __global__ void acceleration_rhs(Param XParam, BlockP<T> XBlo
 	int iy = threadIdx.y;
 	int ibl = blockIdx.x;
 	int ib = XBlock.active[ibl];
-
+    int lev = XBlock.level[ib];
+    T delta = calcres(T(XParam.delta), lev);
 
     int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);//memloc(ix,     iy,     ib);
     int idxp = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);//memloc(ix + 1, iy,     ib);   // su.x[1]
     int idyp = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);//memloc(ix,     iy + 1, ib);   // su.y[1]
 
     T rhs = XParam.rigid ? T(0.0) : XImp.eta_r[id];
-    rhs -= dt * (XImp.su[idxp] - XImp.su[id]) / XParam.Delta;
-    rhs -= dt * (XImp.sv[idyp] - XImp.sv[id]) / XParam.Delta;
+    rhs -= dt * (XImp.su[idxp] - XImp.su[id]) / delta;
+    rhs -= dt * (XImp.sv[idyp] - XImp.sv[id]) / delta;
     XImp.rhs_eta[id] = rhs;
 }
 
@@ -322,11 +330,14 @@ template <class T> __global__ void matvec_facefieldx(Param XParam, BlockP<T> XBl
 	int iy = threadIdx.y;
 	int ibl = blockIdx.x;
 	int ib = XBlock.active[ibl];
+    int lev = XBlock.level[ib];
+
+    T delta = calcres(T(XParam.delta), lev);
 
     int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);//memloc(ix,     iy, ib);
     int idm = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);//memloc(ix - 1, iy, ib);
 
-    T abaro = XParam.g * (eta[idm] - eta[id]) / XParam.Delta;
+    T a_baro = XParam.g * (eta[idm] - eta[id]) / delta;
 
     g_x[id] = alpha_x[id] * a_baro;   // a_baro(eta,0)
 }
@@ -340,11 +351,13 @@ template <class T> __global__ void matvec_facefieldy(Param XParam, BlockP<T> XBl
 	int iy = threadIdx.y;
 	int ibl = blockIdx.x;
 	int ib = XBlock.active[ibl];
+    int lev = XBlock.level[ib];
+    T delta = calcres(T(XParam.delta), lev);
 
     int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);//memloc(ix,     iy, ib);
     int idm = memloc(halowidth, blkmemwidth, ix, iy-1, ib);//memloc(ix - 1, iy, ib);
 
-    T abaro = XParam.g * (eta[idm] - eta[id]) / XParam.Delta;
+    T a_baro = XParam.g * (eta[idm] - eta[id]) / delta;
 
     g_y[id] = alpha_y[id] * a_baro;   // a_baro(eta,0)
 }
@@ -358,14 +371,16 @@ template <class T> __global__ void matvec_apply(Param XParam, BlockP<T> XBlock,T
 	int iy = threadIdx.y;
 	int ibl = blockIdx.x;
 	int ib = XBlock.active[ibl];
+    int lev = XBlock.level[ib];
+    T delta = calcres(T(XParam.delta), lev);
 
     int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);
     int idxp = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);//memloc(ix + 1, iy,     ib);
     int idyp = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);//memloc(ix,     iy + 1, ib);
 
     T Ax = XParam.rigid ? 0.0 : eta[id];
-    Ax -= (g_x[idxp] - g_x[id]) / XParam.Delta;
-    Ax -= (g_y[idyp] - g_y[id]) / XParam.Delta;
+    Ax -= (g_x[idxp] - g_x[id]) / delta;
+    Ax -= (g_y[idyp] - g_y[id]) / delta;
     Aeta[id] = Ax;
 }
 
@@ -387,6 +402,11 @@ template <class T> __global__ void jacobi_diag(Param XParam, BlockP<T> XBlock, F
 	int ibl = blockIdx.x;
 	int ib = XBlock.active[ibl];
 
+    int lev = XBlock.level[ib];
+    T delta = calcres(T(XParam.delta), lev);
+
+    T g = XParam.g;
+
     int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);
     int idxp = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);//memloc(ix + 1, iy,     ib);
     int idyp = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);//memloc(ix,     iy + 1, ib);
@@ -395,7 +415,7 @@ template <class T> __global__ void jacobi_diag(Param XParam, BlockP<T> XBlock, F
     T sumAlpha = XImp.alpha_x[id] + XImp.alpha_x[idxp]
                      + XImp.alpha_y[id] + XImp.alpha_y[idyp];
     // alpha_eta <= 0, so this correctly increases the diagonal:
-    T diag = (XParam.rigid ? 0.0 : 1.0) - (XParam.g / (XParam.Delta * XParam.Delta)) * sumAlpha;
+    T diag = (XParam.rigid ? 0.0 : 1.0) - (g / (delta * delta)) * sumAlpha;
     XImp.diagInv[id] = 1.0 / diag;
 }
 
@@ -411,12 +431,15 @@ template <class T> __global__ void pressure_flux_reconstruction_facex(Param XPar
 	int ibl = blockIdx.x;
 	int ib = XBlock.active[ibl];
 
+    int lev = XBlock.level[ib];
+    T delta = calcres(T(XParam.delta), lev);
+
     int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);
     int idm = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);//memloc(ix - 1, iy, ib);
 
     T dry = XParam.eps;
 
-    T abaro = XParam.g * (XImp.eta_r[idm] - XImp.eta_r[id]) / XParam.Delta;
+    T abaro = XParam.g * (XImp.eta_r[idm] - XImp.eta_r[id]) / delta;
 
     T ax = XParam.theta_H * abaro;   // a_baro(eta_r,0)
     XFlux.hau[id] += XFlux.hfu[id] * ax;
@@ -442,12 +465,15 @@ template <class T> __global__ void pressure_flux_reconstruction_facey(Param XPar
 	int ibl = blockIdx.x;
 	int ib = XBlock.active[ibl];
 
+    int lev = XBlock.level[ib];
+    T delta = calcres(T(XParam.delta), lev);
+
     int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);
     int idm = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);//memloc(ix - 1, iy, ib);
 
     T dry = XParam.eps;
 
-    T abaro = XParam.g * (XImp.eta_r[idm] - XImp.eta_r[id]) / XParam.Delta;
+    T abaro = XParam.g * (XImp.eta_r[idm] - XImp.eta_r[id]) / delta;
 
     T ax = XParam.theta_H * abaro;   // a_baro(eta_r,0)
     XFlux.hav[id] += XFlux.hfv[id] * ax;

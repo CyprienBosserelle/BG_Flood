@@ -47,7 +47,7 @@ public:
 
 	//*Implicit Scheme
 	bool implicit = false;
-
+	bool rigid = false;
 	double theta_H = 0.55; // theta for the implicit barotropic solver (Default: 0.55 for unconditional stability)
 	int max_iter = 100; // Maximum number of iterations for the implicit solver (Default: 30)
 	double mg_tol = 1e-5; // Convergence tolerance for the implicit solver (Default: 1e-5)
