@@ -160,7 +160,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 		acceleration_rhs<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp, T(XLoop.dt));
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		solveEtaPCG(XParam, XModel, T(XLoop.dt));
+		//solveEtaPCG(XParam, XModel, T(XLoop.dt));
 
 		pressure_flux_reconstruction_facex<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluxml, XModel.fluximp, XModel.evolv, T(XLoop.dt));
 		CUDA_CHECK(cudaDeviceSynchronize());
@@ -662,7 +662,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	cudaMemcpy(XModel.fluximp.p, XModel.fluximp.z, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
     T rz_old = reducedot(XParam, XModel.blocks,XModel.fluximp.r, XModel.fluximp.z, XModel.fluximp.store);
-
+	/*
     for (int iter = 0; iter < maxIter; ++iter)
     {
 		// Update Halo for eta_r
@@ -731,6 +731,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
         //vec_xpby<<<blocks1d, threads1d>>>(f.p, f.z, beta, n);
         rz_old = rz_new;
     }
+	*/
     // f.eta_r now holds eta_r^{n+1} (== eta^{n+1} unless rigid lid).
 
 
