@@ -1107,7 +1107,9 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.Outvarlongname["diagInv"] = "diagInv implicit";
 	XModel.Outvarunits["diagInv"] = " ";
 	
-
+	XModel.OutputVarMap["rhs_eta"] = XModel.fluximp.rhs_eta;
+	XModel.Outvarlongname["rhs_eta"] = "rhs_eta implicit";
+	XModel.Outvarunits["rhs_eta"] = " m";
 
 }
 
