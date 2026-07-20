@@ -629,10 +629,10 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
     // --- initial residual: r = rhs_eta - A(eta_r) ---
     //haloExchange(f.eta_r, g);
 
-	matvec_facefieldx<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.evolv.zs,XModel.fluximp.g_x,XModel.fluximp.alpha_x);
+	matvec_facefieldx<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluximp.eta_r,XModel.fluximp.g_x,XModel.fluximp.alpha_x);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	matvec_facefieldy<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.evolv.zs,XModel.fluximp.g_y,XModel.fluximp.alpha_y);
+	matvec_facefieldy<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluximp.eta_r,XModel.fluximp.g_y,XModel.fluximp.alpha_y);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.g_x);
@@ -643,7 +643,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
     //matvec_facefield<<<blocks, threads>>>(f.eta_r, f.g_x, f.alpha_eta_x, g);
     // matvec_facefield_y<<<...>>>(f.eta_r, f.g_y, f.alpha_eta_y, g);  (y-mirror)
-    matvec_apply<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.evolv.zs, XModel.fluximp.Ap, XModel.fluximp.g_x, XModel.fluximp.g_y);
+    matvec_apply<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluximp.eta_r, XModel.fluximp.Ap, XModel.fluximp.g_x, XModel.fluximp.g_y);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
