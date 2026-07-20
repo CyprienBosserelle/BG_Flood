@@ -665,7 +665,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	/*
     for (int iter = 0; iter < maxIter; ++iter)
     {
-	*/
+	
 		// Update Halo for eta_r
 		 HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
 		//CUDA_CHECK(cudaDeviceSynchronize());
@@ -706,9 +706,9 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
         T alpha = rz_old / pAp;
 
 		//printf("rz_old = %f, pAp = %f, alpha = %f, rz_new = %f, beta = %f, maxerror = %f\n",rz_old,pAp,alpha,rz_new, beta,maxerror);
-		printf("rz_old = %f, pAp = %f, alpha = %f, \n",rz_old,pAp,alpha);
+		//printf("rz_old = %f, pAp = %f, alpha = %f, \n",rz_old,pAp,alpha);
 
-		/*
+		
 
         //vec_axpy<<<blocks1d, threads1d>>>(f.eta_r, f.p,  alpha, n);
         //vec_axpy<<<blocks1d, threads1d>>>(f.r,     f.Ap, -alpha, n);
