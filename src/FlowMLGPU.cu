@@ -609,7 +609,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	dim3 gridDimHaloBT(XParam.nblk , 1, 1);
 
 
-	
+	T maxerror;
 
     HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.alpha_x);
 	//CUDA_CHECK(cudaDeviceSynchronize());
@@ -662,7 +662,10 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	cudaMemcpy(XModel.fluximp.p, XModel.fluximp.z, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
     T rz_old = reducedot(XParam, XModel.blocks,XModel.fluximp.r, XModel.fluximp.z, XModel.fluximp.store);
-	/*
+	
+	maxerror=reduceabsmax(XParam, XModel.blocks, XModel.fluximp.r, XModel.fluximp.store);
+	if(maxerror > tol)
+	{
     for (int iter = 0; iter < maxIter; ++iter)
     {
 	
@@ -721,8 +724,8 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
         //if (reduceAbsMax(f.r, n) < tolerance) break;
 
-		T maxerror=reduceabsmax(XParam, XModel.blocks, XModel.fluximp.r, XModel.fluximp.store);
-		//if (maxerror < tol) break;
+		maxerror=reduceabsmax(XParam, XModel.blocks, XModel.fluximp.r, XModel.fluximp.store);
+		if (maxerror < tol) break;
 
        	// vec_jacobi_apply<<<blocks1d, threads1d>>>(f.r, f.z, f.diagInv, n);
 	    jacobi_apply_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.r,XModel.fluximp.z, XModel.fluximp.diagInv);
@@ -744,7 +747,8 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
 		
     }
-	*/
+	}
+	
     // f.eta_r now holds eta_r^{n+1} (== eta^{n+1} unless rigid lid).
 
 
