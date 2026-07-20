@@ -270,27 +270,26 @@ template <class T> __global__ void UpdateButtingerWDXGPU(Param XParam, BlockP<T>
 		etar = etai - dx * XGrad.dzsdx[i];
 		etal = etan + dx * XGrad.dzsdx[ileft];
 
+		// ## Fallback to 2nd order central differencing where monotonicity is violated for eta and h.
+		if ( (hi - hn) * (hr - hl) < 0 ) {
+			hr = 0.5*(hi + hn);
+			hl = 0.5*(hi + hn);
+		}
+		if ( (etai - etan) * (etar - etal) < 0 ) {
+			etar = 0.5*(etai + etan);
+			etal = 0.5*(etai + etan);
+		}
+
 		//define the topography term at the interfaces
 		zr = etar - hr;// zi - dx * XGrad.dzbdx[i];
 		zl = etal - hl;// zn + dx * XGrad.dzbdx[ileft];
 
 
-		// Treatment of Wet/dry faces to eliminate non-monotnous face conditions
-		// Condition on z and zf
-		// if ( (zn < zi) && (zl > zr) ){
-		// 	zA = zr;
-		// } else if ( (zn > zi) && (zl < zr) ){
-		// 	zA = zl;
-		// } else {
-		// 	//define the Audusse terms
-		// 	zA = max(zr, zl);
-		// }
-		
-		// Condition on z, eta and zf
-		//if ( (zn < zi) && (etan < etai) && (zl > zr) ){
+		// Targetted correction of zface where monotonicity is violated at the cell faces but the flow is downhill
+		// Condition on z, eta, h and zf
+			// If z, eta and h are increasing/decreasing at the same time, let flux conditions be described by the upper cell (where the flow comes from) 
 		if ( (zn < zi) && (etan < etai) && (hn < hi) && (zl > zr) ){
 			zA = zr;
-		//} else if ( (zn > zi) && (etan > etai) && (zl < zr) ){
 		} else if ( (zn > zi) && (etan > etai) && (hn > hi) && (zl < zr) ){
             zA = zl;
 		} else {
@@ -861,29 +860,27 @@ template <class T> __global__ void UpdateButtingerWDYGPU(Param XParam, BlockP<T>
 		etar = etai - dx * XGrad.dzsdy[i];
 		etal = etan + dx * XGrad.dzsdy[ibot];
 
+		// ## Fallback to 2nd order central differencing where monotonicity is violated for eta and h.
+		if ( (hi - hn) * (hr - hl) < 0 ) {
+			hr = 0.5*(hi + hn);
+			hl = 0.5*(hi + hn);
+		}
+		if ( (etai - etan) * (etar - etal) < 0 ) {
+			etar = 0.5*(etai + etan);
+			etal = 0.5*(etai + etan);
+		}
+
 		//define the topography term at the interfaces
-		zr = etar - hr;// zi - dx * XGrad.dzbdy[i];
-		zl = etal - hl;// zn + dx * XGrad.dzbdy[ibot];
+		zr = etar - hr;// zi - dx * XGrad.dzbdx[i];
+		zl = etal - hl;// zn + dx * XGrad.dzbdx[ileft];
 
-
-		// Treatment of Wet/dry faces to eliminate non-monotnous face conditions
-		// Condition on z and zf
-		// if ( (zn < zi) && (zl > zr) ){
-		// 	zA = zr;
-		// } else if ( (zn > zi) && (zl < zr) ){
-		// 	zA = zl;
-		// } else {
-		// 	//define the Audusse terms
-		// 	zA = max(zr, zl);
-		// }
-
-		// Condition on z, eta and zf
-		//if ( (zn < zi) && (etan < etai) && (zl > zr) ){
+		// Targetted correction of zface where monotonicity is violated at the cell faces but the flow is downhill
+		// Condition on z, eta, h and zf
+			// If z, eta and h are increasing/decreasing at the same time, let flux conditions be described by the upper cell (where the flow comes from) 
 		if ( (zn < zi) && (etan < etai) && (hn < hi) && (zl > zr) ){
 			zA = zr;
-		//} else if ( (zn > zi) && (etan > etai) && (zl < zr) ){
 		} else if ( (zn > zi) && (etan > etai) && (hn > hi) && (zl < zr) ){
-			zA = zl;
+            zA = zl;
 		} else {
 			//define the Audusse terms
 			zA = max(zr, zl);
