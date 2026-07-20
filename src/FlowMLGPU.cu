@@ -665,6 +665,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	/*
     for (int iter = 0; iter < maxIter; ++iter)
     {
+	*/
 		// Update Halo for eta_r
 		 HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
 		//CUDA_CHECK(cudaDeviceSynchronize());
@@ -729,7 +730,13 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 		///xpby_kernel(Param XParam, BlockP<T> XBlock, double* p, const double* z, double beta)
 		xpby_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.p, XModel.fluximp.z,beta);
         //vec_xpby<<<blocks1d, threads1d>>>(f.p, f.z, beta, n);
+
+		printf("rz_old = %f, pAp = %f, alpha = %f, rz_new = %f, beta = %f\n",rz_old,pAp,alpha,rz_new, beta);
+
         rz_old = rz_new;
+
+
+		/*
     }
 	*/
     // f.eta_r now holds eta_r^{n+1} (== eta^{n+1} unless rigid lid).
