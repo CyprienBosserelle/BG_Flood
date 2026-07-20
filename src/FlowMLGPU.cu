@@ -717,7 +717,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
         //if (reduceAbsMax(f.r, n) < tolerance) break;
 
 		T maxerror=reduceabsmax(XParam, XModel.blocks, XModel.fluximp.r, XModel.fluximp.store);
-		if (maxerror < tol) break;
+		//if (maxerror < tol) break;
 
        	// vec_jacobi_apply<<<blocks1d, threads1d>>>(f.r, f.z, f.diagInv, n);
 	    jacobi_apply_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.r,XModel.fluximp.z, XModel.fluximp.diagInv);
@@ -731,7 +731,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 		xpby_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.p, XModel.fluximp.z,beta);
         //vec_xpby<<<blocks1d, threads1d>>>(f.p, f.z, beta, n);
 
-		printf("rz_old = %f, pAp = %f, alpha = %f, rz_new = %f, beta = %f\n",rz_old,pAp,alpha,rz_new, beta);
+		printf("rz_old = %f, pAp = %f, alpha = %f, rz_new = %f, beta = %f, maxerror = %f\n",rz_old,pAp,alpha,rz_new, beta,maxerror);
 
         rz_old = rz_new;
 
