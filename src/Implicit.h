@@ -27,6 +27,8 @@ template <class T> __global__ void jacobi_apply_kernel(Param XParam, BlockP<T> X
 template <class T> __global__ void axpy_kernel(Param XParam, BlockP<T> XBlock, T* y, T* x, T a);
 template <class T> __global__ void xpby_kernel(Param XParam, BlockP<T> XBlock, T* p, T* z, T beta);
 
+template <class T> __global__ void x2_kernel(Param XParam, BlockP<T> XBlock, T* x, T* y);
+
 template <class T> __global__ void acceleration_facex(Param XParam, BlockP<T> XBlock, FluxMLP<T> XFlux, FluxIMP<T> XImp, EvolvingP<T> XEv,T dt);
 template <class T> __global__ void acceleration_facey(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, FluxIMP<T> XImp, EvolvingP<T> XEv,T dt);
 template <class T> __global__ void acceleration_rhs(Param XParam, BlockP<T> XBlock, FluxIMP<T> XImp, T dt);
