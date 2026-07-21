@@ -24,15 +24,15 @@ template <class T> __global__ void jacobi_diag_kernel(Param XParam, BlockP<T> XB
 template <class T> __global__ void jacobi_apply_kernel(Param XParam, BlockP<T> XBlock, T*  r, T*  z, T* diagInv);
 
 // Yes these are useful!
-template <class T> __global__ void axpy_kernel(Param XParam, BlockP<T> XBlock, T* y, const T* x, T a);
-template <class T> __global__ void xpby_kernel(Param XParam, BlockP<T> XBlock, T* p, const T* z, T beta);
+template <class T> __global__ void axpy_kernel(Param XParam, BlockP<T> XBlock, T* y, T* x, T a);
+template <class T> __global__ void xpby_kernel(Param XParam, BlockP<T> XBlock, T* p, T* z, T beta);
 
 template <class T> __global__ void acceleration_facex(Param XParam, BlockP<T> XBlock, FluxMLP<T> XFlux, FluxIMP<T> XImp, EvolvingP<T> XEv,T dt);
 template <class T> __global__ void acceleration_facey(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, FluxIMP<T> XImp, EvolvingP<T> XEv,T dt);
 template <class T> __global__ void acceleration_rhs(Param XParam, BlockP<T> XBlock, FluxIMP<T> XImp, T dt);
 template <class T> __global__ void matvec_facefieldx(Param XParam, BlockP<T> XBlock,T* eta,T* g_x,T*alpha_x);
 template <class T> __global__ void matvec_facefieldy(Param XParam, BlockP<T> XBlock,T* eta,T* g_y,T*alpha_y);
-template <class T> __global__ void matvec_apply(Param XParam, BlockP<T> XBlock,T* __restrict__ eta,T* __restrict__ Aeta, const T* __restrict__ g_x, const T* __restrict__ g_y);
+template <class T> __global__ void matvec_apply(Param XParam, BlockP<T> XBlock,T* eta,T* Aeta, T* g_x, T* g_y);
 
 template <class T> __global__ void jacobi_diag(Param XParam, BlockP<T> XBlock, FluxIMP<T> XImp);
 template <class T> __global__ void pressure_flux_reconstruction_facex(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, FluxIMP<T> XImp, EvolvingP<T> XEv,T dt);

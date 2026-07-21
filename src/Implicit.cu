@@ -192,7 +192,7 @@ template __global__ void jacobi_apply_kernel<double>(Param XParam, BlockP<double
 // ---------------------------------------------------------------------------
 // 5. Simple vector kernels: axpy-style updates
 // ---------------------------------------------------------------------------
-template <class T> __global__ void axpy_kernel(Param XParam, BlockP<T> XBlock, T* y, const T* x, T a)
+template <class T> __global__ void axpy_kernel(Param XParam, BlockP<T> XBlock, T* y, T* x, T a)
 {
     int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -205,10 +205,10 @@ template <class T> __global__ void axpy_kernel(Param XParam, BlockP<T> XBlock, T
     int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);
     y[id] += a * x[id];
 }
-template __global__ void axpy_kernel<float>(Param XParam, BlockP<float> XBlock, float* y, const float* x, float a);
-template __global__ void axpy_kernel<double>(Param XParam, BlockP<double> XBlock, double* y, const double* x, double a);
+template __global__ void axpy_kernel<float>(Param XParam, BlockP<float> XBlock, float* y, float* x, float a);
+template __global__ void axpy_kernel<double>(Param XParam, BlockP<double> XBlock, double* y, double* x, double a);
 
-template <class T> __global__ void xpby_kernel(Param XParam, BlockP<T> XBlock, T* p, const T* z, T beta)
+template <class T> __global__ void xpby_kernel(Param XParam, BlockP<T> XBlock, T* p, T* z, T beta)
 {
     int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -221,8 +221,25 @@ template <class T> __global__ void xpby_kernel(Param XParam, BlockP<T> XBlock, T
     int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);
     p[id] = z[id] + beta * p[id];
 }
-template __global__ void xpby_kernel<float>(Param XParam, BlockP<float> XBlock, float* p, const float* z, float beta);
-template __global__ void xpby_kernel<double>(Param XParam, BlockP<double> XBlock, double* p, const double* z, double beta);
+template __global__ void xpby_kernel<float>(Param XParam, BlockP<float> XBlock, float* p, float* z, float beta);
+template __global__ void xpby_kernel<double>(Param XParam, BlockP<double> XBlock, double* p, double* z, double beta);
+
+
+template <class T> __global__ void x2_kernel(Param XParam, BlockP<T> XBlock, T* x, T* y)
+{
+    int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.y + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	int ib = XBlock.active[ibl];
+
+    int id   = memloc(halowidth, blkmemwidth, ix, iy, ib);
+    y[id] = x[id];
+}
+template __global__ void x2_kernel<float>(Param XParam, BlockP<float> XBlock, float* x, float* y);
+template __global__ void x2_kernel<double>(Param XParam, BlockP<double> XBlock, double* x, double* y);
 
 template <class T> inline T half_advection_dt(Param XParam,T dt)
 {
@@ -388,7 +405,7 @@ template <class T> __global__ void matvec_facefieldy(Param XParam, BlockP<T> XBl
 template __global__ void matvec_facefieldy<float>(Param XParam, BlockP<float> XBlock,float* eta,float* g_y,float*alpha_y);
 template __global__ void matvec_facefieldy<double>(Param XParam, BlockP<double> XBlock,double* eta,double* g_y,double*alpha_y);
 
-template <class T> __global__ void matvec_apply(Param XParam, BlockP<T> XBlock,T* __restrict__ eta,T* __restrict__ Aeta, const T* __restrict__ g_x, const T* __restrict__ g_y)
+template <class T> __global__ void matvec_apply(Param XParam, BlockP<T> XBlock,T* eta,T* Aeta, T* g_x, T* g_y)
 {
      int halowidth = XParam.halowidth;
 	int blkmemwidth = blockDim.y + halowidth * 2;
@@ -409,8 +426,8 @@ template <class T> __global__ void matvec_apply(Param XParam, BlockP<T> XBlock,T
     Ax -= (g_y[idyp] - g_y[id]) / delta;
     Aeta[id] = Ax;
 }
-template __global__ void matvec_apply<float>(Param XParam, BlockP<float> XBlock,float* __restrict__ eta,float* __restrict__ Aeta, const float* __restrict__ g_x, const float* __restrict__ g_y);
-template __global__ void matvec_apply<double>(Param XParam, BlockP<double> XBlock,double* __restrict__ eta,double* __restrict__ Aeta, const double* __restrict__ g_x, const double* __restrict__ g_y);
+template __global__ void matvec_apply<float>(Param XParam, BlockP<float> XBlock,float* eta,float* Aeta, float* g_x, float* g_y);
+template __global__ void matvec_apply<double>(Param XParam, BlockP<double> XBlock,double* eta,double* Aeta, double* g_x, double* g_y);
 
 
 // ----------------------------------------------------------------------
