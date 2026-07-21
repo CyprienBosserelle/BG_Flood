@@ -593,7 +593,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
     double tol = XParam.mg_tol;//1e-5;
 	int maxIter = XParam.max_iter;//100
 
-	int n = XParam.blksize * XParam.nblk;
+	int n = (XParam.blkwidth + XParam.halowidth*2)*(XParam.blkwidth + XParam.halowidth*2) * XParam.nblk;
    	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 	// for flux reconstruction the loop overlap the right(or top for the y direction) halo
