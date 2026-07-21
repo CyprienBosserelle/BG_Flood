@@ -746,7 +746,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
 		if (iter == maxIter - 1)
 		{
-			log("Warning! Implicit max iteration reached. residual = " * std::to_string(rz_old));
+			log("Warning! Implicit max iteration reached. residual = " + std::to_string(rz_old));
 			//printf("rz_old = %f, pAp = %f, alpha = %f, \n",rz_old,pAp,alpha);
 		}
 		
