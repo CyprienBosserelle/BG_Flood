@@ -668,6 +668,8 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	{
     for (int iter = 0; iter < maxIter; ++iter)
     {
+
+		log("implicit Iteration " + std::to_string(iter));
 	
 		// Update Halo for eta_r
 		 HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
