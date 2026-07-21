@@ -683,7 +683,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
     for (int iter = 0; iter < maxIter; ++iter)
     {
 
-		log("implicit Iteration " + std::to_string(iter));
+		//log("implicit Iteration " + std::to_string(iter));
 	
 		// Update Halo for eta_r
 		 HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
@@ -760,8 +760,15 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	    CUDA_CHECK(cudaDeviceSynchronize());
 
         //double rz_new = reducedot(f.r, f.z, n);
+
+		CUDA_CHECK(cudaMemcpy(XModel.time.arrmax, XModel.fluximp.r, n * sizeof(T), cudaMemcpyDeviceToDevice));
+		CUDA_CHECK(cudaMemcpy(XModel.time.arrmin, XModel.fluximp.z, n * sizeof(T), cudaMemcpyDeviceToDevice));
+
 		T rz_new = reducedot(XParam, XModel.blocks,XModel.fluximp.r, XModel.fluximp.z, XModel.fluximp.store);
         T beta = rz_new / rz_old;
+
+		CUDA_CHECK(cudaMemcpy(XModel.fluximp.r, XModel.time.arrmax, n * sizeof(T), cudaMemcpyDeviceToDevice));
+		CUDA_CHECK(cudaMemcpy(XModel.fluximp.z, XModel.time.arrmin, n * sizeof(T), cudaMemcpyDeviceToDevice));
 
 		///xpby_kernel(Param XParam, BlockP<T> XBlock, double* p, const double* z, double beta)
 		xpby_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.p, XModel.fluximp.z,beta);
