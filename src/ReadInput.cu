@@ -1520,7 +1520,7 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	{
 		if (!XParam.implicit)
 		{
-			XParam.CFL = utils::max(XParam.CFL, 0.5);
+			XParam.CFL = utils::min(XParam.CFL, 0.5);
 		}
 		XParam.wetdryfix = false;
 		//XParam.eps = 0.0000000001;
