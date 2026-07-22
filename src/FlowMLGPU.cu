@@ -153,7 +153,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 		cudaMemcpy(XModel.fluximp.eta_r, XModel.evolv.zs, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
-	
+		/*
 		//assemble_alpha_kernel<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.fluxml,dt);
 		acceleration_facex<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluxml, XModel.fluximp, XModel.evolv, T(XLoop.dt));
 		CUDA_CHECK(cudaDeviceSynchronize());
@@ -205,7 +205,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 		HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hav);
 		CUDA_CHECK(cudaDeviceSynchronize());
-
+*/
 		cudaMemcpy(XModel.evolv.zs, XModel.fluximp.eta_r, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
 	}
