@@ -483,6 +483,7 @@ template <class T> __global__ void pressure_flux_reconstruction_facex(Param XPar
 
     int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);
     int idm = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);//memloc(ix - 1, iy, ib);
+    int idp = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);//memloc(ix - 1, iy, ib);
 
     T dry = XParam.eps;
 
@@ -491,9 +492,9 @@ template <class T> __global__ void pressure_flux_reconstruction_facex(Param XPar
     T ax = XParam.theta_H * abaro;   // a_baro(eta_r,0)
     T newhau = XFlux.hau[id] + XFlux.hfu[id] * ax;
 
-    T hl = XEv.h[idm] > dry ? XEv.h[idm] : 0.0;
+    T hl = XEv.h[idp] > dry ? XEv.h[idp] : 0.0;
     T hr = XEv.h[id]  > dry ? XEv.h[id]  : 0.0;
-    T uf = 0.5*(XEv.u[idm] + XEv.u[id]);//(hl > 0.0 || hr > 0.0) ? (hl * XEv.u[idm] + hr * XEv.u[id]) / (hl + hr) : 0.0;
+    T uf = (hl > 0.0 || hr > 0.0) ? (hl * XEv.u[idp] + hr * XEv.u[id]) / (hl + hr) : 0.0;
 
     // NOTE: what's stored here is theta_H*(hu)^{n+1}, not the full flux --
     // this is intentional (see implicit.h comment) because half_advection
@@ -521,6 +522,7 @@ template <class T> __global__ void pressure_flux_reconstruction_facey(Param XPar
 
     int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);
     int idm = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);//memloc(ix - 1, iy, ib);
+    int idp = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);//memloc(ix - 1, iy, ib);
 
     T dry = XParam.eps;
 
@@ -530,9 +532,9 @@ template <class T> __global__ void pressure_flux_reconstruction_facey(Param XPar
     //XFlux.hav[id] += XFlux.hfv[id] * ax;
     T newhav = XFlux.hav[id] + XFlux.hfv[id] * ax;
 
-    T hl = XEv.h[idm] > dry ? XEv.h[idm] : 0.0;
+    T hl = XEv.h[idp] > dry ? XEv.h[idp] : 0.0;
     T hr = XEv.h[id]  > dry ? XEv.h[id]  : 0.0;
-    T uf = 0.5*(XEv.v[idm] + XEv.v[id]);//(hl > 0.0 || hr > 0.0) ? (hl * XEv.v[idm] + hr * XEv.v[id]) / (hl + hr) : 0.0;
+    T uf = (hl > 0.0 || hr > 0.0) ? (hl * XEv.v[idp] + hr * XEv.v[id]) / (hl + hr) : 0.0;
 
     // NOTE: what's stored here is theta_H*(hu)^{n+1}, not the full flux --
     // this is intentional (see implicit.h comment) because half_advection
