@@ -153,7 +153,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 		cudaMemcpy(XModel.fluximp.eta_r, XModel.evolv.zs, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
-		cudaMemcpy(XModel.fluximp.r, XModel.fluxml.hau, n * sizeof(T), cudaMemcpyDeviceToDevice);
+		cudaMemcpy(XModel.fluximp.r, XModel.fluxml.hav, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
 		//assemble_alpha_kernel<<<gridDim, blockDim, 0 >>>(Param, XModel.blocks,XModel.fluxml,dt);
 		acceleration_facex<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluxml, XModel.fluximp, XModel.evolv, T(XLoop.dt));
@@ -175,7 +175,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 		//solveEtaPCG(XParam, XModel, T(XLoop.dt));
 
-		cudaMemcpy(XModel.fluximp.Ap, XModel.fluxml.hau, n * sizeof(T), cudaMemcpyDeviceToDevice);
+		cudaMemcpy(XModel.fluximp.Ap, XModel.fluxml.hav, n * sizeof(T), cudaMemcpyDeviceToDevice);
 		//cudaMemcpy(XModel.fluximp.z, XModel.fluxml.hu, n * sizeof(T), cudaMemcpyDeviceToDevice);
 		
 
@@ -201,7 +201,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 
-		cudaMemcpy(XModel.fluximp.p, XModel.fluxml.hau, n * sizeof(T), cudaMemcpyDeviceToDevice);
+		cudaMemcpy(XModel.fluximp.p, XModel.fluxml.hav, n * sizeof(T), cudaMemcpyDeviceToDevice);
 		
 
 		
@@ -217,7 +217,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 		HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hav);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		cudaMemcpy(XModel.fluximp.z, XModel.fluxml.hau, n * sizeof(T), cudaMemcpyDeviceToDevice);
+		cudaMemcpy(XModel.fluximp.z, XModel.fluxml.hav, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
 		cudaMemcpy(XModel.evolv.zs, XModel.fluximp.eta_r, n * sizeof(T), cudaMemcpyDeviceToDevice);
 

@@ -499,7 +499,7 @@ template <class T> __global__ void pressure_flux_reconstruction_facex(Param XPar
     // this is intentional (see implicit.h comment) because half_advection
     // already applied (1-theta_H)*dt worth of advection, so hydro.h's own
     // pressure event / advect() call only needs the remaining theta_H*dt.
-    XFlux.hu[id] = XParam.theta_H * (XFlux.hfu[id] * uf + dt * XFlux.hau[id]) - dt * XFlux.hau[id];
+    //XFlux.hu[id] = XParam.theta_H * (XFlux.hfu[id] * uf + dt * XFlux.hau[id]) - dt * XFlux.hau[id];
 }
 template __global__ void pressure_flux_reconstruction_facex<float>(Param XParam, BlockP<float> XBlock,FluxMLP<float> XFlux, FluxIMP<float> XImp, EvolvingP<float> XEv,float dt);
 template __global__ void pressure_flux_reconstruction_facex<double>(Param XParam, BlockP<double> XBlock,FluxMLP<double> XFlux, FluxIMP<double> XImp, EvolvingP<double> XEv,double dt);
@@ -536,7 +536,7 @@ template <class T> __global__ void pressure_flux_reconstruction_facey(Param XPar
     // this is intentional (see implicit.h comment) because half_advection
     // already applied (1-theta_H)*dt worth of advection, so hydro.h's own
     // pressure event / advect() call only needs the remaining theta_H*dt.
-    XFlux.hv[id] = XParam.theta_H * (XFlux.hfv[id] * uf + dt * XFlux.hav[id]) - dt * XFlux.hav[id];
+    //XFlux.hv[id] = XParam.theta_H * (XFlux.hfv[id] * uf + dt * XFlux.hav[id]) - dt * XFlux.hav[id];
 }
 template __global__ void pressure_flux_reconstruction_facey<float>(Param XParam, BlockP<float> XBlock,FluxMLP<float> XFlux, FluxIMP<float> XImp, EvolvingP<float> XEv,float dt);
 template __global__ void pressure_flux_reconstruction_facey<double>(Param XParam, BlockP<double> XBlock,FluxMLP<double> XFlux, FluxIMP<double> XImp, EvolvingP<double> XEv,double dt);
