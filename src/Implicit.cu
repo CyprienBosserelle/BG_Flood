@@ -493,7 +493,7 @@ template <class T> __global__ void pressure_flux_reconstruction_facex(Param XPar
 
     T hl = XEv.h[idm] > dry ? XEv.h[idm] : 0.0;
     T hr = XEv.h[id]  > dry ? XEv.h[id]  : 0.0;
-    T uf = 1.0;//(hl > 0.0 || hr > 0.0) ? (hl * XEv.u[idm] + hr * XEv.u[id]) / (hl + hr) : 0.0;
+    T uf = 0.5*(XEv.u[idm] + XEv.u[id]);//(hl > 0.0 || hr > 0.0) ? (hl * XEv.u[idm] + hr * XEv.u[id]) / (hl + hr) : 0.0;
 
     // NOTE: what's stored here is theta_H*(hu)^{n+1}, not the full flux --
     // this is intentional (see implicit.h comment) because half_advection
@@ -532,7 +532,7 @@ template <class T> __global__ void pressure_flux_reconstruction_facey(Param XPar
 
     T hl = XEv.h[idm] > dry ? XEv.h[idm] : 0.0;
     T hr = XEv.h[id]  > dry ? XEv.h[id]  : 0.0;
-    T uf = 1.0;//(hl > 0.0 || hr > 0.0) ? (hl * XEv.v[idm] + hr * XEv.v[id]) / (hl + hr) : 0.0;
+    T uf = 0.5*(XEv.v[idm] + XEv.v[id]);//(hl > 0.0 || hr > 0.0) ? (hl * XEv.v[idm] + hr * XEv.v[id]) / (hl + hr) : 0.0;
 
     // NOTE: what's stored here is theta_H*(hu)^{n+1}, not the full flux --
     // this is intentional (see implicit.h comment) because half_advection
