@@ -677,8 +677,8 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
     //vec_axpy<<<blocks1d, threads1d>>>(f.r, f.Ap, -1.0, n);
-	//axpy_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.r, XModel.fluximp.Ap,T(-1.0));
-	//CUDA_CHECK(cudaDeviceSynchronize());
+	axpy_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.r, XModel.fluximp.Ap,T(-1.0));
+	CUDA_CHECK(cudaDeviceSynchronize());
 
     //vec_jacobi_apply<<<blocks1d, threads1d>>>(f.r, f.z, f.diagInv, n);
 	jacobi_apply_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.r,XModel.fluximp.z,XModel.fluximp.diagInv);
