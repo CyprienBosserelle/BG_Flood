@@ -173,7 +173,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 		//test_symetry(XParam, XModel, T(XLoop.dt));
 
 		//solveEtaPCG(XParam, XModel, T(XLoop.dt));
-
+		*/
 
 		// Update Halo for eta_r
 		HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
@@ -205,7 +205,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 		HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hav);
 		CUDA_CHECK(cudaDeviceSynchronize());
-*/
+
 		cudaMemcpy(XModel.evolv.zs, XModel.fluximp.eta_r, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
 	}
