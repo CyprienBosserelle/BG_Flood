@@ -172,7 +172,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 		//test_symetry(XParam, XModel, T(XLoop.dt));
 
-		solveEtaPCG(XParam, XModel, T(XLoop.dt));
+		//solveEtaPCG(XParam, XModel, T(XLoop.dt));
 		
 
 		// Update Halo for eta_r
