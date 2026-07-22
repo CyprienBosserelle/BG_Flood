@@ -170,7 +170,11 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 		acceleration_rhs<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp, T(XLoop.dt));
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		solveEtaPCG(XParam, XModel, T(XLoop.dt));
+		test_symetry(XParam, XModel, T(XLoop.dt));
+
+		//solveEtaPCG(XParam, XModel, T(XLoop.dt));
+
+
 		// Update Halo for eta_r
 		HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
 		//CUDA_CHECK(cudaDeviceSynchronize());
@@ -819,6 +823,95 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
 
 }
+
+template <class T> void test_symetry(Param XParam, Model<T> XModel,T dt)
+{
+    double tol = XParam.mg_tol;//1e-5;
+	int maxIter = XParam.max_iter;//100
+
+	int n = (XParam.blkwidth + XParam.halowidth*2)*(XParam.blkwidth + XParam.halowidth*2) * XParam.nblk;
+   	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+	// for flux reconstruction the loop overlap the right(or top for the y direction) halo
+	dim3 blockDimKX(XParam.blkwidth + XParam.halowidth, XParam.blkwidth, 1);
+	dim3 blockDimKY(XParam.blkwidth, XParam.blkwidth + XParam.halowidth, 1);
+
+	// Fill halo for Fu and Fv
+	dim3 blockDimHaloLR(1, XParam.blkwidth, 1);
+	//dim3 blockDimHaloBT(16, 1, 1);
+	dim3 gridDimHaloLR(XParam.nblk, 1, 1);
+
+	dim3 blockDimHaloBT(XParam.blkwidth, 1, 1);
+	dim3 gridDimHaloBT(XParam.nblk , 1, 1);
+
+
+	// Do the first variable eta!
+
+	//Second var is zb
+
+
+	matvec_facefieldx<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluximp.eta_r,XModel.fluximp.g_x,XModel.fluximp.alpha_x);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	matvec_facefieldy<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluximp.eta_r,XModel.fluximp.g_y,XModel.fluximp.alpha_y);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.g_x);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPUTMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.g_y);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+    //matvec_facefield<<<blocks, threads>>>(f.eta_r, f.g_x, f.alpha_eta_x, g);
+    // matvec_facefield_y<<<...>>>(f.eta_r, f.g_y, f.alpha_eta_y, g);  (y-mirror)
+    matvec_apply<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluximp.eta_r, XModel.fluximp.Ap, XModel.fluximp.g_x, XModel.fluximp.g_y);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+	CUDA_CHECK(cudaMemcpy(XModel.time.arrmax, XModel.zb, n * sizeof(T), cudaMemcpyDeviceToDevice));
+	CUDA_CHECK(cudaMemcpy(XModel.time.arrmin, XModel.fluximp.Ap, n * sizeof(T), cudaMemcpyDeviceToDevice));
+
+    T rz_A = reducedot(XParam, XModel.blocks,XModel.zb, XModel.fluximp.Ap, XModel.fluximp.store);
+
+	CUDA_CHECK(cudaMemcpy(XModel.zb, XModel.time.arrmax,  n * sizeof(T), cudaMemcpyDeviceToDevice));
+	CUDA_CHECK(cudaMemcpy(XModel.fluximp.Ap, XModel.time.arrmin,  n * sizeof(T), cudaMemcpyDeviceToDevice));
+
+
+
+
+	matvec_facefieldx<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.zb,XModel.fluximp.g_x,XModel.fluximp.alpha_x);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	matvec_facefieldy<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.zb,XModel.fluximp.g_y,XModel.fluximp.alpha_y);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.g_x);
+	//CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPUTMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.g_y);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+    //matvec_facefield<<<blocks, threads>>>(f.eta_r, f.g_x, f.alpha_eta_x, g);
+    // matvec_facefield_y<<<...>>>(f.eta_r, f.g_y, f.alpha_eta_y, g);  (y-mirror)
+    matvec_apply<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.zb, XModel.fluximp.r, XModel.fluximp.g_x, XModel.fluximp.g_y);
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+
+
+	CUDA_CHECK(cudaMemcpy(XModel.time.arrmax, XModel.fluximp.eta_r, n * sizeof(T), cudaMemcpyDeviceToDevice));
+	CUDA_CHECK(cudaMemcpy(XModel.time.arrmin, XModel.fluximp.r, n * sizeof(T), cudaMemcpyDeviceToDevice));
+
+    T rz_B = reducedot(XParam, XModel.blocks,XModel.fluximp.eta_r, XModel.fluximp.Ap, XModel.fluximp.store);
+
+	CUDA_CHECK(cudaMemcpy(XModel.fluximp.eta_r, XModel.time.arrmax,  n * sizeof(T), cudaMemcpyDeviceToDevice));
+	CUDA_CHECK(cudaMemcpy(XModel.fluximp.r, XModel.time.arrmin,  n * sizeof(T), cudaMemcpyDeviceToDevice));
+
+	printf("symmetry check: %g vs %g (diff %g)\n", rz_A, rz_B, rz_A - rz_B);
+}
+
+
+
 
 
 
