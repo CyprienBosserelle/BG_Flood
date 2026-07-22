@@ -283,9 +283,9 @@ template <class T> __global__ void acceleration_facex(Param XParam, BlockP<T> XB
     hu_new += dt * (theta_H * XFlux.hau[id] - XFlux.hfu[id] * ax);
 
     XFlux.hau[id] -= XFlux.hfu[id] * ax;
-    //XFlux.hu[id]  = hu_new;
+    XFlux.hu[id]  = hu_new;
 
-    XImp.su[id]        = XFlux.hu[id];          // single layer: su.x[] += hu.x[] with su.x[] init 0
+    XImp.su[id]        = hu_new;          // single layer: su.x[] += hu.x[] with su.x[] init 0
     XImp.alpha_x[id] = C * XFlux.hfu[id];       // single layer: alpha_eta.x[] += hf.x[]; then *= C
 }
 template __global__ void acceleration_facex<float>(Param XParam, BlockP<float> XBlock, FluxMLP<float> XFlux, FluxIMP<float> XImp, EvolvingP<float> XEv,float dt);
@@ -327,9 +327,9 @@ template <class T> __global__ void acceleration_facey(Param XParam, BlockP<T> XB
     hu_new += dt * (theta_H * XFlux.hav[id] - XFlux.hfv[id] * ax);
 
     XFlux.hav[id] -= XFlux.hfv[id] * ax;
-    //XFlux.hv[id]  = hu_new;
+    XFlux.hv[id]  = hu_new;
 
-    XImp.sv[id]        = XFlux.hv[id];          // single layer: su.x[] += hu.x[] with su.x[] init 0
+    XImp.sv[id]        = hu_new;          // single layer: su.x[] += hu.x[] with su.x[] init 0
     XImp.alpha_y[id] = C * XFlux.hfv[id];       // single layer: alpha_eta.x[] += hf.x[]; then *= C
 }
 template __global__ void acceleration_facey<float>(Param XParam, BlockP<float> XBlock,FluxMLP<float> XFlux, FluxIMP<float> XImp, EvolvingP<float> XEv,float dt);
@@ -489,17 +489,18 @@ template <class T> __global__ void pressure_flux_reconstruction_facex(Param XPar
     T abaro = XParam.g * (XImp.eta_r[idm] - XImp.eta_r[id]) / delta;
 
     T ax = XParam.theta_H * abaro;   // a_baro(eta_r,0)
-    XFlux.hau[id] += XFlux.hfu[id] * ax;
+    T newhau = XFlux.hau[id] + XFlux.hfu[id] * ax;
 
     T hl = XEv.h[idm] > dry ? XEv.h[idm] : 0.0;
     T hr = XEv.h[id]  > dry ? XEv.h[id]  : 0.0;
-    T uf = (hl > 0.0 || hr > 0.0) ? (hl * XEv.u[idm] + hr * XEv.u[id]) / (hl + hr) : 0.0;
+    T uf = 0.0;//(hl > 0.0 || hr > 0.0) ? (hl * XEv.u[idm] + hr * XEv.u[id]) / (hl + hr) : 0.0;
 
     // NOTE: what's stored here is theta_H*(hu)^{n+1}, not the full flux --
     // this is intentional (see implicit.h comment) because half_advection
     // already applied (1-theta_H)*dt worth of advection, so hydro.h's own
     // pressure event / advect() call only needs the remaining theta_H*dt.
-    //XFlux.hu[id] = XParam.theta_H * (XFlux.hfu[id] * uf + dt * XFlux.hau[id]) - dt * XFlux.hau[id];
+    XFlux.hu[id] = XParam.theta_H * (XFlux.hfu[id] * uf + dt * newhau) - dt * newhau;
+    XFlux.hau[id] = newhau;
 }
 template __global__ void pressure_flux_reconstruction_facex<float>(Param XParam, BlockP<float> XBlock,FluxMLP<float> XFlux, FluxIMP<float> XImp, EvolvingP<float> XEv,float dt);
 template __global__ void pressure_flux_reconstruction_facex<double>(Param XParam, BlockP<double> XBlock,FluxMLP<double> XFlux, FluxIMP<double> XImp, EvolvingP<double> XEv,double dt);
@@ -526,17 +527,19 @@ template <class T> __global__ void pressure_flux_reconstruction_facey(Param XPar
     T abaro = XParam.g * (XImp.eta_r[idm] - XImp.eta_r[id]) / delta;
 
     T ax = XParam.theta_H * abaro;   // a_baro(eta_r,0)
-    XFlux.hav[id] += XFlux.hfv[id] * ax;
+    //XFlux.hav[id] += XFlux.hfv[id] * ax;
+    T newhav = XFlux.hav[id] + XFlux.hfv[id] * ax;
 
     T hl = XEv.h[idm] > dry ? XEv.h[idm] : 0.0;
     T hr = XEv.h[id]  > dry ? XEv.h[id]  : 0.0;
-    T uf = (hl > 0.0 || hr > 0.0) ? (hl * XEv.v[idm] + hr * XEv.v[id]) / (hl + hr) : 0.0;
+    T uf = 0.0;//(hl > 0.0 || hr > 0.0) ? (hl * XEv.v[idm] + hr * XEv.v[id]) / (hl + hr) : 0.0;
 
     // NOTE: what's stored here is theta_H*(hu)^{n+1}, not the full flux --
     // this is intentional (see implicit.h comment) because half_advection
     // already applied (1-theta_H)*dt worth of advection, so hydro.h's own
     // pressure event / advect() call only needs the remaining theta_H*dt.
-    //XFlux.hv[id] = XParam.theta_H * (XFlux.hfv[id] * uf + dt * XFlux.hav[id]) - dt * XFlux.hav[id];
+    XFlux.hv[id] = XParam.theta_H * (XFlux.hfv[id] * uf + dt * newhav[id]) - dt * newhav;
+    XFlux.hav[id] = newhav;
 }
 template __global__ void pressure_flux_reconstruction_facey<float>(Param XParam, BlockP<float> XBlock,FluxMLP<float> XFlux, FluxIMP<float> XImp, EvolvingP<float> XEv,float dt);
 template __global__ void pressure_flux_reconstruction_facey<double>(Param XParam, BlockP<double> XBlock,FluxMLP<double> XFlux, FluxIMP<double> XImp, EvolvingP<double> XEv,double dt);
