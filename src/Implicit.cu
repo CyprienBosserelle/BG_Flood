@@ -283,7 +283,7 @@ template <class T> __global__ void acceleration_facex(Param XParam, BlockP<T> XB
     hu_new += dt * (theta_H * XFlux.hau[id] - XFlux.hfu[id] * ax);
 
     XFlux.hau[id] -= XFlux.hfu[id] * ax;
-    XFlux.hu[id]  = hu_new;
+    //XFlux.hu[id]  = hu_new;
 
     XImp.su[id]        = XFlux.hu[id];          // single layer: su.x[] += hu.x[] with su.x[] init 0
     XImp.alpha_x[id] = C * XFlux.hfu[id];       // single layer: alpha_eta.x[] += hf.x[]; then *= C
@@ -327,7 +327,7 @@ template <class T> __global__ void acceleration_facey(Param XParam, BlockP<T> XB
     hu_new += dt * (theta_H * XFlux.hav[id] - XFlux.hfv[id] * ax);
 
     XFlux.hav[id] -= XFlux.hfv[id] * ax;
-    XFlux.hv[id]  = hu_new;
+    //XFlux.hv[id]  = hu_new;
 
     XImp.sv[id]        = XFlux.hv[id];          // single layer: su.x[] += hu.x[] with su.x[] init 0
     XImp.alpha_y[id] = C * XFlux.hfv[id];       // single layer: alpha_eta.x[] += hf.x[]; then *= C
