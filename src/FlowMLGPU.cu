@@ -172,7 +172,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 		//test_symetry(XParam, XModel, T(XLoop.dt));
 
-		solveEtaPCG(XParam, XModel, T(XLoop.dt));
+		//solveEtaPCG(XParam, XModel, T(XLoop.dt));
 
 
 		// Update Halo for eta_r
@@ -680,6 +680,8 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	axpy_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.r, XModel.fluximp.Ap,T(-1.0));
 	CUDA_CHECK(cudaDeviceSynchronize());
 
+	//CUDA_CHECK(cudaMemcpy(XModel.fluximp.z, XModel.fluximp.r, n * sizeof(T), cudaMemcpyDeviceToDevice));
+
     //vec_jacobi_apply<<<blocks1d, threads1d>>>(f.r, f.z, f.diagInv, n);
 	jacobi_apply_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.r,XModel.fluximp.z,XModel.fluximp.diagInv);
 	CUDA_CHECK(cudaDeviceSynchronize());
@@ -711,7 +713,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 		//log("implicit Iteration " + std::to_string(iter));
 	
 		// Update Halo for eta_r
-		 HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
+		HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
 		//CUDA_CHECK(cudaDeviceSynchronize());
 
 		HaloFluxGPUBMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
