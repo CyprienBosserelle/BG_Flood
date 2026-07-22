@@ -144,8 +144,12 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	{
 		//
 		int n = XParam.blksize * XParam.nblk;
-		T dt_thetaH = T((1 - XParam.theta_H) * XLoop.dt);
-		AdvecML( XParam, XLoop, XForcing, XModel, dt_thetaH);
+
+		if(XParam.theta_H < 1.0)
+		{
+			T dt_thetaH = T((1 - XParam.theta_H) * XLoop.dt);
+			AdvecML( XParam, XLoop, XForcing, XModel, dt_thetaH);
+		}
 
 		cudaMemcpy(XModel.fluximp.eta_r, XModel.evolv.zs, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
