@@ -173,7 +173,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 		//test_symetry(XParam, XModel, T(XLoop.dt));
 
-		solveEtaPCG(XParam, XModel, T(XLoop.dt));
+		//solveEtaPCG(XParam, XModel, T(XLoop.dt));
 
 		//cudaMemcpy(XModel.fluximp.Ap, XModel.fluxml.hav, n * sizeof(T), cudaMemcpyDeviceToDevice);
 		//cudaMemcpy(XModel.fluximp.z, XModel.fluxml.hu, n * sizeof(T), cudaMemcpyDeviceToDevice);
