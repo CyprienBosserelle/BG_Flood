@@ -637,7 +637,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 {
     T tol = XParam.mg_tol;//1e-5;
 
-	log("max tol = " + std::to_string(tol))
+	log("max tol = " + std::to_string(tol));
 
 
 	int maxIter = XParam.max_iter;//100
