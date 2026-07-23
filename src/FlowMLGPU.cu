@@ -740,17 +740,19 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 		//log("implicit Iteration " + std::to_string(iter));
 	
 		// Update Halo for eta_r
-		HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
-		CUDA_CHECK(cudaDeviceSynchronize());
+		// HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
+		// CUDA_CHECK(cudaDeviceSynchronize());
 
-		HaloFluxGPUBMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
-		CUDA_CHECK(cudaDeviceSynchronize());
+		// HaloFluxGPUBMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
+		// CUDA_CHECK(cudaDeviceSynchronize());
 
-		HaloFluxGPULMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
-		CUDA_CHECK(cudaDeviceSynchronize());
+		// HaloFluxGPULMLnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
+		// CUDA_CHECK(cudaDeviceSynchronize());
 
-		HaloFluxGPUTMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
-		CUDA_CHECK(cudaDeviceSynchronize());
+		// HaloFluxGPUTMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
+		// CUDA_CHECK(cudaDeviceSynchronize());
+
+		fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.eta_r);
 
         HaloFluxGPULMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.p);
 		//CUDA_CHECK(cudaDeviceSynchronize());
