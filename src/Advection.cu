@@ -763,7 +763,7 @@ template __host__ double reduceabsmaxold<double>(Param XParam, BlockP<double> XB
 // do a Harris-style (kernel 3, sequential addressing) shared-memory
 // reduction down to ONE max value for that block.
 // ---------------------------------------------------------------------
-template <class T> __global__ void absmaxReduceStage1(Param XParam, BlockP<T> XBlock, T* a,T* store))
+template <class T> __global__ void absmaxReduceStage1(Param XParam, BlockP<T> XBlock, T* a,T* store)
 {
     extern __shared__ T sdata[];
 
