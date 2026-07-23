@@ -846,10 +846,10 @@ template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a,T* store)
 
     static T* d_blockMax = nullptr;
     static unsigned int allocatedBlocks = 0;
-    if ((unsigned)nblkactive > allocatedBlocks) {
+    if ((unsigned)XParam.nblk > allocatedBlocks) {
         if (d_blockMax) cudaFree(d_blockMax);
-        cudaMalloc(&d_blockMax, nblkactive * sizeof(T));
-        allocatedBlocks = nblkactive;
+        cudaMalloc(&d_blockMax, XParam.nblk * sizeof(T));
+        allocatedBlocks = XParam.nblk;
     }
 
 	//absmaxReduceStage1(Param XParam, BlockP<T> XBlock, T* a,T* store)
@@ -858,7 +858,7 @@ template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a,T* store)
 
     // --- Stage 2: multi-pass reduction of the nblkactive per-block maxima ---
     const unsigned int threads2 = 256;
-    unsigned int n = (unsigned int)nblkactive;
+    unsigned int n = (unsigned int)XParam.nblk;
 
     static double* d_bufA = nullptr;
     static double* d_bufB = nullptr;
