@@ -841,7 +841,7 @@ template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a,T* store)
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
     dim3 threads1(XParam.blkwidth, XParam.blkwidth);
-    dim3 blocks1(Param.nblk);
+    dim3 blocks1(XParam.nblk);
     size_t smem1 = XParam.blkwidth * XParam.blkwidth * sizeof(T);
 
     static T* d_blockMax = nullptr;
