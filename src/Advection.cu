@@ -860,8 +860,8 @@ template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a,T* store)
     const unsigned int threads2 = 256;
     unsigned int n = (unsigned int)XParam.nblk;
 
-    static double* d_bufA = nullptr;
-    static double* d_bufB = nullptr;
+    static T* d_bufA = nullptr;
+    static T* d_bufB = nullptr;
     static unsigned int allocatedSize2 = 0;
     unsigned int neededSize = std::max((n + threads2 - 1) / threads2, 1u);
     if (neededSize > allocatedSize2) {
