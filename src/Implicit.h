@@ -39,4 +39,7 @@ template <class T> __global__ void matvec_apply(Param XParam, BlockP<T> XBlock,T
 template <class T> __global__ void jacobi_diag(Param XParam, BlockP<T> XBlock, FluxIMP<T> XImp);
 template <class T> __global__ void pressure_flux_reconstruction_facex(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, FluxIMP<T> XImp, EvolvingP<T> XEv,T dt);
 template <class T> __global__ void pressure_flux_reconstruction_facey(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, FluxIMP<T> XImp, EvolvingP<T> XEv,T dt);
+
+template <class T> __global__  void HaloFluxGPURMLclamp(Param XParam, BlockP<T> XBlock, T* z,T val);
+template <class T> __global__  void HaloFluxGPUTMLclamp(Param XParam, BlockP<T> XBlock, T* z,T val);
 #endif

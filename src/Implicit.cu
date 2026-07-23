@@ -547,6 +547,70 @@ template __global__ void pressure_flux_reconstruction_facey<float>(Param XParam,
 template __global__ void pressure_flux_reconstruction_facey<double>(Param XParam, BlockP<double> XBlock,FluxMLP<double> XFlux, FluxIMP<double> XImp, EvolvingP<double> XEv,double dt);
 
 
+template <class T> __global__  void HaloFluxGPURMLclamp(Param XParam, BlockP<T> XBlock, T* z,T val)
+{
+	int jj, i, iia, iib;
+	int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	//unsigned int ix = 0;
+	int iy = threadIdx.y;
+	int ibl = blockIdx.x;
+	if (ibl < XParam.nblk)
+	{
+
+		int ib = XBlock.active[ibl];
+
+
+		int j = iy;
+
+		i = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, j, ib);
+		
+
+		if (XBlock.RightBot[ib] == ib) // it is a boundary side
+		{
+            //
+            z[i] = val;
+        }
+        
+        
+
+	}
+}
+template __global__  void HaloFluxGPURMLclamp<float>(Param XParam, BlockP<float> XBlock, float* z,float val);
+template __global__  void HaloFluxGPURMLclamp<double>(Param XParam, BlockP<double> XBlock, double* z,double val);
+
+template <class T> __global__  void HaloFluxGPUTMLclamp(Param XParam, BlockP<T> XBlock, T* z,T val)
+{
+	int jj, i, iia, iib;
+	int blkmemwidth = blockDim.x + XParam.halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+	int ix = threadIdx.x;
+	//unsigned int iy = threadIdx.x;
+	int ibl = blockIdx.x;
+	
+
+	int j = ix;
+
+
+	if (ibl < XParam.nblk)
+	{
+		int ib = XBlock.active[ibl];
+
+		i = memloc(XParam.halowidth, blkmemwidth, j, XParam.blkwidth, ib);
+		
+
+		if (XBlock.TopLeft[ib] == ib)
+		{
+            z[i] = val;
+        }
+    }
+}
+template __global__  void HaloFluxGPUTMLclamp<float>(Param XParam, BlockP<float> XBlock, float* z,float val);
+template __global__  void HaloFluxGPUTMLclamp<double>(Param XParam, BlockP<double> XBlock, double* z,double val);
+
+
+
+
 // /**
 //  * @brief Multigrid relaxation function (Red-Black Gauss-Seidel)
 //  */
