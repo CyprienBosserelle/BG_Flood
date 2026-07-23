@@ -748,7 +748,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
     for (int iter = 0; iter < maxIter; ++iter)
     {
 
-		//log("implicit Iteration " + std::to_string(iter));
+		log("implicit Iteration " + std::to_string(iter));
 	
 		// Update Halo for eta_r
 		// HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
@@ -776,6 +776,12 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
 		HaloFluxGPURMLclamp<<< gridDimHaloLR, blockDimHaloLR, 0 >>> (XParam, XModel.blocks,XModel.fluximp.p,T(0.0));
 		CUDA_CHECK(cudaDeviceSynchronize());
+
+		// HaloFluxGPUBMLclamp<<< gridDimHaloBT, blockDimHaloBT, 0 >>>(XParam, XModel.blocks,XModel.fluximp.p,T(0.0));
+		// CUDA_CHECK(cudaDeviceSynchronize());
+
+		// HaloFluxGPULMLclamp<<< gridDimHaloLR, blockDimHaloLR, 0 >>> (XParam, XModel.blocks,XModel.fluximp.p,T(0.0));
+		// CUDA_CHECK(cudaDeviceSynchronize());
 
 
 		matvec_facefieldx<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.p, XModel.fluximp.g_x, XModel.fluximp.alpha_x);
