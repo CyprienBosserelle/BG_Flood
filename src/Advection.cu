@@ -691,7 +691,7 @@ template <class T> __host__ T reducedot(Param XParam, BlockP<T> XBlock, T* a, T*
 template __host__ float reducedot<float>(Param XParam, BlockP<float> XBlock, float* a, float* b, float* store);
 template __host__ double reducedot<double>(Param XParam, BlockP<double> XBlock, double* a, double* b, double* store);
 
-template <class T> __host__ T reduceabsmax(Param XParam, BlockP<T> XBlock, T* a,T* store)
+template <class T> __host__ T reduceabsmaxold(Param XParam, BlockP<T> XBlock, T* a,T* store)
 {
 	T* dummy;
 	AllocateCPU(32, 1, dummy);
@@ -754,10 +754,141 @@ template <class T> __host__ T reduceabsmax(Param XParam, BlockP<T> XBlock, T* a,
 
 	free(dummy);
 }
-template __host__ float reduceabsmax<float>(Param XParam, BlockP<float> XBlock, float* a, float* store);
-template __host__ double reduceabsmax<double>(Param XParam, BlockP<double> XBlock, double* a, double* store);
+template __host__ float reduceabsmaxold<float>(Param XParam, BlockP<float> XBlock, float* a, float* store);
+template __host__ double reduceabsmaxold<double>(Param XParam, BlockP<double> XBlock, double* a, double* store);
 
+// ---------------------------------------------------------------------
+// Stage 1: one CUDA block per ACTIVE memory block. Every thread reads
+// exactly one interior cell, the whole block's 16x16=256 threads then
+// do a Harris-style (kernel 3, sequential addressing) shared-memory
+// reduction down to ONE max value for that block.
+// ---------------------------------------------------------------------
+template <class T> __global__ void absmaxReduceStage1(Param XParam, BlockP<T> XBlock, T* a,T* store))
+{
+    extern __shared__ T sdata[];
 
+    int ix  = threadIdx.x;
+    int iy  = threadIdx.y;
+    int ibl = blockIdx.x;
+    int ib  = active[ibl];          // real block id, only ACTIVE blocks get launched
+
+    // Flatten the 2D thread index for the 1D shared-memory reduction below.
+    unsigned int tid = iy * blockDim.x + ix;
+
+    int id = memloc(halowidth, blkmemwidth, ix, iy, ib);
+    sdata[tid] = fabs(a[id]);        // single, non-destructive read of `a`
+    __syncthreads();
+
+    // Sequential addressing (Harris kernel 3): halve the active range each
+    // step, contiguous threads tid=0..s-1 do the work -> no bank conflicts,
+    // no warp divergence. blockDim.x*blockDim.y (256) is a power of two,
+    // so this cleanly reaches s=0.
+    for (unsigned int s = (blockDim.x * blockDim.y) / 2; s > 0; s >>= 1)
+    {
+        if (tid < s)
+            sdata[tid] = fmax(sdata[tid], sdata[tid + s]);
+        __syncthreads();
+    }
+
+    if (tid == 0) blockMax[ibl] = sdata[0];   // one value per active block
+}
+
+// ---------------------------------------------------------------------
+// Stage 2: reduce the (small) per-block maxima down to one scalar.
+// Same sequential-addressing technique, generic over array length via
+// a multi-pass host loop (exactly the pattern used for reduceDot's
+// Harris-3 version) since nblkactive isn't guaranteed to fit in one
+// block's worth of threads.
+// ---------------------------------------------------------------------
+template <class T> __global__ void maxReduceStage2(const T* __restrict__ g_idata,
+                                 T* __restrict__ g_odata,
+                                 unsigned int n)
+{
+    extern __shared__ T sdata[];
+    unsigned int tid = threadIdx.x;
+    unsigned int i   = blockIdx.x * blockDim.x + threadIdx.x;
+
+    // Cells beyond n contribute 0.0, the identity for max over |.| >= 0 data.
+    sdata[tid] = (i < n) ? g_idata[i] : 0.0;
+    __syncthreads();
+
+    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1)
+    {
+        if (tid < s)
+            sdata[tid] = fmax(sdata[tid], sdata[tid + s]);
+        __syncthreads();
+    }
+
+    if (tid == 0) g_odata[blockIdx.x] = sdata[0];
+}
+
+// ---------------------------------------------------------------------
+// Host driver.
+//   a              : the field to reduce (e.g. f.r, residual, etc.)
+//   d_active       : device pointer to XBlock.active (compact list,
+//                    length nblkactive)
+//   nblkactive     : number of ACTIVE blocks (== grid size for stage 1)
+//   halowidth      : XParam.halowidth (1 in your example)
+//   blkdim         : interior tile size (16 in your example)
+// ---------------------------------------------------------------------
+//double reduceAbsMax(const double* a, const int* d_active, int nblkactive, int halowidth, int blkdim)
+template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a,T* store)
+{
+    int blkmemwidth = XParam.blkwidth + 2 * halowidth;
+
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+    dim3 threads1(XParam.blkwidth, XParam.blkwidth);
+    dim3 blocks1(Param.nblk);
+    size_t smem1 = XParam.blkwidth * XParam.blkwidth * sizeof(T);
+
+    static T* d_blockMax = nullptr;
+    static unsigned int allocatedBlocks = 0;
+    if ((unsigned)nblkactive > allocatedBlocks) {
+        if (d_blockMax) cudaFree(d_blockMax);
+        cudaMalloc(&d_blockMax, nblkactive * sizeof(T));
+        allocatedBlocks = nblkactive;
+    }
+
+    absmaxReduceStage1<<<blocks1, threads1, smem1>>>(
+        a, d_active, d_blockMax, halowidth, blkmemwidth);
+
+    // --- Stage 2: multi-pass reduction of the nblkactive per-block maxima ---
+    const unsigned int threads2 = 256;
+    unsigned int n = (unsigned int)nblkactive;
+
+    static double* d_bufA = nullptr;
+    static double* d_bufB = nullptr;
+    static unsigned int allocatedSize2 = 0;
+    unsigned int neededSize = std::max((n + threads2 - 1) / threads2, 1u);
+    if (neededSize > allocatedSize2) {
+        if (d_bufA) cudaFree(d_bufA);
+        if (d_bufB) cudaFree(d_bufB);
+        cudaMalloc(&d_bufA, neededSize * sizeof(T));
+        cudaMalloc(&d_bufB, neededSize * sizeof(T));
+        allocatedSize2 = neededSize;
+    }
+
+    // First stage-2 pass reads directly from d_blockMax (the stage-1 output).
+    unsigned int blocks2 = (n + threads2 - 1) / threads2;
+    size_t smem2 = threads2 * sizeof(T);
+    maxReduceStage2<<<blocks2, threads2, smem2>>>(d_blockMax, d_bufA, n);
+
+    n = blocks2;
+    T* src = d_bufA;
+    T* dst = d_bufB;
+    while (n > 1)
+    {
+        unsigned int nextBlocks = (n + threads2 - 1) / threads2;
+        maxReduceStage2<<<nextBlocks, threads2, smem2>>>(src, dst, n);
+        std::swap(src, dst);
+        n = nextBlocks;
+    }
+
+    T h_result;
+    cudaMemcpy(&h_result, src, sizeof(T), cudaMemcpyDeviceToHost);
+    return h_result;
+}
 
 /**
  * @brief GPU kernel to compute the minimum value in an array using parallel reduction.
