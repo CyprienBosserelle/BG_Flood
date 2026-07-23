@@ -1312,7 +1312,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 				int n = memloc(XParam, ix, iy, ib);
 				XModel.time.dtmax[n] = mininput * T(1.1) + utils::max(T(rand()) / T(RAND_MAX), T(0.0));
 
-				XModel.evolv.u[n] = maxinput * T(0.9) + T(rand()) / T(RAND_MAX)) - T(0.5)*T(RAND_MAX);
+				XModel.evolv.u[n] = maxinput * T(0.9) + T(rand()) / T(RAND_MAX) - T(0.5)*T(RAND_MAX);
 
 			}
 		}
