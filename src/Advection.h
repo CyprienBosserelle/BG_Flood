@@ -35,7 +35,8 @@ template <class T> __global__ void maxReduce3(const T* __restrict__ g_idata, T* 
 template <class T> __global__ void densify(Param XParam, BlockP<T> XBlock, T* g_idata, T* g_odata);
 
 
-template <class T> __host__ T reduceabsmax(Param XParam, BlockP<T> XBlock, T* a,T* store);
+template <class T> __host__ T reduceabsmaxold(Param XParam, BlockP<T> XBlock, T* a,T* store);
+template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a,T* store);
 template <class T> __host__ T reducedot(Param XParam, BlockP<T> XBlock, T* a, T* b, T* store);
 
 

@@ -892,6 +892,8 @@ template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a,T* store)
     cudaMemcpy(&h_result, src, sizeof(T), cudaMemcpyDeviceToHost);
     return h_result;
 }
+template float reduceAbsMax<float>(Param XParam, BlockP<float> XBlock, float* a,float* store);
+template double reduceAbsMax<double>(Param XParam, BlockP<double> XBlock, double* a,double* store);
 
 /**
  * @brief GPU kernel to compute the minimum value in an array using parallel reduction.
