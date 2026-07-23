@@ -767,15 +767,17 @@ template <class T> __global__ void absmaxReduceStage1(Param XParam, BlockP<T> XB
 {
     extern __shared__ T sdata[];
 
+	 int blkmemwidth = XParam.blkwidth + 2 * XParam.halowidth;
+
     int ix  = threadIdx.x;
     int iy  = threadIdx.y;
     int ibl = blockIdx.x;
-    int ib  = active[ibl];          // real block id, only ACTIVE blocks get launched
+    int ib  = XBlock.active[ibl];          // real block id, only ACTIVE blocks get launched
 
     // Flatten the 2D thread index for the 1D shared-memory reduction below.
     unsigned int tid = iy * blockDim.x + ix;
 
-    int id = memloc(halowidth, blkmemwidth, ix, iy, ib);
+    int id = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
     sdata[tid] = fabs(a[id]);        // single, non-destructive read of `a`
     __syncthreads();
 
@@ -790,7 +792,7 @@ template <class T> __global__ void absmaxReduceStage1(Param XParam, BlockP<T> XB
         __syncthreads();
     }
 
-    if (tid == 0) blockMax[ibl] = sdata[0];   // one value per active block
+    if (tid == 0) store[ibl] = sdata[0];   // one value per active block
 }
 
 // ---------------------------------------------------------------------
@@ -834,7 +836,7 @@ template <class T> __global__ void maxReduceStage2(const T* __restrict__ g_idata
 //double reduceAbsMax(const double* a, const int* d_active, int nblkactive, int halowidth, int blkdim)
 template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a,T* store)
 {
-    int blkmemwidth = XParam.blkwidth + 2 * halowidth;
+    int blkmemwidth = XParam.blkwidth + 2 * XParam.halowidth;
 
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
@@ -850,8 +852,9 @@ template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a,T* store)
         allocatedBlocks = nblkactive;
     }
 
-    absmaxReduceStage1<<<blocks1, threads1, smem1>>>(
-        a, d_active, d_blockMax, halowidth, blkmemwidth);
+	//absmaxReduceStage1(Param XParam, BlockP<T> XBlock, T* a,T* store)
+
+    absmaxReduceStage1<<<blocks1, threads1, smem1>>>(XParam,XBlock,a,store);
 
     // --- Stage 2: multi-pass reduction of the nblkactive per-block maxima ---
     const unsigned int threads2 = 256;
