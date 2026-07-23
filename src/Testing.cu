@@ -1283,6 +1283,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 	dim3 gridDim(XParam.nblk, 1, 1);
 	//srand(seed);
 	T mininput = T(rand()) / T(RAND_MAX);
+	T maxinput = T(rand()) / T(RAND_MAX);
 	bool test = true;
 
 	Loop<T> XLoop;
@@ -1310,6 +1311,9 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 				//
 				int n = memloc(XParam, ix, iy, ib);
 				XModel.time.dtmax[n] = mininput * T(1.1) + utils::max(T(rand()) / T(RAND_MAX), T(0.0));
+
+				XModel.evolv.u[n] = maxinput * T(0.9) + T(rand()) / T(RAND_MAX)) - T(0.5)*T(RAND_MAX);
+
 			}
 		}
 	}
@@ -1323,10 +1327,14 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 	int nn = memloc(XParam, ixx, iyy, ibb);
 
 	XModel.time.dtmax[nn] = mininput;
+	XModel.evolv.u[nn] = maxinput;
 
 	T reducedt = CalctimestepCPU(XParam, XLoop, XModel.blocks, XModel.time);
 
+	
 	test = abs(reducedt - mininput) < T(100.0) * (XLoop.epsilon);
+
+	
 	bool testgpu;
 
 	if (!test)
@@ -1346,11 +1354,23 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 		T reducedtgpu = CalctimestepGPU(XParam, XLoop, XModel_g.blocks, XModel_g.time);
 		testgpu = abs(reducedtgpu - mininput) < T(100.0) * (XLoop.epsilon);
 
+
+		CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.evolv.u, XModel_g.evolv.u);
+		T redabsmax = reduceabsmax(XParam, XModel.blocks, XModel_g.evolv.u, XModel_g.evolv.v);
+		bool testmax =  abs(redabsmax - maxinput) < T(100.0) * (XLoop.epsilon);
+
 		if (!testgpu)
 		{
 			char buffer[256]; sprintf(buffer, "%e", abs(reducedtgpu - mininput));
 			std::string str(buffer);
 			log("\t\t GPU test failed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedtgpu) + ";  error=" + str);
+		}
+
+		if (!testmax)
+		{
+			char buffer[256]; sprintf(buffer, "%e", abs(redabsmax - maxinput));
+			std::string str(buffer);
+			log("\t\t GPU Max test failed! : Expected=" + std::to_string(maxinput) + ";  Reduced=" + std::to_string(redabsmax) + ";  error=" + str);
 		}
 
 		if (abs(reducedtgpu - reducedt) > T(100.0) * (XLoop.epsilon))

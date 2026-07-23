@@ -635,7 +635,11 @@ template void AdvecML<double>(Param XParam, Loop<double>& XLoop, Forcing<float> 
 
 template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 {
-    double tol = XParam.mg_tol;//1e-5;
+    T tol = XParam.mg_tol;//1e-5;
+
+	log("max tol = " + std::to_string(tol))
+
+
 	int maxIter = XParam.max_iter;//100
 
 	int n = (XParam.blkwidth + XParam.halowidth*2)*(XParam.blkwidth + XParam.halowidth*2) * XParam.nblk;
@@ -655,6 +659,9 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
 
 	T maxerror;
+
+	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, T(0.0), XModel.fluximp.r);
+	CUDA_CHECK(cudaDeviceSynchronize());
 
     HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >>> (XParam, XModel.blocks, XModel.fluximp.alpha_x);
 	//CUDA_CHECK(cudaDeviceSynchronize());
@@ -748,7 +755,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
     for (int iter = 0; iter < maxIter; ++iter)
     {
 
-		log("implicit Iteration " + std::to_string(iter));
+		log("implicit Iteration " + std::to_string(iter) + "max tol = " + std::to_string(tol) + " maxerror = " + std::to_string(maxerror));
 	
 		// Update Halo for eta_r
 		// HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
