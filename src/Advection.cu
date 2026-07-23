@@ -765,9 +765,10 @@ template __host__ double reduceabsmaxold<double>(Param XParam, BlockP<double> XB
 // ---------------------------------------------------------------------
 template <class T> __global__ void absmaxReduceStage1(Param XParam, BlockP<T> XBlock, T* a,T* store)
 {
-    extern __shared__ T sdata[];
+    //extern __shared__ T sdata[];
+	T* sdata = SharedMemory<T>();
 
-	 int blkmemwidth = XParam.blkwidth + 2 * XParam.halowidth;
+	int blkmemwidth = XParam.blkwidth + 2 * XParam.halowidth;
 
     int ix  = threadIdx.x;
     int iy  = threadIdx.y;
@@ -806,7 +807,8 @@ template <class T> __global__ void maxReduceStage2(const T* __restrict__ g_idata
                                  T* __restrict__ g_odata,
                                  unsigned int n)
 {
-    extern __shared__ T sdata[];
+    //extern __shared__ T sdata[];
+	T* sdata = SharedMemory<T>();
     unsigned int tid = threadIdx.x;
     unsigned int i   = blockIdx.x * blockDim.x + threadIdx.x;
 
