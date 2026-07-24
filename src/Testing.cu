@@ -1327,7 +1327,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 	int nn = memloc(XParam, ixx, iyy, ibb);
 
 	XModel.time.dtmax[nn] = mininput;
-	XModel.evolv.u[nn] = maxinput + T(RAND_MAX);
+	XModel.evolv.u[nn] = maxinput;
 
 	T reducedt = CalctimestepCPU(XParam, XLoop, XModel.blocks, XModel.time);
 
@@ -1359,6 +1359,8 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 
 
 		CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.evolv.u, XModel_g.evolv.u);
+
+
 		T redabsmax = reduceAbsMax(XParam, XModel_g.blocks, XModel_g.evolv.u);
 		//T redabsmax = T(0.0);
 		//T redabsmaxold = reduceabsmaxold(XParam, XModel_g.blocks, XModel_g.evolv.u, XModel_g.evolv.v);
