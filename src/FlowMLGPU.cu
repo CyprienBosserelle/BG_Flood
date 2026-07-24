@@ -637,7 +637,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 {
     T tol = XParam.mg_tol;//1e-5;
 
-	log("max tol = " + std::to_string(tol));
+	//log("max tol = " + std::to_string(tol));
 
 
 	int maxIter = XParam.max_iter;//100
@@ -755,7 +755,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
     for (int iter = 0; iter < maxIter; ++iter)
     {
 
-		log("implicit Iteration " + std::to_string(iter) + "max tol = " + std::to_string(tol) + " maxerror = " + std::to_string(maxerror));
+		log("implicit Iteration " + std::to_string(iter) + "; max tol = " + std::to_string(tol) + "; maxerror = " + std::to_string(maxerror));
 	
 		// Update Halo for eta_r
 		// HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
