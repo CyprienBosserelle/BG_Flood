@@ -168,8 +168,14 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 		HaloFluxGPUTMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.sv);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.su);
-		fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.sv);
+		// fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.su);
+		// fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.sv);
+
+		HaloFluxGPUTMLclamp<<< gridDimHaloBT, blockDimHaloBT, 0 >>>(XParam, XModel.blocks,XModel.fluximp.g_y,T(0.0));
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		HaloFluxGPURMLclamp<<< gridDimHaloLR, blockDimHaloLR, 0 >>> (XParam, XModel.blocks,XModel.fluximp.g_x,T(0.0));
+		CUDA_CHECK(cudaDeviceSynchronize());
 
 		acceleration_rhs<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp, T(XLoop.dt));
 		CUDA_CHECK(cudaDeviceSynchronize());
