@@ -571,7 +571,7 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 		if (h[i] > XParam.eps || zsX > zsi )
 		{
 			ABS1DQ(T(XParam.g), sign, factime, facrel, zsi, zsX, zsinside, h[i], qmean, F, G, S);
-			qmean = T(0.0);
+			//qmean = T(0.0);
 		}
 		else
 		{
