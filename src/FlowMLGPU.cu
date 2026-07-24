@@ -171,10 +171,10 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 		acceleration_rhs<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp, T(XLoop.dt));
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
-		{
-			FlowbndFluxML(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
-		}
+		//for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+		//{
+		//	FlowbndFluxML(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
+		//}
 
 		//test_symetry(XParam, XModel, T(XLoop.dt));
 
@@ -660,8 +660,8 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
 	T maxerror;
 
-	reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, T(0.0), XModel.fluximp.r);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	//reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, T(0.0), XModel.fluximp.r);
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
     HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >>> (XParam, XModel.blocks, XModel.fluximp.alpha_x);
 	//CUDA_CHECK(cudaDeviceSynchronize());
@@ -681,8 +681,8 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	// HaloFluxGPURMLclamp<<< gridDimHaloLR, blockDimHaloLR, 0 >>> (XParam, XModel.blocks,XModel.fluximp.alpha_x,T(0.0));
 	// CUDA_CHECK(cudaDeviceSynchronize());
 
-	fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.alpha_x);
-	fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.alpha_y);
+	//fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.alpha_x);
+	//fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.alpha_y);
 
     jacobi_diag<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp);
 	CUDA_CHECK(cudaDeviceSynchronize());
@@ -736,19 +736,19 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	//x2_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.z, XModel.fluximp.p);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
-	CUDA_CHECK(cudaMemcpy(XModel.time.arrmax, XModel.fluximp.z, n * sizeof(T), cudaMemcpyDeviceToDevice));
-	CUDA_CHECK(cudaMemcpy(XModel.time.arrmin, XModel.fluximp.r, n * sizeof(T), cudaMemcpyDeviceToDevice));
+	//CUDA_CHECK(cudaMemcpy(XModel.time.arrmax, XModel.fluximp.z, n * sizeof(T), cudaMemcpyDeviceToDevice));
+	//CUDA_CHECK(cudaMemcpy(XModel.time.arrmin, XModel.fluximp.r, n * sizeof(T), cudaMemcpyDeviceToDevice));
 
     T rz_old = reduceDot(XParam, XModel.blocks,XModel.fluximp.r, XModel.fluximp.z);
 
-	CUDA_CHECK(cudaMemcpy(XModel.fluximp.z, XModel.time.arrmax,  n * sizeof(T), cudaMemcpyDeviceToDevice));
-	CUDA_CHECK(cudaMemcpy(XModel.fluximp.r, XModel.time.arrmin,  n * sizeof(T), cudaMemcpyDeviceToDevice));
+	//CUDA_CHECK(cudaMemcpy(XModel.fluximp.z, XModel.time.arrmax,  n * sizeof(T), cudaMemcpyDeviceToDevice));
+	//CUDA_CHECK(cudaMemcpy(XModel.fluximp.r, XModel.time.arrmin,  n * sizeof(T), cudaMemcpyDeviceToDevice));
 
 
 	
 	maxerror=reduceAbsMax(XParam, XModel.blocks, XModel.fluximp.r);
 
-	CUDA_CHECK(cudaMemcpy(XModel.fluximp.r, XModel.time.arrmin,  n * sizeof(T), cudaMemcpyDeviceToDevice));
+	//CUDA_CHECK(cudaMemcpy(XModel.fluximp.r, XModel.time.arrmin,  n * sizeof(T), cudaMemcpyDeviceToDevice));
 
 	if(maxerror > tol)
 	{
@@ -778,11 +778,11 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 		HaloFluxGPUBMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.p);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		HaloFluxGPUTMLclamp<<< gridDimHaloBT, blockDimHaloBT, 0 >>>(XParam, XModel.blocks,XModel.fluximp.p,T(0.0));
-		CUDA_CHECK(cudaDeviceSynchronize());
+		//HaloFluxGPUTMLclamp<<< gridDimHaloBT, blockDimHaloBT, 0 >>>(XParam, XModel.blocks,XModel.fluximp.p,T(0.0));
+		//CUDA_CHECK(cudaDeviceSynchronize());
 
-		HaloFluxGPURMLclamp<<< gridDimHaloLR, blockDimHaloLR, 0 >>> (XParam, XModel.blocks,XModel.fluximp.p,T(0.0));
-		CUDA_CHECK(cudaDeviceSynchronize());
+		//HaloFluxGPURMLclamp<<< gridDimHaloLR, blockDimHaloLR, 0 >>> (XParam, XModel.blocks,XModel.fluximp.p,T(0.0));
+		//CUDA_CHECK(cudaDeviceSynchronize());
 
 		// HaloFluxGPUBMLclamp<<< gridDimHaloBT, blockDimHaloBT, 0 >>>(XParam, XModel.blocks,XModel.fluximp.p,T(0.0));
 		// CUDA_CHECK(cudaDeviceSynchronize());
@@ -825,14 +825,14 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
         //double pAp   = reduceDot(f.p, f.Ap, n);
 
-		CUDA_CHECK(cudaMemcpy(XModel.time.arrmax, XModel.fluximp.p, n * sizeof(T), cudaMemcpyDeviceToDevice));
-		CUDA_CHECK(cudaMemcpy(XModel.time.arrmin, XModel.fluximp.Ap, n * sizeof(T), cudaMemcpyDeviceToDevice));
+		//CUDA_CHECK(cudaMemcpy(XModel.time.arrmax, XModel.fluximp.p, n * sizeof(T), cudaMemcpyDeviceToDevice));
+		//CUDA_CHECK(cudaMemcpy(XModel.time.arrmin, XModel.fluximp.Ap, n * sizeof(T), cudaMemcpyDeviceToDevice));
 
 		T pAp   = reduceDot(XParam, XModel.blocks, XModel.fluximp.p, XModel.fluximp.Ap);
         T alpha = rz_old / pAp;
 
-		CUDA_CHECK(cudaMemcpy(XModel.fluximp.p, XModel.time.arrmax,  n * sizeof(T), cudaMemcpyDeviceToDevice));
-		CUDA_CHECK(cudaMemcpy(XModel.fluximp.Ap, XModel.time.arrmin, n * sizeof(T), cudaMemcpyDeviceToDevice));
+		//CUDA_CHECK(cudaMemcpy(XModel.fluximp.p, XModel.time.arrmax,  n * sizeof(T), cudaMemcpyDeviceToDevice));
+		//CUDA_CHECK(cudaMemcpy(XModel.fluximp.Ap, XModel.time.arrmin, n * sizeof(T), cudaMemcpyDeviceToDevice));
 
 		//printf("rz_old = %f, pAp = %f, alpha = %f, rz_new = %f, beta = %f, maxerror = %f\n",rz_old,pAp,alpha,rz_new, beta,maxerror);
 		//printf("rz_old = %f, pAp = %f, alpha = %f, \n",rz_old,pAp,alpha);
@@ -850,11 +850,11 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
         //if (reduceAbsMax(f.r, n) < tolerance) break;
 
-		CUDA_CHECK(cudaMemcpy(XModel.time.arrmax, XModel.fluximp.r, n * sizeof(T), cudaMemcpyDeviceToDevice));
+		//CUDA_CHECK(cudaMemcpy(XModel.time.arrmax, XModel.fluximp.r, n * sizeof(T), cudaMemcpyDeviceToDevice));
 
 		maxerror=reduceAbsMax(XParam, XModel.blocks, XModel.fluximp.r);
 		
-		CUDA_CHECK(cudaMemcpy(XModel.fluximp.r, XModel.time.arrmax, n * sizeof(T), cudaMemcpyDeviceToDevice));
+		//CUDA_CHECK(cudaMemcpy(XModel.fluximp.r, XModel.time.arrmax, n * sizeof(T), cudaMemcpyDeviceToDevice));
 
 		if (maxerror < tol) break;
 
@@ -864,14 +864,14 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
         //double rz_new = reducedot(f.r, f.z, n);
 
-		CUDA_CHECK(cudaMemcpy(XModel.time.arrmax, XModel.fluximp.r, n * sizeof(T), cudaMemcpyDeviceToDevice));
-		CUDA_CHECK(cudaMemcpy(XModel.time.arrmin, XModel.fluximp.z, n * sizeof(T), cudaMemcpyDeviceToDevice));
+		//CUDA_CHECK(cudaMemcpy(XModel.time.arrmax, XModel.fluximp.r, n * sizeof(T), cudaMemcpyDeviceToDevice));
+		//CUDA_CHECK(cudaMemcpy(XModel.time.arrmin, XModel.fluximp.z, n * sizeof(T), cudaMemcpyDeviceToDevice));
 
 		T rz_new = reduceDot(XParam, XModel.blocks,XModel.fluximp.r, XModel.fluximp.z);
         T beta = rz_new / rz_old;
 
-		CUDA_CHECK(cudaMemcpy(XModel.fluximp.r, XModel.time.arrmax, n * sizeof(T), cudaMemcpyDeviceToDevice));
-		CUDA_CHECK(cudaMemcpy(XModel.fluximp.z, XModel.time.arrmin, n * sizeof(T), cudaMemcpyDeviceToDevice));
+		//CUDA_CHECK(cudaMemcpy(XModel.fluximp.r, XModel.time.arrmax, n * sizeof(T), cudaMemcpyDeviceToDevice));
+		//CUDA_CHECK(cudaMemcpy(XModel.fluximp.z, XModel.time.arrmin, n * sizeof(T), cudaMemcpyDeviceToDevice));
 
 		///xpby_kernel(Param XParam, BlockP<T> XBlock, double* p, const double* z, double beta)
 		xpby_kernel<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp.p, XModel.fluximp.z,beta);
