@@ -699,6 +699,8 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
     // --- initial residual: r = rhs_eta - A(eta_r) ---
     //haloExchange(f.eta_r, g);
 
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.eta_r);
+
 	matvec_facefieldx<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks,XModel.fluximp.eta_r,XModel.fluximp.g_x,XModel.fluximp.alpha_x);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
