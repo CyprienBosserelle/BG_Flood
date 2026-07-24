@@ -1359,7 +1359,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 
 
 		CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.evolv.u, XModel_g.evolv.u);
-		T redabsmax = reduceAbsMax(XParam, XModel_g.blocks, XModel_g.evolv.u, XModel_g.evolv.v);
+		//T redabsmax = reduceAbsMax(XParam, XModel_g.blocks, XModel_g.evolv.u, XModel_g.evolv.v);
 		//T redabsmaxold = reduceabsmaxold(XParam, XModel_g.blocks, XModel_g.evolv.u, XModel_g.evolv.v);
 		bool testmax =  abs(redabsmax - maxinput) < T(100.0) * (XLoop.epsilon);
 		//bool testmax =  abs(redabsmax - maxinput) < T(100.0) * (XLoop.epsilon);
@@ -1385,7 +1385,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 			log("\t\t CPU vs GPU test failed! : Expected=" + std::to_string(reducedt) + ";  Reduced=" + std::to_string(reducedtgpu) + ";  error=" + str);
 		}
 
-		test = test && testgpu;
+		test = test && testgpu && testmax;
 	}
 
 
