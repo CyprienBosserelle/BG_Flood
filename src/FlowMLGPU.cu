@@ -168,6 +168,9 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 		HaloFluxGPUTMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.sv);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
+		fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.su);
+		fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.sv);
+
 		acceleration_rhs<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp, T(XLoop.dt));
 		CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -681,8 +684,8 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	// HaloFluxGPURMLclamp<<< gridDimHaloLR, blockDimHaloLR, 0 >>> (XParam, XModel.blocks,XModel.fluximp.alpha_x,T(0.0));
 	// CUDA_CHECK(cudaDeviceSynchronize());
 
-	//fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.alpha_x);
-	//fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.alpha_y);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.alpha_x);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.alpha_y);
 
     jacobi_diag<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp);
 	CUDA_CHECK(cudaDeviceSynchronize());
@@ -755,7 +758,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
     for (int iter = 0; iter < maxIter; ++iter)
     {
 
-		log("implicit Iteration " + std::to_string(iter) + "; max tol = " + std::to_string(tol) + "; maxerror = " + std::to_string(maxerror));
+		//log("implicit Iteration " + std::to_string(iter) + "; max tol = " + std::to_string(tol) + "; maxerror = " + std::to_string(maxerror));
 	
 		// Update Halo for eta_r
 		// HaloFluxGPURMLnew <<< gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluximp.eta_r);
