@@ -1139,11 +1139,11 @@ __global__ void sumReduceStage2(const T* __restrict__ g_idata,
 // ---------------------------------------------------------------------
 template <typename T> T reduceDot(Param XParam, BlockP<T> XBlock, T* a, T* b)//const T* a, const T* b, const int* d_active,int nblkactive, int halowidth, int blkdim)
 {
-    int blkmemwidth = XParam.blkdim + 2 * XParam.halowidth;
+    int blkmemwidth = XParam.blkwidth + 2 * XParam.halowidth;
 
-    dim3 threads1(XParam.blkdim, XParam.blkdim);
+    dim3 threads1(XParam.blkwidth, XParam.blkwidth);
     dim3 blocks1(XParam.nblk);
-    size_t smem1 = XParam.blkdim * XParam.blkdim * sizeof(T);
+    size_t smem1 = XParam.blkwidth * XParam.blkwidth * sizeof(T);
 
     static T* d_blockSum = nullptr;
     static unsigned int allocatedBlocks = 0;
