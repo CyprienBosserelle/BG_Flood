@@ -893,7 +893,16 @@ template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a,T* store)
     }
 
     T h_result;
-    cudaMemcpy(&h_result, src, sizeof(T), cudaMemcpyDeviceToHost);
+	T* dummy;
+	AllocateCPU(32, 1, dummy);
+
+    cudaMemcpy(dummy, src, 32*sizeof(T), cudaMemcpyDeviceToHost);
+	h_result=dummy[0];
+	for (int i = 1; i < 32; i++)
+	{
+		h_result = fmax(h_result,dummy[i]);
+	}
+
     return h_result;
 }
 template float reduceAbsMax<float>(Param XParam, BlockP<float> XBlock, float* a,float* store);
