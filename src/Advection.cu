@@ -1080,7 +1080,7 @@ __global__ void dotReduceStage1(Param XParam, BlockP<T> XBlock, T* a, T* b, T* b
 {
     T* sdata = SharedMemory<T>();
 
-	int blkmemwidth = XParam.blkdim + 2 * XParam.halowidth;
+	int blkmemwidth =XParam.blkwidth + 2 * XParam.halowidth;
 
     int ix  = threadIdx.x;
     int iy  = threadIdx.y;
