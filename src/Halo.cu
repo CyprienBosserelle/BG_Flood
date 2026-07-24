@@ -1986,7 +1986,7 @@ template <class T> __global__  void HaloFluxGPULMLnew(Param XParam, BlockP<T> XB
 
 
 		}
-		if (XBlock.level[XBlock.LeftBot[ib]] <= XBlock.level[ib])
+		if ((XBlock.LeftBot[ib] != ib) && (XBlock.level[XBlock.LeftBot[ib]] <= XBlock.level[ib]))
 		{
 			jj = XBlock.level[XBlock.LeftBot[ib]] == XBlock.level[ib] ? j : XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? floor(j * T(0.5)) : floor(j * T(0.5)) + XParam.blkwidth / 2;
 
@@ -2041,7 +2041,7 @@ template <class T> __global__  void HaloFluxGPUBMLnew(Param XParam, BlockP<T> XB
 
 
 		}
-		if (XBlock.level[XBlock.BotLeft[ib]] <= XBlock.level[ib])//The lower half is a boundary 
+		if ((XBlock.BotLeft[ib] != ib) && (XBlock.level[XBlock.BotLeft[ib]] <= XBlock.level[ib]))//The lower half is a boundary 
 		{
 			jj = XBlock.level[XBlock.BotLeft[ib]] == XBlock.level[ib] ? j : XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? floor(j * T(0.5)) : floor(j * T(0.5)) + XParam.blkwidth / 2;
 
@@ -2095,7 +2095,7 @@ template <class T> __global__  void HaloFluxGPURMLnew(Param XParam, BlockP<T> XB
 
 
 		}
-		if (XBlock.level[XBlock.RightBot[ib]] <= XBlock.level[ib] )
+		if ((XBlock.RightBot[ib] != ib) && (XBlock.level[XBlock.RightBot[ib]] <= XBlock.level[ib] ))
 		{
 			jj = XBlock.level[XBlock.RightBot[ib]] == XBlock.level[ib] ? j : XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? floor(j * T(0.5)) : floor(j *T(0.5)) + XParam.blkwidth / 2;
 
@@ -2150,7 +2150,7 @@ template <class T> __global__  void HaloFluxGPUTMLnew(Param XParam, BlockP<T> XB
 
 
 		}
-		if (XBlock.level[XBlock.TopLeft[ib]] <= XBlock.level[ib])//The lower half is a boundary 
+		if ((XBlock.TopLeft[ib] != ib) && (XBlock.level[XBlock.TopLeft[ib]] <= XBlock.level[ib]) )//The lower half is a boundary 
 		{
 			jj = XBlock.level[XBlock.TopLeft[ib]] == XBlock.level[ib] ? j : XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? floor(j * T(0.5)) : floor(j * T(0.5)) + XParam.blkwidth / 2;
 
