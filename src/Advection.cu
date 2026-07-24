@@ -857,6 +857,7 @@ template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a,T* store)
 	//absmaxReduceStage1(Param XParam, BlockP<T> XBlock, T* a,T* store)
 
     absmaxReduceStage1<<<blocks1, threads1, smem1>>>(XParam,XBlock,a,store);
+	CUDA_CHECK(cudaDeviceSynchronize());
 
     // --- Stage 2: multi-pass reduction of the nblkactive per-block maxima ---
     const unsigned int threads2 = 256;
@@ -878,6 +879,7 @@ template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a,T* store)
     unsigned int blocks2 = (n + threads2 - 1) / threads2;
     size_t smem2 = threads2 * sizeof(T);
     maxReduceStage2<<<blocks2, threads2, smem2>>>(d_blockMax, d_bufA, n);
+	CUDA_CHECK(cudaDeviceSynchronize());
 
     n = blocks2;
     T* src = d_bufA;
