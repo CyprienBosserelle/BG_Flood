@@ -739,7 +739,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	CUDA_CHECK(cudaMemcpy(XModel.time.arrmax, XModel.fluximp.z, n * sizeof(T), cudaMemcpyDeviceToDevice));
 	CUDA_CHECK(cudaMemcpy(XModel.time.arrmin, XModel.fluximp.r, n * sizeof(T), cudaMemcpyDeviceToDevice));
 
-    T rz_old = reducedot(XParam, XModel.blocks,XModel.fluximp.r, XModel.fluximp.z, XModel.fluximp.store);
+    T rz_old = reduceDot(XParam, XModel.blocks,XModel.fluximp.r, XModel.fluximp.z);
 
 	CUDA_CHECK(cudaMemcpy(XModel.fluximp.z, XModel.time.arrmax,  n * sizeof(T), cudaMemcpyDeviceToDevice));
 	CUDA_CHECK(cudaMemcpy(XModel.fluximp.r, XModel.time.arrmin,  n * sizeof(T), cudaMemcpyDeviceToDevice));
@@ -748,7 +748,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	
 	maxerror=reduceAbsMax(XParam, XModel.blocks, XModel.fluximp.r);
 
-	//CUDA_CHECK(cudaMemcpy(XModel.fluximp.r, XModel.time.arrmin,  n * sizeof(T), cudaMemcpyDeviceToDevice));
+	CUDA_CHECK(cudaMemcpy(XModel.fluximp.r, XModel.time.arrmin,  n * sizeof(T), cudaMemcpyDeviceToDevice));
 
 	if(maxerror > tol)
 	{
@@ -828,7 +828,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 		CUDA_CHECK(cudaMemcpy(XModel.time.arrmax, XModel.fluximp.p, n * sizeof(T), cudaMemcpyDeviceToDevice));
 		CUDA_CHECK(cudaMemcpy(XModel.time.arrmin, XModel.fluximp.Ap, n * sizeof(T), cudaMemcpyDeviceToDevice));
 
-		T pAp   = reducedot(XParam, XModel.blocks, XModel.fluximp.p, XModel.fluximp.Ap, XModel.fluximp.store);
+		T pAp   = reduceDot(XParam, XModel.blocks, XModel.fluximp.p, XModel.fluximp.Ap);
         T alpha = rz_old / pAp;
 
 		CUDA_CHECK(cudaMemcpy(XModel.fluximp.p, XModel.time.arrmax,  n * sizeof(T), cudaMemcpyDeviceToDevice));
@@ -850,11 +850,11 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 
         //if (reduceAbsMax(f.r, n) < tolerance) break;
 
-		//CUDA_CHECK(cudaMemcpy(XModel.time.arrmax, XModel.fluximp.r, n * sizeof(T), cudaMemcpyDeviceToDevice));
+		CUDA_CHECK(cudaMemcpy(XModel.time.arrmax, XModel.fluximp.r, n * sizeof(T), cudaMemcpyDeviceToDevice));
 
 		maxerror=reduceAbsMax(XParam, XModel.blocks, XModel.fluximp.r);
 		
-		//CUDA_CHECK(cudaMemcpy(XModel.fluximp.r, XModel.time.arrmax, n * sizeof(T), cudaMemcpyDeviceToDevice));
+		CUDA_CHECK(cudaMemcpy(XModel.fluximp.r, XModel.time.arrmax, n * sizeof(T), cudaMemcpyDeviceToDevice));
 
 		if (maxerror < tol) break;
 
@@ -867,7 +867,7 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 		CUDA_CHECK(cudaMemcpy(XModel.time.arrmax, XModel.fluximp.r, n * sizeof(T), cudaMemcpyDeviceToDevice));
 		CUDA_CHECK(cudaMemcpy(XModel.time.arrmin, XModel.fluximp.z, n * sizeof(T), cudaMemcpyDeviceToDevice));
 
-		T rz_new = reducedot(XParam, XModel.blocks,XModel.fluximp.r, XModel.fluximp.z, XModel.fluximp.store);
+		T rz_new = reduceDot(XParam, XModel.blocks,XModel.fluximp.r, XModel.fluximp.z);
         T beta = rz_new / rz_old;
 
 		CUDA_CHECK(cudaMemcpy(XModel.fluximp.r, XModel.time.arrmax, n * sizeof(T), cudaMemcpyDeviceToDevice));

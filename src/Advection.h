@@ -37,8 +37,8 @@ template <class T> __global__ void densify(Param XParam, BlockP<T> XBlock, T* g_
 
 template <class T> __host__ T reduceabsmaxold(Param XParam, BlockP<T> XBlock, T* a,T* store);
 template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a);
-template <class T> __host__ T reducedot(Param XParam, BlockP<T> XBlock, T* a, T* b, T* store);
-
+template <class T> __host__ T reducedotold(Param XParam, BlockP<T> XBlock, T* a, T* b, T* store);
+template <typename T> T reduceDot(Param XParam, BlockP<T> XBlock, T* a, T* b);
 
 
 

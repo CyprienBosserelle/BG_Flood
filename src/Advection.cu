@@ -621,7 +621,7 @@ template <class T> __host__ T CalctimestepGPU(Param XParam,Loop<T> XLoop, BlockP
 template __host__ float CalctimestepGPU<float>(Param XParam,Loop<float> XLoop, BlockP<float> XBlock, TimeP<float> XTime);
 template __host__ double CalctimestepGPU<double>(Param XParam, Loop<double> XLoop, BlockP<double> XBlock, TimeP<double> XTime);
 
-template <class T> __host__ T reducedot(Param XParam, BlockP<T> XBlock, T* a, T* b, T* store)
+template <class T> __host__ T reducedotold(Param XParam, BlockP<T> XBlock, T* a, T* b, T* store)
 {
 	T* dummy;
 	AllocateCPU(32, 1, dummy);
@@ -688,8 +688,8 @@ template <class T> __host__ T reducedot(Param XParam, BlockP<T> XBlock, T* a, T*
 
 	free(dummy);
 }
-template __host__ float reducedot<float>(Param XParam, BlockP<float> XBlock, float* a, float* b, float* store);
-template __host__ double reducedot<double>(Param XParam, BlockP<double> XBlock, double* a, double* b, double* store);
+template __host__ float reducedotold<float>(Param XParam, BlockP<float> XBlock, float* a, float* b, float* store);
+template __host__ double reducedotold<double>(Param XParam, BlockP<double> XBlock, double* a, double* b, double* store);
 
 template <class T> __host__ T reduceabsmaxold(Param XParam, BlockP<T> XBlock, T* a,T* store)
 {
@@ -857,7 +857,7 @@ template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a)
 	//absmaxReduceStage1(Param XParam, BlockP<T> XBlock, T* a,T* store)
 
     absmaxReduceStage1<<<blocks1, threads1, smem1>>>(XParam,XBlock,a,d_blockMax);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
     // --- Stage 2: multi-pass reduction of the nblkactive per-block maxima ---
     const unsigned int threads2 = 256;
@@ -879,7 +879,7 @@ template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a)
     unsigned int blocks2 = (n + threads2 - 1) / threads2;
     size_t smem2 = threads2 * sizeof(T);
     maxReduceStage2<<<blocks2, threads2, smem2>>>(d_blockMax, d_bufA, n);
-	CUDA_CHECK(cudaDeviceSynchronize());
+	//CUDA_CHECK(cudaDeviceSynchronize());
 
     n = blocks2;
     T* src = d_bufA;
@@ -888,7 +888,7 @@ template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a)
     {
         unsigned int nextBlocks = (n + threads2 - 1) / threads2;
         maxReduceStage2<<<nextBlocks, threads2, smem2>>>(src, dst, n);
-		CUDA_CHECK(cudaDeviceSynchronize());
+		//CUDA_CHECK(cudaDeviceSynchronize());
         std::swap(src, dst);
         n = nextBlocks;
     }
@@ -1067,4 +1067,129 @@ template <class T> __global__ void densify(Param XParam, BlockP<T> XBlock, T* g_
 
 	g_odata[o] = g_idata[i];
 }
+
+// ---------------------------------------------------------------------
+// Stage 1: one CUDA block per active memory block. Each thread reads
+// ONE interior cell from a AND b (fused multiply), the block's 256
+// threads then reduce via Harris kernel-3 sequential addressing down
+// to a single partial sum for that block. Non-destructive: a, b are
+// each read exactly once, never written.
+// ---------------------------------------------------------------------
+template <typename T>
+__global__ void dotReduceStage1(Param XParam, BlockP<T> XBlock, T* a, T* b, T* blockSum)
+{
+    T* sdata = SharedMemory<T>();
+
+	int blkmemwidth = XParam.blkdim + 2 * XParam.halowidth;
+
+    int ix  = threadIdx.x;
+    int iy  = threadIdx.y;
+    int ibl = blockIdx.x;
+    int ib  = XBlock.active[ibl];
+
+    unsigned int tid = iy * blockDim.x + ix;
+
+    int id = memloc(XParam.halowidth, blkmemwidth, ix, iy, ib);
+    sdata[tid] = a[id] * b[id];        // single, non-destructive read of a, b
+    __syncthreads();
+
+    for (unsigned int s = (blockDim.x * blockDim.y) / 2; s > 0; s >>= 1)
+    {
+        if (tid < s)
+            sdata[tid] += sdata[tid + s];
+        __syncthreads();
+    }
+
+    if (tid == 0) blockSum[ibl] = sdata[0];
+}
+
+// ---------------------------------------------------------------------
+// Stage 2: generic multi-pass sum-reduction of the per-block partial
+// sums down to one scalar. Identical structure to reduceAbsMax's
+// stage 2, "+=" instead of fmax(), identity 0 for out-of-range padding
+// (correct identity for sum, same as it is for |.|>=0 max).
+// ---------------------------------------------------------------------
+template <typename T>
+__global__ void sumReduceStage2(const T* __restrict__ g_idata,
+                                 T* __restrict__ g_odata,
+                                 unsigned int n)
+{
+    T* sdata = SharedMemory<T>();
+
+    unsigned int tid = threadIdx.x;
+    unsigned int i   = blockIdx.x * blockDim.x + threadIdx.x;
+
+    sdata[tid] = (i < n) ? g_idata[i] : T(0);
+    __syncthreads();
+
+    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1)
+    {
+        if (tid < s)
+            sdata[tid] += sdata[tid + s];
+        __syncthreads();
+    }
+
+    if (tid == 0) g_odata[blockIdx.x] = sdata[0];
+}
+
+// ---------------------------------------------------------------------
+// Host driver, templated on T. Static scratch buffers cached per T,
+// same as reduceAbsMax<T> -- separate float/double calls never share
+// or clobber each other's scratch allocations.
+// ---------------------------------------------------------------------
+template <typename T> T reduceDot(Param XParam, BlockP<T> XBlock, T* a, T* b)//const T* a, const T* b, const int* d_active,int nblkactive, int halowidth, int blkdim)
+{
+    int blkmemwidth = XParam.blkdim + 2 * XParam.halowidth;
+
+    dim3 threads1(XParam.blkdim, XParam.blkdim);
+    dim3 blocks1(XParam.nblk);
+    size_t smem1 = XParam.blkdim * XParam.blkdim * sizeof(T);
+
+    static T* d_blockSum = nullptr;
+    static unsigned int allocatedBlocks = 0;
+    if ((unsigned)XParam.nblk > allocatedBlocks) {
+        if (d_blockSum) cudaFree(d_blockSum);
+        cudaMalloc(&d_blockSum, XParam.nblk * sizeof(T));
+        allocatedBlocks = XParam.nblk;
+    }
+
+    dotReduceStage1<T><<<blocks1, threads1, smem1>>>(XParam, XBlock,  a, b, d_blockSum);
+
+    const unsigned int threads2 = 256;
+    unsigned int n = (unsigned int)XParam.nblk;
+    size_t smem2 = threads2 * sizeof(T);
+
+    static T* d_bufA = nullptr;
+    static T* d_bufB = nullptr;
+    static unsigned int allocatedSize2 = 0;
+    unsigned int neededSize = std::max((n + threads2 - 1) / threads2, 1u);
+    if (neededSize > allocatedSize2) {
+        if (d_bufA) cudaFree(d_bufA);
+        if (d_bufB) cudaFree(d_bufB);
+        cudaMalloc(&d_bufA, neededSize * sizeof(T));
+        cudaMalloc(&d_bufB, neededSize * sizeof(T));
+        allocatedSize2 = neededSize;
+    }
+
+    unsigned int blocks2 = (n + threads2 - 1) / threads2;
+    sumReduceStage2<T><<<blocks2, threads2, smem2>>>(d_blockSum, d_bufA, n);
+
+    n = blocks2;
+    T* src = d_bufA;
+    T* dst = d_bufB;
+    while (n > 1)
+    {
+        unsigned int nextBlocks = (n + threads2 - 1) / threads2;
+        sumReduceStage2<T><<<nextBlocks, threads2, smem2>>>(src, dst, n);
+        std::swap(src, dst);
+        n = nextBlocks;
+    }
+
+    T h_result;
+    cudaMemcpy(&h_result, src, sizeof(T), cudaMemcpyDeviceToHost);
+    return h_result;
+}
+template float reduceDot<float>(Param XParam, BlockP<float> XBlock, float* a, float* b);
+template double reduceDot<double>(Param XParam, BlockP<double> XBlock, double* a, double* b);
+
 
