@@ -23,8 +23,24 @@ template <class T> __host__ T CalctimestepGPU(Param XParam, Loop<T> XLoop, Block
 template <class T> __host__ T timestepreductionCPU(Param XParam, Loop<T> XLoop, BlockP<T> XBlock, TimeP<T> XTime);
 
 template <class T> __global__ void reducemin3(T* g_idata, T* g_odata, unsigned int n);
+template <class T> __global__ void dotReduce3(const T* __restrict__ a, const T* __restrict__ b, T* __restrict__ g_odata, unsigned int n);
+template <class T> __global__ void sumReduce3(const T* __restrict__ g_idata, T* __restrict__ g_odata, unsigned int n);
+template <class T> __global__ void absmaxReduce3(const T* __restrict__ a, T* __restrict__ g_odata, unsigned int n);
+template <class T> __global__ void maxReduce3(const T* __restrict__ g_idata, T* __restrict__ g_odata, unsigned int n);
+
+
+
+
 
 template <class T> __global__ void densify(Param XParam, BlockP<T> XBlock, T* g_idata, T* g_odata);
+
+
+template <class T> __host__ T reduceabsmaxold(Param XParam, BlockP<T> XBlock, T* a,T* store);
+template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a);
+template <class T> __host__ T reducedotold(Param XParam, BlockP<T> XBlock, T* a, T* b, T* store);
+template <typename T> T reduceDot(Param XParam, BlockP<T> XBlock, T* a, T* b);
+
+
 
 // End of global definition
 #endif

@@ -346,6 +346,7 @@ template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> 
 
 	CopytoGPU(nblk, blksize, XModel_cpu.cf, XModel_gpu.cf);
 
+	
 	CopytoGPU(nblk, blksize, XModel_cpu.grad.dzbdx, XModel_gpu.grad.dzbdx);
 	CopytoGPU(nblk, blksize, XModel_cpu.grad.dzbdy, XModel_gpu.grad.dzbdy);
 	

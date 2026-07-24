@@ -195,22 +195,29 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		std::vector<std::string> buttingerstr = { "b","butt","buttinger","1" };
+		
 		std::size_t found;
 		bool foo = false;
-		for (int ii = 0; ii < buttingerstr.size(); ii++)
+		if(!foo)
 		{
-			found = case_insensitive_compare(parametervalue, buttingerstr[ii]);// it needs to strictly compare
-			if (found == 0)
+			for (int ii = 0; ii < buttingerstr.size(); ii++)
 			{
-				param.engine = 1;
-				foo = true;
-			}
+				found = case_insensitive_compare(parametervalue, buttingerstr[ii]);// it needs to strictly compare
+				if (found == 0)
+				{
+					param.engine = 1;
+					foo = true;
+					break;
+				}
 
+			}
 		}
-		if (!foo)
+		if(!foo)
 		{
 			param.engine = std::stoi(parametervalue);
+			foo = true;
 		}
+
 	}
 	///////////////////////////////////////////////////////
 	// Adaptation
@@ -409,6 +416,36 @@ Param readparamstr(std::string line, Param param)
 
 	}
 
+	paramvec = {"theta_imp","thetaH","theta_H"};
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.theta_H = std::stod(parametervalue);
+	}
+
+	paramvec = {"mg_max_iter","maxiter","maximumiteration","max_iter"};
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.max_iter = std::stoi(parametervalue);
+	}
+
+	paramvec = {"mg_tol","imp_tol","implicit_tolerance","tol","tolerance"};
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.mg_tol = std::stod(parametervalue);
+	}
+
+	paramvec = { "imp","implicit" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		//
+		param.implicit = readparambool(parametervalue, param.implicit);
+
+	}
+
 	paramvec = { "outputtimestep","outtimestep","outputstep" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
@@ -516,7 +553,14 @@ Param readparamstr(std::string line, Param param)
 			//Need to add more here
 
 
-			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","zso","uo","vo","ho","hmean","zsmean","umean","vmean","hUmean","Umean","hmax","zsmax","umax","vmax","hUmax","Umax","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw","hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy" };
+			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h",
+				"zso","uo","vo","ho","hmean","zsmean","umean","vmean","hUmean","Umean",
+				"hmax","zsmax","umax","vmax","hUmax","Umax","twet",
+				"dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy",
+				"Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv",
+				"cf","Patm","datmpdx","datmpdy","il","cl","hgw",
+				"hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy",
+				"r_imp","p_imp","Ap_imp","z_imp","gx_imp","gy_imp","alphax_imp","alphay_imp","eta_r","diagInv","rhs_eta","su_imp","sv_imp"};
 
 
 
@@ -1474,7 +1518,10 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 	// Engine checks
 	if (XParam.engine == 5)
 	{
-		XParam.CFL = utils::max(XParam.CFL, 0.5);
+		if (!XParam.implicit)
+		{
+			XParam.CFL = utils::min(XParam.CFL, 0.5);
+		}
 		XParam.wetdryfix = false;
 		//XParam.eps = 0.0000000001;
 	}

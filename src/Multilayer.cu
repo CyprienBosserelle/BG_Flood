@@ -27,9 +27,9 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 	T dry = eps;
 	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
-	T CFL = T(XParam.CFL);
+	T CFL = min(T(0.5),T(XParam.CFL));//T(XParam.CFL);
 
-	T CFL_H = CFL;// T(0.5); should be different in multi-layer
+	T CFL_H = XParam.implicit ? T(XParam.CFL) : CFL;//  T(0.5); should be different in multi-layer
 
 	T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
 
@@ -150,9 +150,9 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 
 	T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]):T(1.0);
 
-	T CFL = T(XParam.CFL);
+	T CFL = min(T(0.5),T(XParam.CFL));//T(XParam.CFL);
 
-	T CFL_H = CFL;// T(0.5); Should be different in Multi layer
+	T CFL_H = XParam.implicit ? T(XParam.CFL) : CFL;// T(0.5); Should be different in Multi layer?
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ibot = memloc(halowidth, blkmemwidth, ix, iy-1, ib);
@@ -262,9 +262,9 @@ template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock,
 	T dry = eps;
 	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
-	T CFL = T(XParam.CFL);
+	T CFL = min(T(0.5),T(XParam.CFL));//T(XParam.CFL);
 
-	T CFL_H = CFL;//T(0.5);// Should be different in Multi layer
+	//T CFL_H = XParam.implicit ? T(XParam.CFL) : CFL;// T(0.5); Should be different in Multi layer?
 
 	T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
 
@@ -323,9 +323,9 @@ template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock,
 	T dry = eps;
 	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
-	T CFL = T(XParam.CFL);
+	T CFL = min(T(0.5),T(XParam.CFL));//T(XParam.CFL);
 
-	T CFL_H = CFL;// T(0.5); //Should be different for multilayer
+	//T CFL_H = CFL;// T(0.5); //Should be different for multilayer
 
 	T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
 
