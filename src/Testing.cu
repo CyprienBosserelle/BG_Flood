@@ -1283,7 +1283,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 	dim3 gridDim(XParam.nblk, 1, 1);
 	//srand(seed);
 	T mininput = T(rand()) / T(RAND_MAX);
-	T maxinput = T(rand()) / T(RAND_MAX) + T(RAND_MAX);
+	T maxinput = T(rand()) / T(RAND_MAX) + T(1.0);
 	bool test = true;
 
 	Loop<T> XLoop;
@@ -1312,7 +1312,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 				int n = memloc(XParam, ix, iy, ib);
 				XModel.time.dtmax[n] = mininput * T(1.1) + utils::max(T(rand()) / T(RAND_MAX), T(0.0));
 
-				XModel.evolv.u[n] = T(rand()) / T(RAND_MAX) - T(0.5)*T(RAND_MAX);
+				XModel.evolv.u[n] = T(rand()) / T(RAND_MAX) - T(0.5);
 
 			}
 		}
