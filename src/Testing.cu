@@ -1350,8 +1350,8 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 		reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XLoop.hugeposval, XModel_g.time.dtmax);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.v);
-		CUDA_CHECK(cudaDeviceSynchronize());
+		//reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.v);
+		//CUDA_CHECK(cudaDeviceSynchronize());
 
 		CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.time.dtmax, XModel_g.time.dtmax);
 		T reducedtgpu = CalctimestepGPU(XParam, XLoop, XModel_g.blocks, XModel_g.time);
@@ -1359,7 +1359,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 
 
 		CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.evolv.u, XModel_g.evolv.u);
-		T redabsmax = reduceAbsMax(XParam, XModel_g.blocks, XModel_g.evolv.u, XModel_g.evolv.v);
+		T redabsmax = reduceAbsMax(XParam, XModel_g.blocks, XModel_g.evolv.u);
 		//T redabsmax = T(0.0);
 		//T redabsmaxold = reduceabsmaxold(XParam, XModel_g.blocks, XModel_g.evolv.u, XModel_g.evolv.v);
 		bool testmax =  abs(redabsmax - maxinput) < T(100.0) * (XLoop.epsilon);

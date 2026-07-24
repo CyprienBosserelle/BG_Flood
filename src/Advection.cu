@@ -836,7 +836,7 @@ template <class T> __global__ void maxReduceStage2(const T* __restrict__ g_idata
 //   blkdim         : interior tile size (16 in your example)
 // ---------------------------------------------------------------------
 //double reduceAbsMax(const double* a, const int* d_active, int nblkactive, int halowidth, int blkdim)
-template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a,T* store)
+template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a)
 {
     int blkmemwidth = XParam.blkwidth + 2 * XParam.halowidth;
 
@@ -856,7 +856,7 @@ template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a,T* store)
 
 	//absmaxReduceStage1(Param XParam, BlockP<T> XBlock, T* a,T* store)
 
-    absmaxReduceStage1<<<blocks1, threads1, smem1>>>(XParam,XBlock,a,store);
+    absmaxReduceStage1<<<blocks1, threads1, smem1>>>(XParam,XBlock,a,d_blockMax);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
     // --- Stage 2: multi-pass reduction of the nblkactive per-block maxima ---
@@ -888,6 +888,7 @@ template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a,T* store)
     {
         unsigned int nextBlocks = (n + threads2 - 1) / threads2;
         maxReduceStage2<<<nextBlocks, threads2, smem2>>>(src, dst, n);
+		CUDA_CHECK(cudaDeviceSynchronize());
         std::swap(src, dst);
         n = nextBlocks;
     }
@@ -898,15 +899,15 @@ template <class T> T reduceAbsMax(Param XParam, BlockP<T> XBlock, T* a,T* store)
 
     cudaMemcpy(dummy, src, 32*sizeof(T), cudaMemcpyDeviceToHost);
 	h_result=dummy[0];
-	for (int i = 1; i < 32; i++)
-	{
-		h_result = fmax(h_result,dummy[i]);
-	}
+	// for (int i = 1; i < 32; i++)
+	// {
+	// 	h_result = fmax(h_result,dummy[i]);
+	// }
 
     return h_result;
 }
-template float reduceAbsMax<float>(Param XParam, BlockP<float> XBlock, float* a,float* store);
-template double reduceAbsMax<double>(Param XParam, BlockP<double> XBlock, double* a,double* store);
+template float reduceAbsMax<float>(Param XParam, BlockP<float> XBlock, float* a);
+template double reduceAbsMax<double>(Param XParam, BlockP<double> XBlock, double* a);
 
 /**
  * @brief GPU kernel to compute the minimum value in an array using parallel reduction.
