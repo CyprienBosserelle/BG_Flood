@@ -628,13 +628,13 @@ template <class T> __global__ void bndFluxGPUSideF(Param XParam, bndsegmentside 
 	if (side.isright == 0)
 	{
 		ix = threadIdx.x;
-		iy = side.istop < 0 ? 0 : (blockDim.x);
+		iy = side.istop < 0 ? -1 : (blockDim.x - 1);
 		//itx = (xx - XParam.xo) / (XParam.xmax - XParam.xo) * side.nbnd;
 	}
 	else
 	{
 		iy = threadIdx.x;
-		ix = side.isright < 0 ? 0 : (blockDim.x);
+		ix = side.isright < 0 ? -1 : (blockDim.x - 1);
 		//itx = (yy - XParam.yo) / (XParam.ymax - XParam.yo) * side.nbnd;
 	}
 
