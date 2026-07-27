@@ -428,7 +428,7 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 		}
 		*/
 		iub = memloc(halowidth, blkmemwidth, ix + ixshft, iy - 1, ib);
-		iut = memloc(halowidth, blkmemwidth, ix + ixshft, iy + 1, ib);
+		iut = memloc(halowidth, blkmemwidth, ix + ixshft, max(iy + 1 , XParam.XParam.blkwidth), ib);
 
 
 		int iv = memloc(halowidth, blkmemwidth, ix, iy + iyshft, ib);
@@ -453,7 +453,7 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 			ivl = memloc(halowidth, blkmemwidth, ix - 1, iy+iyshft, ib);
 		}
 		*/
-		ivr = memloc(halowidth, blkmemwidth, ix + 1, iy + iyshft, ib);
+		ivr = memloc(halowidth, blkmemwidth, max(ix + 1 , XParam.XParam.blkwidth), iy + iyshft, ib);
 		ivl = memloc(halowidth, blkmemwidth, ix - 1, iy + iyshft, ib);
 
 		
@@ -537,7 +537,7 @@ template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock,T dt, 
 
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-	int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
+	//int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
 	int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
 	int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
 	//For each layer

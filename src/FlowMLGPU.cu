@@ -445,6 +445,7 @@ template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 {
 
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 blockDimW(XParam.blkwidth+ XParam.halowidth, XParam.blkwidth+ XParam.halowidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 	// for flux reconstruction the loop overlap the right(or top for the y direction) halo
 	dim3 blockDimKX(XParam.blkwidth + XParam.halowidth, XParam.blkwidth, 1);
@@ -589,7 +590,7 @@ template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	
 	// Advection
-	AdvecFluxML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, dt, XModel.evolv, XModel.grad, XModel.fluxml);
+	AdvecFluxML << < gridDim, blockDimW, 0 >> > (XParam, XModel.blocks, dt, XModel.evolv, XModel.grad, XModel.fluxml);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	
