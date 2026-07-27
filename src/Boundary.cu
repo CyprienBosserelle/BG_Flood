@@ -586,9 +586,9 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 
 	if (side.isright < 0 || side.istop < 0) // left or bottom
 	{
-		Fh[inside]=F;
-		Fq[i]=S;
-		Ss[inside]=G;
+		Fh[i]=F;
+		Fq[i]=G;
+		Ss[inside]=S;
 	}
 	else
 	{
