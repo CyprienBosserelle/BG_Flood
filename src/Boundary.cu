@@ -261,25 +261,25 @@ template <class T> void FlowbndFluxML(Param XParam, double totaltime, BlockP<T> 
 			//if (bndseg.left.nblk > 0)
 			{
 				//Left
-				bndFluxGPUSide << < gridDimBBNDLeft, blockDim, 0 >> > (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.hu, XFlux.hfu, XFlux.hau);
+				bndFluxGPUSideF << < gridDimBBNDLeft, blockDim, 0 >> > (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fux);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			//if (bndseg.right.nblk > 0)
 			{
 				//Right
-				bndFluxGPUSide << < gridDimBBNDRight, blockDim, 0 >> > (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.hu, XFlux.hfu, XFlux.hau);
+				bndFluxGPUSideF << < gridDimBBNDRight, blockDim, 0 >> > (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fux);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			//if (bndseg.top.nblk > 0)
 			{
 				//top
-				bndFluxGPUSide << < gridDimBBNDTop, blockDim, 0 >> > (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.hv, XFlux.hfv, XFlux.hav);
+				bndFluxGPUSideF << < gridDimBBNDTop, blockDim, 0 >> > (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fvy);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			//if (bndseg.bot.nblk > 0)
 			{
 				//bot
-				bndFluxGPUSide << < gridDimBBNDBot, blockDim, 0 >> > (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.hv, XFlux.hfv, XFlux.hfv);
+				bndFluxGPUSideF << < gridDimBBNDBot, blockDim, 0 >> > (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fvy);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 		}
@@ -595,6 +595,215 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 		Fh[i] = F;
 		Ss[i] = G;
 		Fq[inside] = S;
+	}
+	
+
+	
+
+
+
+
+}
+
+template <class T> __global__ void bndFluxGPUSideF(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, int type, float zsbnd, T taper, T* zs, T* h, T* un, T* ut, T* Fhun)
+{
+	//
+
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = blockDim.x + halowidth * 2;
+	//unsigned int blksize = blkmemwidth * blkmemwidth;
+
+	int ibl = blockIdx.x;
+	int ix, iy;
+	
+
+	int iq = ibl * XParam.blkwidth + threadIdx.x;
+
+	int ib = side.blk_g[ibl];
+	int lev = XBlock.level[ib];
+
+
+	T delta = calcres(T(XParam.dx), lev);
+
+	if (side.isright == 0)
+	{
+		ix = threadIdx.x;
+		iy = side.istop < 0 ? 0 : (blockDim.x);
+		//itx = (xx - XParam.xo) / (XParam.xmax - XParam.xo) * side.nbnd;
+	}
+	else
+	{
+		iy = threadIdx.x;
+		ix = side.isright < 0 ? 0 : (blockDim.x);
+		//itx = (yy - XParam.yo) / (XParam.ymax - XParam.yo) * side.nbnd;
+	}
+
+	T sign = T(side.isright) + T(side.istop);
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+
+
+	T xx, yy;
+
+	xx = XBlock.xo[ib] + ix * delta;
+	yy = XBlock.yo[ib] + iy * delta;
+
+
+	T zsatm = T(0.0);
+
+	if (XParam.atmpforcing)
+	{
+		float atmpi;
+
+		atmpi = interpDyn2BUQ(XParam.xo + xx, XParam.yo + yy, Atmp.GPU);
+		zsatm = -1.0 * (atmpi - XParam.Paref) * XParam.Pa2m;
+	}
+	if (!uniform)
+	{
+
+
+		zsbnd = interpDyn2BUQ(XParam.xo + xx, XParam.yo + yy, Zsmap.GPU);
+	}
+
+	
+	
+	zsbnd = zsbnd + XParam.zsoffset;
+	
+
+	int inside = Inside(halowidth, blkmemwidth, side.isright, side.istop, ix, iy, ib);
+
+	//T zsbnd;
+	T unbnd = T(0.0);
+	T utbnd = T(0.0);
+
+	T zsinside, hinside, uninside, utinside,zsi;
+	T F, G, S;
+	T qmean;
+
+	zsi = zs[i];
+	zsinside = zs[inside];
+	hinside = h[inside];
+	uninside = un[inside];
+	utinside = ut[inside];
+
+	T zsX = (zsbnd + zsatm - 0.5 * (zsi + zsinside)) * taper + 0.5 * (zsi + zsinside);
+
+	qmean = side.qmean_g[iq];
+
+	
+	if (side.isright < 0 || side.istop < 0) //left or bottom
+	{
+		F = Fhun[inside];
+		
+
+	}
+	else
+	{
+		F = Fhun[i];
+		
+	}
+
+	G = 0.0;
+	S = 0.0;
+	
+	T factime = min(T(XParam.dt / XParam.bndfiltertime), T(1.0));
+	T facrel =  T(1.0) - min(T(XParam.dt / XParam.bndrelaxtime), T(1.0));
+
+
+	T ybo = (T)XParam.yo + XBlock.yo[ib];
+
+	T yup = T(iy);
+	T ydwn = T(iy)-T(1.0);
+
+	if (iy == XParam.blkwidth - 1)
+	{
+		if (XBlock.level[XBlock.TopLeft[ib]] > XBlock.level[ib])
+		{
+			yup = iy + T(0.75);
+		}
+
+	}
+	if (iy == 0)
+	{
+		if (XBlock.level[XBlock.BotLeft[ib]] > XBlock.level[ib])
+		{
+			ydwn = iy - T(0.25);
+		}
+
+	}
+	/*
+	T cm = XParam.spherical ? calcCM(T(XParam.Radius), delta, ybo, iy-1) : T(1.0);
+	T fmu = T(1.0);
+	T fmv = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, ydwn) : T(1.0);
+	T fmup = T(1.0);
+	T fmvp = XParam.spherical ? calcFM(T(XParam.Radius), delta, ybo, yup) : T(1.0);
+	T dmdt = (fmvp - fmv) / (cm * delta);
+	T sphcorr = side.istop == 1 ? hinside * hinside * XParam.g * 0.5 * dmdt : T(0.0);
+	*/
+
+
+	if (type == 0) // No Flux
+	{
+		//noslipbnd(zsinside, hinside, unnew, utnew, zsnew, hnew);
+		//noslipbndQ(F, G, S);
+		
+		
+		noslipbndQ(F, G, S);//noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
+
+		
+	}
+	else if (type == 2)
+	{
+		if (h[i] > XParam.eps || zsX > zsi)
+		{
+			//
+			Dirichlet1Q(T(XParam.g), sign, zsX, zsinside, hinside, uninside, F);
+		}
+		else
+		{
+			noslipbndQ(F, G, S);
+			qmean = T(0.0);
+		}
+	}
+	else if (type == 2)
+	{
+		if (h[i] > XParam.eps || zsX > zsi)
+		{
+			//
+			Dirichlet1Q(T(XParam.g), sign, zsX, zsinside, hinside, uninside, F);
+		}
+		else
+		{
+			noslipbndQ(F, G, S);
+			qmean = T(0.0);
+		}
+	}
+	else if (type == 3)
+	{
+		if (h[i] > XParam.eps || zsX > zsi )
+		{
+			ABS1DQ(T(XParam.g), sign, factime, facrel, zsi, zsX, zsinside, hinside, qmean, F, G, S);
+			//qmean = T(0.0);
+		}
+		else
+		{
+			noslipbndQ(F, G, S);
+			qmean = T(0.0);
+		}
+		side.qmean_g[iq] = qmean;
+	}
+	
+
+	// write the results
+
+	if (side.isright < 0 || side.istop < 0) // left or bottom
+	{
+		Fhun[inside]=F;
+		
+	}
+	else
+	{
+		Fhun[i] = F;
+		
 	}
 	
 
