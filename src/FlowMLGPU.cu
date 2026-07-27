@@ -509,7 +509,10 @@ template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 
-	
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		FlowbndFluxML(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
+	}
 	//HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
 	//CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -608,10 +611,7 @@ template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fvy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
-	{
-		FlowbndFluxML(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
-	}
+	
 	/*
 	refine_bilinearGPU(XParam, XModel.blocks, XModel.fluxml.Fux);
 	refine_bilinearGPU(XParam, XModel.blocks, XModel.fluxml.Fvx);
