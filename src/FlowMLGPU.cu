@@ -713,14 +713,14 @@ template <class T> void solveEtaPCG(Param XParam, Model<T> XModel,T dt)
 	HaloFluxGPUTMLnew <<< gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluximp.g_y);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	HaloFluxGPUTMLclamp<<< gridDimHaloBT, blockDimHaloBT, 0 >>>(XParam, XModel.blocks,XModel.fluximp.g_y,T(0.0));
-	CUDA_CHECK(cudaDeviceSynchronize());
+	// HaloFluxGPUTMLclamp<<< gridDimHaloBT, blockDimHaloBT, 0 >>>(XParam, XModel.blocks,XModel.fluximp.g_y,T(0.0));
+	// CUDA_CHECK(cudaDeviceSynchronize());
 
-	HaloFluxGPURMLclamp<<< gridDimHaloLR, blockDimHaloLR, 0 >>> (XParam, XModel.blocks,XModel.fluximp.g_x,T(0.0));
-	CUDA_CHECK(cudaDeviceSynchronize());
+	// HaloFluxGPURMLclamp<<< gridDimHaloLR, blockDimHaloLR, 0 >>> (XParam, XModel.blocks,XModel.fluximp.g_x,T(0.0));
+	// CUDA_CHECK(cudaDeviceSynchronize());
 
-	// fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.g_x);
-	// fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.g_y);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.g_x);
+	fillHaloGPU(XParam, XModel.blocks, XModel.fluximp.g_y);
 
     //matvec_facefield<<<blocks, threads>>>(f.eta_r, f.g_x, f.alpha_eta_x, g);
     // matvec_facefield_y<<<...>>>(f.eta_r, f.g_y, f.alpha_eta_y, g);  (y-mirror)
