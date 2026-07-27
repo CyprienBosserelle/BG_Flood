@@ -494,9 +494,9 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 	}
 	else
 	{
-		//F = Fh[i];
-		//G = Ss[i];
-		//S = Fq[inside];
+		F = Fh[i];
+		G = Ss[i];
+		S = Fq[inside];
 	}
 	
 	T factime = min(T(XParam.dt / XParam.bndfiltertime), T(1.0));
