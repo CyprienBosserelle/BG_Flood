@@ -428,7 +428,7 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 		}
 		*/
 		iub = memloc(halowidth, blkmemwidth, ix + ixshft, iy - 1, ib);
-		iut = memloc(halowidth, blkmemwidth, ix + ixshft, min(iy + 1 , XParam.XParam.blkwidth), ib);
+		iut = memloc(halowidth, blkmemwidth, ix + ixshft, min(iy + 1 ,XParam.blkwidth), ib);
 
 
 		int iv = memloc(halowidth, blkmemwidth, ix, iy + iyshft, ib);
