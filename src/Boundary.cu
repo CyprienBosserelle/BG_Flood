@@ -592,9 +592,9 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 	}
 	else
 	{
-		Fh[inside] = F;
-		Ss[inside] = G;
-		Fq[i] = S;
+		Fh[i] = F;
+		Ss[i] = G;
+		Fq[inside] = S;
 	}
 	
 
