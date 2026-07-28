@@ -41,6 +41,11 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	//============================================
 	//  Fill the halo for gradient reconstruction & Recalculate zs
 	fillHaloGPU(XParam, XModel.blocks, XModel.evolv, XModel.zb);
+
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		FlowbndFluxMLEv(XParam, XLoop.totaltime + dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
+	}
 	
 	
 	//CUDA_CHECK(cudaMemcpy(XModel.evolv_o.h, XModel.evolv.h, XParam.nblk * XParam.blksize * sizeof(T), cudaMemcpyDeviceToDevice));
@@ -512,7 +517,7 @@ template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
 	{
-		FlowbndFluxML(XParam, XLoop.totaltime + dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
+		//FlowbndFluxML(XParam, XLoop.totaltime + dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
 	}
 	//HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
 	//CUDA_CHECK(cudaDeviceSynchronize());

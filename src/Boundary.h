@@ -28,8 +28,11 @@ template <class T> __global__ void maskbndGPUFluxbot(Param XParam, BlockP<T> XBl
 template <class T> void FlowbndFlux(Param XParam, double totaltime, BlockP<T> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxP<T> XFlux);
 template <class T> void FlowbndFlux(Param XParam,double totaltime, BlockP<T> XBlock, bndparam side, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxP<T> XFlux);
 template <class T> void FlowbndFluxML(Param XParam, double totaltime, BlockP<T> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxMLP<T> XFlux);
+template <class T> void FlowbndFluxMLEv(Param XParam, double totaltime, BlockP<T> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxMLP<T> XFlux);
 
 template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, int type, float zsbnd, T taper, T* zs, T* h, T* un, T* ut, T* Fh, T* Fq, T* Ss);
+template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside side, BlockP<T> XBlock, DynForcingP<float> Atmp, DynForcingP<float> Zsmap, bool uniform, int type, float zsbnd, T taper, T* zs, T* h, T* un, T* ut);
+
 
 template <class T> __global__ void bndGPU(Param XParam, bndparam side, BlockP<T> XBlock, DynForcingP<float> Atmp, float itime, T* zs, T* h, T* un, T* ut);
 template <class T> __host__ void bndCPU(Param XParam, bndparam side, BlockP<T> XBlock, std::vector<double> zsbndvec, std::vector<double> uubndvec, std::vector<double> vvbndvec, DynForcingP<float> Atmp, T* zs, T* h, T* un, T* ut);
