@@ -262,7 +262,7 @@ template <class T> void FlowbndFluxML(Param XParam, double totaltime, BlockP<T> 
 			{
 				//Left
 				//bndFluxGPUSideF << < gridDimBBNDLeft, blockDim, 0 >> > (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fux);
-				bndFluxGPUSide << < gridDimBBNDLeft, blockDim, 0 >> > (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.hu, XFlux.hfu, XFlux.hau);
+				bndFluxGPUSide << < gridDimBBNDLeft, blockDim, 0 >> > (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.hu, XFlux.Fux, XFlux.hau);
 				
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
@@ -270,21 +270,21 @@ template <class T> void FlowbndFluxML(Param XParam, double totaltime, BlockP<T> 
 			{
 				//Right
 				//bndFluxGPUSideF << < gridDimBBNDRight, blockDim, 0 >> > (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fux);
-				bndFluxGPUSide << < gridDimBBNDRight, blockDim, 0 >> > (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.hu, XFlux.hfu, XFlux.hau);
+				bndFluxGPUSide << < gridDimBBNDRight, blockDim, 0 >> > (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.hu, XFlux.Fux, XFlux.hau);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			//if (bndseg.top.nblk > 0)
 			{
 				//top
 				//bndFluxGPUSideF << < gridDimBBNDTop, blockDim, 0 >> > (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fvy);
-				bndFluxGPUSide << < gridDimBBNDTop, blockDim, 0 >> > (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.hv, XFlux.hfv, XFlux.hav);
+				bndFluxGPUSide << < gridDimBBNDTop, blockDim, 0 >> > (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.hv, XFlux.Fvy, XFlux.hav);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			//if (bndseg.bot.nblk > 0)
 			{
 				//bot
 				//bndFluxGPUSideF << < gridDimBBNDBot, blockDim, 0 >> > (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fvy);
-				bndFluxGPUSide << < gridDimBBNDBot, blockDim, 0 >> > (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.hv, XFlux.hfv, XFlux.hav);
+				bndFluxGPUSide << < gridDimBBNDBot, blockDim, 0 >> > (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.hv, XFlux.Fvy, XFlux.hav);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 		}
@@ -701,14 +701,16 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 	if (side.isright < 0 || side.istop < 0) // left or bottom
 	{
 		Fh[i]=F;
-		Fq[i]=G;
-		Ss[inside]=S;
+		Fq[i]=F;
+		//Fq[i]=G;
+		//Ss[inside]=S;
 	}
 	else
 	{
 		Fh[i] = F;
-		Ss[i] = G;
-		Fq[inside] = S;
+		Fq[i]=F;
+		//Ss[i] = G;
+		//Fq[inside] = S;
 	}
 	
 
