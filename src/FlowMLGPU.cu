@@ -590,7 +590,7 @@ template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	
 	// Advection
-	AdvecFluxML << < gridDim, blockDimW, 0 >> > (XParam, XModel.blocks, dt, XModel.evolv, XModel.grad, XModel.fluxml);
+	AdvecFluxML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, dt, XModel.evolv, XModel.grad, XModel.fluxml);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	
@@ -614,7 +614,7 @@ template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
 	{
-		//FlowbndFluxML(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
+		//FlowbndFluxMLF(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
 	}
 	
 	/*
