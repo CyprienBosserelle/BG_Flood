@@ -44,7 +44,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
 	{
-		FlowbndFluxMLEv(XParam, XLoop.totaltime + dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
+		FlowbndFluxMLEv(XParam, XLoop.totaltime, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
 	}
 	
 	
