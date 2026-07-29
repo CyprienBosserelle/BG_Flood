@@ -1011,7 +1011,7 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 	uninside = un[inside];
 	utinside = ut[inside];
 
-	T zsX = (zsbnd + zsatm - 0.5 * (zsi + zsinside)) * taper + 0.5 * (zsi + zsinside);
+	T zsX = (zsbnd + zsatm);// - 0.5 * (zsi + zsinside)) * taper + 0.5 * (zsi + zsinside);
 
 	qmean = side.qmean_g[iq];
 
