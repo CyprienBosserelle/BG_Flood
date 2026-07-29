@@ -563,7 +563,7 @@ template <class T> __global__  void HaloFluxGPURMLclamp(Param XParam, BlockP<T> 
 
 		int j = iy;
 
-		i = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth, j, ib);
+		i = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth-1, j, ib);
 		
 
 		if (XBlock.RightBot[ib] == ib) // it is a boundary side
@@ -596,7 +596,7 @@ template <class T> __global__  void HaloFluxGPUTMLclamp(Param XParam, BlockP<T> 
 	{
 		int ib = XBlock.active[ibl];
 
-		i = memloc(XParam.halowidth, blkmemwidth, j, XParam.blkwidth, ib);
+		i = memloc(XParam.halowidth, blkmemwidth, j, XParam.blkwidth-1, ib);
 		
 
 		if (XBlock.TopLeft[ib] == ib)
