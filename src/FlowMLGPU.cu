@@ -158,9 +158,9 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 		cudaMemcpy(XModel.fluximp.eta_r, XModel.evolv.zs, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
-		cudaMemcpy(XModel.fluximp.su, XModel.fluxml.hu, n * sizeof(T), cudaMemcpyDeviceToDevice);
+		//cudaMemcpy(XModel.fluximp.su, XModel.fluxml.hu, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
-		cudaMemcpy(XModel.fluximp.sv, XModel.fluxml.hv, n * sizeof(T), cudaMemcpyDeviceToDevice);
+		//cudaMemcpy(XModel.fluximp.sv, XModel.fluxml.hv, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
 		// HaloFluxGPUTMLclamp<<< gridDimHaloBT, blockDimHaloBT, 0 >>>(XParam, XModel.blocks,XModel.fluximp.eta_r,T(0.0));
 		// //CUDA_CHECK(cudaDeviceSynchronize());
@@ -206,7 +206,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 		for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
 		{
-			FlowbndFluxML(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
+			FlowbndFluxMLEv(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.fluximp.eta_r,XModel.evolv.h,XModel.fluximp.su,XModel.fluximp.sv);
 		}
 
 		//test_symetry(XParam, XModel, T(XLoop.dt));
@@ -536,7 +536,7 @@ template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
 	{
-		//FlowbndFluxML(XParam, XLoop.totaltime + dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
+		FlowbndFluxML(XParam, XLoop.totaltime + dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
 	}
 	//HaloFluxGPULRnew << < gridDimHaloLR, blockDimHaloLR, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hu);
 	//CUDA_CHECK(cudaDeviceSynchronize());
@@ -638,7 +638,7 @@ template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
 	{
-		FlowbndFluxML(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
+		//FlowbndFluxML(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
 	}
 	
 	/*

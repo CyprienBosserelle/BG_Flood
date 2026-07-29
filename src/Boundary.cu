@@ -317,7 +317,7 @@ template void FlowbndFluxML<double>(Param XParam, double totaltime, BlockP<doubl
  * Handles boundary fluxes for ML variables, applies tapers, and manages GPU/CPU execution for boundary segments.
  * Integrates any existing comments and logic.
  */
-template <class T> void FlowbndFluxMLEv(Param XParam, double totaltime, BlockP<T> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<T> XEv, FluxMLP<T> XFlux)
+template <class T> void FlowbndFluxMLEv(Param XParam, double totaltime, BlockP<T> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, T* zs, T* h, T* hu, T* hv)
 {
 	dim3 blockDim(XParam.blkwidth, 1, 1);
 	dim3 gridDimBBNDLeft(bndseg.left.nblk, 1, 1);
@@ -369,7 +369,7 @@ template <class T> void FlowbndFluxMLEv(Param XParam, double totaltime, BlockP<T
 			{
 				//Left
 				//bndFluxGPUSideF << < gridDimBBNDLeft, blockDim, 0 >> > (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fux);
-				bndFluxGPUSideEv << < gridDimBBNDLeft, blockDim, 0 >> > (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v);
+				bndFluxGPUSideEv << < gridDimBBNDLeft, blockDim, 0 >> > (XParam, bndseg.left, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, zs, h, hu, hv);
 				
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
@@ -377,21 +377,21 @@ template <class T> void FlowbndFluxMLEv(Param XParam, double totaltime, BlockP<T
 			{
 				//Right
 				//bndFluxGPUSideF << < gridDimBBNDRight, blockDim, 0 >> > (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v, XFlux.Fux);
-				bndFluxGPUSideEv << < gridDimBBNDRight, blockDim, 0 >> > (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.u, XEv.v);
+				bndFluxGPUSideEv << < gridDimBBNDRight, blockDim, 0 >> > (XParam, bndseg.right, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, zs, h, hu, hv);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			//if (bndseg.top.nblk > 0)
 			{
 				//top
 				//bndFluxGPUSideF << < gridDimBBNDTop, blockDim, 0 >> > (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fvy);
-				bndFluxGPUSideEv << < gridDimBBNDTop, blockDim, 0 >> > (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u);
+				bndFluxGPUSideEv << < gridDimBBNDTop, blockDim, 0 >> > (XParam, bndseg.top, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, zs, h, hv, hu);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 			//if (bndseg.bot.nblk > 0)
 			{
 				//bot
 				//bndFluxGPUSideF << < gridDimBBNDBot, blockDim, 0 >> > (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u, XFlux.Fvy);
-				bndFluxGPUSideEv << < gridDimBBNDBot, blockDim, 0 >> > (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, XEv.zs, XEv.h, XEv.v, XEv.u);
+				bndFluxGPUSideEv << < gridDimBBNDBot, blockDim, 0 >> > (XParam, bndseg.bot, XBlock, Atmp, bndseg.WLmap, bndseg.uniform, bndseg.type, float(zsbnd), taper, zs, h, hv, hu);
 				CUDA_CHECK(cudaDeviceSynchronize());
 			}
 		}
@@ -406,8 +406,8 @@ template <class T> void FlowbndFluxMLEv(Param XParam, double totaltime, BlockP<T
 		}
 	}
 }
-template void FlowbndFluxMLEv<float>(Param XParam, double totaltime, BlockP<float> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<float> XEv, FluxMLP<float> XFlux);
-template void FlowbndFluxMLEv<double>(Param XParam, double totaltime, BlockP<double> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, EvolvingP<double> XEv, FluxMLP<double> XFlux);
+template void FlowbndFluxMLEv<float>(Param XParam, double totaltime, BlockP<float> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, float* zs,float* h,float* hu, float* hv);
+template void FlowbndFluxMLEv<double>(Param XParam, double totaltime, BlockP<double> XBlock, bndsegment bndseg, DynForcingP<float> Atmp, double* zs, double* h, double* hu, double* hv);
 
 
 
@@ -1138,7 +1138,7 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 	h[i] = max(zsX - (zsinside - hinside), T(0.0));
 
 
-	un[i] = F/hinside;
+	un[i] = F;
 	//utinside = ut[inside];
 
 	
