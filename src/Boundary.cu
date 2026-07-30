@@ -1138,7 +1138,7 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 	h[i] = max(zsX - (zsinside - hinside), T(0.0));
 
 
-	un[i] = F * XParam.theta_H;
+	un[i] =  uninside + F * XParam.theta_H * 2;
 	//utinside = ut[inside];
 
 	
