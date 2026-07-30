@@ -126,6 +126,12 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	//HaloFluxGPUBMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hfv);
+
+	HaloFluxGPUTMLclamp<<< gridDimHaloBT, blockDimHaloBT, 0 >>>(XParam, XModel.blocks,XModel.fluxml.hfu,T(10.0));
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPURMLclamp<<< gridDimHaloLR, blockDimHaloLR, 0 >>> (XParam, XModel.blocks,XModel.fluxml.hfv,T(10.0));
+	CUDA_CHECK(cudaDeviceSynchronize());
 	//CUDA_CHECK(cudaDeviceSynchronize());
 	
 
@@ -144,6 +150,14 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.hav);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
+	HaloFluxGPUTMLclamp<<< gridDimHaloBT, blockDimHaloBT, 0 >>>(XParam, XModel.blocks,XModel.fluxml.hau,T(0.0));
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	HaloFluxGPURMLclamp<<< gridDimHaloLR, blockDimHaloLR, 0 >>> (XParam, XModel.blocks,XModel.fluxml.hav,T(0.0));
+	CUDA_CHECK(cudaDeviceSynchronize());
+
+	
+
 	// Half advection if implicit
 	if (XParam.implicit)//&& (theta_H < 1.)
 	{
@@ -153,7 +167,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 		if(XParam.theta_H < 1.0)
 		{
 			T dt_thetaH = T((1 - XParam.theta_H) * XLoop.dt);
-			//AdvecML( XParam, XLoop, XForcing, XModel, dt_thetaH);
+			AdvecML( XParam, XLoop, XForcing, XModel, dt_thetaH);
 		}
 
 		cudaMemcpy(XModel.fluximp.eta_r, XModel.evolv.zs, n * sizeof(T), cudaMemcpyDeviceToDevice);
@@ -211,7 +225,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 		//test_symetry(XParam, XModel, T(XLoop.dt));
 
-		//solveEtaPCG(XParam, XModel, T(XLoop.dt));
+		solveEtaPCG(XParam, XModel, T(XLoop.dt));
 
 		//cudaMemcpy(XModel.fluximp.Ap, XModel.fluxml.hav, n * sizeof(T), cudaMemcpyDeviceToDevice);
 		//cudaMemcpy(XModel.fluximp.z, XModel.fluxml.hu, n * sizeof(T), cudaMemcpyDeviceToDevice);
@@ -258,6 +272,14 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		//cudaMemcpy(XModel.fluximp.z, XModel.fluxml.hav, n * sizeof(T), cudaMemcpyDeviceToDevice);
+
+		HaloFluxGPUTMLclamp<<< gridDimHaloBT, blockDimHaloBT, 0 >>>(XParam, XModel.blocks,XModel.fluxml.hau,T(0.0));
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+		HaloFluxGPURMLclamp<<< gridDimHaloLR, blockDimHaloLR, 0 >>> (XParam, XModel.blocks,XModel.fluxml.hau,T(0.0));
+		CUDA_CHECK(cudaDeviceSynchronize());
+
+
 
 		cudaMemcpy(XModel.evolv.zs, XModel.fluximp.eta_r, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
