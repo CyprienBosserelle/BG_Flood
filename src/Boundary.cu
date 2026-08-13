@@ -1029,7 +1029,7 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 	}
 	*/
 
-	F = 0.0;
+	F = un[i];
 
 	G = 0.0;
 	S = 0.0;
@@ -1080,19 +1080,7 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 
 		
 	}
-	else if (type == 2)
-	{
-		if (h[i] > XParam.eps || zsX > zsi)
-		{
-			//
-			Dirichlet1Q(T(XParam.g), sign, zsX, zsinside, hinside, uninside, F);
-		}
-		else
-		{
-			noslipbndQ(F, G, S);
-			qmean = T(0.0);
-		}
-	}
+	
 	else if (type == 2)
 	{
 		if (h[i] > XParam.eps || zsX > zsi)
@@ -1131,14 +1119,14 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 	}
 	else
 	{
-		zs[i] = zsX;
+		//zs[i] = zsX;
 	}
 	
 	
 	h[i] = max(zsX - (zsinside - hinside), T(0.0));
 
 
-	un[i] =  F * XParam.theta_H;
+	un[i] =  F;
 	//utinside = ut[inside];
 
 	

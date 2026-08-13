@@ -1983,6 +1983,7 @@ template <class T> __global__  void HaloFluxGPULMLnew(Param XParam, BlockP<T> XB
 			iib = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj + 1, BlockLeft);
 
 			zout = T(0.5) * (z[iia] + z[iib]);
+			z[i] = zout;
 
 
 		}
@@ -1993,10 +1994,11 @@ template <class T> __global__  void HaloFluxGPULMLnew(Param XParam, BlockP<T> XB
 
 			iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj, XBlock.LeftBot[ib]);
 			zout = z[iia];
+			z[i] = zout;
 
 			//
 		}
-		z[i] = zout;
+		
 
 	}
 }
@@ -2038,6 +2040,7 @@ template <class T> __global__  void HaloFluxGPUBMLnew(Param XParam, BlockP<T> XB
 			iib = memloc(XParam.halowidth, blkmemwidth, jj + 1, XParam.blkwidth - 1, BlockBot);
 
 			zout = T(0.5) * (z[iia] + z[iib]);
+			z[i] = zout;
 
 
 		}
@@ -2048,10 +2051,11 @@ template <class T> __global__  void HaloFluxGPUBMLnew(Param XParam, BlockP<T> XB
 
 			iia = memloc(XParam.halowidth, blkmemwidth, jj, XParam.blkwidth - 1, XBlock.BotLeft[ib]);
 			zout = z[iia];
+			z[i] = zout;
 
 			//
 		}
-		z[i] = zout;
+		//z[i] = zout;
 
 	}
 }
@@ -2092,6 +2096,7 @@ template <class T> __global__  void HaloFluxGPURMLnew(Param XParam, BlockP<T> XB
 			iib = memloc(XParam.halowidth, blkmemwidth, 0, jj + 1, BlockRight);
 
 			zout = T(0.5) * (z[iia] + z[iib]);
+			z[i] = zout;
 
 
 		}
@@ -2102,10 +2107,11 @@ template <class T> __global__  void HaloFluxGPURMLnew(Param XParam, BlockP<T> XB
 
 			iia = memloc(XParam.halowidth, blkmemwidth, 0, jj, XBlock.RightBot[ib]);
 			zout = z[iia];
+			z[i] = zout;
 		
 			//
 		}
-		z[i] = zout;
+		//z[i] = zout;
 
 	}
 }
@@ -2147,6 +2153,7 @@ template <class T> __global__  void HaloFluxGPUTMLnew(Param XParam, BlockP<T> XB
 			iib = memloc(XParam.halowidth, blkmemwidth, jj + 1, 0, BlockTop);
 
 			zout = T(0.5) * (z[iia] + z[iib]);
+			z[i] = zout;
 
 
 		}
@@ -2157,10 +2164,11 @@ template <class T> __global__  void HaloFluxGPUTMLnew(Param XParam, BlockP<T> XB
 
 			iia = memloc(XParam.halowidth, blkmemwidth, jj, 0, XBlock.TopLeft[ib]);
 			zout = z[iia];
+			z[i] = zout;
 
 			//
 		}
-		z[i] = zout;
+		//z[i] = zout;
 
 	}
 }
