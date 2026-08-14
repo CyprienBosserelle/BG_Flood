@@ -695,23 +695,23 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 		side.qmean_g[iq] = qmean;
 	}
 	
+	T newh =  max(zsX - (zsinside - hinside), T(0.0));
+
+	T unn = F / newh;
+	T Fhi = Fh[i];
+	
 
 	// write the results
 
-	if (side.isright < 0 || side.istop < 0) // left or bottom
+	if (hinside > XParam.eps)
 	{
-		Fh[i]=F;
-		Fq[i]=F;
+		Fh[i] = Fh[inside];// / hinside * newh;// newh * unn;
+		Fq[i] = Fq[inside];//
+	}
+	
 		//Fq[i]=G;
 		//Ss[inside]=S;
-	}
-	else
-	{
-		Fh[i] = F;
-		Fq[i]=F;
-		//Ss[i] = G;
-		//Fq[inside] = S;
-	}
+	
 	
 
 	
@@ -1124,9 +1124,10 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 	
 	
 	h[i] = max(zsX - (zsinside - hinside), T(0.0));
+	//h[inside] = h[i];
 
-
-	un[i] =  F;
+	un[i] =  F /h[i];
+	//un[inside] = un[i];
 	//utinside = ut[inside];
 
 	

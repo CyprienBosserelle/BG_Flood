@@ -42,11 +42,11 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	//  Fill the halo for gradient reconstruction & Recalculate zs
 	fillHaloGPU(XParam, XModel.blocks, XModel.evolv, XModel.zb);
 
-	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+
+	/*for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
 	{
-		//FlowbndFluxMLEv(XParam, XLoop.totaltime, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
-	}
-	
+		FlowbndFluxMLEv(XParam, XLoop.totaltime, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv.zs, XModel.evolv.h, XModel.evolv.u, XModel.evolv.v);
+	}*/
 	
 	//CUDA_CHECK(cudaMemcpy(XModel.evolv_o.h, XModel.evolv.h, XParam.nblk * XParam.blksize * sizeof(T), cudaMemcpyDeviceToDevice));
 	//============================================
@@ -220,10 +220,10 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 		acceleration_rhs<<<gridDim, blockDim, 0 >>>(XParam, XModel.blocks, XModel.fluximp, T(XLoop.dt));
 		CUDA_CHECK(cudaDeviceSynchronize());
 
-		for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
-		{
-			FlowbndFluxMLEv(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.fluximp.eta_r,XModel.evolv.h,XModel.fluximp.su,XModel.fluximp.sv);
-		}
+		//for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+		//{
+		//	//FlowbndFluxMLEv(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.fluximp.eta_r,XModel.evolv.h,XModel.fluximp.su,XModel.fluximp.sv);
+		//}
 
 		//test_symetry(XParam, XModel, T(XLoop.dt));
 
@@ -349,6 +349,9 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 		TheresholdVelGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
+
+
+
 
 	// Recalculate zs based on h and zb
 	CleanupML << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.evolv, XModel.zb);
@@ -672,7 +675,7 @@ template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
 	{
-		FlowbndFluxML(XParam, XLoop.totaltime + XLoop.dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
+		FlowbndFluxML(XParam, XLoop.totaltime + dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
 	}
 	
 	/*
