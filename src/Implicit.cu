@@ -294,7 +294,7 @@ template __global__ void acceleration_facex<double>(Param XParam, BlockP<double>
 template <class T> __global__ void acceleration_facey(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, FluxIMP<T> XImp, EvolvingP<T> XEv,T dt)
 {
     int halowidth = XParam.halowidth;
-	int blkmemwidth = blockDim.y + halowidth * 2;
+	int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
@@ -386,7 +386,7 @@ template __global__ void matvec_facefieldx<double>(Param XParam, BlockP<double> 
 template <class T> __global__ void matvec_facefieldy(Param XParam, BlockP<T> XBlock,T* eta,T* g_y,T*alpha_y)
 {
    int halowidth = XParam.halowidth;
-	int blkmemwidth = blockDim.y + halowidth * 2;
+	int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
@@ -483,7 +483,7 @@ template <class T> __global__ void pressure_flux_reconstruction_facex(Param XPar
 
     int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);
     int idm = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);//memloc(ix - 1, iy, ib);
-    int idp = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);//memloc(ix - 1, iy, ib);
+    //int idp = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);//memloc(ix - 1, iy, ib);
 
     T dry = XParam.eps;
 
@@ -510,7 +510,7 @@ template __global__ void pressure_flux_reconstruction_facex<double>(Param XParam
 template <class T> __global__ void pressure_flux_reconstruction_facey(Param XParam, BlockP<T> XBlock,FluxMLP<T> XFlux, FluxIMP<T> XImp, EvolvingP<T> XEv,T dt)
 {
      int halowidth = XParam.halowidth;
-	int blkmemwidth = blockDim.y + halowidth * 2;
+	int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
@@ -522,7 +522,7 @@ template <class T> __global__ void pressure_flux_reconstruction_facey(Param XPar
 
     int id  = memloc(halowidth, blkmemwidth, ix, iy, ib);
     int idm = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);//memloc(ix - 1, iy, ib);
-    int idp = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);//memloc(ix - 1, iy, ib);
+   // int idp = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);//memloc(ix - 1, iy, ib);
 
     T dry = XParam.eps;
 
@@ -665,6 +665,45 @@ template <class T> __global__  void HaloFluxGPULMLclamp(Param XParam, BlockP<T> 
 }
 template __global__  void HaloFluxGPULMLclamp<float>(Param XParam, BlockP<float> XBlock, float* z,float val);
 template __global__  void HaloFluxGPULMLclamp<double>(Param XParam, BlockP<double> XBlock, double* z,double val);
+
+
+template <class T> __global__  void AVGTRcorner(Param XParam, BlockP<T> XBlock, T* z)
+{
+    int jj, i, icorner, ileft, ibot;
+    int blkmemwidth = blockDim.y + XParam.halowidth * 2;
+    //unsigned int blksize = blkmemwidth * blkmemwidth;
+    //unsigned int ix = 0;
+    int iy = threadIdx.y;
+    int ibl = blockIdx.x;
+    if (ibl < XParam.nblk)
+    {
+
+        int ib = XBlock.active[ibl];
+
+       // printf("search corner\t");
+
+        //int j = iy;
+
+        i = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 1, ib);
+
+        icorner= memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 2, ib);
+        ileft = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 2, XParam.blkwidth - 1, ib);
+        ibot = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, XParam.blkwidth - 2, ib);
+
+        //T zout;
+
+        if (XBlock.RightTop[ib] == ib && XBlock.TopRight[ib] == ib)
+        {
+
+            //printf("Found corner\t");
+
+            z[i] = T(0.25)* (z[i] + z[icorner] + z[ileft] + z[ibot]);
+
+        }
+    }
+}
+template __global__  void AVGTRcorner<float>(Param XParam, BlockP<float> XBlock, float* z);
+template __global__  void AVGTRcorner<double>(Param XParam, BlockP<double> XBlock, double* z);
 
 // /**
 //  * @brief Multigrid relaxation function (Red-Black Gauss-Seidel)

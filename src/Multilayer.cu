@@ -284,10 +284,12 @@ template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock,
 		if (hul * dt / (delta * cmn) > CFL * hn)
 		{
 			hul = CFL * hn * delta * cmn / dt;
+			//printf("here is the problem!\n");
 		}
 		else if (-hul * dt / (delta * cmi) > CFL * hi)
 		{
 			hul = -CFL * hi * delta * cmi / dt;
+			//printf("here is the problem!\n");
 		}
 
 		if (hul != XFlux.hu[i])
@@ -344,10 +346,12 @@ template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock,
 		if (hvl * dt / (delta * cmn) > CFL * hn)
 		{
 			hvl = CFL * hn * delta * cmn / dt;
+			//printf("here is the problem!\n");
 		}
 		else if (-hvl * dt / (delta * cmi) > CFL * hi)
 		{
 			hvl = -CFL * hi * delta * cmi / dt;
+			//printf("here is the problem!\n");
 		}
 
 		if (hvl != XFlux.hv[i])

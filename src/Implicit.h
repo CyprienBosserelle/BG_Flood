@@ -44,4 +44,6 @@ template <class T> __global__  void HaloFluxGPURMLclamp(Param XParam, BlockP<T> 
 template <class T> __global__  void HaloFluxGPUTMLclamp(Param XParam, BlockP<T> XBlock, T* z,T val);
 template <class T> __global__  void HaloFluxGPUBMLclamp(Param XParam, BlockP<T> XBlock, T* z,T val);
 template <class T> __global__  void HaloFluxGPULMLclamp(Param XParam, BlockP<T> XBlock, T* z,T val);
+
+template <class T> __global__  void AVGTRcorner(Param XParam, BlockP<T> XBlock, T* z);
 #endif
