@@ -686,6 +686,8 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 		{
 			ABS1DQ(T(XParam.g), sign, factime, facrel, zsi, zsX, zsinside, h[i], qmean, F, G, S);
 			//qmean = T(0.0);
+
+			
 		}
 		else
 		{
@@ -705,7 +707,7 @@ template <class T> __global__ void bndFluxGPUSide(Param XParam, bndsegmentside s
 
 	if (hinside > XParam.eps)
 	{
-		Fh[i] = Fh[inside];// / hinside * newh;// newh * unn;
+		Fh[i] = F;// hinside* unn;// newh* unn;
 		Fq[i] = Fq[inside];//
 	}
 	
@@ -744,13 +746,13 @@ template <class T> __global__ void bndFluxGPUSideF(Param XParam, bndsegmentside 
 	if (side.isright == 0)
 	{
 		ix = threadIdx.x;
-		iy = side.istop < 0 ? 0 : (blockDim.x );
+		iy = side.istop < 0 ? -1 : (blockDim.x );
 		//itx = (xx - XParam.xo) / (XParam.xmax - XParam.xo) * side.nbnd;
 	}
 	else
 	{
 		iy = threadIdx.x;
-		ix = side.isright < 0 ? 0 : (blockDim.x);
+		ix = side.isright < 0 ? -1 : (blockDim.x);
 		//itx = (yy - XParam.yo) / (XParam.ymax - XParam.yo) * side.nbnd;
 	}
 
@@ -954,13 +956,13 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 	if (side.isright == 0)
 	{
 		ix = threadIdx.x;
-		iy = side.istop < 0 ? 0 : (blockDim.x );
+		iy = side.istop < 0 ? -1 : (blockDim.x );
 		//itx = (xx - XParam.xo) / (XParam.xmax - XParam.xo) * side.nbnd;
 	}
 	else
 	{
 		iy = threadIdx.x;
-		ix = side.isright < 0 ? 0 : (blockDim.x);
+		ix = side.isright < 0 ? -1: (blockDim.x);
 		//itx = (yy - XParam.yo) / (XParam.ymax - XParam.yo) * side.nbnd;
 	}
 
@@ -1099,7 +1101,8 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 		if (h[i] > XParam.eps || zsX > zsi )
 		{
 			ABS1DQ(T(XParam.g), sign, factime, facrel, zsi, zsX, zsinside, hinside, qmean, F, G, S);
-			//qmean = T(0.0);
+			//qmean = T(0.0);\
+
 		}
 		else
 		{
@@ -1123,10 +1126,42 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 	}
 	
 	
-	h[i] = max(zsX - (zsinside - hinside), T(0.0));
+	
+	T hnew = max(zsX - (zsinside - hinside), T(0.0));
 	//h[inside] = h[i];
+	//if (XBlock.TopRight[ib] == ib && XBlock.RightTop[ib] == ib )
+	//un[i] = sign * ( sqrt(XParam.g * max(h[i], 0.)) - sqrt(XParam.g * hnew));
+	//un[i] = sign* (sqrt(XParam.g / hinside) * (zsinside - zsX));
 
-	un[i] =  F /h[i];
+
+	bool isbotleft = false;// (XBlock.BotLeft[ib] == ib) && (XBlock.LeftBot[ib] == ib) && (threadIdx.x == 0);
+	bool istopleft = false;// (XBlock.TopLeft[ib] == ib) && (XBlock.LeftTop[ib] == ib) && (threadIdx.x == (blockDim.x - 1));
+	if (isbotleft || istopleft)
+	{
+		un[i] = 0.0;//
+	}
+	else
+	{
+		//h[i] = hnew;// +0.9 * hinside;
+		//zs[i] = zsX;// +0.9 * zsinside;
+		//un[i] = un[inside];
+
+		//un[i] = sign * (sqrt(XParam.g / hinside) * (zsinside - zsX));
+	}
+	
+
+	//zs[i] = zsX;
+	//h[i] = hnew;
+	
+
+	//if (XBlock.TopRight[ib] == ib && XBlock.RightTop[ib] == ib)
+
+
+	//zs[i] = zsX;
+	//h[i] = hnew;
+	// max(zsX - (zsinside - hinside), T(0.0));
+
+	//un[i] = sqrt(G * max(H, 0.)) - sqrt(G * max(ref - zb[], 0.));
 	//un[inside] = un[i];
 	//utinside = ut[inside];
 

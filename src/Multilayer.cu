@@ -132,7 +132,7 @@ template __global__ void CalcfaceValX<double>(double pdt, Param XParam, BlockP<d
 template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux, T* dtmax, T* zb,T* Patm)
 {
 	int halowidth = XParam.halowidth;
-	int blkmemwidth = blockDim.y + halowidth * 2;
+	int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
@@ -310,7 +310,7 @@ template __global__ void CheckadvecMLX<double>(Param XParam, BlockP<double> XBlo
 template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock,T dt, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux)
 {
 	int halowidth = XParam.halowidth;
-	int blkmemwidth = blockDim.y + halowidth * 2;
+	int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
