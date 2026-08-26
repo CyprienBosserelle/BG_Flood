@@ -746,13 +746,13 @@ template <class T> __global__ void bndFluxGPUSideF(Param XParam, bndsegmentside 
 	if (side.isright == 0)
 	{
 		ix = threadIdx.x;
-		iy = side.istop < 0 ? -1 : (blockDim.x );
+		iy = side.istop < 0 ? 0 : (blockDim.x );
 		//itx = (xx - XParam.xo) / (XParam.xmax - XParam.xo) * side.nbnd;
 	}
 	else
 	{
 		iy = threadIdx.x;
-		ix = side.isright < 0 ? -1 : (blockDim.x);
+		ix = side.isright < 0 ? 0 : (blockDim.x);
 		//itx = (yy - XParam.yo) / (XParam.ymax - XParam.yo) * side.nbnd;
 	}
 
@@ -1134,9 +1134,12 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 	//un[i] = sign* (sqrt(XParam.g / hinside) * (zsinside - zsX));
 
 
-	bool isbotleft = false;// (XBlock.BotLeft[ib] == ib) && (XBlock.LeftBot[ib] == ib) && (threadIdx.x == 0);
-	bool istopleft = false;// (XBlock.TopLeft[ib] == ib) && (XBlock.LeftTop[ib] == ib) && (threadIdx.x == (blockDim.x - 1));
-	if (isbotleft || istopleft)
+	bool isbotleft = (XBlock.BotLeft[ib] == ib) && (XBlock.LeftBot[ib] == ib) && (threadIdx.x == 0);
+	bool isbotright = (XBlock.BotRight[ib] == ib) && (XBlock.RightBot[ib] == ib) && (threadIdx.x == 0);
+	bool istopleft =  (XBlock.TopLeft[ib] == ib) && (XBlock.LeftTop[ib] == ib) && (threadIdx.x == (blockDim.x - 1));
+	bool istopright = (XBlock.TopRight[ib] == ib) && (XBlock.RightTop[ib] == ib) && (threadIdx.x == (blockDim.x - 1));
+
+	if (isbotleft || istopleft || istopright || isbotright)
 	{
 		un[i] = 0.0;//
 	}
@@ -1146,7 +1149,11 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 		//zs[i] = zsX;// +0.9 * zsinside;
 		//un[i] = un[inside];
 
-		//un[i] = sign * (sqrt(XParam.g / hinside) * (zsinside - zsX));
+		//un[i] = sign* (sqrt(XParam.g / hinside) * (zsinside - zsX));
+		//sqrt(G* max(H, 0.)) - sqrt(G * max(ref - zb[], 0.));
+		un[i] =  sign* (sqrt(XParam.g* hinside) - sqrt(XParam.g * (hnew)));
+
+		
 	}
 	
 

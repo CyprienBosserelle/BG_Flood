@@ -193,7 +193,10 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 		//cudaMemcpy(XModel.fluximp.r, XModel.evolv.h, n * sizeof(T), cudaMemcpyDeviceToDevice);
 
-		
+		for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+		{
+			FlowbndFluxMLEv(XParam, XLoop.totaltime, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv.zs, XModel.evolv.h, XModel.evolv.u, XModel.evolv.v);
+		}
 		
 
 		acceleration_facex<<<gridDim, blockDimKX, 0 >>>(XParam, XModel.blocks, XModel.fluxml, XModel.fluximp, XModel.evolv, T(XLoop.dt));
@@ -581,7 +584,7 @@ template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 
 	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
 	{
-		FlowbndFluxMLEv(XParam, XLoop.totaltime + dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv.zs, XModel.evolv.h, XModel.evolv.u, XModel.evolv.v);
+		//FlowbndFluxMLEv(XParam, XLoop.totaltime + dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv.zs, XModel.evolv.h, XModel.evolv.u, XModel.evolv.v);
 	}
 	
 	//fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hu);
