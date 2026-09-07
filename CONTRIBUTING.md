@@ -34,7 +34,7 @@ We welcome code contributions that improve model physics, accelerate performance
 
 * **Core Engine:** High-performance routines utilize parallel programming frameworks. Ensure any modifications to the code **try** to preserve parallel efficiency of the kernels
 * **Data Formats:** BG_Flood relies heavily on structured grid structures and geospatial formats. Ensure that any updates affecting coordinate tracking or spatial ordering correctly handle standard vertical datums and projections without loss of spatial fidelity.
-* **Minimal Dependencies:** BG_Flood is meant to be as portable as possible and should only rely on minimal dependancies. Only significant features should call for adding dependancies  
+* **Minimal Dependencies:** BG_Flood is meant to be as portable as possible and should only rely on minimal dependencies. Only significant features should call for adding dependencies  
 
 #### Code Style Guide
 
@@ -54,7 +54,7 @@ To submit your changes, please follow these steps:
 3. **Implement Tests:** If adding a new feature or fixing a hydraulic routing bug, include corresponding **internal** validation tests. Verify your changes against standard benchmark flood scenarios if modifying any of the hydraulic engines.
 4. **Document Changes and show your own test results:** Update any relevant markdown documentation, inline comments, or configuration schema definitions if your changes introduce new parameters (e.g., modified rainfall ARI inputs or custom roughness coefficients).
 5. **Submit the PR:** Make sure you stage your changes appropriately. Well tested features That succeeds all of its test can open a Pull Request against `development` branch but poorly optimise experiment that need a bit of work should pull request on another branch off developments
-6. **No PR to main:** PR to main are reserved for lead dev team and will only be merged after thourough checks from the development branch. Exceptions are for text edit of documentation. 
+6. **No PR to main:** PR to main are reserved for lead dev team and will only be merged after thorough checks from the development branch. Exceptions are for text edit of documentation. 
 
 ### Pull Request Checklist
 

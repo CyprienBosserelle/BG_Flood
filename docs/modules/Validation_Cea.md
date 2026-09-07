@@ -5,7 +5,7 @@ shape basin with walls on the slopes (see link for layout). This lab test is mor
 
 The observed discharge show oscillations at the peak, most models do not show such oscillation but instead show a smooth steady curve. [Cea et al. (2008)](https://iwra.org/proceedings/congress/resource/abs478_article.pdf) in the paper show their model producing a smooth curve and [Molls et al. (2016)](https://cdn.ymaws.com/membersfloodplain.site-ym.com/resource/resmgr/2016Conference/FMA2016_Sacramento_RAS2DVeri.pdf) show a smooth curve for HEC-RAS (and suspiciouly smooth data).
 
-BG_Flood does replicate the oscillation they are produced s the water at the mottom of the bassin start to oscilate at the bottom of the basin. 
+BG_Flood does replicate the oscillation they are produced s the water at the mottom of the bassin start to oscillate at the bottom of the basin. 
 
 
 ## Comparison between all engines

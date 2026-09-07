@@ -58,7 +58,7 @@ It is normal for the velocity to be non-zero. this is due to the round off error
 
 
 ## Mass conservation 
-Mass should be conserved in a model except when water is meant to leave the domain. Mass conservation is a basic test where whe check if mass of water already in the model and what is meant to be injected (river and/or rain) stay in the model (with wall bnds). This test is basic and trivial test with mild slope and already wet environment. It is, however a surprisingly hard test to suceed on steep dry slopes. 
+Mass should be conserved in a model except when water is meant to leave the domain. Mass conservation is a basic test where whe check if mass of water already in the model and what is meant to be injected (river and/or rain) stay in the model (with wall bnds). This test is basic and trivial test with mild slope and already wet environment. It is, however a surprisingly hard test to succeed on steep dry slopes. 
 
 The simple mass conservation test is great for checking engine flaws when using rain on grid. Here we push it to the extreme by throwing 100 m<sup>3</sup>/s for 100 s over 1 km<sup>2</sup> (equivalent 10 mm of rainfall falling in 100 s which is equivalent to a rate of 360 mm/h for 1.5-ish minutes ). Note that there are a few tricks to to force the Buttinger to conserve mass but we decided not to turn them off for these tests. 
 
@@ -82,12 +82,12 @@ The test above confirm that rainfall forcing is consistent with theory (even whe
 ## Boundary check
 We have checks to ensure that boundary work. 
 
-### Wall boundary are impermable
+### Wall boundary are impermeable
 IN this test we run a river down a steep slope and checks the mass inside the model is conserved. We do that along each side of the model.
 
 
 ## Adaptive
-Eahc of the test are run in a uniform resolution or with a variable resolution. for the mass conservation test the goal is the same but for propagation the results need to be different. More importantly in the variable resolution we chack that the solution are symetrical and that mesh structure do not impede wave propagation.
+Eahc of the test are run in a uniform resolution or with a variable resolution. for the mass conservation test the goal is the same but for propagation the results need to be different. More importantly in the variable resolution we chack that the solution are symmetrical and that mesh structure do not impede wave propagation.
 
 
 
