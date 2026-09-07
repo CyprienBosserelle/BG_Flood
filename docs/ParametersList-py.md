@@ -10,7 +10,7 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 |test|test| -1|-1: no test, 99: run all independent tests, X: run test X|
 |g|g| 9.81|Acceleration of gravity in m.s-2|
 |rho|rho| 1025.0|Fluid density in kg.m-3|
-|eps|eps| 0.0001|Drying height in m (if h<eps, the surface is concidered dry)|
+|eps|eps| 0.0001|Drying height in m (if h<eps, the surface is considered dry)|
 |dt|dt| 0.0|Model time step in s.|
 |CFL|CFL| 0.5|Current Freidrich Limiter criterium (between 0 and 1. Higher values may make the model unstable)|
 |theta|theta| 1.3|Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).|
@@ -33,7 +33,7 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 ### Grid parameters
 |_Reference_|_Keys_|_default_|_Explanation_|
 |---|---|---|---|
-|dx|dx| nan("")|Grid resolution, in m for a metric grid or in decimal degree for a sperical grid.|
+|dx|dx| nan("")|Grid resolution, in m for a metric grid or in decimal degree for a spherical grid.|
 |nx|nx| 0|Initial/input grid size (number of nodes) in x direction|
 |ny|ny| 0|Initial/input grid size (number of nodes) in y direction|
 |xo| xo , xmin | nan("")|Grid x origin (if not alter by the user, will be defined based on the topography/bathymetry input map)|
@@ -120,9 +120,9 @@ BG_flood user interface consists in a text file (`BG_param.txt` by default), ass
 |cf| cf , roughness , cfmap |(see constant in parameters)|cf=0.001;<br>cf=bottom_friction.nc?bfc;|Bottom friction coefficient map (associated to the chosen bottom friction model: n, z0, ...)<br>A list of roughness map can be provide. At any grid point, the last one defined will be used.|
 |il| il , Rain_il , initialloss |(see constant in parameters)|il=rain_loss.nc?initial_loss;|Initial Rain loss coefficient map (in mm)|
 |cl| cl , Rain_cl , continuousloss |(see constant in parameters)|cl=rain_loss.nc?continuous_loss;|Continuous Rain loss coefficient map (in mm/h)|
-|Bathy| Bathy , bathyfile , bathymetry , depfile , depthfile , topofile , topo , DEM |None but input NECESSARY|bathy=Westport_DEM_2020.nc?z<br>topo=Westport_DEM_2020.asc| Bathymetry/Topography input, ONLY NECESSARY INPUT<br>Different format are accepted: .asc, .nc, .md. , the grid must be regular with growing coordinate.<br>This grid will define the extend of the model domain and model resolution (if not inform by the user).<br>The coordinate can be cartesian or spherical (still in development).<br>A list of file can also be use to provide a thiner resolution localy by using the key word each time on a different line.<br>The first file will be use to define the domain area and base resolution but the following file<br>will be used during the refinement process.|
+|Bathy| Bathy , bathyfile , bathymetry , depfile , depthfile , topofile , topo , DEM |None but input NECESSARY|bathy=Westport_DEM_2020.nc?z<br>topo=Westport_DEM_2020.asc| Bathymetry/Topography input, ONLY NECESSARY INPUT<br>Different format are accepted: .asc, .nc, .md. , the grid must be regular with growing coordinate.<br>This grid will define the extend of the model domain and model resolution (if not inform by the user).<br>The coordinate can be cartesian or spherical (still in development).<br>A list of file can also be use to provide a thiner resolution locally by using the key word each time on a different line.<br>The first file will be use to define the domain area and base resolution but the following file<br>will be used during the refinement process.|
 |AOI| AOI , aoipoly |N/A|AOI=myarea.gmt;|Area of interest polygon<br>the input file is a text file with 2 columns containing the coordinate of a closed polygon (last line==first line)|
-|left| left , leftbndfile , leftbnd |1|left = 0;<br>left = leftBnd.txt,2;| 0:Wall (no slip); 1:neumann (zeros gradient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)<br>For type 2 and 3 boundary, a file need to be added to determine the vaules at the boundary. This file will consist in a first column containing time (with possibly variable time steps) and forcing values in the following columns (1 column of values corresponding to a constant value along the boundary, 2 columns correspond to values at boundary edges with linear evolution in between, n columns correspond to n regularly spaced values applied along the boundary)|
+|left| left , leftbndfile , leftbnd |1|left = 0;<br>left = leftBnd.txt,2;| 0:Wall (no slip); 1:neumann (zeros gradient) [Default]; 2:sealevel dirichlet; 3: Absorbing 1D 4: Absorbing 2D (not yet implemented)<br>For type 2 and 3 boundary, a file need to be added to determine the values at the boundary. This file will consist in a first column containing time (with possibly variable time steps) and forcing values in the following columns (1 column of values corresponding to a constant value along the boundary, 2 columns correspond to values at boundary edges with linear evolution in between, n columns correspond to n regularly spaced values applied along the boundary)|
 |right| right , rightbndfile , rightbnd |1|right = 0;<br>right = rightBnd.txt,2;|Same as left boundary|
 |top| top , topbndfile , topbnd |1|top = 0;<br>top = topBnd.txt,2;|Same as left boundary|
 |bot| bot , botbndfile , botbnd , bottom |1|bot = 0;<br>bot = botBnd.txt,2;|Same as left boundary|

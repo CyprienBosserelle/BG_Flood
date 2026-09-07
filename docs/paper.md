@@ -67,7 +67,7 @@ The model has been validated against standard academic benchmarks [@bosserelle20
 
 - **Efficient Block Uniform Quadtree (BUQ):** Implements a memory model inspired by @vacondio2017 to maximise GPU warp efficiency and significantly reduce memory latency within a CUDA-native framework. This variable-resolution grid implementation minimises the computational overhead typically associated with quadtree structures on GPU architectures (Figure 1). While this required intensive internal development it allows the code to run efficiently with a relatively naive implementation.
 - **Multiple Solvers:** Implements several well-tested, depth-averaged Shallow Water Equation (SWE) solvers and reconstruction schemes. The core numerical schemes have been ported and adapted from the `Basilisk` framework [@popinet2011quadtree].
-- **Explicit Mesh-Agnostic Preprocessing:** The computational mesh is generated natively by the code. All gridded geospatial inputs are automatically interpolated or block-averaged to the computational mesh during initialization, simplifying the preprocessing of disparate datasets. The mesh generation is This was acheived with minimal dependencies. 
+- **Explicit Mesh-Agnostic Preprocessing:** The computational mesh is generated natively by the code. All gridded geospatial inputs are automatically interpolated or block-averaged to the computational mesh during initialization, simplifying the preprocessing of disparate datasets. The mesh generation is This was achieved with minimal dependencies. 
 
 ## Data Interoperability and Automation
 
