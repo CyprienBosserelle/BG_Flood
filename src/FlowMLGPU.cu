@@ -37,7 +37,10 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 
 
 	// fill halo for zs,h,u and v 
-
+	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	{
+		FlowbndFluxMLEv(XParam, XLoop.totaltime, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv.zs, XModel.evolv.h, XModel.evolv.u, XModel.evolv.v);
+	}
 	
 
 	//============================================
@@ -45,10 +48,7 @@ template <class T> void FlowMLGPU(Param XParam, Loop<T>& XLoop, Forcing<float> X
 	fillHaloGPU(XParam, XModel.blocks, XModel.evolv, XModel.zb);
 
 
-	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
-	{
-		FlowbndFluxMLEv(XParam, XLoop.totaltime, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv.zs, XModel.evolv.h, XModel.evolv.u, XModel.evolv.v);
-	}
+	
 	
 	//CUDA_CHECK(cudaMemcpy(XModel.evolv_o.h, XModel.evolv.h, XParam.nblk * XParam.blksize * sizeof(T), cudaMemcpyDeviceToDevice));
 	//============================================
@@ -582,10 +582,10 @@ template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	fillHaloGPU(XParam, XModel.blocks, XModel.evolv.u);
 	fillHaloGPU(XParam, XModel.blocks, XModel.evolv.v);
 
-	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
-	{
-		//FlowbndFluxMLEv(XParam, XLoop.totaltime + dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv.zs, XModel.evolv.h, XModel.evolv.u, XModel.evolv.v);
-	}
+	//for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	//{
+	//	//FlowbndFluxMLEv(XParam, XLoop.totaltime + dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv.zs, XModel.evolv.h, XModel.evolv.u, XModel.evolv.v);
+	//}
 	
 	//fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hu);
 	//fillHaloGPU(XParam, XModel.blocks, XModel.fluxml.hv);
@@ -731,10 +731,10 @@ template <class T> void AdvecML(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	HaloFluxGPUTMLnew << < gridDimHaloBT, blockDimHaloBT, 0 >> > (XParam, XModel.blocks, XModel.fluxml.Fvy);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
-	for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
-	{
-		//FlowbndFluxML(XParam, XLoop.totaltime + dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
-	}
+	//for (int iseg = 0; iseg < XForcing.bndseg.size(); iseg++)
+	//{
+	//	//FlowbndFluxML(XParam, XLoop.totaltime + dt, XModel.blocks, XForcing.bndseg[iseg], XForcing.Atmp, XModel.evolv, XModel.fluxml);
+	//}
 	
 	/*
 	refine_bilinearGPU(XParam, XModel.blocks, XModel.fluxml.Fux);
