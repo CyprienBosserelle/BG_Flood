@@ -1983,20 +1983,22 @@ template <class T> __global__  void HaloFluxGPULMLnew(Param XParam, BlockP<T> XB
 			iib = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj + 1, BlockLeft);
 
 			zout = T(0.5) * (z[iia] + z[iib]);
+			z[i] = zout;
 
 
 		}
-		if (XBlock.level[XBlock.LeftBot[ib]] <= XBlock.level[ib])
+		if ((XBlock.LeftBot[ib] != ib) && (XBlock.level[XBlock.LeftBot[ib]] <= XBlock.level[ib]))
 		{
 			jj = XBlock.level[XBlock.LeftBot[ib]] == XBlock.level[ib] ? j : XBlock.RightBot[XBlock.LeftBot[ib]] == ib ? floor(j * T(0.5)) : floor(j * T(0.5)) + XParam.blkwidth / 2;
 
 
 			iia = memloc(XParam.halowidth, blkmemwidth, XParam.blkwidth - 1, jj, XBlock.LeftBot[ib]);
 			zout = z[iia];
+			z[i] = zout;
 
 			//
 		}
-		z[i] = zout;
+		
 
 	}
 }
@@ -2038,20 +2040,22 @@ template <class T> __global__  void HaloFluxGPUBMLnew(Param XParam, BlockP<T> XB
 			iib = memloc(XParam.halowidth, blkmemwidth, jj + 1, XParam.blkwidth - 1, BlockBot);
 
 			zout = T(0.5) * (z[iia] + z[iib]);
+			z[i] = zout;
 
 
 		}
-		if (XBlock.level[XBlock.BotLeft[ib]] <= XBlock.level[ib])//The lower half is a boundary 
+		if ((XBlock.BotLeft[ib] != ib) && (XBlock.level[XBlock.BotLeft[ib]] <= XBlock.level[ib]))//The lower half is a boundary 
 		{
 			jj = XBlock.level[XBlock.BotLeft[ib]] == XBlock.level[ib] ? j : XBlock.TopLeft[XBlock.BotLeft[ib]] == ib ? floor(j * T(0.5)) : floor(j * T(0.5)) + XParam.blkwidth / 2;
 
 
 			iia = memloc(XParam.halowidth, blkmemwidth, jj, XParam.blkwidth - 1, XBlock.BotLeft[ib]);
 			zout = z[iia];
+			z[i] = zout;
 
 			//
 		}
-		z[i] = zout;
+		//z[i] = zout;
 
 	}
 }
@@ -2092,20 +2096,22 @@ template <class T> __global__  void HaloFluxGPURMLnew(Param XParam, BlockP<T> XB
 			iib = memloc(XParam.halowidth, blkmemwidth, 0, jj + 1, BlockRight);
 
 			zout = T(0.5) * (z[iia] + z[iib]);
+			z[i] = zout;
 
 
 		}
-		if (XBlock.level[XBlock.RightBot[ib]] <= XBlock.level[ib] )
+		if ((XBlock.RightBot[ib] != ib) && (XBlock.level[XBlock.RightBot[ib]] <= XBlock.level[ib] ))
 		{
 			jj = XBlock.level[XBlock.RightBot[ib]] == XBlock.level[ib] ? j : XBlock.LeftBot[XBlock.RightBot[ib]] == ib ? floor(j * T(0.5)) : floor(j *T(0.5)) + XParam.blkwidth / 2;
 
 
 			iia = memloc(XParam.halowidth, blkmemwidth, 0, jj, XBlock.RightBot[ib]);
 			zout = z[iia];
+			z[i] = zout;
 		
 			//
 		}
-		z[i] = zout;
+		//z[i] = zout;
 
 	}
 }
@@ -2147,20 +2153,22 @@ template <class T> __global__  void HaloFluxGPUTMLnew(Param XParam, BlockP<T> XB
 			iib = memloc(XParam.halowidth, blkmemwidth, jj + 1, 0, BlockTop);
 
 			zout = T(0.5) * (z[iia] + z[iib]);
+			z[i] = zout;
 
 
 		}
-		if (XBlock.level[XBlock.TopLeft[ib]] <= XBlock.level[ib])//The lower half is a boundary 
+		if ((XBlock.TopLeft[ib] != ib) && (XBlock.level[XBlock.TopLeft[ib]] <= XBlock.level[ib]) )//The lower half is a boundary 
 		{
 			jj = XBlock.level[XBlock.TopLeft[ib]] == XBlock.level[ib] ? j : XBlock.BotLeft[XBlock.TopLeft[ib]] == ib ? floor(j * T(0.5)) : floor(j * T(0.5)) + XParam.blkwidth / 2;
 
 
 			iia = memloc(XParam.halowidth, blkmemwidth, jj, 0, XBlock.TopLeft[ib]);
 			zout = z[iia];
+			z[i] = zout;
 
 			//
 		}
-		z[i] = zout;
+		//z[i] = zout;
 
 	}
 }

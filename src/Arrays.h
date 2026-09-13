@@ -149,6 +149,9 @@ struct FluxMLP
 	T* hau;
 	/** h*a flux in v-direction */
 	T* hav;
+	
+	
+	
 	/** Flux of u in x-direction */
 	T* Fux;
 	/** Flux of v in y-direction */
@@ -157,6 +160,42 @@ struct FluxMLP
 	T* Fuy;
 	/** Flux of v in x-direction */
 	T* Fvx;
+
+
+	
+};
+
+/**
+ * @brief Structure holding implicit solvr variables 
+ * @tparam T Data type
+ */
+template <class T>
+struct FluxIMP
+{
+	T* rhs_eta;
+
+	
+	T* eta_r;
+	T* r;
+	T* z;
+	T* p;
+	T* Ap;
+	T* diagInv;
+	T* store;
+
+	/** su in x-direction */
+	T* su;
+	/** su in y-direction */
+	T* sv;
+
+	/** alpha_eta in x-direction */
+	T* alpha_x;
+	/** alpha_eta in y-direction */
+	T* alpha_y;
+
+	T* g_x; // Basilisk: g.x  (temporary face field in residual_hydro)
+	T* g_y;
+
 };
 
 /**
@@ -321,6 +360,7 @@ struct Model
 	GradientsP<T> grad;
 	FluxP<T> flux;
 	FluxMLP<T> fluxml;
+	FluxIMP<T> fluximp;
 	AdvanceP<T> adv;
 
 	//Culverts
@@ -334,6 +374,8 @@ struct Model
 
 	//GroundWater elevation (due to the accumulation of water by infiltration during the simulation)
 	T* hgw;
+
+
 	
 	// Used for external forcing too
 	// May need a better placeholder

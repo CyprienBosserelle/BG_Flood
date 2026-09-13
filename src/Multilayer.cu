@@ -27,9 +27,9 @@ template <class T> __global__ void CalcfaceValX(T pdt,Param XParam, BlockP<T> XB
 	T dry = eps;
 	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
-	T CFL = T(XParam.CFL);
+	T CFL = min(T(0.5),T(XParam.CFL));//T(XParam.CFL);
 
-	T CFL_H = CFL;// T(0.5); should be different in multi-layer
+	T CFL_H = XParam.implicit ? T(XParam.CFL) : CFL;//  T(0.5); should be different in multi-layer
 
 	T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
 
@@ -132,7 +132,7 @@ template __global__ void CalcfaceValX<double>(double pdt, Param XParam, BlockP<d
 template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux, T* dtmax, T* zb,T* Patm)
 {
 	int halowidth = XParam.halowidth;
-	int blkmemwidth = blockDim.y + halowidth * 2;
+	int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
@@ -150,9 +150,9 @@ template <class T> __global__ void CalcfaceValY(T pdt, Param XParam, BlockP<T> X
 
 	T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]):T(1.0);
 
-	T CFL = T(XParam.CFL);
+	T CFL = min(T(0.5),T(XParam.CFL));//T(XParam.CFL);
 
-	T CFL_H = CFL;// T(0.5); Should be different in Multi layer
+	T CFL_H = XParam.implicit ? T(XParam.CFL) : CFL;// T(0.5); Should be different in Multi layer?
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
 	int ibot = memloc(halowidth, blkmemwidth, ix, iy-1, ib);
@@ -262,9 +262,9 @@ template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock,
 	T dry = eps;
 	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
-	T CFL = T(XParam.CFL);
+	T CFL = min(T(0.5),T(XParam.CFL));//T(XParam.CFL);
 
-	T CFL_H = CFL;//T(0.5);// Should be different in Multi layer
+	//T CFL_H = XParam.implicit ? T(XParam.CFL) : CFL;// T(0.5); Should be different in Multi layer?
 
 	T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
 
@@ -284,10 +284,12 @@ template <class T> __global__ void CheckadvecMLX(Param XParam, BlockP<T> XBlock,
 		if (hul * dt / (delta * cmn) > CFL * hn)
 		{
 			hul = CFL * hn * delta * cmn / dt;
+			//printf("here is the problem!\n");
 		}
 		else if (-hul * dt / (delta * cmi) > CFL * hi)
 		{
 			hul = -CFL * hi * delta * cmi / dt;
+			//printf("here is the problem!\n");
 		}
 
 		if (hul != XFlux.hu[i])
@@ -308,7 +310,7 @@ template __global__ void CheckadvecMLX<double>(Param XParam, BlockP<double> XBlo
 template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock,T dt, EvolvingP<T> XEv, GradientsP<T> XGrad, FluxMLP<T> XFlux)
 {
 	int halowidth = XParam.halowidth;
-	int blkmemwidth = blockDim.y + halowidth * 2;
+	int blkmemwidth = blockDim.x + halowidth * 2;
 	//unsigned int blksize = blkmemwidth * blkmemwidth;
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
@@ -323,9 +325,9 @@ template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock,
 	T dry = eps;
 	T delta = calcres(T(XParam.delta), lev);
 	T g = T(XParam.g);
-	T CFL = T(XParam.CFL);
+	T CFL = min(T(0.5),T(XParam.CFL));//T(XParam.CFL);
 
-	T CFL_H = CFL;// T(0.5); //Should be different for multilayer
+	//T CFL_H = CFL;// T(0.5); //Should be different for multilayer
 
 	T ybo = XParam.spherical ? T(XParam.yo + XBlock.yo[ib]) : T(1.0);
 
@@ -344,10 +346,12 @@ template <class T> __global__ void CheckadvecMLY(Param XParam, BlockP<T> XBlock,
 		if (hvl * dt / (delta * cmn) > CFL * hn)
 		{
 			hvl = CFL * hn * delta * cmn / dt;
+			//printf("here is the problem!\n");
 		}
 		else if (-hvl * dt / (delta * cmi) > CFL * hi)
 		{
 			hvl = -CFL * hi * delta * cmi / dt;
+			//printf("here is the problem!\n");
 		}
 
 		if (hvl != XFlux.hv[i])
@@ -428,7 +432,7 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 		}
 		*/
 		iub = memloc(halowidth, blkmemwidth, ix + ixshft, iy - 1, ib);
-		iut = memloc(halowidth, blkmemwidth, ix + ixshft, iy + 1, ib);
+		iut = memloc(halowidth, blkmemwidth, ix + ixshft, min(iy + 1 ,XParam.blkwidth), ib);
 
 
 		int iv = memloc(halowidth, blkmemwidth, ix, iy + iyshft, ib);
@@ -453,7 +457,7 @@ template <class T> __global__ void AdvecFluxML(Param XParam, BlockP<T> XBlock,T 
 			ivl = memloc(halowidth, blkmemwidth, ix - 1, iy+iyshft, ib);
 		}
 		*/
-		ivr = memloc(halowidth, blkmemwidth, ix + 1, iy + iyshft, ib);
+		ivr = memloc(halowidth, blkmemwidth, min(ix + 1 , XParam.blkwidth), iy + iyshft, ib);
 		ivl = memloc(halowidth, blkmemwidth, ix - 1, iy + iyshft, ib);
 
 		
@@ -537,7 +541,7 @@ template <class T> __global__ void AdvecEv(Param XParam, BlockP<T> XBlock,T dt, 
 
 
 	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
-	int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
+	//int ileft = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
 	int iright = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
 	int itop = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
 	//For each layer

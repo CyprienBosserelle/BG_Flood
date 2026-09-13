@@ -18,6 +18,7 @@ public:
 	double dt = 0.0; // Model time step in s.
 	double CFL = 0.5; // Current Freidrich Limiter criterium (between 0 and 1. Higher values may make the model unstable)
 	double theta = 1.3; // Minmod limiter parameter, theta in [1,2]. <br>Can be used to tune the momentum dissipation (theta=1 gives minmod the most dissipative limiter and theta = 2 gives	superbee, the least dissipative).
+	
 	double VelThreshold = -1.0; // Using Velocity threshold if the the velocuity exceeds that threshold. Advice value of 16.0 to use or negative value (-1) to turn off
 	int frictionmodel = 0; // Bottom friction model flag (-1: Manning model, 0: quadratic, 1: Smart roughtness length model)
 	double cf = 0.0001; // Bottom friction coefficient for the model (if constant)
@@ -43,6 +44,15 @@ public:
 
 	int engine = 1; // 1: Buttinger-Kreuzhuber et al. 2019, 2: Kurganov (Popinet 2011), 3: KurganovATMP same as Kurganov but with atmospheric forcing terms 
 
+
+	//*Implicit Scheme
+	bool implicit = false;
+	bool rigid = false;
+	double theta_H = 0.55; // theta for the implicit barotropic solver (Default: 0.55 for unconditional stability)
+	int max_iter = 100; // Maximum number of iterations for the implicit solver (Default: 30)
+	double mg_tol = 1e-5; // Convergence tolerance for the implicit solver (Default: 1e-5)
+	
+	
 	//*Grid parameters
 	double dx = nan(""); // Grid resolution, in m for a metric grid or in decimal degree for a sperical grid.
 	double delta; // Grid resolution for the model. in Spherical coordinates this is dx * Radius*pi / 180.0

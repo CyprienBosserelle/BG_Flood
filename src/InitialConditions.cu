@@ -1066,6 +1066,59 @@ template<class T> void Initmaparray(Model<T>& XModel)
 	XModel.Outvarlongname["twet"] = "time since the cell has been wet";
 	XModel.Outvarunits["twet"] = "s";
 	//XModel.OutputVarMap["vort"] = XModel.vort;
+
+	XModel.OutputVarMap["r_imp"] = XModel.fluximp.r;
+	XModel.Outvarlongname["r_imp"] = "r implicit";
+	XModel.Outvarunits["r_imp"] = " ";
+
+	XModel.OutputVarMap["z_imp"] = XModel.fluximp.z;
+	XModel.Outvarlongname["z_imp"] = "z implicit";
+	XModel.Outvarunits["z_imp"] = " ";
+
+	XModel.OutputVarMap["p_imp"] = XModel.fluximp.p;
+	XModel.Outvarlongname["p_imp"] = "p implicit";
+	XModel.Outvarunits["p_imp"] = " ";
+
+	XModel.OutputVarMap["Ap_imp"] = XModel.fluximp.Ap;
+	XModel.Outvarlongname["Ap_imp"] = "Ap implicit";
+	XModel.Outvarunits["Ap_imp"] = " ";
+
+	XModel.OutputVarMap["gx_imp"] = XModel.fluximp.g_x;
+	XModel.Outvarlongname["gx_imp"] = "g_x implicit";
+	XModel.Outvarunits["gx_imp"] = " ";
+
+	XModel.OutputVarMap["gy_imp"] = XModel.fluximp.g_y;
+	XModel.Outvarlongname["gy_imp"] = "g_y implicit";
+	XModel.Outvarunits["gy_imp"] = " ";
+
+	XModel.OutputVarMap["alphax_imp"] = XModel.fluximp.alpha_x;
+	XModel.Outvarlongname["alphax_imp"] = "alpha_x implicit";
+	XModel.Outvarunits["alphax_imp"] = " ";
+
+	XModel.OutputVarMap["alphay_imp"] = XModel.fluximp.alpha_y;
+	XModel.Outvarlongname["alphay_imp"] = "alpha_y implicit";
+	XModel.Outvarunits["alphay_imp"] = " ";
+
+	XModel.OutputVarMap["su_imp"] = XModel.fluximp.su;
+	XModel.Outvarlongname["su_imp"] = "su implicit";
+	XModel.Outvarunits["su_imp"] = " ";
+
+	XModel.OutputVarMap["sv_imp"] = XModel.fluximp.sv;
+	XModel.Outvarlongname["sv_imp"] = "sv implicit";
+	XModel.Outvarunits["sv_imp"] = " ";
+
+	XModel.OutputVarMap["eta_r"] = XModel.fluximp.eta_r;
+	XModel.Outvarlongname["eta_r"] = "eta_r implicit";
+	XModel.Outvarunits["eta_r"] = " m";
+
+	XModel.OutputVarMap["diagInv"] = XModel.fluximp.diagInv;
+	XModel.Outvarlongname["diagInv"] = "diagInv implicit";
+	XModel.Outvarunits["diagInv"] = " ";
+	
+	XModel.OutputVarMap["rhs_eta"] = XModel.fluximp.rhs_eta;
+	XModel.Outvarlongname["rhs_eta"] = "rhs_eta implicit";
+	XModel.Outvarunits["rhs_eta"] = " m";
+
 }
 
 template void Initmaparray<float>(Model<float>& XModel);
