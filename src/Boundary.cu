@@ -1013,7 +1013,8 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 	uninside = un[inside];
 	utinside = ut[inside];
 
-	T zsX = (zsbnd + zsatm);// - 0.5 * (zsi + zsinside)) * taper + 0.5 * (zsi + zsinside);
+	T zsX = (zsbnd + zsatm) - 0.5 * (zsi + zsinside) * taper + 0.5 * (zsi + zsinside);
+	T hnew = max(zsX - (zsinside - hinside), T(0.0));
 
 	qmean = side.qmean_g[iq];
 
@@ -1079,7 +1080,8 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 		
 		
 		noslipbndQ(F, G, S);//noslipbndQ(T & F, T & G, T & S) F = T(0.0); S = G;
-
+		zsX = zsinside;
+		hnew = hinside;
 		
 	}
 	
@@ -1127,7 +1129,7 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 	
 	
 	
-	T hnew = max(zsX - (zsinside - hinside), T(0.0));
+	
 	//h[inside] = h[i];
 	//if (XBlock.TopRight[ib] == ib && XBlock.RightTop[ib] == ib )
 	//un[i] = sign * ( sqrt(XParam.g * max(h[i], 0.)) - sqrt(XParam.g * hnew));
