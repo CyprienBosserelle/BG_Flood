@@ -20,6 +20,15 @@ __host__ int memloc(Param XParam, int i, int j, int ib)
 {
 	return (i+XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 }
+__host__ int memloc(Param XParam, int i, int j, int k, int ib)
+{
+	int blkstride = XParam.blkmemwidth * XParam.blkmemwidth;   // cells per layer, per block
+	int blktotal = blkstride * XParam.nl;              // full block, all layers, incl. halo
+
+	return (i + XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth
+		+ k * blkstride
+		+ ib * blktotal;
+}
 
 
 /**
@@ -37,6 +46,16 @@ __host__ int memloc(Param XParam, int i, int j, int ib)
 __host__ __device__ int memloc(int halowidth, int blkmemwidth, int i, int j, int ib)
 {
 	return (i + halowidth) + (j + halowidth) * blkmemwidth + ib * (blkmemwidth* blkmemwidth);
+}
+
+__host__ __device__ int memloc(int halowidth, int blkmemwidth, int nl, int i, int j, int k, int ib)
+{
+	int blkstride = blkmemwidth * blkmemwidth;   // cells per layer, per block
+	int blktotal = blkstride * nl;              // full block, all layers, incl. halo
+
+	return (i + halowidth) + (j + halowidth) * blkmemwidth
+		+ k * blkstride
+		+ ib * blktotal;
 }
 
 /**
