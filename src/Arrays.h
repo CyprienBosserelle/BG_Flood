@@ -161,6 +161,9 @@ struct FluxMLP
 	/** Flux of v in x-direction */
 	T* Fvx;
 
+	/** Total water depth for multi-layer solver H (if n layer == 1 then H == h)*/
+	T* H;
+
 
 	
 };
