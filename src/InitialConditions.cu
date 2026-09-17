@@ -1387,7 +1387,8 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 	//if(XForcing.bndseg.size()>0)
 
 	std::vector<int> bndblks;
-	std::vector<int> bndsegment;
+	std::vector<int> bndsegmentleft, bndsegmentright, bndsegmenttop, bndsegmentbot;
+	T dxlev;
 	// 1. Find all the boundary blocks (block with themselves as neighbours)
 	
 	
@@ -1398,22 +1399,95 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 		bool testbot = (XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib) || (XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib) || (XBlock.LeftTop[ib] == ib) || (XBlock.LeftBot[ib] == ib) || (XBlock.RightTop[ib] == ib) || (XBlock.RightBot[ib] == ib);
 		if (testbot)
 		{
-			T dxlev = calcres(XParam.dx, XBlock.level[ib]);
+			dxlev = calcres(XParam.dx, XBlock.level[ib]);
 
 			bndblks.push_back(ib);
-			bndsegment.push_back(XForcing.bndseg.size()-1); // i.e. by default the block doesn't belong to a segment so it belongs to collector (last) segemnt
+			bndsegmentleft.push_back(-1); // i.e. by default none of the side belong to anyone segment (i.e. none are assumed to be bnds)
+			bndsegmentright.push_back( - 1);
+			bndsegmenttop.push_back(- 1);
+			bndsegmentbot.push_back( - 1);
 			//loop through all but the last bnd seg which is meant for block that are not in any segments
-			for (int s = 0; s < XForcing.bndseg.size()-1; s++)
+			if (((XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib))) // Check if the side is a bnd and which segment the bottom side belongs to
 			{
-				bool inpoly=blockinpoly(T(XParam.xo + XBlock.xo[ib]), T(XParam.yo + XBlock.yo[ib]), dxlev, XParam.blkwidth, XForcing.bndseg[s].poly);
-
-				if (inpoly)
+				bndsegmentbot.back() = XForcing.bndseg.size() - 1; // by default a side belongs to the last collector segment
+				for (int s = 0; s < XForcing.bndseg.size() - 1; s++)
 				{
-					bndsegment.back() = s;
+					
+					bool inpoly = blockinpoly(T(XParam.xo + XBlock.xo[ib]), T(XParam.yo + XBlock.yo[ib]), dxlev, XParam.blkwidth, XForcing.bndseg[s].poly);
+
+					if (inpoly)
+					{
+						
+						bool sideisinseg = wn_PnPoly(T(XParam.xo + XBlock.xo[ib]), T(XParam.yo + XBlock.yo[ib] - T(0.5) * dxlev), XForcing.bndseg[s].poly) != 0;
+						if (sideisinseg)
+						{
+							bndsegmentbot.back() = s;
+						}
+					}
+				}
+
+			}
+			if ((XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib))  
+			{
+				bndsegmenttop.back() = XForcing.bndseg.size() - 1; 
+				for (int s = 0; s < XForcing.bndseg.size() - 1; s++)
+				{
+					bool inpoly = blockinpoly(T(XParam.xo + XBlock.xo[ib]), T(XParam.yo + XBlock.yo[ib]), dxlev, XParam.blkwidth, XForcing.bndseg[s].poly);
+
+					if (inpoly)
+					{
+						
+						bool sideisinseg = wn_PnPoly(T(XParam.xo + XBlock.xo[ib]), T(XParam.yo + XBlock.yo[ib] + T(0.5) * dxlev), XForcing.bndseg[s].poly) != 0 ;
+
+						if (sideisinseg)
+						{
+							bndsegmenttop.back() = s;
+						}
+					}
+				}
+
+			}
+			if ((XBlock.LeftBot[ib] == ib) || (XBlock.LeftTop[ib] == ib))
+			{
+				bndsegmentleft.back() = XForcing.bndseg.size() - 1;
+				for (int s = 0; s < XForcing.bndseg.size() - 1; s++)
+				{
+					bool inpoly = blockinpoly(T(XParam.xo + XBlock.xo[ib]), T(XParam.yo + XBlock.yo[ib]), dxlev, XParam.blkwidth, XForcing.bndseg[s].poly);
+
+					if (inpoly)
+					{
+
+						bool sideisinseg = wn_PnPoly(T(XParam.xo + XBlock.xo[ib] - T(0.5) * dxlev), T(XParam.yo + XBlock.yo[ib]), XForcing.bndseg[s].poly) != 0;
+
+						if (sideisinseg)
+						{
+							bndsegmentleft.back() = s;
+						}
+					}
 				}
 
 			}
 
+			if ((XBlock.RightBot[ib] == ib) || (XBlock.RightTop[ib] == ib))
+			{
+				bndsegmentright.back() = XForcing.bndseg.size() - 1;
+				for (int s = 0; s < XForcing.bndseg.size() - 1; s++)
+				{
+					bool inpoly = blockinpoly(T(XParam.xo + XBlock.xo[ib]), T(XParam.yo + XBlock.yo[ib]), dxlev, XParam.blkwidth, XForcing.bndseg[s].poly);
+
+					if (inpoly)
+					{
+
+						bool sideisinseg = wn_PnPoly(T(XParam.xo + XBlock.xo[ib] + T(0.5) * dxlev), T(XParam.yo + XBlock.yo[ib]), XForcing.bndseg[s].poly) != 0;
+
+						if (sideisinseg)
+						{
+							bndsegmentright.back() = s;
+						}
+					}
+				}
+
+			}
 
 
 		}
@@ -1429,31 +1503,37 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 		int rightcount = 0;
 		int topcount = 0;
 		int botcount = 0;
+
+
 		
 		for (int ibl = 0; ibl < bndblks.size(); ibl++)
 		{
-			int ib = bndblks[ibl];
-			if (bndsegment[ibl] == s)
+			bool blkisseg = false;
+			if (bndsegmentleft[ibl] == s)
+			{
+				leftcount++;
+				blkisseg = true;
+			}
+			if (bndsegmentright[ibl] == s)
+			{
+				rightcount++;
+				blkisseg = true;
+			}
+			if (bndsegmentbot[ibl] == s)
+			{
+				botcount++;
+				blkisseg = true;
+			}
+			if (bndsegmenttop[ibl] == s)
+			{
+				topcount++;
+				blkisseg = true;
+			}
+			if (blkisseg)
 			{
 				segcount++;
-
-				if ((XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib))
-				{
-					botcount++;
-				}
-				if ((XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib))
-				{
-					topcount++;
-				}
-				if ((XBlock.LeftBot[ib] == ib) || (XBlock.LeftTop[ib] == ib))
-				{
-					leftcount++;
-				}
-				if ((XBlock.RightBot[ib] == ib) || (XBlock.RightTop[ib] == ib))
-				{
-					rightcount++;
-				}
 			}
+			
 		}
 		XForcing.bndseg[s].nblk = segcount;
 
@@ -1490,30 +1570,29 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 		{
 			int ib = bndblks[ibl];
 
-			if (bndsegment[ibl] == s)
+			if (bndsegmentleft[ibl] == s)
 			{
-				if ((XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib))
-				{
-					XForcing.bndseg[s].bot.blk[botcount] = ib;
-					botcount++;
-				}
-				if ((XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib))
-				{
-					XForcing.bndseg[s].top.blk[topcount] = ib;
-					topcount++;
-				}
-				if ((XBlock.LeftBot[ib] == ib) || (XBlock.LeftTop[ib] == ib))
-				{
-					XForcing.bndseg[s].left.blk[leftcount] = ib;
-					leftcount++;
-				}
-				if ((XBlock.RightBot[ib] == ib) || (XBlock.RightTop[ib] == ib))
-				{
-					XForcing.bndseg[s].right.blk[rightcount] = ib;
-					rightcount++;
-				}
-
+				XForcing.bndseg[s].left.blk[leftcount] = ib;
+				leftcount++;
 			}
+			if (bndsegmentright[ibl] == s)
+			{
+				XForcing.bndseg[s].right.blk[rightcount] = ib;
+				rightcount++;
+			}
+			if (bndsegmentbot[ibl] == s)
+			{
+				XForcing.bndseg[s].bot.blk[botcount] = ib;
+				botcount++;
+				
+			}
+			if (bndsegmenttop[ibl] == s)
+			{
+				XForcing.bndseg[s].top.blk[topcount] = ib;
+				topcount++;
+				
+			}
+
 
 		}
 
