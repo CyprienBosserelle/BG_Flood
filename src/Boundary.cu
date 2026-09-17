@@ -1088,11 +1088,11 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 	
 	else if (type == 2)
 	{
-		if (h[i] > XParam.eps || zsX > zsi)
+		if (hinside > XParam.eps || zsX > zsi)
 		{
 			//
 			Dirichlet1Q(T(XParam.g), sign, zsX, zsinside, hinside, uninside, F);
-			F = F / hnew;
+			F = F / hinside;
 		}
 		else
 		{
@@ -1104,11 +1104,11 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 	}
 	else if (type == 3)
 	{
-		if (h[i] > XParam.eps || zsX > zsi )
+		if (hinside > XParam.eps || zsX > zsi )
 		{
 			ABS1DQ(T(XParam.g), sign, factime, facrel, zsi, zsX, zsinside, hinside, qmean, F, G, S);
 			//qmean = T(0.0);
-			F = F / hnew;
+			F = F / hinside;
 
 		}
 		else
