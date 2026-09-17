@@ -87,4 +87,16 @@ Residuals and implicit solver variables are available for output:
 However most of these variables above are only useful for debugging. For understanding residuals, focus on:
 `eta_r, rhs_eta `
 
-### More testing will be completed as part of the development of the multi-layering. 
+### side changes
+Bnd side structure was rewritten triggered by frustration about the way bnd were decided prior.
+
+
+## Test and Validation
+
+### Monai
+The Monai example is great for validating. The implicit scheme gives very similar results to the explicit solver but exagerates some of the peaks and trough. 
+
+<img width="679" height="452" alt="image" src="https://github.com/user-attachments/assets/d93c98eb-d53e-495c-89ce-583dcae35047" />
+
+The model performs well with a higher CFL with limited impact for higher CFL because after a while the timestep is controlled by the flow speed rather than depth. $\theta_H$ has a bigger impact with the solution looking a lot more like engine 1 when `theta_H = 0.75`
+<img width="703" height="458" alt="image" src="https://github.com/user-attachments/assets/4779ce4d-0912-41cb-ba04-219db669e6c1" />
