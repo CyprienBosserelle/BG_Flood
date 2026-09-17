@@ -1015,6 +1015,7 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 
 	T zsX = (zsbnd + zsatm) - 0.5 * (zsi + zsinside) * taper + 0.5 * (zsi + zsinside);
 	T hnew = max(zsX - (zsinside - hinside), T(0.0));
+	
 
 	qmean = side.qmean_g[iq];
 
@@ -1091,11 +1092,14 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 		{
 			//
 			Dirichlet1Q(T(XParam.g), sign, zsX, zsinside, hinside, uninside, F);
+			F = F / hnew;
 		}
 		else
 		{
 			noslipbndQ(F, G, S);
 			qmean = T(0.0);
+			zsX = zsinside;
+			hnew = hinside;
 		}
 	}
 	else if (type == 3)
@@ -1103,13 +1107,16 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 		if (h[i] > XParam.eps || zsX > zsi )
 		{
 			ABS1DQ(T(XParam.g), sign, factime, facrel, zsi, zsX, zsinside, hinside, qmean, F, G, S);
-			//qmean = T(0.0);\
+			//qmean = T(0.0);
+			F = F / hnew;
 
 		}
 		else
 		{
 			noslipbndQ(F, G, S);
 			qmean = T(0.0);
+			zsX = zsinside;
+			hnew = hinside;
 		}
 		side.qmean_g[iq] = qmean;
 	}
@@ -1118,14 +1125,6 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 	// write the results
 
 
-	if (type < 2)
-	{
-		//zs[i] = zs[i];
-	}
-	else
-	{
-		//zs[i] = zsX;
-	}
 	
 	
 	
@@ -1143,7 +1142,7 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 
 	if (isbotleft || istopleft || istopright || isbotright)
 	{
-		fac=0.5;//
+		fac=1.0;//
 	}
 	/*
 	else
@@ -1163,10 +1162,10 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 
 	zs[i] = zsX;
 	h[i] = hnew;
-	un[i] = fac * F / hnew;
+	un[i] = fac * F;
 	zs[inside] = zsX;
 	h[inside] = hnew;
-	un[inside] = fac * F / hnew;
+	un[inside] = fac * F ;
 
 	//if (XBlock.TopRight[ib] == ib && XBlock.RightTop[ib] == ib)
 
