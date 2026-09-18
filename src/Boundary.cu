@@ -1142,7 +1142,7 @@ template <class T> __global__ void bndFluxGPUSideEv(Param XParam, bndsegmentside
 
 	if (isbotleft || istopleft || istopright || isbotright)
 	{
-		fac=1.0;//
+		fac=0.5;//
 	}
 	/*
 	else
