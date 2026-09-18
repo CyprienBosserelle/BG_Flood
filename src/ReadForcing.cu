@@ -723,7 +723,7 @@ Polygon readbndpolysegment(bndsegment bnd, Param XParam)
 {
 	Polygon bndpoly;
 	Vertex va,vb,vc,vd;
-	double epsbnd = calcres(XParam.dx,XParam.initlevel);
+	double epsbnd = calcres(XParam.dx,XParam.maxlevel)*0.4; // 0.4 so that the side bnd only affect faces that are exposed to that side
 	double xo = XParam.xo;
 	double xmax = XParam.xmax;
 	double yo = XParam.yo;

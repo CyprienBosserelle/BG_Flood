@@ -461,7 +461,7 @@ template <class T> bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly
 	//printf("test_SegmentIntersect=%s\n", test ? "true" : "false");
 
 	// First check if it isinmside the bounding box
-	insidepoly = OBBdetect(xo, xo + dx * blkwidth, yo, yo + dx * blkwidth, T(Poly.xmin), T(Poly.xmax), T(Poly.ymin), T(Poly.ymax));
+	insidepoly = OBBdetect(xo - T(0.5) * dx, xo + dx * blkwidth + T(0.5) * dx, yo - T(0.5) * dx, yo + dx * blkwidth+T(0.5) * dx, T(Poly.xmin), T(Poly.xmax), T(Poly.ymin), T(Poly.ymax));
 
 	if (insidepoly)
 	{
@@ -472,10 +472,10 @@ template <class T> bool blockinpoly(T xo, T yo, T dx, int blkwidth, Polygon Poly
 		int wnBL,wnBR,wnTL,wnTR;
 		insidepoly = false;
 		
-		wnBL = wn_PnPoly(xo, yo, Poly);
-		wnBR = wn_PnPoly(xo + blkwidth*dx, yo, Poly);
-		wnTL = wn_PnPoly(xo, yo + blkwidth * dx, Poly);
-		wnTR = wn_PnPoly(xo + blkwidth * dx, yo + blkwidth * dx, Poly);
+		wnBL = wn_PnPoly(xo - T(0.5) * dx, yo - T(0.5) * dx, Poly);
+		wnBR = wn_PnPoly(xo + blkwidth*dx + T(0.5) * dx, yo - T(0.5) * dx, Poly);
+		wnTL = wn_PnPoly(xo - T(0.5) * dx, yo + blkwidth * dx + T(0.5) * dx, Poly);
+		wnTR = wn_PnPoly(xo + blkwidth * dx + T(0.5) * dx, yo + blkwidth * dx + T(0.5) * dx, Poly);
 
 		insidepoly = (wnBL != 0 || wnBR != 0 || wnTL != 0 || wnTR != 0);
 

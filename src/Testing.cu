@@ -1283,6 +1283,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 	dim3 gridDim(XParam.nblk, 1, 1);
 	//srand(seed);
 	T mininput = T(rand()) / T(RAND_MAX);
+	T maxinput = T(rand()) / T(RAND_MAX) + T(1.0);
 	bool test = true;
 
 	Loop<T> XLoop;
@@ -1310,6 +1311,9 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 				//
 				int n = memloc(XParam, ix, iy, ib);
 				XModel.time.dtmax[n] = mininput * T(1.1) + utils::max(T(rand()) / T(RAND_MAX), T(0.0));
+
+				XModel.evolv.u[n] = T(rand()) / T(RAND_MAX) - T(0.5);
+
 			}
 		}
 	}
@@ -1323,10 +1327,14 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 	int nn = memloc(XParam, ixx, iyy, ibb);
 
 	XModel.time.dtmax[nn] = mininput;
+	XModel.evolv.u[nn] = maxinput;
 
 	T reducedt = CalctimestepCPU(XParam, XLoop, XModel.blocks, XModel.time);
 
+	
 	test = abs(reducedt - mininput) < T(100.0) * (XLoop.epsilon);
+
+	
 	bool testgpu;
 
 	if (!test)
@@ -1342,15 +1350,35 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 		reset_var <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel_g.blocks.active, XLoop.hugeposval, XModel_g.time.dtmax);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
+		//reset_var << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel_g.blocks.active, T(0.0), XModel_g.evolv.v);
+		//CUDA_CHECK(cudaDeviceSynchronize());
+
 		CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.time.dtmax, XModel_g.time.dtmax);
 		T reducedtgpu = CalctimestepGPU(XParam, XLoop, XModel_g.blocks, XModel_g.time);
 		testgpu = abs(reducedtgpu - mininput) < T(100.0) * (XLoop.epsilon);
+
+
+		CopytoGPU(XParam.nblkmem, XParam.blksize, XModel.evolv.u, XModel_g.evolv.u);
+
+
+		T redabsmax = reduceAbsMax(XParam, XModel_g.blocks, XModel_g.evolv.u);
+		//T redabsmax = T(0.0);
+		//T redabsmaxold = reduceabsmaxold(XParam, XModel_g.blocks, XModel_g.evolv.u, XModel_g.evolv.v);
+		bool testmax =  abs(redabsmax - maxinput) < T(100.0) * (XLoop.epsilon);
+		//bool testmax =  abs(redabsmax - maxinput) < T(100.0) * (XLoop.epsilon);
 
 		if (!testgpu)
 		{
 			char buffer[256]; sprintf(buffer, "%e", abs(reducedtgpu - mininput));
 			std::string str(buffer);
 			log("\t\t GPU test failed! : Expected=" + std::to_string(mininput) + ";  Reduced=" + std::to_string(reducedtgpu) + ";  error=" + str);
+		}
+
+		if (!testmax)
+		{
+			char buffer[256]; sprintf(buffer, "%e", abs(redabsmax - maxinput));
+			std::string str(buffer);
+			log("\t\t GPU Max test failed! : Expected=" + std::to_string(maxinput) + ";  Reduced=" + std::to_string(redabsmax) + ";  error=" + str);
 		}
 
 		if (abs(reducedtgpu - reducedt) > T(100.0) * (XLoop.epsilon))
@@ -1360,7 +1388,7 @@ template <class T> bool reductiontest(Param XParam, Model<T> XModel, Model<T> XM
 			log("\t\t CPU vs GPU test failed! : Expected=" + std::to_string(reducedt) + ";  Reduced=" + std::to_string(reducedtgpu) + ";  error=" + str);
 		}
 
-		test = test && testgpu;
+		test = test && testgpu && testmax;
 	}
 
 
