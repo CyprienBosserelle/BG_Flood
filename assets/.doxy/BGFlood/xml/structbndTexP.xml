@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="structbndTexP" kind="struct" language="C++" prot="public">
+    <compoundname>bndTexP</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="structbndTexP_1a0d2c8993342fbbac9ecfa289062c5e89" prot="public" static="no" mutable="no">
+        <type><ref refid="structTexSetP" kindref="compound">TexSetP</ref></type>
+        <definition>TexSetP bndTexP::WLS</definition>
+        <argsstring></argsstring>
+        <name>WLS</name>
+        <qualifiedname>bndTexP::WLS</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="23" column="9" bodyfile="src/Forcing.h" bodystart="23" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structbndTexP_1a06d3d893be06493f87cbe15cd3d9e430" prot="public" static="no" mutable="no">
+        <type><ref refid="structTexSetP" kindref="compound">TexSetP</ref></type>
+        <definition>TexSetP bndTexP::Uvel</definition>
+        <argsstring></argsstring>
+        <name>Uvel</name>
+        <qualifiedname>bndTexP::Uvel</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="24" column="9" bodyfile="src/Forcing.h" bodystart="24" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="structbndTexP_1a1bb081f65fee4e07e46cd0e9eeb730ef" prot="public" static="no" mutable="no">
+        <type><ref refid="structTexSetP" kindref="compound">TexSetP</ref></type>
+        <definition>TexSetP bndTexP::Vvel</definition>
+        <argsstring></argsstring>
+        <name>Vvel</name>
+        <qualifiedname>bndTexP::Vvel</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="25" column="9" bodyfile="src/Forcing.h" bodystart="25" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <collaborationgraph>
+      <node id="2">
+        <label>TexSetP</label>
+        <link refid="structTexSetP"/>
+      </node>
+      <node id="1">
+        <label>bndTexP</label>
+        <link refid="structbndTexP"/>
+        <childnode refid="2" relation="usage">
+          <edgelabel>Uvel</edgelabel>
+          <edgelabel>Vvel</edgelabel>
+          <edgelabel>WLS</edgelabel>
+        </childnode>
+      </node>
+    </collaborationgraph>
+    <location file="src/Forcing.h" line="21" column="1" bodyfile="src/Forcing.h" bodystart="22" bodyend="26"/>
+    <listofallmembers>
+      <member refid="structbndTexP_1a06d3d893be06493f87cbe15cd3d9e430" prot="public" virt="non-virtual"><scope>bndTexP</scope><name>Uvel</name></member>
+      <member refid="structbndTexP_1a1bb081f65fee4e07e46cd0e9eeb730ef" prot="public" virt="non-virtual"><scope>bndTexP</scope><name>Vvel</name></member>
+      <member refid="structbndTexP_1a0d2c8993342fbbac9ecfa289062c5e89" prot="public" virt="non-virtual"><scope>bndTexP</scope><name>WLS</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
