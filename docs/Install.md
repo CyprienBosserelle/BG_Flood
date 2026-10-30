@@ -55,10 +55,27 @@ If not, you may need to modify the cuda path in the makefile (line 155) :
 NVCC          := nvcc -ccbin $(HOST_COMPILER)
 ```
 
-
 !!! warning
-    The code can compile for multiple GPU architecture but later compiler do not support old GPU (2.0 is no longer supported).
-    If needed, remove unsupported architecture in line 213 of the makefile.
+    The code can compile for multiple GPU architecture but later compiler do not support old GPU (2.0 is no longer supported). So you will likely need to adjust the Makefile 
+    **See __Unsupported gpu__ below on how to fix this.**
+### Adjust for supported gpu architecture
+The code can compile for multiple GPU architecture. We use a couple of older (Tesla) GPUs to do the continuous testing so by default the Makefile compiles for old GPU architecture that are not supported by recent CUDA. If you use a recent version of CUDA, you will likely see this message:
+
+```{bash} 
+nvcc fatal   : Unsupported gpu architecture 'compute_50'
+```
+
+It's easy to fix:
+Find line 218 in the make file:
+```{bash} 
+SMS ?= 50 52 60 75
+```
+and replace with the architecture you might need. For example:
+```{bash} 
+SMS ?= 80 90 100
+```
+
+Check this [page](https://developer.nvidia.com/cuda/gpus) to find the right SMS for your GPU (Hint: SMS is 10x Compute Capability)
 
 Then just type 
 ```{bash} 
@@ -67,6 +84,9 @@ make
 
 !!! success
     Many warning will show up but that is OK...
+
+
+
 
 ## :material-server: Supercomputers
 
