@@ -34,7 +34,7 @@ CFL = 0.500000;
 totaltime = 0.000000; # Start time
 endtime = 54000.000000;
 outputtimestep = 600.000000;
-outvars = hh,zs,zsmax;
+outvars = h,zs,zsmax;
 
 
 # Files

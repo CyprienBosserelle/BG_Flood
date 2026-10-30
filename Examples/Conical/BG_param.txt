@@ -16,7 +16,7 @@ frictionmodel =0;
 # Timekeeping parameters
 CFL = 0.500000;
 outputtimestep = 1.000000;
-outvars = zs,hh,uu,vv,zb;
+outvars = zs,h,u,v,zb;
 endtime = 20.000000;
 
 smallnc=0

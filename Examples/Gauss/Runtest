@@ -28,7 +28,7 @@ printf "# Flow parameters\n eps = 0.00010000;\n cf=0.0000;\n frictionmodel = 0\n
 printf "# Timekeeping parameters\n" >> BG_param.txt
 printf "CFL = 0.500000;\n" >> BG_param.txt
 printf "outputtimestep = 1.0;\n" >> BG_param.txt
-printf "outvars = zb, hh, uu, vv, hhmax, zs, zsmax;\n" >> BG_param.txt
+printf "outvars = zb, h, u, v, hmax, zs, zsmax;\n" >> BG_param.txt
 printf "endtime = 32.0;\n" >> BG_param.txt
 
 printf "left=0;\n" >> BG_param.txt
