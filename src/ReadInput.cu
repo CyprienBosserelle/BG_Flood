@@ -562,6 +562,8 @@ Param readparamstr(std::string line, Param param, bool &foundparam)
 			//Verify that the variable name makes sense?
 			//Need to add more here
 
+			bool foundvar = false;
+
 
 			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","hmean","zsmean","umean","vmean","hUmean","hUUmean","Umean","hmax","zsmax","umax","vmax","hUmax","hUUmax","Umax","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw","hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy" };
 
@@ -573,10 +575,15 @@ Param readparamstr(std::string line, Param param, bool &foundparam)
 				//std::cout << "..." << vvar << "..." << std::endl;
 				if (vvar.compare(SupportedVarNames[isup]) == 0)
 				{
+					foundvar = true;
 					param.outvars.push_back(vvar);
 					break;
 				}
 
+			}
+			if (foundvar == false)
+			{
+				log("WARNING: unrecognised output variable : " + vvar);
 			}
 
 			param.outmean = (vvar.compare("hmean") == 0) ? true : param.outmean;
