@@ -31,10 +31,10 @@ bot = 0;
 
 # Time series output
 #TSnodesout=Offshore.txt,xloc,yloc;
-TSnodesout = gauge1-Test3_GPU_FLT.txt,4.521, 1.196;
+TSnodesout = gauge6.txt,9.36,13.80;
 
-TSnodesout = gauge2-Test3_GPU_FLT.txt,4.521, 1.696;
+TSnodesout = gauge9.txt,10.36,13.80;
 
-TSnodesout = gauge3-Test3_GPU_FLT.txt,4.521, 2.196;
+TSnodesout = gauge16.txt,12.96,11.22;
 
-
+TSnodesout = gauge22.txt,15.56,13.80;
