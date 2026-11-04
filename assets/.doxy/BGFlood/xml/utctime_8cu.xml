@@ -1,0 +1,1237 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="utctime_8cu" kind="file" language="C++">
+    <compoundname>utctime.cu</compoundname>
+    <includes refid="utctime_8h" local="yes">utctime.h</includes>
+    <incdepgraph>
+      <node id="33">
+        <label>Arrays.h</label>
+        <link refid="Arrays_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+      </node>
+      <node id="39">
+        <label>Boundary.h</label>
+        <link refid="Boundary_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+      </node>
+      <node id="46">
+        <label>ConserveElevation.h</label>
+        <link refid="ConserveElevation_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="27">
+        <label>Forcing.h</label>
+        <link refid="Forcing_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>General.h</label>
+        <link refid="General_8h_source"/>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+        <childnode refid="12" relation="include">
+        </childnode>
+        <childnode refid="13" relation="include">
+        </childnode>
+        <childnode refid="14" relation="include">
+        </childnode>
+        <childnode refid="15" relation="include">
+        </childnode>
+        <childnode refid="16" relation="include">
+        </childnode>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+      </node>
+      <node id="43">
+        <label>Gradients.h</label>
+        <link refid="Gradients_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+      </node>
+      <node id="37">
+        <label>GridManip.h</label>
+        <link refid="GridManip_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="35">
+        <label>Halo.h</label>
+        <link refid="Halo_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="36" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="39" relation="include">
+        </childnode>
+        <childnode refid="46" relation="include">
+        </childnode>
+      </node>
+      <node id="42">
+        <label>InitEvolv.h</label>
+        <link refid="InitEvolv_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="40" relation="include">
+        </childnode>
+      </node>
+      <node id="41">
+        <label>InitialConditions.h</label>
+        <link refid="InitialConditions_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="42" relation="include">
+        </childnode>
+        <childnode refid="43" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="25">
+        <label>Input.h</label>
+        <link refid="Input_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+      </node>
+      <node id="45">
+        <label>Kurganov.h</label>
+        <link refid="Kurganov_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="44" relation="include">
+        </childnode>
+      </node>
+      <node id="32">
+        <label>MemManagement.h</label>
+        <link refid="MemManagement_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+      </node>
+      <node id="36">
+        <label>Mesh.h</label>
+        <link refid="Mesh_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+      </node>
+      <node id="24">
+        <label>Param.h</label>
+        <link refid="Param_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+      </node>
+      <node id="38">
+        <label>Poly.h</label>
+        <link refid="Poly_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+      </node>
+      <node id="29">
+        <label>ReadForcing.h</label>
+        <link refid="ReadForcing_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="30" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="34" relation="include">
+        </childnode>
+        <childnode refid="38" relation="include">
+        </childnode>
+      </node>
+      <node id="23">
+        <label>ReadInput.h</label>
+        <link refid="ReadInput_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+      </node>
+      <node id="30">
+        <label>Read_netcdf.h</label>
+        <link refid="Read__netcdf_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="31" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="34">
+        <label>Setup_GPU.h</label>
+        <link refid="Setup__GPU_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="35" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+      </node>
+      <node id="44">
+        <label>Spherical.h</label>
+        <link refid="Spherical_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="45" relation="include">
+        </childnode>
+      </node>
+      <node id="40">
+        <label>Updateforcing.h</label>
+        <link refid="Updateforcing_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+        <childnode refid="41" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="29" relation="include">
+        </childnode>
+        <childnode refid="37" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+      </node>
+      <node id="28">
+        <label>Util_CPU.h</label>
+        <link refid="Util__CPU_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="31">
+        <label>Write_netcdf.h</label>
+        <link refid="Write__netcdf_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="32" relation="include">
+        </childnode>
+        <childnode refid="28" relation="include">
+        </childnode>
+        <childnode refid="33" relation="include">
+        </childnode>
+      </node>
+      <node id="26">
+        <label>Write_txtlog.h</label>
+        <link refid="Write__txtlog_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/utctime.cu</label>
+        <link refid="utctime_8cu"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>utctime.h</label>
+        <link refid="utctime_8h_source"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+      </node>
+      <node id="16">
+        <label>algorithm</label>
+      </node>
+      <node id="10">
+        <label>chrono</label>
+      </node>
+      <node id="9">
+        <label>cmath</label>
+      </node>
+      <node id="11">
+        <label>ctime</label>
+      </node>
+      <node id="4">
+        <label>cuda_runtime.h</label>
+      </node>
+      <node id="5">
+        <label>device_launch_parameters.h</label>
+      </node>
+      <node id="19">
+        <label>fstream</label>
+      </node>
+      <node id="18">
+        <label>iomanip</label>
+      </node>
+      <node id="17">
+        <label>iostream</label>
+      </node>
+      <node id="21">
+        <label>limits</label>
+      </node>
+      <node id="14">
+        <label>map</label>
+      </node>
+      <node id="8">
+        <label>math.h</label>
+      </node>
+      <node id="15">
+        <label>netcdf.h</label>
+      </node>
+      <node id="20">
+        <label>sstream</label>
+      </node>
+      <node id="6">
+        <label>stdio.h</label>
+      </node>
+      <node id="7">
+        <label>stdlib.h</label>
+      </node>
+      <node id="12">
+        <label>string</label>
+      </node>
+      <node id="22">
+        <label>thread</label>
+      </node>
+      <node id="13">
+        <label>vector</label>
+      </node>
+    </incdepgraph>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="utctime_8cu_1a0a3a38b6e2386e474eb636b692121523" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>int</type>
+        <definition>int days_from_epoch</definition>
+        <argsstring>(int y, int m, int d)</argsstring>
+        <name>days_from_epoch</name>
+        <param>
+          <type>int</type>
+          <declname>y</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>m</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>d</declname>
+        </param>
+        <briefdescription>
+<para>Calculate the number of days from the epoch (1970-01-01) to a given date. Algorithm: <ulink url="http://howardhinnant.github.io/date_algorithms.html">http://howardhinnant.github.io/date_algorithms.html</ulink>. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>y</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Year </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>m</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Month </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>d</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Day </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/utctime.cu" line="32" column="5" bodyfile="src/utctime.cu" bodystart="32" bodyend="40"/>
+      </memberdef>
+      <memberdef kind="function" id="utctime_8cu_1a79d4a397f2c917965f4e3575819c7e23" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>struct tm *</type>
+        <definition>struct tm * gmtime_r</definition>
+        <argsstring>(const time_t *timep, struct tm *tm)</argsstring>
+        <name>gmtime_r</name>
+        <param>
+          <type>const time_t *</type>
+          <declname>timep</declname>
+        </param>
+        <param>
+          <type>struct tm *</type>
+          <declname>tm</declname>
+        </param>
+        <briefdescription>
+<para>Convert a Unix timestamp to a Gregorian civil date-time tuple. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Converts a Unix timestamp (number of seconds since the beginning of 1970 CE) to a Gregorian civil date-time tuple in GMT (UTC) time zone.</para>
+<para>This conforms to C89 (and C99...) and POSIX.</para>
+<para>This implementation works, and doesn&apos;t overflow for any sizeof(time_t). It doesn&apos;t check for overflow/underflow in tm-&gt;tm_year output. Other than that, it never overflows or underflows. It assumes that that time_t is signed.</para>
+<para>This implements the inverse of the POSIX formula (<ulink url="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_15">http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_15</ulink>) for all time_t values, no matter the size, as long as tm-&gt;tm_year doesn&apos;t overflow or underflow. The formula is: tm_sec + tm_min*60 + tm_hour*3600<itemizedlist>
+<listitem><para>tm_yday*86400 + (tm_year-70)*31536000 + ((tm_year-69)/4)*86400 - ((tm_year-1)/100)*86400 + ((tm_year+299)/400)*86400.</para>
+</listitem></itemizedlist>
+</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>timep</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Pointer to the Unix timestamp </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>tm</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Pointer to the struct tm to be filled </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Pointer to the filled struct tm </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/utctime.cu" line="66" column="10" bodyfile="src/utctime.cu" bodystart="66" bodyend="131"/>
+      </memberdef>
+      <memberdef kind="function" id="utctime_8cu_1aea46066db9ed2948c3461b4fa2cd750e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>long long</type>
+        <definition>long long timegm</definition>
+        <argsstring>(struct tm const *t)</argsstring>
+        <name>timegm</name>
+        <param>
+          <type>struct tm const *</type>
+          <declname>t</declname>
+        </param>
+        <briefdescription>
+<para>Convert a Gregorian civil date-time tuple to a Unix timestamp. Converts a Gregorian civil date-time tuple in GMT (UTC) time zone to a Unix timestamp. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="note"><para>It does not modify broken-down time </para>
+</simplesect>
+<parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>t</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Pointer to the struct tm to be converted </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The corresponding Unix timestamp </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/utctime.cu" line="143" column="11" bodyfile="src/utctime.cu" bodystart="143" bodyend="161"/>
+      </memberdef>
+      <memberdef kind="function" id="utctime_8cu_1a3c261abf339910fb89343ad74110cc00" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>long long</type>
+        <definition>long long date_string_to_time</definition>
+        <argsstring>(std::string date)</argsstring>
+        <name>date_string_to_time</name>
+        <param>
+          <type>std::string</type>
+          <declname>date</declname>
+        </param>
+        <briefdescription>
+<para>Convert a date string to a Unix timestamp. Converts a date string in the format &quot;YYYY-MM-DDTHH:MM:SS&quot; or &quot;YYYY/MM/DD HH:MM:SS&quot; to a Unix timestamp (number of seconds since the beginning of 1970 CE). </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>date</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The date string to convert </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The corresponding Unix timestamp as long long </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/utctime.cu" line="210" column="11" bodyfile="src/utctime.cu" bodystart="210" bodyend="288"/>
+      </memberdef>
+      <memberdef kind="function" id="utctime_8cu_1aff0fc67a8861299f85e8a864b2acdb6e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>double</type>
+        <definition>double date_string_to_s</definition>
+        <argsstring>(std::string datetime, std::string refdate)</argsstring>
+        <name>date_string_to_s</name>
+        <param>
+          <type>std::string</type>
+          <declname>datetime</declname>
+        </param>
+        <param>
+          <type>std::string</type>
+          <declname>refdate</declname>
+        </param>
+        <briefdescription>
+<para>Convert a date string to seconds from a reference date. Converts a date string in the format &quot;YYYY-MM-DDTHH:MM:SS&quot; or &quot;YYYY/MM/DD HH:MM:SS&quot; to seconds from the reference date. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>datetime</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The date string to convert </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>refdate</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The reference date string </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The number of seconds from the reference date as double </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/utctime.cu" line="298" column="8" bodyfile="src/utctime.cu" bodystart="298" bodyend="329"/>
+      </memberdef>
+      <memberdef kind="function" id="utctime_8cu_1a27f2b180b6604b41db7189d467736e50" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>double</type>
+        <definition>double readinputtimetxt</definition>
+        <argsstring>(std::string input, std::string &amp;refdate)</argsstring>
+        <name>readinputtimetxt</name>
+        <param>
+          <type>std::string</type>
+          <declname>input</declname>
+        </param>
+        <param>
+          <type>std::string &amp;</type>
+          <declname>refdate</declname>
+        </param>
+        <briefdescription>
+<para>Read a time string and convert it to seconds. Reads a time string and converts it to seconds. If the string is a valid datetime string it returns the seconds from the reference date, otherwise it returns a float of seconds. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>input</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The input time string </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>refdate</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The reference date string </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The time in seconds as double </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/utctime.cu" line="341" column="8" bodyfile="src/utctime.cu" bodystart="341" bodyend="366"/>
+      </memberdef>
+      <memberdef kind="function" id="utctime_8cu_1afd41627872b2b532a3b6fd44eeffeffa" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool testime1</definition>
+        <argsstring>(int hour)</argsstring>
+        <name>testime1</name>
+        <param>
+          <type>int</type>
+          <declname>hour</declname>
+        </param>
+        <briefdescription>
+<para>Test time calculation functions. Test time calculation functions. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>hour</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The hour to test </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/utctime.cu" line="373" column="6" bodyfile="src/utctime.cu" bodystart="373" bodyend="421"/>
+      </memberdef>
+      <memberdef kind="function" id="utctime_8cu_1ab56faa576f8839224ec998518baaf6dc" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool testime2</definition>
+        <argsstring>(int hour)</argsstring>
+        <name>testime2</name>
+        <param>
+          <type>int</type>
+          <declname>hour</declname>
+        </param>
+        <briefdescription>
+<para>Test time calculation functions for greater than comparison. Test time calculation functions for greater than comparison. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>hour</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The hour to test </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/utctime.cu" line="428" column="6" bodyfile="src/utctime.cu" bodystart="428" bodyend="480"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&quot;utctime.h&quot;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight><highlight class="keyword">namespace<sp/></highlight><highlight class="normal">chrono<sp/>=<sp/>std::chrono;</highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="keyword">using<sp/></highlight><highlight class="normal">chrono::duration_cast;</highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="keyword">using<sp/></highlight><highlight class="normal">chrono::time_point_cast;<sp/></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="comment">/*</highlight></codeline>
+<codeline lineno="8"><highlight class="comment">namespace<sp/>{</highlight></codeline>
+<codeline lineno="9"><highlight class="comment"></highlight></codeline>
+<codeline lineno="10"><highlight class="comment">std::time_t<sp/>to_time_t(const<sp/>UTCClock::time_point<sp/>&amp;tp)<sp/>noexcept</highlight></codeline>
+<codeline lineno="11"><highlight class="comment">{</highlight></codeline>
+<codeline lineno="12"><highlight class="comment"><sp/><sp/>return<sp/>std::time_t(</highlight></codeline>
+<codeline lineno="13"><highlight class="comment"><sp/><sp/><sp/><sp/><sp/><sp/>duration_cast&lt;chrono::seconds&gt;(tp.time_since_epoch()).count());</highlight></codeline>
+<codeline lineno="14"><highlight class="comment">}</highlight></codeline>
+<codeline lineno="15"><highlight class="comment"></highlight></codeline>
+<codeline lineno="16"><highlight class="comment">UTCClock::time_point<sp/>from_time_t(std::time_t<sp/>tt)<sp/>noexcept</highlight></codeline>
+<codeline lineno="17"><highlight class="comment">{</highlight></codeline>
+<codeline lineno="18"><highlight class="comment"><sp/><sp/>return<sp/>time_point_cast&lt;UTCClock::duration&gt;(</highlight></codeline>
+<codeline lineno="19"><highlight class="comment"><sp/><sp/><sp/><sp/><sp/>chrono::time_point&lt;UTCClock,chrono::seconds&gt;(chrono::seconds(tt)));</highlight></codeline>
+<codeline lineno="20"><highlight class="comment">}</highlight></codeline>
+<codeline lineno="21"><highlight class="comment"></highlight></codeline>
+<codeline lineno="22"><highlight class="comment">}<sp/>//<sp/>namespace</highlight></codeline>
+<codeline lineno="23"><highlight class="comment">*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight><highlight class="comment">//<sp/>Algorithm:<sp/>http://howardhinnant.github.io/date_algorithms.html</highlight></codeline>
+<codeline lineno="32"><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>days_from_epoch(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>y,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>m,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>d)</highlight></codeline>
+<codeline lineno="33"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"><sp/><sp/><sp/><sp/>y<sp/>-=<sp/>m<sp/>&lt;=<sp/>2;</highlight></codeline>
+<codeline lineno="35"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>era<sp/>=<sp/>y<sp/>/<sp/>400;</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>yoe<sp/>=<sp/>y<sp/>-<sp/>era<sp/>*<sp/>400;<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>[0,<sp/>399]</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="37"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>doy<sp/>=<sp/>(153<sp/>*<sp/>(m<sp/>+<sp/>(m<sp/>&gt;<sp/>2<sp/>?<sp/>-3<sp/>:<sp/>9))<sp/>+<sp/>2)<sp/>/<sp/>5<sp/>+<sp/>d<sp/>-<sp/>1;<sp/><sp/></highlight><highlight class="comment">//<sp/>[0,<sp/>365]</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="38"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>doe<sp/>=<sp/>yoe<sp/>*<sp/>365<sp/>+<sp/>yoe<sp/>/<sp/>4<sp/>-<sp/>yoe<sp/>/<sp/>100<sp/>+<sp/>doy;<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>[0,<sp/>146096]</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>era<sp/>*<sp/>146097<sp/>+<sp/>doe<sp/>-<sp/>719468;</highlight></codeline>
+<codeline lineno="40"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"></highlight></codeline>
+<codeline lineno="66"><highlight class="normal"></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal">tm*<sp/>gmtime_r(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>time_t*<sp/>timep,<sp/></highlight><highlight class="keyword">struct</highlight><highlight class="normal"><sp/>tm*<sp/>tm)<sp/>{</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>time_t<sp/>ts<sp/>=<sp/>*timep;</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"><sp/><sp/><sp/><sp/>time_t<sp/>t<sp/>=<sp/>ts<sp/>/<sp/>86400;</highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/>hms<sp/>=<sp/>ts<sp/>%<sp/>86400;<sp/><sp/></highlight><highlight class="comment">/*<sp/>-86399<sp/>&lt;=<sp/>hms<sp/>&lt;=<sp/>86399.<sp/>This<sp/>needs<sp/>sizeof(int)<sp/>&gt;=<sp/>4.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="70"><highlight class="normal"><sp/><sp/><sp/><sp/>time_t<sp/>c,<sp/>f;</highlight></codeline>
+<codeline lineno="71"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/>yday;<sp/><sp/></highlight><highlight class="comment">/*<sp/>0<sp/>&lt;=<sp/>yday<sp/>&lt;=<sp/>426.<sp/>Also<sp/>fits<sp/>to<sp/>an<sp/>`unsigned<sp/>short&apos;,<sp/>but<sp/>`int&apos;<sp/>is<sp/>faster.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="72"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/>a;<sp/><sp/></highlight><highlight class="comment">/*<sp/>0<sp/>&lt;=<sp/>a<sp/>&lt;=<sp/>2133.<sp/>Also<sp/>fits<sp/>to<sp/>an<sp/>`unsigned<sp/>short&apos;,<sp/>but<sp/>`int&apos;<sp/>is<sp/>faster.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>((</highlight><highlight class="keywordtype">int</highlight><highlight class="normal">)hms<sp/>&lt;<sp/>0)<sp/>{<sp/>--t;<sp/>hms<sp/>+=<sp/>86400;<sp/>}<sp/><sp/></highlight><highlight class="comment">/*<sp/>Fix<sp/>quotient<sp/>and<sp/>negative<sp/>remainder<sp/>if<sp/>ts<sp/>was<sp/>negative<sp/>(i.e.<sp/>before<sp/>year<sp/>1970<sp/>CE).<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="74"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>Now:<sp/>-24856<sp/>&lt;=<sp/>t<sp/>&lt;=<sp/>24855.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="75"><highlight class="normal"><sp/><sp/><sp/><sp/>tm-&gt;tm_sec<sp/>=<sp/>hms<sp/>%<sp/>60;</highlight></codeline>
+<codeline lineno="76"><highlight class="normal"><sp/><sp/><sp/><sp/>hms<sp/>/=<sp/>60;</highlight></codeline>
+<codeline lineno="77"><highlight class="normal"><sp/><sp/><sp/><sp/>tm-&gt;tm_min<sp/>=<sp/>hms<sp/>%<sp/>60;</highlight></codeline>
+<codeline lineno="78"><highlight class="normal"><sp/><sp/><sp/><sp/>tm-&gt;tm_hour<sp/>=<sp/>hms<sp/>/<sp/>60;</highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(time_t)<sp/>&gt;<sp/>4)<sp/>{<sp/><sp/></highlight><highlight class="comment">/*<sp/>Optimization.<sp/>For<sp/>int32_t,<sp/>this<sp/>would<sp/>keep<sp/>t<sp/>intact,<sp/>so<sp/>we<sp/>won&apos;t<sp/>have<sp/>to<sp/>do<sp/>it.<sp/>This<sp/>produces<sp/>unreachable<sp/>code.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="80"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>f<sp/>=<sp/>(t<sp/>+<sp/>4)<sp/>%<sp/>7;</highlight></codeline>
+<codeline lineno="81"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(f<sp/>&lt;<sp/>0)<sp/>f<sp/>+=<sp/>7;<sp/><sp/></highlight><highlight class="comment">/*<sp/>Fix<sp/>negative<sp/>remainder<sp/>if<sp/>(t<sp/>+<sp/>4)<sp/>was<sp/>negative.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="82"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>Now<sp/>0<sp/>&lt;=<sp/>f<sp/>&lt;=<sp/>6.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="83"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm-&gt;tm_wday<sp/>=<sp/>f;</highlight></codeline>
+<codeline lineno="84"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>c<sp/>=<sp/>(t<sp/>&lt;&lt;<sp/>2)<sp/>+<sp/>102032;</highlight></codeline>
+<codeline lineno="85"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>f<sp/>=<sp/>c<sp/>/<sp/>146097;</highlight></codeline>
+<codeline lineno="86"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(c<sp/>%<sp/>146097<sp/>&lt;<sp/>0)<sp/>--f;<sp/><sp/></highlight><highlight class="comment">/*<sp/>Fix<sp/>negative<sp/>remainder<sp/>if<sp/>c<sp/>was<sp/>negative.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="87"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>--f;</highlight></codeline>
+<codeline lineno="88"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>t<sp/>+=<sp/>f;</highlight></codeline>
+<codeline lineno="89"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>f<sp/>&gt;&gt;=<sp/>2;</highlight></codeline>
+<codeline lineno="90"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>t<sp/>-=<sp/>f;</highlight></codeline>
+<codeline lineno="91"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>f<sp/>=<sp/>(t<sp/>&lt;&lt;<sp/>2)<sp/>+<sp/>102035;</highlight></codeline>
+<codeline lineno="92"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>c<sp/>=<sp/>f<sp/>/<sp/>1461;</highlight></codeline>
+<codeline lineno="93"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(f<sp/>%<sp/>1461<sp/>&lt;<sp/>0)<sp/>--c;<sp/><sp/></highlight><highlight class="comment">/*<sp/>Fix<sp/>negative<sp/>remainder<sp/>if<sp/>f<sp/>was<sp/>negative.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="94"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="95"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"><sp/>{</highlight></codeline>
+<codeline lineno="96"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm-&gt;tm_wday<sp/>=<sp/>(t<sp/>+<sp/>24861)<sp/>%<sp/>7;<sp/><sp/></highlight><highlight class="comment">/*<sp/>t<sp/>+<sp/>24861<sp/>&gt;=<sp/>0.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="97"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>Now:<sp/>-24856<sp/>&lt;=<sp/>t<sp/>&lt;=<sp/>24855.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="98"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>c<sp/>=<sp/>((t<sp/>&lt;&lt;<sp/>2)<sp/>+<sp/>102035)<sp/>/<sp/>1461;</highlight></codeline>
+<codeline lineno="99"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="100"><highlight class="normal"><sp/><sp/><sp/><sp/>yday<sp/>=<sp/>t<sp/>-<sp/>365<sp/>*<sp/>c<sp/>-<sp/>(c<sp/>&gt;&gt;<sp/>2)<sp/>+<sp/>25568;</highlight></codeline>
+<codeline lineno="101"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>Now:<sp/>0<sp/>&lt;=<sp/>yday<sp/>&lt;=<sp/>425.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="102"><highlight class="normal"><sp/><sp/><sp/><sp/>a<sp/>=<sp/>yday<sp/>*<sp/>5<sp/>+<sp/>8;</highlight></codeline>
+<codeline lineno="103"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>Now:<sp/>8<sp/>&lt;=<sp/>a<sp/>&lt;=<sp/>2133.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="104"><highlight class="normal"><sp/><sp/><sp/><sp/>tm-&gt;tm_mon<sp/>=<sp/>a<sp/>/<sp/>153;</highlight></codeline>
+<codeline lineno="105"><highlight class="normal"><sp/><sp/><sp/><sp/>a<sp/>%=<sp/>153;<sp/><sp/></highlight><highlight class="comment">/*<sp/>No<sp/>need<sp/>to<sp/>fix<sp/>if<sp/>a<sp/>&lt;<sp/>0,<sp/>because<sp/>a<sp/>cannot<sp/>be<sp/>negative<sp/>here.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="106"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>Now:<sp/>2<sp/>&lt;=<sp/>tm-&gt;tm_mon<sp/>&lt;=<sp/>13.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="107"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>Now:<sp/>0<sp/>&lt;=<sp/>a<sp/>&lt;=<sp/>152.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="108"><highlight class="normal"><sp/><sp/><sp/><sp/>tm-&gt;tm_mday<sp/>=<sp/>1<sp/>+<sp/>a<sp/>/<sp/>5;<sp/><sp/></highlight><highlight class="comment">/*<sp/>No<sp/>need<sp/>to<sp/>fix<sp/>if<sp/>a<sp/>&lt;<sp/>0,<sp/>because<sp/>a<sp/>cannot<sp/>be<sp/>negative<sp/>here.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="109"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>Now:<sp/>1<sp/>&lt;=<sp/>tm-&gt;tm_mday<sp/>&lt;=<sp/>31.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="110"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(tm-&gt;tm_mon<sp/>&gt;=<sp/>12)<sp/>{</highlight></codeline>
+<codeline lineno="111"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm-&gt;tm_mon<sp/>-=<sp/>12;</highlight></codeline>
+<codeline lineno="112"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>Now:<sp/>0<sp/>&lt;=<sp/>tm-&gt;tm_mon<sp/>&lt;=<sp/>1.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="113"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>++c;</highlight></codeline>
+<codeline lineno="114"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>yday<sp/>-=<sp/>366;</highlight></codeline>
+<codeline lineno="115"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="116"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"><sp/>{<sp/><sp/></highlight><highlight class="comment">/*<sp/>Check<sp/>for<sp/>leap<sp/>year<sp/>(in<sp/>c).<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="117"><highlight class="normal"><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>Now:<sp/>2<sp/>&lt;=<sp/>tm-&gt;tm_mon<sp/>&lt;=<sp/>11.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="118"><highlight class="normal"><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>1903:<sp/>not<sp/>leap;<sp/>1904:<sp/>leap,<sp/>1900:<sp/>not<sp/>leap;<sp/>2000:<sp/>leap<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="119"><highlight class="normal"><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>With<sp/>sizeof(time_t)<sp/>==<sp/>4,<sp/>we<sp/>have<sp/>1901<sp/>&lt;=<sp/>year<sp/>&lt;=<sp/>2038;<sp/>of<sp/>these</highlight></codeline>
+<codeline lineno="120"><highlight class="comment"><sp/><sp/><sp/><sp/>*<sp/>years<sp/>only<sp/>2000<sp/>is<sp/>divisble<sp/>by<sp/>100,<sp/>and<sp/>that&apos;s<sp/>a<sp/>leap<sp/>year,<sp/>no<sp/>we</highlight></codeline>
+<codeline lineno="121"><highlight class="comment"><sp/><sp/><sp/><sp/>*<sp/>optimize<sp/>the<sp/>check<sp/>to<sp/>`(c<sp/>&amp;<sp/>3)<sp/>==<sp/>0&apos;<sp/>only.</highlight></codeline>
+<codeline lineno="122"><highlight class="comment"><sp/><sp/><sp/><sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="123"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!((c<sp/>&amp;<sp/>3)<sp/>==<sp/>0<sp/>&amp;&amp;<sp/>(</highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(time_t)<sp/>&lt;=<sp/>4<sp/>||<sp/>c<sp/>%<sp/>100<sp/>!=<sp/>0<sp/>||<sp/>(c<sp/>+<sp/>300)<sp/>%<sp/>400<sp/>==<sp/>0)))<sp/>--yday;<sp/><sp/></highlight><highlight class="comment">/*<sp/>These<sp/>`==<sp/>0&apos;<sp/>comparisons<sp/>work<sp/>even<sp/>if<sp/>c<sp/>&lt;<sp/>0.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="124"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="125"><highlight class="normal"><sp/><sp/><sp/><sp/>tm-&gt;tm_year<sp/>=<sp/>c;<sp/><sp/></highlight><highlight class="comment">/*<sp/>This<sp/>assignment<sp/>may<sp/>overflow<sp/>or<sp/>underflow,<sp/>we<sp/>don&apos;t<sp/>check<sp/>it.<sp/>Example:<sp/>time_t<sp/>is<sp/>a<sp/>huge<sp/>int64_t,<sp/>tm-&gt;tm_year<sp/>is<sp/>int32_t.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="126"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>Now:<sp/>0<sp/>&lt;=<sp/>tm-&gt;tm_mon<sp/>&lt;=<sp/>11.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="127"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">/*<sp/>Now:<sp/>0<sp/>&lt;=<sp/>yday<sp/>&lt;=<sp/>365.<sp/>*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="128"><highlight class="normal"><sp/><sp/><sp/><sp/>tm-&gt;tm_yday<sp/>=<sp/>yday;</highlight></codeline>
+<codeline lineno="129"><highlight class="normal"><sp/><sp/><sp/><sp/>tm-&gt;tm_isdst<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="130"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>tm;</highlight></codeline>
+<codeline lineno="131"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="132"><highlight class="normal"></highlight></codeline>
+<codeline lineno="133"><highlight class="normal"></highlight></codeline>
+<codeline lineno="134"><highlight class="normal"></highlight><highlight class="comment">//<sp/>It<sp/><sp/>does<sp/>not<sp/>modify<sp/>broken-down<sp/>time</highlight></codeline>
+<codeline lineno="143"><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/>timegm(</highlight><highlight class="keyword">struct</highlight><highlight class="normal"><sp/>tm<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal">*<sp/>t)</highlight></codeline>
+<codeline lineno="144"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="145"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>year<sp/>=<sp/>t-&gt;tm_year<sp/>+<sp/>1900;</highlight></codeline>
+<codeline lineno="146"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>month<sp/>=<sp/>t-&gt;tm_mon;<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>0-11</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="147"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(month<sp/>&gt;<sp/>11)</highlight></codeline>
+<codeline lineno="148"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="149"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>year<sp/>+=<sp/>month<sp/>/<sp/>12;</highlight></codeline>
+<codeline lineno="150"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>month<sp/>%=<sp/>12;</highlight></codeline>
+<codeline lineno="151"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="152"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(month<sp/>&lt;<sp/>0)</highlight></codeline>
+<codeline lineno="153"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="154"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>years_diff<sp/>=<sp/>(11<sp/>-<sp/>month)<sp/>/<sp/>12;</highlight></codeline>
+<codeline lineno="155"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>year<sp/>-=<sp/>years_diff;</highlight></codeline>
+<codeline lineno="156"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>month<sp/>+=<sp/>12<sp/>*<sp/>years_diff;</highlight></codeline>
+<codeline lineno="157"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="158"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>days_since_epoch<sp/>=<sp/>days_from_epoch(year,<sp/>month<sp/>+<sp/>1,<sp/>t-&gt;tm_mday);</highlight></codeline>
+<codeline lineno="159"><highlight class="normal"></highlight></codeline>
+<codeline lineno="160"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>60LL<sp/>*<sp/>(60LL<sp/>*<sp/>(24LL<sp/>*<sp/>days_since_epoch<sp/>+<sp/>(</highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/>long)t-&gt;tm_hour)<sp/>+<sp/>(</highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/>long)t-&gt;tm_min)<sp/>+<sp/>(</highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/>long)t-&gt;tm_sec;</highlight></codeline>
+<codeline lineno="161"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="162"><highlight class="normal"></highlight><highlight class="comment">/*</highlight></codeline>
+<codeline lineno="163"><highlight class="comment">UTCClock::time_point<sp/>UTCClock::fromDate(</highlight></codeline>
+<codeline lineno="164"><highlight class="comment"><sp/><sp/><sp/><sp/>int<sp/>year,<sp/>int<sp/>month,<sp/>int<sp/>day,<sp/>int<sp/>hour,<sp/>int<sp/>min,<sp/>int<sp/>sec,<sp/>int<sp/>usec)</highlight></codeline>
+<codeline lineno="165"><highlight class="comment">{</highlight></codeline>
+<codeline lineno="166"><highlight class="comment"><sp/><sp/>std::tm<sp/>tm<sp/><sp/><sp/><sp/><sp/>=<sp/>{0};</highlight></codeline>
+<codeline lineno="167"><highlight class="comment"><sp/><sp/>tm.tm_year<sp/><sp/><sp/><sp/><sp/>=<sp/>year<sp/>-<sp/>1900;</highlight></codeline>
+<codeline lineno="168"><highlight class="comment"><sp/><sp/>tm.tm_mon<sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>month<sp/>-<sp/>1;</highlight></codeline>
+<codeline lineno="169"><highlight class="comment"><sp/><sp/>tm.tm_mday<sp/><sp/><sp/><sp/><sp/>=<sp/>day;</highlight></codeline>
+<codeline lineno="170"><highlight class="comment"><sp/><sp/>tm.tm_hour<sp/><sp/><sp/><sp/><sp/>=<sp/>hour;</highlight></codeline>
+<codeline lineno="171"><highlight class="comment"><sp/><sp/>tm.tm_min<sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>min;</highlight></codeline>
+<codeline lineno="172"><highlight class="comment"><sp/><sp/>tm.tm_sec<sp/><sp/><sp/><sp/><sp/><sp/>=<sp/>sec;</highlight></codeline>
+<codeline lineno="173"><highlight class="comment"><sp/><sp/>tm.tm_isdst<sp/><sp/><sp/><sp/>=<sp/>-1;</highlight></codeline>
+<codeline lineno="174"><highlight class="comment"><sp/><sp/>std::time_t<sp/>tt<sp/>=<sp/>timegm(&amp;tm);</highlight></codeline>
+<codeline lineno="175"><highlight class="comment"><sp/><sp/>return<sp/>from_time_t(tt)<sp/>+<sp/>chrono::microseconds(usec);</highlight></codeline>
+<codeline lineno="176"><highlight class="comment">}</highlight></codeline>
+<codeline lineno="177"><highlight class="comment"></highlight></codeline>
+<codeline lineno="178"><highlight class="comment"></highlight></codeline>
+<codeline lineno="179"><highlight class="comment">void<sp/>UTCClock::toDate(const<sp/>UTCClock::time_point<sp/>&amp;tp,</highlight></codeline>
+<codeline lineno="180"><highlight class="comment"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>int<sp/>&amp;year,</highlight></codeline>
+<codeline lineno="181"><highlight class="comment"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>int<sp/>&amp;month,</highlight></codeline>
+<codeline lineno="182"><highlight class="comment"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>int<sp/>&amp;day,</highlight></codeline>
+<codeline lineno="183"><highlight class="comment"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>int<sp/>&amp;hour,</highlight></codeline>
+<codeline lineno="184"><highlight class="comment"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>int<sp/>&amp;min,</highlight></codeline>
+<codeline lineno="185"><highlight class="comment"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>int<sp/>&amp;sec,</highlight></codeline>
+<codeline lineno="186"><highlight class="comment"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>int<sp/>&amp;usec)</highlight></codeline>
+<codeline lineno="187"><highlight class="comment">{</highlight></codeline>
+<codeline lineno="188"><highlight class="comment"><sp/><sp/>std::time_t<sp/>tt<sp/>=<sp/>to_time_t(tp);</highlight></codeline>
+<codeline lineno="189"><highlight class="comment"><sp/><sp/>std::tm<sp/>tm;</highlight></codeline>
+<codeline lineno="190"><highlight class="comment"><sp/><sp/>gmtime_r(&amp;tt,<sp/>&amp;tm);</highlight></codeline>
+<codeline lineno="191"><highlight class="comment"><sp/><sp/>year<sp/><sp/>=<sp/>tm.tm_year<sp/>+<sp/>1900;</highlight></codeline>
+<codeline lineno="192"><highlight class="comment"><sp/><sp/>month<sp/>=<sp/>tm.tm_mon<sp/>+<sp/>1;</highlight></codeline>
+<codeline lineno="193"><highlight class="comment"><sp/><sp/>day<sp/><sp/><sp/>=<sp/>tm.tm_mday;</highlight></codeline>
+<codeline lineno="194"><highlight class="comment"><sp/><sp/>hour<sp/><sp/>=<sp/>tm.tm_hour;</highlight></codeline>
+<codeline lineno="195"><highlight class="comment"><sp/><sp/>min<sp/><sp/><sp/>=<sp/>tm.tm_min;</highlight></codeline>
+<codeline lineno="196"><highlight class="comment"><sp/><sp/>chrono::microseconds<sp/>leftover<sp/>=</highlight></codeline>
+<codeline lineno="197"><highlight class="comment"><sp/><sp/><sp/><sp/><sp/><sp/>tp<sp/>-<sp/>from_time_t(tt)<sp/>+<sp/>chrono::seconds(tm.tm_sec);</highlight></codeline>
+<codeline lineno="198"><highlight class="comment"><sp/><sp/>sec<sp/>=<sp/>duration_cast&lt;chrono::seconds&gt;(leftover).count();</highlight></codeline>
+<codeline lineno="199"><highlight class="comment"><sp/><sp/>usec<sp/>=<sp/>(leftover-chrono::seconds(sec)).count();</highlight></codeline>
+<codeline lineno="200"><highlight class="comment">}</highlight></codeline>
+<codeline lineno="201"><highlight class="comment">*/</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="202"><highlight class="normal"></highlight></codeline>
+<codeline lineno="210"><highlight class="normal"></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/>date_string_to_time(std::string<sp/>date)</highlight></codeline>
+<codeline lineno="211"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="212"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keyword">struct<sp/></highlight><highlight class="normal">tm<sp/>tm<sp/>=<sp/>{<sp/>0<sp/>};<sp/></highlight><highlight class="comment">//<sp/>Important,<sp/>initialize<sp/>all<sp/>members</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="213"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//int<sp/>n<sp/>=<sp/>0;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="214"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//int<sp/>year,<sp/>mon,<sp/>day,<sp/>hour,<sp/>min,<sp/>sec;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="215"><highlight class="normal"><sp/><sp/><sp/><sp/>std::vector&lt;std::string&gt;<sp/><sp/>datetime,<sp/>ddd,<sp/>ttt;</highlight></codeline>
+<codeline lineno="216"><highlight class="normal"><sp/><sp/><sp/><sp/>datetime<sp/>=<sp/>split(date,<sp/></highlight><highlight class="charliteral">&apos;T&apos;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="217"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(datetime.size()<sp/>&lt;<sp/>2)</highlight></codeline>
+<codeline lineno="218"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="219"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>datetime.clear();</highlight></codeline>
+<codeline lineno="220"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>datetime<sp/>=<sp/>split(date,<sp/></highlight><highlight class="charliteral">&apos;<sp/>&apos;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="221"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="222"><highlight class="normal"></highlight></codeline>
+<codeline lineno="223"><highlight class="normal"><sp/><sp/><sp/><sp/>ddd<sp/>=<sp/>split(datetime[0],<sp/></highlight><highlight class="charliteral">&apos;-&apos;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="224"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(ddd.size()<sp/>&lt;<sp/>3)</highlight></codeline>
+<codeline lineno="225"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="226"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ddd<sp/>=<sp/>split(datetime[0],<sp/></highlight><highlight class="charliteral">&apos;/&apos;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="227"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="228"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>index<sp/>for<sp/>the<sp/>year<sp/>and<sp/>mday</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="229"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//by<sp/>default<sp/>we<sp/>assume<sp/>date<sp/>is<sp/>written<sp/>as<sp/>yyyy-mm-ddTHH:MM:SS</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="230"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>indexyear<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="231"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>indexmday<sp/>=<sp/>2;</highlight></codeline>
+<codeline lineno="232"><highlight class="normal"></highlight></codeline>
+<codeline lineno="233"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(ddd[0].length()<sp/>&lt;<sp/>4<sp/>&amp;&amp;<sp/>ddd[2].length()<sp/>==<sp/>4)</highlight><highlight class="comment">//i.e.<sp/>date<sp/>is<sp/>written<sp/>as<sp/>dd-mm-yyyy</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="234"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="235"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>indexyear<sp/>=<sp/>2;</highlight></codeline>
+<codeline lineno="236"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>indexmday<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="237"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="238"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>If<sp/>you<sp/>write<sp/>date<sp/>like<sp/>an<sp/>American<sp/>(mm-dd-yyyy).<sp/>it<sp/>wont<sp/>work<sp/>and<sp/>I<sp/>can&apos;t<sp/>help</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="239"><highlight class="normal"></highlight></codeline>
+<codeline lineno="240"><highlight class="normal"><sp/><sp/><sp/><sp/>tm.tm_year<sp/>=<sp/>std::stoi(ddd[indexyear]);</highlight></codeline>
+<codeline lineno="241"><highlight class="normal"></highlight></codeline>
+<codeline lineno="242"><highlight class="normal"><sp/><sp/><sp/><sp/>tm.tm_mon<sp/>=<sp/>std::stoi(ddd[1]);</highlight></codeline>
+<codeline lineno="243"><highlight class="normal"></highlight></codeline>
+<codeline lineno="244"><highlight class="normal"><sp/><sp/><sp/><sp/>tm.tm_mday<sp/>=<sp/>std::stoi(ddd[indexmday]);</highlight></codeline>
+<codeline lineno="245"><highlight class="normal"></highlight></codeline>
+<codeline lineno="246"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(datetime.size()<sp/>&gt;<sp/>1)</highlight></codeline>
+<codeline lineno="247"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="248"><highlight class="normal"></highlight></codeline>
+<codeline lineno="249"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>ttt<sp/>=<sp/>split(datetime[1],<sp/></highlight><highlight class="charliteral">&apos;:&apos;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="250"><highlight class="normal"></highlight></codeline>
+<codeline lineno="251"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm.tm_hour<sp/>=<sp/>std::stoi(ttt[0]);</highlight></codeline>
+<codeline lineno="252"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm.tm_min<sp/>=<sp/>std::stoi(ttt[1]);</highlight></codeline>
+<codeline lineno="253"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(ttt.size()<sp/>==<sp/>3)</highlight></codeline>
+<codeline lineno="254"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="255"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm.tm_sec<sp/>=<sp/>std::stoi(ttt[2]);</highlight></codeline>
+<codeline lineno="256"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="257"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="258"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="259"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm.tm_sec<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="260"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="261"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="262"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="263"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="264"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm.tm_hour<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="265"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm.tm_min<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="266"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm.tm_sec<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="267"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="268"><highlight class="normal"></highlight></codeline>
+<codeline lineno="269"><highlight class="normal"></highlight></codeline>
+<codeline lineno="270"><highlight class="normal"></highlight></codeline>
+<codeline lineno="271"><highlight class="normal"></highlight></codeline>
+<codeline lineno="272"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//sscanf(date,<sp/>&quot;%d-%d-%dT%d:%d:%d<sp/>%n&quot;,<sp/>&amp;tm.tm_year,<sp/>&amp;tm.tm_mon,<sp/>&amp;tm.tm_mday,</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="273"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/><sp/>&amp;tm.tm_hour,<sp/>&amp;tm.tm_min,<sp/>&amp;tm.tm_sec,<sp/>&amp;n);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="274"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>If<sp/>scan<sp/>did<sp/>not<sp/>completely<sp/>succeed<sp/>or<sp/>extra<sp/>junk</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="275"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//if<sp/>(n<sp/>==<sp/>0<sp/>||<sp/>date[n])<sp/>{</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="276"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/><sp/>return<sp/>(time_t)-1;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="277"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//}</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="278"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//tm.tm_isdst<sp/>=<sp/>0;<sp/>//<sp/>Eforce<sp/>output<sp/>to<sp/>be<sp/>standard<sp/>time.<sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="279"><highlight class="normal"><sp/><sp/><sp/><sp/>tm.tm_mon--;<sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Months<sp/>since<sp/>January</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="280"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Assume<sp/>2<sp/>digit<sp/>year<sp/>if<sp/>in<sp/>the<sp/>range<sp/>2000-2099,<sp/>else<sp/>assume<sp/>year<sp/>as<sp/>given</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="281"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(tm.tm_year<sp/>&gt;=<sp/>0<sp/>&amp;&amp;<sp/>tm.tm_year<sp/>&lt;<sp/>100)<sp/>{</highlight></codeline>
+<codeline lineno="282"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm.tm_year<sp/>+=<sp/>2000;</highlight></codeline>
+<codeline lineno="283"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="284"><highlight class="normal"><sp/><sp/><sp/><sp/>tm.tm_year<sp/>-=<sp/>1900;<sp/></highlight><highlight class="comment">//<sp/>Years<sp/>since<sp/>1900</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="285"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//UTCTime<sp/>t1<sp/>=<sp/>UTCClock::fromDate(year,<sp/>mon,<sp/>day,<sp/>hour,<sp/>min,<sp/>sec,<sp/>0);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="286"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/>t1<sp/>=<sp/>timegm(&amp;tm);</highlight></codeline>
+<codeline lineno="287"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>t1;</highlight></codeline>
+<codeline lineno="288"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="289"><highlight class="normal"></highlight></codeline>
+<codeline lineno="298"><highlight class="normal"></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>date_string_to_s(std::string<sp/>datetime,<sp/>std::string<sp/>refdate)</highlight></codeline>
+<codeline lineno="299"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="300"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//testime1(1);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="301"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//testime2(2);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="302"><highlight class="normal"></highlight></codeline>
+<codeline lineno="303"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//UTCTime<sp/>ttime<sp/>=<sp/>date_string_to_time(datetime);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="304"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//UTCTime<sp/>reftime<sp/>=<sp/>date_string_to_time(refdate);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="305"><highlight class="normal"></highlight></codeline>
+<codeline lineno="306"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>diff;</highlight></codeline>
+<codeline lineno="307"><highlight class="normal"></highlight></codeline>
+<codeline lineno="308"><highlight class="normal"><sp/><sp/><sp/><sp/>std::string::size_type<sp/>n<sp/>=<sp/>datetime.find(</highlight><highlight class="charliteral">&apos;T&apos;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="309"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(std::string::npos<sp/>==<sp/>n)</highlight></codeline>
+<codeline lineno="310"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="311"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>diff<sp/>=<sp/>std::stod(datetime);</highlight></codeline>
+<codeline lineno="312"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="313"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="314"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="315"><highlight class="normal"></highlight></codeline>
+<codeline lineno="316"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/>ttime<sp/>=<sp/>date_string_to_time(datetime);</highlight></codeline>
+<codeline lineno="317"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/>reftime<sp/>=<sp/>date_string_to_time(refdate);</highlight></codeline>
+<codeline lineno="318"><highlight class="normal"></highlight></codeline>
+<codeline lineno="319"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//double<sp/>diff<sp/>=<sp/>difftime(ttime,<sp/>reftime);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="320"><highlight class="normal"></highlight></codeline>
+<codeline lineno="321"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//std::chrono::microseconds<sp/>timeDiff<sp/>=<sp/>ttime<sp/>-<sp/>reftime;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="322"><highlight class="normal"></highlight></codeline>
+<codeline lineno="323"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//double<sp/>diff<sp/>=<sp/>((double)<sp/>duration_cast&lt;std::chrono::milliseconds&gt;(ttime<sp/>-<sp/>reftime).count())/1000.0;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="324"><highlight class="normal"></highlight></codeline>
+<codeline lineno="325"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>diff<sp/>=<sp/>(double)(ttime<sp/>-<sp/>reftime);</highlight></codeline>
+<codeline lineno="326"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="327"><highlight class="normal"></highlight></codeline>
+<codeline lineno="328"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>diff;</highlight></codeline>
+<codeline lineno="329"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="330"><highlight class="normal"></highlight></codeline>
+<codeline lineno="331"><highlight class="normal"></highlight><highlight class="comment">//<sp/>Read<sp/>time<sp/>string.<sp/>If<sp/>it<sp/>is<sp/>a<sp/>valid<sp/>datetime<sp/>string<sp/>return<sp/>s<sp/>from<sp/>reftime<sp/>otherwise<sp/>return<sp/>a<sp/>foat<sp/>of<sp/>seconds<sp/></highlight></codeline>
+<codeline lineno="341"><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>readinputtimetxt(std::string<sp/>input,<sp/>std::string<sp/>&amp;<sp/>refdate)</highlight></codeline>
+<codeline lineno="342"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="343"><highlight class="normal"><sp/><sp/><sp/><sp/>std::string<sp/>date<sp/>=<sp/>trim(input,<sp/></highlight><highlight class="stringliteral">&quot;<sp/>&quot;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="344"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>timeinsec;</highlight></codeline>
+<codeline lineno="345"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//check<sp/>if<sp/>string<sp/>contains<sp/>a<sp/>T<sp/>a<sp/>marker<sp/>of<sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="346"><highlight class="normal"><sp/><sp/><sp/><sp/>std::vector&lt;std::string&gt;<sp/><sp/>datetime<sp/>=<sp/>split(date,<sp/></highlight><highlight class="charliteral">&apos;T&apos;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="347"><highlight class="normal"></highlight></codeline>
+<codeline lineno="348"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(datetime.size()<sp/>&gt;<sp/>1)</highlight></codeline>
+<codeline lineno="349"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="350"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//likely<sp/>a<sp/>datetime</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="351"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(refdate.empty())</highlight></codeline>
+<codeline lineno="352"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="353"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>refdate<sp/>=<sp/>date;</highlight></codeline>
+<codeline lineno="354"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="355"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>timeinsec<sp/>=<sp/>date_string_to_s(date,<sp/>refdate);</highlight></codeline>
+<codeline lineno="356"><highlight class="normal"></highlight></codeline>
+<codeline lineno="357"><highlight class="normal"></highlight></codeline>
+<codeline lineno="358"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="359"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">else</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="360"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="361"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//Likely<sp/>a<sp/>float</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="362"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>timeinsec<sp/>=<sp/>std::stod(datetime[0]);</highlight></codeline>
+<codeline lineno="363"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="364"><highlight class="normal"></highlight></codeline>
+<codeline lineno="365"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>timeinsec;</highlight></codeline>
+<codeline lineno="366"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="367"><highlight class="normal"></highlight></codeline>
+<codeline lineno="373"><highlight class="normal"></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>testime1(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>hour)</highlight></codeline>
+<codeline lineno="374"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="375"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>test<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="376"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>eps<sp/>=<sp/>1e-7;</highlight></codeline>
+<codeline lineno="377"><highlight class="normal"></highlight></codeline>
+<codeline lineno="378"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>iy<sp/>=<sp/>1400;<sp/>iy<sp/>&lt;=<sp/>2800;<sp/>iy++)</highlight></codeline>
+<codeline lineno="379"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="380"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm<sp/>tm1,<sp/>tm2;</highlight></codeline>
+<codeline lineno="381"><highlight class="normal"></highlight></codeline>
+<codeline lineno="382"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm1.tm_year<sp/>=<sp/>iy;</highlight></codeline>
+<codeline lineno="383"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm2.tm_year<sp/>=<sp/>iy;</highlight></codeline>
+<codeline lineno="384"><highlight class="normal"></highlight></codeline>
+<codeline lineno="385"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm1.tm_mday<sp/>=<sp/>1;</highlight></codeline>
+<codeline lineno="386"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm2.tm_mday<sp/>=<sp/>1;</highlight></codeline>
+<codeline lineno="387"><highlight class="normal"></highlight></codeline>
+<codeline lineno="388"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm1.tm_mon<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="389"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm2.tm_mon<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="390"><highlight class="normal"></highlight></codeline>
+<codeline lineno="391"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm1.tm_hour<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="392"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm2.tm_hour<sp/>=<sp/>hour;</highlight></codeline>
+<codeline lineno="393"><highlight class="normal"></highlight></codeline>
+<codeline lineno="394"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm1.tm_min<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="395"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm2.tm_min<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="396"><highlight class="normal"></highlight></codeline>
+<codeline lineno="397"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm1.tm_sec<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="398"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm2.tm_sec<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="399"><highlight class="normal"></highlight></codeline>
+<codeline lineno="400"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//UTCTime<sp/>t1<sp/>=<sp/>UTCClock::fromDate(iy,<sp/>1,<sp/>1,<sp/>0,<sp/>0,<sp/>0,<sp/>0);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="401"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//UTCTime<sp/>t2<sp/>=<sp/>UTCClock::fromDate(iy,<sp/>1,<sp/>1,<sp/>hour,<sp/>0,<sp/>0,<sp/>0);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="402"><highlight class="normal"></highlight></codeline>
+<codeline lineno="403"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/>t1<sp/>=<sp/>timegm(&amp;tm1);</highlight></codeline>
+<codeline lineno="404"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/>t2<sp/>=<sp/>timegm(&amp;tm2);</highlight></codeline>
+<codeline lineno="405"><highlight class="normal"></highlight></codeline>
+<codeline lineno="406"><highlight class="normal"></highlight></codeline>
+<codeline lineno="407"><highlight class="normal"></highlight></codeline>
+<codeline lineno="408"><highlight class="normal"></highlight></codeline>
+<codeline lineno="409"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//double<sp/>dt12<sp/>=<sp/>((double)duration_cast&lt;std::chrono::milliseconds&gt;(t2<sp/>-<sp/>t1).count())<sp/>/<sp/>1000.0;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="410"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">double</highlight><highlight class="normal"><sp/>dt12<sp/>=<sp/>(double)(t2<sp/>-<sp/>t1);</highlight></codeline>
+<codeline lineno="411"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>test<sp/>=<sp/>abs(dt12<sp/>-<sp/>(hour<sp/>*<sp/>3600.0))<sp/>&lt;<sp/>eps;</highlight></codeline>
+<codeline lineno="412"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!test)</highlight></codeline>
+<codeline lineno="413"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="414"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>printf(</highlight><highlight class="stringliteral">&quot;Failed<sp/>datetime<sp/>calculation:<sp/>year=%d\n&quot;</highlight><highlight class="normal">,<sp/>iy);</highlight></codeline>
+<codeline lineno="415"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">break</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="416"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="417"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="418"><highlight class="normal"></highlight></codeline>
+<codeline lineno="419"><highlight class="normal"></highlight></codeline>
+<codeline lineno="420"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>test;</highlight></codeline>
+<codeline lineno="421"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="422"><highlight class="normal"></highlight></codeline>
+<codeline lineno="428"><highlight class="normal"></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>testime2(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>hour)</highlight></codeline>
+<codeline lineno="429"><highlight class="normal">{</highlight></codeline>
+<codeline lineno="430"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>test<sp/>=<sp/></highlight><highlight class="keyword">false</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="431"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="432"><highlight class="normal"></highlight></codeline>
+<codeline lineno="433"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>iy<sp/>=<sp/>1970;<sp/>iy<sp/>&lt;=<sp/>2400;<sp/>iy++)</highlight></codeline>
+<codeline lineno="434"><highlight class="normal"><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="435"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//UTCTime<sp/>t1<sp/>=<sp/>UTCClock::fromDate(1970,<sp/>1,<sp/>1,<sp/>0,<sp/>0,<sp/>0,<sp/>0);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="436"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//UTCTime<sp/>t2<sp/>=<sp/>UTCClock::fromDate(iy,<sp/>1,<sp/>1,<sp/>hour,<sp/>0,<sp/>0,<sp/>0);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="437"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm<sp/>tm1,<sp/>tm2;</highlight></codeline>
+<codeline lineno="438"><highlight class="normal"></highlight></codeline>
+<codeline lineno="439"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm1.tm_year<sp/>=<sp/>1970;</highlight></codeline>
+<codeline lineno="440"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm2.tm_year<sp/>=<sp/>iy;</highlight></codeline>
+<codeline lineno="441"><highlight class="normal"></highlight></codeline>
+<codeline lineno="442"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm1.tm_mday<sp/>=<sp/>1;</highlight></codeline>
+<codeline lineno="443"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm2.tm_mday<sp/>=<sp/>1;</highlight></codeline>
+<codeline lineno="444"><highlight class="normal"></highlight></codeline>
+<codeline lineno="445"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm1.tm_mon<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="446"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm2.tm_mon<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="447"><highlight class="normal"></highlight></codeline>
+<codeline lineno="448"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm1.tm_hour<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="449"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm2.tm_hour<sp/>=<sp/>hour;</highlight></codeline>
+<codeline lineno="450"><highlight class="normal"></highlight></codeline>
+<codeline lineno="451"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm1.tm_min<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="452"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm2.tm_min<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="453"><highlight class="normal"></highlight></codeline>
+<codeline lineno="454"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm1.tm_sec<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="455"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>tm2.tm_sec<sp/>=<sp/>0;</highlight></codeline>
+<codeline lineno="456"><highlight class="normal"></highlight></codeline>
+<codeline lineno="457"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//UTCTime<sp/>t1<sp/>=<sp/>UTCClock::fromDate(iy,<sp/>1,<sp/>1,<sp/>0,<sp/>0,<sp/>0,<sp/>0);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="458"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//UTCTime<sp/>t2<sp/>=<sp/>UTCClock::fromDate(iy,<sp/>1,<sp/>1,<sp/>hour,<sp/>0,<sp/>0,<sp/>0);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="459"><highlight class="normal"></highlight></codeline>
+<codeline lineno="460"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/>t1<sp/>=<sp/>timegm(&amp;tm1);</highlight></codeline>
+<codeline lineno="461"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/>t2<sp/>=<sp/>timegm(&amp;tm2);</highlight></codeline>
+<codeline lineno="462"><highlight class="normal"></highlight></codeline>
+<codeline lineno="463"><highlight class="normal"></highlight></codeline>
+<codeline lineno="464"><highlight class="normal"></highlight></codeline>
+<codeline lineno="465"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//double<sp/>dt12<sp/>=<sp/>((double)duration_cast&lt;std::chrono::milliseconds&gt;(t2<sp/>-<sp/>t1).count())<sp/>/<sp/>1000.0;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="466"><highlight class="normal"></highlight></codeline>
+<codeline lineno="467"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>test<sp/>=<sp/>t2&gt;t1;</highlight></codeline>
+<codeline lineno="468"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!test)</highlight></codeline>
+<codeline lineno="469"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>{</highlight></codeline>
+<codeline lineno="470"><highlight class="normal"></highlight></codeline>
+<codeline lineno="471"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>dse<sp/>=<sp/>days_from_epoch(tm2.tm_year,<sp/>tm2.tm_mon<sp/>+<sp/>1,<sp/>tm2.tm_mday);</highlight></codeline>
+<codeline lineno="472"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>printf(</highlight><highlight class="stringliteral">&quot;Failed<sp/>datetime<sp/>calculation<sp/>greater<sp/>than:<sp/>year=%d\n&quot;</highlight><highlight class="normal">,<sp/>iy);</highlight></codeline>
+<codeline lineno="473"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>printf(</highlight><highlight class="stringliteral">&quot;dse=%d\nt1<sp/>=<sp/>%lld;\n<sp/>t2=%lld\n&quot;</highlight><highlight class="normal">,dse,<sp/>t1,<sp/>t2);</highlight></codeline>
+<codeline lineno="474"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">break</highlight><highlight class="normal">;</highlight></codeline>
+<codeline lineno="475"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="476"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="477"><highlight class="normal"></highlight></codeline>
+<codeline lineno="478"><highlight class="normal"></highlight></codeline>
+<codeline lineno="479"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>test;</highlight></codeline>
+<codeline lineno="480"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="src/utctime.cu"/>
+  </compounddef>
+</doxygen>

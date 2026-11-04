@@ -1,0 +1,227 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.9.8" xml:lang="en-US">
+  <compounddef id="classforcingmap" kind="class" language="C++" prot="public">
+    <compoundname>forcingmap</compoundname>
+    <basecompoundref refid="classinputmap" prot="public" virt="non-virtual">inputmap</basecompoundref>
+    <derivedcompoundref refid="structDynForcingP" prot="public" virt="non-virtual">DynForcingP&lt; float &gt;</derivedcompoundref>
+    <derivedcompoundref refid="structDynForcingP" prot="public" virt="non-virtual">DynForcingP&lt; T &gt;</derivedcompoundref>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="classforcingmap_1acf0cde9231bc9fe49a243d9ca86b34cf" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int forcingmap::nt</definition>
+        <argsstring></argsstring>
+        <name>nt</name>
+        <qualifiedname>forcingmap::nt</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="31" column="5" bodyfile="src/Forcing.h" bodystart="31" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classforcingmap_1abbba286376311267f198f537b6b6f11a" prot="public" static="no" mutable="no">
+        <type>bool</type>
+        <definition>bool forcingmap::uniform</definition>
+        <argsstring></argsstring>
+        <name>uniform</name>
+        <qualifiedname>forcingmap::uniform</qualifiedname>
+        <initializer>= false</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="32" column="6" bodyfile="src/Forcing.h" bodystart="32" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classforcingmap_1a0399eeb097a9c1a280686713fb712408" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double forcingmap::to</definition>
+        <argsstring></argsstring>
+        <name>to</name>
+        <qualifiedname>forcingmap::to</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="33" column="8" bodyfile="src/Forcing.h" bodystart="33" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classforcingmap_1a83b2d0b4d27cebc2118472a1d45c7416" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double forcingmap::tmax</definition>
+        <argsstring></argsstring>
+        <name>tmax</name>
+        <qualifiedname>forcingmap::tmax</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="33" column="11" bodyfile="src/Forcing.h" bodystart="33" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classforcingmap_1a8a97eabfb7f5087636b41e88588904ca" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double forcingmap::dt</definition>
+        <argsstring></argsstring>
+        <name>dt</name>
+        <qualifiedname>forcingmap::dt</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="34" column="8" bodyfile="src/Forcing.h" bodystart="34" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classforcingmap_1accc4f9ed82b52bd50a5e51bad42de6b7" prot="public" static="no" mutable="no">
+        <type>int</type>
+        <definition>int forcingmap::instep</definition>
+        <argsstring></argsstring>
+        <name>instep</name>
+        <qualifiedname>forcingmap::instep</qualifiedname>
+        <initializer>= 0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="35" column="5" bodyfile="src/Forcing.h" bodystart="35" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classforcingmap_1a9f3e3e78c2e33aa1b4d3fd27d98a22d0" prot="public" static="no" mutable="no">
+        <type>std::string</type>
+        <definition>std::string forcingmap::inputfile</definition>
+        <argsstring></argsstring>
+        <name>inputfile</name>
+        <qualifiedname>forcingmap::inputfile</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="36" column="13" bodyfile="src/Forcing.h" bodystart="36" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classforcingmap_1a4a403bdb44fe48e58ba2fbbc030efe71" prot="public" static="no" mutable="no">
+        <type>std::vector&lt; <ref refid="classWindin" kindref="compound">Windin</ref> &gt;</type>
+        <definition>std::vector&lt;Windin&gt; forcingmap::unidata</definition>
+        <argsstring></argsstring>
+        <name>unidata</name>
+        <qualifiedname>forcingmap::unidata</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="37" column="13" bodyfile="src/Forcing.h" bodystart="37" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classforcingmap_1aa37c64c455ee1e2f7cf59f7b120f88c0" prot="public" static="no" mutable="no">
+        <type>double</type>
+        <definition>double forcingmap::nowvalue</definition>
+        <argsstring></argsstring>
+        <name>nowvalue</name>
+        <qualifiedname>forcingmap::nowvalue</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="38" column="8" bodyfile="src/Forcing.h" bodystart="38" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="classforcingmap_1a6ec2ab87c9365acf2c56f6746ded5335" prot="public" static="no" mutable="no">
+        <type><ref refid="structTexSetP" kindref="compound">TexSetP</ref></type>
+        <definition>TexSetP forcingmap::GPU</definition>
+        <argsstring></argsstring>
+        <name>GPU</name>
+        <qualifiedname>forcingmap::GPU</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/Forcing.h" line="39" column="9" bodyfile="src/Forcing.h" bodystart="39" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="4">
+        <label>DynForcingP&lt; T &gt;</label>
+        <link refid="structDynForcingP"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>DynForcingP&lt; float &gt;</label>
+        <link refid="structDynForcingP"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>forcingmap</label>
+        <link refid="classforcingmap"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="2">
+        <label>inputmap</label>
+        <link refid="classinputmap"/>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="3">
+        <label>TexSetP</label>
+        <link refid="structTexSetP"/>
+      </node>
+      <node id="1">
+        <label>forcingmap</label>
+        <link refid="classforcingmap"/>
+        <childnode refid="2" relation="public-inheritance">
+        </childnode>
+        <childnode refid="3" relation="usage">
+          <edgelabel>GPU</edgelabel>
+        </childnode>
+      </node>
+      <node id="2">
+        <label>inputmap</label>
+        <link refid="classinputmap"/>
+      </node>
+    </collaborationgraph>
+    <location file="src/Forcing.h" line="28" column="1" bodyfile="src/Forcing.h" bodystart="28" bodyend="41"/>
+    <listofallmembers>
+      <member refid="classinputmap_1ad24365594041423812590029c48c3cd5" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>denanval</name></member>
+      <member refid="classforcingmap_1a8a97eabfb7f5087636b41e88588904ca" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>dt</name></member>
+      <member refid="classinputmap_1af8166beb80032716a2cb79f1f30e1629" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>dx</name></member>
+      <member refid="classinputmap_1a2a7b526a69debaf802ee8b4365a4d949" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>dy</name></member>
+      <member refid="classinputmap_1a80721901bfe18f039255b521b29ed05f" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>extension</name></member>
+      <member refid="classinputmap_1a5fc2664ee0afe5e4644088c7e72be361" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>flipxx</name></member>
+      <member refid="classinputmap_1a9c22e10895c1559b69b36092abd7aca8" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>flipyy</name></member>
+      <member refid="classforcingmap_1a6ec2ab87c9365acf2c56f6746ded5335" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>GPU</name></member>
+      <member refid="classinputmap_1aa2b14e34e56df59f0bcbe89d8cc13ec0" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>grdalpha</name></member>
+      <member refid="classforcingmap_1a9f3e3e78c2e33aa1b4d3fd27d98a22d0" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>inputfile</name></member>
+      <member refid="classforcingmap_1accc4f9ed82b52bd50a5e51bad42de6b7" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>instep</name></member>
+      <member refid="classforcingmap_1aa37c64c455ee1e2f7cf59f7b120f88c0" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>nowvalue</name></member>
+      <member refid="classforcingmap_1acf0cde9231bc9fe49a243d9ca86b34cf" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>nt</name></member>
+      <member refid="classinputmap_1a9d6f8c1f590ac5f7028b3292ac3fb089" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>nx</name></member>
+      <member refid="classinputmap_1ac59a3d3482087b0cf9c3073c1b5ad21c" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>ny</name></member>
+      <member refid="classforcingmap_1a83b2d0b4d27cebc2118472a1d45c7416" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>tmax</name></member>
+      <member refid="classforcingmap_1a0399eeb097a9c1a280686713fb712408" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>to</name></member>
+      <member refid="classforcingmap_1a4a403bdb44fe48e58ba2fbbc030efe71" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>unidata</name></member>
+      <member refid="classforcingmap_1abbba286376311267f198f537b6b6f11a" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>uniform</name></member>
+      <member refid="classinputmap_1a0c4a0a0a0abecc18739d3a0dcc7fb939" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>varname</name></member>
+      <member refid="classinputmap_1a52be2d69065064213cb71040c39f52c3" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>xmax</name></member>
+      <member refid="classinputmap_1aae6869906665be95b77c419954993188" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>xo</name></member>
+      <member refid="classinputmap_1aaf71c0ab5507a6a9a22c8c4ffcce3cb9" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>ymax</name></member>
+      <member refid="classinputmap_1a2b3e749a3d8c925d0cb4e96b1a017280" prot="public" virt="non-virtual"><scope>forcingmap</scope><name>yo</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
