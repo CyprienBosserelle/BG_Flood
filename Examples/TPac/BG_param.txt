@@ -20,7 +20,6 @@ dx=0.08;
 
 gpudevice = 0;
 
-mask = 30.0;
 
 # Flow parameters
 eps = 0.000100;
@@ -41,10 +40,9 @@ outvars = h,zs,zsmax;
 outfile = Output_simple_fault.nc;
 smallnc = 0; #if smallnc==1 all Output are scaled and saved as a short int
 
-TSnode = -86.374,-17.984
-TSOfile = SW_Lima.txt
+TSnodesout = SW_Lima.txt,-86.374,-17.984
 
-hotstartfile=Maule_zs_init_simpleflt.nc;
+deform=zsinit.nc?zs;
 
 # Boundaries
 # 0:wall; 1: Neumann (Default)
@@ -52,6 +50,7 @@ right = 1;
 left = 1;
 top = 1;
 bot = 1;
+
 
 
 # Others
