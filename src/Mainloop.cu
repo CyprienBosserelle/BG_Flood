@@ -654,7 +654,8 @@ template <class T> void CrashDetection(Param& XParam, Loop<T> XLoop, Model<T> XM
 		XLoop.nextoutputtime = XLoop.totaltime;
 
 		log(" \n ");
-		log("\t\tModel CRASHED: time steps (" + std::to_string(XLoop.dt) + ") inferior to " + std::to_string(XParam.dtmin) + "\n");
+		log("\t\tModel Likely CRASHED: time steps (" + std::to_string(XLoop.dt) + ") inferior to " + std::to_string(XParam.dtmin) + "\n");
+		log("\t\tIf running lab scale (i.e. very high resolution) or very deep bathymetry you may want to lower dtmin parameter \n");
 
 		std::vector<std::string> outvi = { "zb","h","zs","u","v","ho","vo","uo","zso" };
 		std::vector<std::string> outvold = XParam.outvars;
@@ -709,7 +710,7 @@ template <class T> void CrashDetection(Param& XParam, Loop<T> XLoop, Model<T> XM
 		XParam.outvars = outvold;
 		//XParam.outfile = oldname;
 
-
+		exit(1);
 
 	}
 	//double weight = 0.25;
