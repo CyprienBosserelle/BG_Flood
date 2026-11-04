@@ -16,11 +16,11 @@ template <class T> T readfileinfo(std::string input, T outinfo);
 
 void Readparamfile(Param& XParam, Forcing<float>& XForcing, std::string Paramfile);
 
-template <class T> Forcing<T> readparamstr(std::string line, Forcing<T> forcing);
+template <class T> Forcing<T> readparamstr(std::string line, Forcing<T> forcing,bool& foundparam);
 
-Param readparamstr(std::string line, Param param);
+Param readparamstr(std::string line, Param param, bool& foundparam);
 
-template <class T>Forcing<T> readparamstr(std::string line, Forcing<T> forcing);
+template <class T>Forcing<T> readparamstr(std::string line, Forcing<T> forcing, bool &foundparam);
 void checkparamsanity(Param& XParam, Forcing<float>& XForcing);
 double setendtime(Param XParam, Forcing<float> XForcing);
 std::string findparameter(std::vector<std::string> parameterstr, std::string line);

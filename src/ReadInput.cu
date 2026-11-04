@@ -122,15 +122,23 @@ void Readparamfile(Param& XParam, Forcing<float>& XForcing, std::string Paramfil
 		std::string line;
 		while (std::getline(fs, line))
 		{
-
+			
+			bool foundparam = false;
 			//Get param or skip empty lines
 			if (!line.empty() && line.substr(0, 1).compare("#") != 0)
 			{
-				XParam = readparamstr(line, XParam);
-				XForcing = readparamstr(line, XForcing);
+				XParam = readparamstr(line, XParam, foundparam);
+				XForcing = readparamstr(line, XForcing, foundparam);
+
+				if (foundparam == false)
+				{
+					log("WARNING: unrecognised parameter/line : " + line);
+				}
 
 				//std::cout << line << std::endl;
 			}
+			
+
 
 		}
 		fs.close();
@@ -159,7 +167,7 @@ void Readparamfile(Param& XParam, Forcing<float>& XForcing, std::string Paramfil
  * @param param Parameter structure to update
  * @return Updated parameter structure
  */
-Param readparamstr(std::string line, Param param)
+Param readparamstr(std::string line, Param param, bool &foundparam)
 {
 
 
@@ -169,11 +177,14 @@ Param readparamstr(std::string line, Param param)
 	// General parameters
 	//
 
+	
+
 	parameterstr = "test";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
 		param.test = std::stoi(parametervalue);
+		foundparam = true;
 	}
 
 	paramvec = { "GPUDEVICE","gpu" };
@@ -181,6 +192,7 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.GPUDEVICE = std::stoi(parametervalue);
+		foundparam = true;
 	}
 
 	parameterstr = "doubleprecision";
@@ -188,12 +200,14 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.doubleprecision = std::stoi(parametervalue);
+		foundparam = true;
 	}
 
 	parameterstr = "engine";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		std::vector<std::string> buttingerstr = { "b","butt","buttinger","1" };
 		std::size_t found;
 		bool foo = false;
@@ -220,6 +234,7 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.maxlevel = std::stoi(parametervalue);
+		foundparam = true;
 	}
 
 	parameterstr = "minlevel";
@@ -227,6 +242,7 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.minlevel = std::stoi(parametervalue);
+		foundparam = true;
 	}
 
 	parameterstr = "initlevel";
@@ -234,6 +250,7 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.initlevel = std::stoi(parametervalue);
+		foundparam = true;
 	}
 
 	paramvec = { "adaptmaxiteration","maxiterationadapt" };
@@ -241,6 +258,7 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.adaptmaxiteration = std::stoi(parametervalue);
+		foundparam = true;
 	}
 
 	parameterstr = "conserveElevation";
@@ -248,6 +266,7 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.conserveElevation = readparambool(parametervalue, param.conserveElevation);
+		foundparam = true;
 	}
 
 	paramvec = { "wetdryfix","reminstab","fixinstab" };
@@ -256,6 +275,7 @@ Param readparamstr(std::string line, Param param)
 	{
 
 		param.wetdryfix = readparambool(parametervalue, param.wetdryfix);
+		foundparam = true;
 
 	}
 
@@ -265,6 +285,7 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.membuffer = std::stod(parametervalue);
+		foundparam = true;
 	}
 
 	///////////////////////////////////////////////////////
@@ -275,12 +296,14 @@ Param readparamstr(std::string line, Param param)
 	if (!parametervalue.empty())
 	{
 		param.eps = std::stod(parametervalue);
+		foundparam = true;
 	}
 
 	paramvec = { "cf","roughness","cfmap" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha) == false) //(std::isdigit(parametervalue[0]) == true)
 		{
 			param.cf = std::stod(parametervalue);
@@ -291,6 +314,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha) == false) //(std::isdigit(parametervalue[0]) == true)
 		{
 			param.il = std::stod(parametervalue);
@@ -302,6 +326,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha) == false) //(std::isdigit(parametervalue[0]) == true)
 		{
 			param.cl = std::stod(parametervalue);
@@ -313,6 +338,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.VelThreshold = std::stod(parametervalue);
 	}
 
@@ -320,6 +346,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.Cd = std::stod(parametervalue);
 	}
 
@@ -327,6 +354,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.Pa2m = std::stod(parametervalue);
 	}
 
@@ -334,6 +362,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.Paref = std::stod(parametervalue);
 	}
 
@@ -341,6 +370,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.mask = std::stod(parametervalue);
 	}
 
@@ -351,6 +381,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.dt = std::stod(parametervalue);
 
 	}
@@ -359,6 +390,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.dtmin = std::stod(parametervalue);
 
 	}
@@ -366,6 +398,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.bndtaper = std::stod(parametervalue);
 
 	}
@@ -374,6 +407,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.bndrelaxtime = std::stod(parametervalue);
 
 	}
@@ -381,6 +415,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.bndfiltertime = std::stod(parametervalue);
 
 	}
@@ -390,6 +425,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.aoibnd = std::stoi(parametervalue);
 	}
 
@@ -398,6 +434,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.CFL = std::stod(parametervalue);
 
 	}
@@ -405,6 +442,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.theta = std::stod(parametervalue);
 
 	}
@@ -413,6 +451,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.outputtimestep = std::stod(parametervalue);
 
 	}
@@ -421,6 +460,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.endtime = readinputtimetxt(parametervalue, param.reftime);
 
 	}
@@ -429,6 +469,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		//param.totaltime = std::stod(parametervalue);
 		param.totaltime = readinputtimetxt(parametervalue, param.reftime);
 
@@ -438,6 +479,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		//param.totaltime = std::stod(parametervalue);
 		param.totaltime = readinputtimetxt(parametervalue, param.reftime);
 		param.ForceMassConserve = readparambool(parametervalue, param.ForceMassConserve);
@@ -449,6 +491,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.dtinit = std::stod(parametervalue);
 
 	}
@@ -457,6 +500,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		if (param.reftime.empty())
 		{
 			param.reftime = parametervalue;
@@ -472,6 +516,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.outfile = parametervalue;
 
 	}
@@ -482,6 +527,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		TSoutnode node;
 		std::vector<std::string> nodeitems = split(parametervalue, ',');
 		if (nodeitems.size() >= 3)
@@ -509,6 +555,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		std::vector<std::string> vars = split(parametervalue, ',');
 		for (int nv = 0; nv < vars.size(); nv++)
 		{
@@ -564,6 +611,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		outzoneP zone;
 		std::vector<std::string> zoneitems = split(parametervalue, ',');
 		if (zoneitems.size() >= 5)
@@ -608,6 +656,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		if (std::stoi(parametervalue) == 1)
 		{
 			param.resetmax = true;
@@ -621,12 +670,14 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.outishift = std::stoi(parametervalue);
 	}
 	parameterstr = "outjshift";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.outjshift = std::stoi(parametervalue);
 	}
 
@@ -637,6 +688,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.nx = std::stoi(parametervalue);
 	}
 
@@ -644,6 +696,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.ny = std::stoi(parametervalue);
 	}
 
@@ -651,6 +704,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.dx = std::stod(parametervalue);
 	}
 
@@ -658,6 +712,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.grdalpha = std::stod(parametervalue);
 	}
 
@@ -665,6 +720,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.xo = std::stod(parametervalue);
 	}
 
@@ -672,6 +728,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.yo = std::stod(parametervalue);
 	}
 
@@ -679,6 +736,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.xmax = std::stod(parametervalue);
 	}
 
@@ -686,6 +744,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.ymax = std::stod(parametervalue);
 	}
 
@@ -693,6 +752,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.g = std::stod(parametervalue);
 
 	}
@@ -701,6 +761,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.rho = std::stod(parametervalue);
 	}
 
@@ -708,24 +769,28 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.smallnc = std::stoi(parametervalue);
 	}
 	parameterstr = "scalefactor";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.scalefactor = std::stof(parametervalue);
 	}
 	parameterstr = "addoffset";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.addoffset = std::stof(parametervalue);
 	}
 	parameterstr = "posdown";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.posdown = std::stoi(parametervalue);
 	}
 
@@ -734,36 +799,42 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.use_catalyst = std::stoi(parametervalue);
 	}
 	parameterstr = "catalyst_python_pipeline";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.catalyst_python_pipeline = std::stoi(parametervalue);
 	}
 	parameterstr = "vtk_output_frequency";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.vtk_output_frequency = std::stoi(parametervalue);
 	}
 	parameterstr = "vtk_output_time_interval";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.vtk_output_time_interval = std::stod(parametervalue);
 	}
 	parameterstr = "vtk_outputfile_root";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.vtk_outputfile_root = parametervalue;
 	}
 	parameterstr = "python_pipeline";
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.python_pipeline = parametervalue;
 	}
 #endif
@@ -772,6 +843,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.zsinit = std::stod(parametervalue);
 	}
 
@@ -779,12 +851,14 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.zsoffset = std::stod(parametervalue);
 	}
 	paramvec = { "rainbnd", "rainonbnd" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.rainbnd = readparambool(parametervalue, param.rainbnd);
 
 	}
@@ -794,6 +868,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.hotstartfile = parametervalue;
 
 	}
@@ -802,6 +877,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.hotstep = std::stoi(parametervalue);
 	}
 
@@ -810,6 +886,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.spherical = readparambool(parametervalue, param.spherical);
 	}
 
@@ -817,6 +894,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.Radius = std::stod(parametervalue);
 	}
 
@@ -824,6 +902,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.frictionmodel = std::stoi(parametervalue);
 	}
 
@@ -831,6 +910,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		std::vector<std::string> adaptpar = split(parametervalue, ',');
 
 		if (!adaptpar.empty())
@@ -853,6 +933,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.crs_ref = parametervalue;
 	}
 
@@ -861,6 +942,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.Toutput.inputstr = ReadToutSTR(parametervalue);
 	}
 
@@ -868,6 +950,7 @@ Param readparamstr(std::string line, Param param)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		param.savebyblk = readparambool(parametervalue, param.savebyblk);
 	}
 
@@ -891,15 +974,18 @@ Param readparamstr(std::string line, Param param)
  * @return Updated forcing structure
  */
 template <class T>
-Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
+Forcing<T> readparamstr(std::string line, Forcing<T> forcing, bool &foundparam)
 {
 	std::string parameterstr, parametervalue;
 	std::vector<std::string> paramvec;
+
+	
 
 	paramvec = { "Bathy","bathyfile","bathymetry","depfile","depthfile","topofile","topo","DEM" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		StaticForcingP<float> infobathy;
 		forcing.Bathy.push_back(readfileinfo(parametervalue, infobathy));
 		//std::cerr << "Bathymetry file found!" << std::endl;
@@ -911,6 +997,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		forcing.AOI.file = parametervalue;
 		forcing.AOI.active = true;
 	}
@@ -922,6 +1009,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		//forcing.left = readbndline(parametervalue);
 		forcing.bndseg.push_back(readbndlineside(parametervalue, "left"));
 
@@ -933,6 +1021,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		//forcing.right = readbndline(parametervalue);
 		forcing.bndseg.push_back(readbndlineside(parametervalue, "right"));
 
@@ -942,6 +1031,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		//forcing.top = readbndline(parametervalue);
 		forcing.bndseg.push_back(readbndlineside(parametervalue, "top"));
 	}
@@ -950,6 +1040,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		//forcing.bot = readbndline(parametervalue);
 		forcing.bndseg.push_back(readbndlineside(parametervalue, "bot"));
 	}
@@ -958,6 +1049,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		//forcing.bot = readbndline(parametervalue);
 		forcing.bndseg.push_back(readbndline(parametervalue));
 	}
@@ -968,6 +1060,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 
 		deformmap<float> thisdeform;
 		std::vector<std::string> items = split(parametervalue, ',');
@@ -994,6 +1087,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 
 		deformmap<float> thisdeform;
 
@@ -1022,6 +1116,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		std::vector<std::string> vars = split(parametervalue, ',');
 		if (vars.size() == 5)
 		{
@@ -1050,6 +1145,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha)) //(std::isdigit(parametervalue[0]) == false)
 		{
 			//forcing.cf = readfileinfo(parametervalue, forcing.cf);
@@ -1070,6 +1166,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha)) //(std::isdigit(parametervalue[0]) == false)
 		{
 			forcing.il = readfileinfo(parametervalue, forcing.il);
@@ -1079,6 +1176,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		if (std::any_of(parametervalue.begin(), parametervalue.end(), ::isalpha)) //(std::isdigit(parametervalue[0]) == false)
 		{
 			forcing.cl = readfileinfo(parametervalue, forcing.cl);
@@ -1090,6 +1188,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 
 		std::vector<std::string> vars = split(parametervalue, ',');
 		if (vars.size() == 2)
@@ -1125,6 +1224,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		// needs to be a netcdf file 
 		forcing.Atmp = readfileinfo(parametervalue, forcing.Atmp);
 
@@ -1135,6 +1235,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		// netcdf file == Variable spatially
 		// txt file (other than .nc) == spatially cst (txt file with 2 col time and mmm/h )
 		forcing.Rain = readfileinfo(parametervalue, forcing.Rain);
@@ -1156,6 +1257,7 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	parametervalue = findparameter(parameterstr, line);
 	if (!parametervalue.empty())
 	{
+		foundparam = true;
 		std::vector<std::string> adaptpar = split(parametervalue, ',');
 		// special case for 'Targetlevel' adaptation
 		if (!adaptpar.empty())
@@ -1172,6 +1274,8 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 		}
 
 	}
+
+	
 
 	return forcing;
 }
