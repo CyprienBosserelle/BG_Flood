@@ -4,7 +4,7 @@ bathy = Bathy_CI.asc;
 posdown=-1;
 
 # Model controls
-gpudevice = -1;
+gpudevice = 0;
 
 # Flow parameters
 eps = 0.00010000;
@@ -23,19 +23,18 @@ smallnc=0
 
 # Files
 outfile = Test3_GPU_FLT.nc;
-leftbndfile = WG0;
-left =2
+
+left =2,WG0
 right = 0;
 top = 0;
 bot = 0;
 
 # Time series output
-TSOfile = gauge1-Test3_GPU_FLT.txt
-TSnode = 4.521, 1.196; #Note these are x, y values converted to the nearest i,j
+#TSnodesout=Offshore.txt,xloc,yloc;
+TSnodesout = gauge6.txt,9.36,13.80;
 
-TSOfile = gauge2-Test3_GPU_FLT.txt
-TSnode = 4.521, 1.696;
+TSnodesout = gauge9.txt,10.36,13.80;
 
-TSOfile = gauge3-Test3_GPU_FLT.txt
-TSnode = 4.521, 2.196;
+TSnodesout = gauge16.txt,12.96,11.22;
 
+TSnodesout = gauge22.txt,15.56,13.80;

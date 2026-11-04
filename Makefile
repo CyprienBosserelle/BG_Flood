@@ -215,7 +215,7 @@ ALL_LDFLAGS += $(shell nc-config --libs)
 
 # Gencode arguments
 
-SMS ?= 50 52 60 75
+SMS ?= 50 52 60 75 80 90 100
 
 #SMS ?= 20 30 35
 ifeq ($(SMS),)

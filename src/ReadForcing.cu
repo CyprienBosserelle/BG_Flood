@@ -1830,7 +1830,15 @@ template<class T> T readforcinghead(T ForcingParam)
 			ForcingParam.xmax = ForcingParam.xo + (ForcingParam.nx-1)* ForcingParam.dx;
 			ForcingParam.ymax = ForcingParam.yo + (ForcingParam.ny-1)* ForcingParam.dx;
 
+			ForcingParam.dy = ForcingParam.dx;
+
 			log("For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)");
+			if (ForcingParam.nx == 0 || ForcingParam.ny == 0 || ForcingParam.dx == 0)
+			{
+				log("FATAL ERROR:  Something wrong occurred when reading file: " + ForcingParam.inputfile);
+				exit(1);
+			}
+
 		}
 
 		

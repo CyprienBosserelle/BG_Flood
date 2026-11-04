@@ -1,0 +1,35 @@
+#################################
+# Bathymetry file
+bathy = bathy.nc?z;
+
+# Model controls
+gpudevice = 0;
+doubleprecision=1;
+hotstartfile=zsinit.nc;
+
+# Flow parameters
+eps = 0.00010000;
+cf=0.000;
+frictionmodel =0;
+
+engine=3;
+
+# Timekeeping parameters
+CFL = 0.500000;
+outputtimestep = 0.100000;
+outvars = zb, h, u, v, hmax, zs, zsmax;
+endtime = 1.000000;
+
+smallnc=0
+
+# Files
+outfile = Gauss_GPU.nc;
+
+left = 0;
+right = 0;
+top = 0;
+bot = 0;
+
+
+
+
