@@ -1,6 +1,6 @@
 
-
 #include "Updateforcing.h"
+#include "Write_netcdf.h"
 
 /**
  * @brief Update dynamic forcings for the current simulation step.
@@ -102,6 +102,9 @@ void Forcingthisstep(Param XParam, double totaltime, DynForcingP<float> &XDynFor
 
 			// Read the actual file data
 
+			// The NetCDF library is not thread safe: make sure no map output is
+			// being written in the background before reading the forcing file
+			WaitForMapSave();
 			readvardata(XDynForcing.inputfile, XDynForcing.varname, readfirststep + 1, XDynForcing.after, XDynForcing.flipxx, XDynForcing.flipyy);
 			if (XParam.GPUDEVICE >= 0)
 			{

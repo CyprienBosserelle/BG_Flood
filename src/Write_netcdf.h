@@ -20,6 +20,10 @@ template <class T> void InitSave2Netcdf(Param &XParam, Model<T> &XModel);
 extern "C" void writenctimestep(std::string outfile, double totaltime);
 template <class T> void Save2Netcdf(Param XParam, Loop<T> XLoop, Model<T> &XModel);
 
+// Asynchronous (background CPU thread) map output
+template <class T> void Save2NetcdfAsync(Param XParam, Loop<T> XLoop, Model<T>& XModel);
+void WaitForMapSave();
+
 extern "C" void create2dnc(char* filename, int nx, int ny, double* xx, double* yy, double* var, char* varname);
 extern "C" void create3dnc(char* name, int nx, int ny, int nt, double* xx, double* yy, double* theta, double* var, char* varname);
 extern "C" void write3dvarnc(int nx, int ny, int nt, double totaltime, double* var);

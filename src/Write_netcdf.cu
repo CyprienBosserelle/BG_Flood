@@ -1690,17 +1690,34 @@ template void SaveInitialisation2Netcdf<double>(Param& XParam, Model<double>& XM
 */
 
 /**
- * @brief Save model output to NetCDF files at specified output times.
- * Saves model output to NetCDF files at specified output times based on the provided parameters.
- * It checks if the current output time matches the next scheduled output time for each output zone,
- * and if so, writes the relevant variables to the corresponding NetCDF files.
- * @param XParam The parameter object containing grid settings and model parameters.
- * @param XLoop The loop object containing time-stepping information.
- * @param XModel The model object containing block information and output variable mappings.
- * @note This is a templated function that can handle different data types for the model (e.g., float, double).
- * @see writenctimestep for writing the time step to the NetCDF file.
+ * @brief Snapshot of everything needed to write one map output step to NetCDF.
+ * The job is filled on the main thread (PrepSave2Netcdf) and can then be written
+ * either immediately or from a background thread (WriteMapSaveJob) without touching
+ * the Model/Loop structures that the main thread keeps modifying.
+ * Only pointers to the host output buffers are kept (no data copy), so the host buffers
+ * must not be overwritten until the write is completed (see WaitForMapSave).
  */
-template <class T> void Save2Netcdf(Param XParam, Loop<T> XLoop, Model<T>& XModel)
+template <class T> struct MapSaveJob
+{
+	Param XParam;
+	std::vector<outzoneB> zones; // copy of the zones to write (with index_next_OutputT before increment)
+	int* active = NULL;
+	int* level = NULL;
+	T* blkxo = NULL;
+	T* blkyo = NULL;
+	double totaltime = 0.0;
+	std::map<std::string, T*> OutputVarMap;
+	std::map<std::string, std::string> Outvarlongname;
+	std::map<std::string, std::string> Outvarstdname;
+	std::map<std::string, std::string> Outvarunits;
+};
+
+/**
+ * @brief Prepare a map output step (main thread part of Save2Netcdf).
+ * Checks which output zones need writing at this time, logs the output, advances
+ * the zones output index and returns a self-contained job for WriteMapSaveJob.
+ */
+template <class T> MapSaveJob<T> PrepSave2Netcdf(Param XParam, Loop<T> XLoop, Model<T>& XModel)
 {
 	double NextZoneOutTime;
 	double tiny = 0.0000001;
@@ -1713,47 +1730,137 @@ template <class T> void Save2Netcdf(Param XParam, Loop<T> XLoop, Model<T>& XMode
 	}
 	sprintf(buffer, "%e", meanTspeps);
 	std::string str(buffer);
-	//std::string maps;
+
+	MapSaveJob<T> job;
+	job.XParam = XParam;
+	job.totaltime = XLoop.totaltime;
+	job.active = XModel.blocks.active;
+	job.level = XModel.blocks.level;
+	job.blkxo = XModel.blocks.xo;
+	job.blkyo = XModel.blocks.yo;
 
 	if (!XParam.outvars.empty())
 	{
 		for (int o = 0; o < XModel.blocks.outZone.size(); o++)
 		{
-			//printf("\n  (int(XModel.blocks.outZone[o].OutputT.size() - 1)) = %d\n", (int(XModel.blocks.outZone[o].OutputT.size() - 1)));
 			int indLoc = min(XModel.blocks.outZone[o].index_next_OutputT, (int(XModel.blocks.outZone[o].OutputT.size() - 1)));
 			NextZoneOutTime = XModel.blocks.outZone[o].OutputT[indLoc];
 			if (abs(XLoop.nextoutputtime - NextZoneOutTime) < tiny)
 			{
 				log("Output to map: " + XModel.blocks.outZone[o].outname + ", Totaltime = " + std::to_string(XLoop.totaltime) + " s; Mean dt = " + str + " s");
 
-				writenctimestep(XModel.blocks.outZone[o].outname, XLoop.totaltime);
-				for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
-				{
-					if (XModel.blocks.outZone[o].index_next_OutputT == 0)//first time output
-					{
-						std::string varstr = XParam.outvars[ivar];
-						defncvarBUQ(XParam, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, varstr, XModel.Outvarlongname[varstr], XModel.Outvarstdname[varstr], XModel.Outvarunits[varstr], 3, XModel.OutputVarMap[varstr], XModel.blocks.outZone[o]);
-					}
-					else
-					{
-						if (XParam.savebyblk)
-						{
-							writencvarstepBUQ(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
-						}
-						else
-						{
-							writencvarstepBUQlev(XParam, 3, XModel.blocks.active, XModel.blocks.level, XModel.blocks.xo, XModel.blocks.yo, XParam.outvars[ivar], XModel.OutputVarMap[XParam.outvars[ivar]], XModel.blocks.outZone[o]);
-						}
-					}
-				}
+				job.zones.push_back(XModel.blocks.outZone[o]);
 				XModel.blocks.outZone[o].index_next_OutputT++;
 			}
 		}
+		if (!job.zones.empty())
+		{
+			job.OutputVarMap = XModel.OutputVarMap;
+			job.Outvarlongname = XModel.Outvarlongname;
+			job.Outvarstdname = XModel.Outvarstdname;
+			job.Outvarunits = XModel.Outvarunits;
+		}
 	}
-	//maps.erase(maps.size() - 2);
+	return job;
+}
+
+/**
+ * @brief Write a prepared map output step to the NetCDF files.
+ * This only uses data stored in the job so it is safe to call from a background thread.
+ * No logging is done here (logging stays on the main thread).
+ */
+template <class T> void WriteMapSaveJob(MapSaveJob<T> job)
+{
+	Param& XParam = job.XParam;
+	for (int iz = 0; iz < job.zones.size(); iz++)
+	{
+		outzoneB& Xzone = job.zones[iz];
+		writenctimestep(Xzone.outname, job.totaltime);
+		for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
+		{
+			std::string varstr = XParam.outvars[ivar];
+			if (Xzone.index_next_OutputT == 0)//first time output
+			{
+				defncvarBUQ(XParam, job.active, job.level, job.blkxo, job.blkyo, varstr, job.Outvarlongname[varstr], job.Outvarstdname[varstr], job.Outvarunits[varstr], 3, job.OutputVarMap[varstr], Xzone);
+			}
+			else
+			{
+				if (XParam.savebyblk)
+				{
+					writencvarstepBUQ(XParam, 3, job.active, job.level, job.blkxo, job.blkyo, varstr, job.OutputVarMap[varstr], Xzone);
+				}
+				else
+				{
+					writencvarstepBUQlev(XParam, 3, job.active, job.level, job.blkxo, job.blkyo, varstr, job.OutputVarMap[varstr], Xzone);
+				}
+			}
+		}
+	}
+}
+
+/**
+ * @brief Save model output to NetCDF files at specified output times.
+ * Saves model output to NetCDF files at specified output times based on the provided parameters.
+ * It checks if the current output time matches the next scheduled output time for each output zone,
+ * and if so, writes the relevant variables to the corresponding NetCDF files.
+ * This version is blocking: the function returns once the data is written to disk.
+ * @param XParam The parameter object containing grid settings and model parameters.
+ * @param XLoop The loop object containing time-stepping information.
+ * @param XModel The model object containing block information and output variable mappings.
+ * @note This is a templated function that can handle different data types for the model (e.g., float, double).
+ * @see writenctimestep for writing the time step to the NetCDF file.
+ * @see Save2NetcdfAsync for the non-blocking version.
+ */
+template <class T> void Save2Netcdf(Param XParam, Loop<T> XLoop, Model<T>& XModel)
+{
+	// Make sure no background write is still using the NetCDF library / files
+	WaitForMapSave();
+	WriteMapSaveJob(PrepSave2Netcdf(XParam, XLoop, XModel));
 }
 template void Save2Netcdf<float>(Param XParam, Loop<float> XLoop, Model<float>& XModel);
 template void Save2Netcdf<double>(Param XParam, Loop<double> XLoop, Model<double>& XModel);
+
+
+// Background thread used to write map outputs to disk
+// There is at most one pending write at any time.
+static std::thread MapSaveThread;
+
+/**
+ * @brief Block until the pending background map output (if any) is written to disk.
+ * Must be called before:
+ *  - overwriting the host output buffers (XModel.OutputVarMap), e.g. before the
+ *    next device to host copy;
+ *  - any other NetCDF library call on the main thread (the NetCDF library is not thread safe);
+ *  - the end of the simulation / program.
+ */
+void WaitForMapSave()
+{
+	if (MapSaveThread.joinable())
+	{
+		MapSaveThread.join();
+	}
+}
+
+/**
+ * @brief Save model output to NetCDF files without blocking the model.
+ * Same as Save2Netcdf but the writing to disk is done in a background CPU thread so the
+ * model can carry on with the next steps. The host output buffers (XModel.OutputVarMap)
+ * are read by the background thread until it completes: call WaitForMapSave() before
+ * modifying them (mapoutput does this before the next device to host copy).
+ * Only use this when the host buffers are not the live model arrays (i.e. GPU runs).
+ */
+template <class T> void Save2NetcdfAsync(Param XParam, Loop<T> XLoop, Model<T>& XModel)
+{
+	// Only one write at a time (file order and NetCDF library are not thread safe)
+	WaitForMapSave();
+	MapSaveJob<T> job = PrepSave2Netcdf(XParam, XLoop, XModel);
+	if (!job.zones.empty())
+	{
+		MapSaveThread = std::thread(WriteMapSaveJob<T>, job);
+	}
+}
+template void Save2NetcdfAsync<float>(Param XParam, Loop<float> XLoop, Model<float>& XModel);
+template void Save2NetcdfAsync<double>(Param XParam, Loop<double> XLoop, Model<double>& XModel);
 
 
 //The following functions are tools to create 2D or 3D netcdf files (for testing for example)

@@ -85,8 +85,8 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		printstatus(XLoop.totaltime, XLoop.dt);
 	}
 	
-
-	
+	// Make sure the last map output is fully written to disk
+	WaitForMapSave();
 
 }
 template void MainLoop<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel, Model<float>& XModel_g);
@@ -183,6 +183,9 @@ template <class T> void DebugLoop(Param& XParam, Forcing<float> XForcing, Model<
 		printstatus(XLoop.totaltime, XLoop.dt);
 		XLoop.nstep++;
 	}
+
+	// Make sure the last map output is fully written to disk
+	WaitForMapSave();
 
 
 
@@ -324,13 +327,24 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop, Model<T>& XModel
 	{
 		if (XParam.GPUDEVICE >= 0)
 		{
+			// The previous map output may still be being written to disk by the
+			// background thread from the host buffers: wait for it to complete
+			// before overwriting the host buffers with the new GPU data.
+			WaitForMapSave();
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 			{
 				CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
 			}
+			// Write to disk in a background CPU thread, the model can carry on
+			// computing on the GPU in the meantime.
+			Save2NetcdfAsync(XParam, XLoop, XModel);
 		}
-
-		Save2Netcdf(XParam, XLoop, XModel);
+		else
+		{
+			// On the CPU the host buffers are the live model arrays,
+			// so the write needs to be completed before the model carries on.
+			Save2Netcdf(XParam, XLoop, XModel);
+		}
 
 		XLoop.indNextoutputtime++;
 		if (XLoop.indNextoutputtime < XModel.OutputT.size())
@@ -655,6 +669,10 @@ template <class T> void CrashDetection(Param& XParam, Loop<T> XLoop, Model<T> XM
 
 		log(" \n ");
 		log("\t\tModel CRASHED: time steps (" + std::to_string(XLoop.dt) + ") inferior to " + std::to_string(XParam.dtmin) + "\n");
+
+		// Wait for any pending background map output: the host buffers are about to be
+		// overwritten and the NetCDF library is not thread safe
+		WaitForMapSave();
 
 		std::vector<std::string> outvi = { "zb","h","zs","u","v","ho","vo","uo","zso" };
 		std::vector<std::string> outvold = XParam.outvars;

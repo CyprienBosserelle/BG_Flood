@@ -205,7 +205,7 @@ ALL_LDFLAGS += $(addprefix -Xlinker ,$(EXTRA_LDFLAGS))
 
 # Common includes and paths for CUDA
 INCLUDES  := -I/usr/includes
-LIBRARIES :=
+LIBRARIES := -lpthread
 
 # Add NetCDF include library
 INCLUDES += $(shell nc-config --cflags)
