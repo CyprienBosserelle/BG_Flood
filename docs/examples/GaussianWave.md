@@ -15,7 +15,7 @@ This is a basic but common test to verify the integrity of the model equations. 
 
 #### Bathy
 
-#### Initial conditon
+#### Initial condition
 Here we follow a similar initial condition as in [Basilisk](http://basilisk.fr/Tutorial)
 #### BG_param.txt
     bathy = bathy.nc?z;

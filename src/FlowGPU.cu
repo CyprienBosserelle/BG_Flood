@@ -14,6 +14,7 @@
  */
 template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T> XModel)
 {
+
 	//============================================
 	// construct threads abnd block parameters
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
@@ -35,7 +36,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	if (XParam.atmpforcing)
 	{
 		//Update atm press forcing
-		AddPatmforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.Atmp, XModel);
+		AddPatmforcingGPU << < gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XForcing.Atmp, XModel);
 		CUDA_CHECK(cudaDeviceSynchronize());
 
 		//Fill atmp halo
@@ -45,24 +46,27 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 		CUDA_CHECK(cudaDeviceSynchronize());
 		cudaStreamDestroy(atmpstreams[0]);
 
-		//Calc dpdx and dpdy
+		if (XParam.engine < 5)
+		{
 
-		gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+			//Calc dpdx and dpdy
 
-		
-		CUDA_CHECK(cudaDeviceSynchronize());
-		gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
-		//
-			
-
-		refine_linearGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
-
-		gradient <<< gridDim, blockDim, 0 >>> (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
-		CUDA_CHECK(cudaDeviceSynchronize());
-
-		gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+			gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
 
 
+			CUDA_CHECK(cudaDeviceSynchronize());
+			gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+			//
+
+
+			refine_linearGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+
+			gradient << < gridDim, blockDim, 0 >> > (XParam.halowidth, XModel.blocks.active, XModel.blocks.level, (T)XParam.theta, (T)XParam.delta, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+			CUDA_CHECK(cudaDeviceSynchronize());
+
+			gradientHaloGPU(XParam, XModel.blocks, XModel.Patm, XModel.datmpdx, XModel.datmpdy);
+
+		}
 	}
 
 		
@@ -160,7 +164,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	CUDA_CHECK(cudaDeviceSynchronize());
 	
 	//============================================
-	// Add forcing (Rain, Wind)
+	// Add forcing (Rain, Wind, Culverts)
 	//if (!XForcing.Rain.inputfile.empty())
 	//{
 	//	AddrainforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.Rain, XModel.adv);
@@ -173,6 +177,13 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	if (XForcing.rivers.size() > 0)
 	{
 		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
+	}
+
+
+	if (XForcing.culverts.size() > 0)
+	{
+		AddCulverts(XParam, XLoop.dt, XForcing.culverts, XModel);
+		//CUDA_CHECK(cudaDeviceSynchronize());
 	}
 
 	//============================================
@@ -249,7 +260,7 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	
 
 	//============================================
-	// Add forcing (Rain, Wind)
+	// Add forcing (Rain, Wind, Culverts)
 	//if (!XForcing.Rain.inputfile.empty())
 	//{
 	//	AddrainforcingGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XForcing.Rain, XModel.adv);
@@ -263,7 +274,11 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	{
 		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
 	}
-
+	if (XForcing.culverts.size() > 0)
+	{
+		AddCulverts(XParam, XLoop.dt, XForcing.culverts, XModel);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
 
 	//============================================
 	//Update evolving variable by 1 full time step
@@ -483,6 +498,11 @@ template <class T> void HalfStepGPU(Param XParam, Loop<T>& XLoop, Forcing<float>
 	if (XForcing.rivers.size() > 0)
 	{
 		AddRiverForcing(XParam, XLoop, XForcing.rivers, XModel);
+	}
+	if (XForcing.culverts.size() > 0)
+	{
+		AddCulverts(XParam, XLoop.dt, XForcing.culverts, XModel);
+		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 
 	//============================================

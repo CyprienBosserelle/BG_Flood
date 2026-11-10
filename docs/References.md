@@ -1,6 +1,6 @@
 # References
 
-!!! tip "Prefered BG_Flood citation"   
+!!! tip "Preferred BG_Flood citation"
     [@Coast_ports2022]@Coast_ports2022
 
 ## Acknowledgments

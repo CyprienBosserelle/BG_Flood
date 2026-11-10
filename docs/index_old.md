@@ -19,7 +19,7 @@ For full documentation visit [mkdocs.org](https://www.mkdocs.org).
         index.md  # The documentation homepage.
         ...       # Other markdown pages, images and other files.
 
-## Test of mkdoc functionnalities
+## Test of mkdoc functionalities
 ### Admonitions ([link](https://squidfunk.github.io/mkdocs-material/reference/admonitions/)):
 
 !!! tip "Phasellus posuere in sem ut cursus"

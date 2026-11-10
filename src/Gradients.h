@@ -18,6 +18,8 @@ template <class T> void gradientHalo(Param XParam, BlockP<T>XBlock, T* a, T* dad
 // GPU specific functions
 template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb);
 template <class T> void gradientGPUnew(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb);
+template <class T> void gradientGPUML(Param XParam, BlockP<T>XBlock, EvolvingP<T> XEv, GradientsP<T> XGrad, T* zb);
+
 template <class T> __global__ void gradient(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady);
 template <class T> __global__ void gradientSM(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady);
 template <class T> __global__ void gradientSMB(int halowidth, int* active, int* level, T theta, T dx, T* a, T* dadx, T* dady);
@@ -39,6 +41,8 @@ template <class T> __global__ void gradientHaloLeftGPU(Param XParam, BlockP<T>XB
 template <class T> __global__ void gradientHaloRightGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady);
 template <class T> __global__ void gradientHaloTopGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady);
 template <class T> __global__ void gradientHaloBotGPU(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady);
+
+template <class T> void gradientHaloGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady);
 
 template <class T> __global__ void gradientHaloLeftGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady);
 template <class T> __global__ void gradientHaloRightGPUnew(Param XParam, BlockP<T>XBlock, T* a, T* dadx, T* dady);

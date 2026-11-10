@@ -1,648 +1,293 @@
-# River flooding tutorial
+# Basic rain flood tutorial
 
-The objectif of this tutorial is to explain how to use the code BG_Flood to model river flooding.
-As the code allows rain on grid, we will look at pluvial and fluvial flooding.
+The objective of this tutorial is to explain the basic use of BG_Flood and starting a simple model from scratch.
 
-This testcase aims to broadly reproduce the flooding event that occured from the 16 to the 18 of July 2021 (a 1 in 50 year flood event). 
-During this event, the Buller river, passing through the town of Westport, on the West Coast of the South Island of Aotearoa New Zealand, get out of its primary bed and flooded the Westport area.
+## START SIMPLE !
+It is easy to get excited about starting a new model and adding lots of complex features (spatially variable rainfall, a friction map, a tide boundary, and a bunch of streams and culverts). But it is important to start simple. It is a lot harder to find what is going wrong with a complex model.
 
-!!! info "Prerequisite"
-     Before begining this tutoral, the user is expected to have downloaded the windows executable ([last release](https://github.com/CyprienBosserelle/BG_Flood/releases/latest) on github) or compiled the sources (version > 0.8) of the BG_flood code on linux.
+## Tools
+BG_Flood is not a one-stop shop for making inundation models, and you will need to have a decent background on GIS data manipulation to develop complex models. A bit of knowledge on scripting languages does help too. In this tutorial we use only BG_Flood, but in my everyday model development I use:
 
-During this tutorial, we will build, step by step, a test case. A relatively simple testcase will be build first. Then an example with more complex rain, tidal boundaries inputs will also be shared and explained.
+* Scripting tools/notebooks make everything easier and easier to repeat operations. I use Julia, but many of my colleagues use Python.
+* QGIS for quick visualisation of input and outputs.
+* GMT for manipulating grids.
 
+Don't have or like these tools? There are plenty of alternative ways to do these operations. Ask your favourite AI agent or search engine for help. 
 
-## Param file
-The interface with BG_flood software is done using only a text file: `BG_param.txt`
-(This is the name of the input parameter file by defauls, an other name can be use as first variable when lauching BG_Flood.)
+## DEM 
+A good inundation model requires a good topography and bathymetry. This requires a tutorial of its own. To keep this tutorial simple, we provided a ready-to-use DEM of Port Charles in Coromandel, Aotearoa New Zealand.
 
-This file consists in a list of key words and inputs, separated by a "=" sign. 
-For a full list of the available key words and a further description of this file, please refer to the [parameter list]{../ParametersList-py.md} and the [manual]{../Manual.md}.
-
-### Preparation of the topography/bathymetry (DEM: Digital Elevation Model)
-The DEM, topography or bathymetry file is the only necessary file to be added to BG_param file to run the model.
-``` txt
-DEM = Wesport_DEM_8m.nc?z;
-``` 
-
-![bathy](../figure/Westport_topo.png)
-
-!!! note 
-    Different formats can be used for this file ( ASCII: .asc or NetCDF .nc principally).
-    As Netcdf files can contain different variables, the "?" follows by the name of the variable is needed.
-
-Without further information, the code will run will default values for physical parameters and initialisation, Neumann boundaries and no external forcing:
-
-![shell](../figure/Shell_output.png)
+![dem](../../Examples/SimpleRain/DEM_figure.png)
 
 
-A result files: `output.nc` is created (here opened with the [PyNcView]{https://pyncview.software.informer.com/}) 
+## Make it rain!
+This tutorial is about rain on grid, so we need to put rain. Again keeping it simple, we just generate a text file with a timeseries of rainfall intensities (in mm/h). 
 
-![outputs](../figure/outputs.png)
+### Go big or go home
+When developing a new model, it is useful to push the model to some extreme. This usually helps find problematic areas where the conditioning may not be optimal. So here I'm putting 100 mm/h of rain for an hour. In tropical areas, that would be about your 1% AEP 1-hour duration event. In NZ, this is a bit more extreme.
 
-It contains 2D spatial fields saved regularly in time.
-It details the blocs information:
+Here is my file: `rain.txt`
 
-- `blockid`: block index
-- `blocklevel`: level of refinement for each block
-- `blockstatus`: Is the block active ?
-- `blockwidth`: number of cells in x or y direction in the block (not considering halo cells for computational purpose only)
-- `blockxo`/`blockyo`: coordinate of the bottom left corner of he block
-
-the time 1D variables or coordinates:
-
-- `time`: time vector in second or real time
-- `xx`/`yy` axis: spacial coordinate in m (by default)
-
-and the by default outputs:
-
-- `h` : the water depth in m
-- `u` : the veloctity vector component in the x direction
-- `v`: the velocity vector component in the y direction
-- `zb`: the bottom/ground elevation (m from vertical projection reference)
-- `zs`: the surface water elevation (m from vertical projection reference)
-
-(see manual for further description of the variables).
-
-!!! note
-    In BG_Flood, the memory is organised in blocked for an optimal parallelisation on GPU. All the cells on a block will share some status and parameter such as the level of refinement (or cell size) and the active status.
-
-
-
-A log file: `BG_log.txt` (very similaire to the shell outputs) is also created to keep the terminal output information:
-
-![logfile](../figure/log_file.png)
-
-
-## Basic fluvial flooding set-up
-
-
-### River discharge
-The river are (at this stage) forced by a vertical discharge on a user defined rectagular area:
-``` txt 
-river = river_discharge_TeKuha2.txt,1490249,1490427,5367640,5367805;
 ```
-where the four final numbers are: $x_1$, $x_2$, $y_1$, $y_2$, to define the area for the vertical discharge and a text file containing the time-serie of the discharge (first column: time ($s$) from reference time, second column: river discharge in $m^3s^{-1}$).
-
-![riverfile](../figure/river_discharge.png)
-
-This file has been generated from an observed hydrograph, with data saved every $5$min, in second from the begining of the simulation (or event):
-
-![riverF](../figure/TE_Kuha_hydrograph.png)
-
-For each new river, just add the a similar river input line in the parameter file.
-
-### Timekeeping parameters
-In this code, the time is defined in second, relative to some reference or the start of the simulation by default.
-
-The end of the simulation is prescribed in second as :
-``` txt  
-endtime = 21600;
+# time  rain_int
+0.0   100.0
+3600.0  100.0
+3601.0  0.0
+36000.0 0.0
 ```
 
-The time steps can't be defined by the used, it will be automatically computed as the more restrictive one in the domain by the solver, using the prescribe CFL (Current Friedrich Limiter) value, $CFL=0.5000$ by default.
+> **Note:** BG_Flood reads time either as calendar datetime or seconds from an arbitrary date. Importantly, time steps do not need to be uniform; BG_Flood will linearly interpolate between them. So here, I want rain to go for one hour and then stop.
 
-The simulation begin, by default at $t=0(s)$, but this can modify using "totaltime": 
-``` txt 
-totaltime = 3600;
+> **Important:** You need 0.0 rainfall after the rain stops to be in the rain file because the model will refuse to go beyond the last time in forcing! So here, I will not be able to (and shouldn't) run the model beyond 10 hours. 
+
+
+## Make a parameter file
+Yes, rainfall and a DEM are all you need to get a simple model started. Again, don't expect much from such a simple model, but it is a basic building block for a more complex and realistic model.
+
+### General good practice for your parameter files
+
+Add comments about what the model is meant to do and why. This makes it easier to modify when you revisit a model. I like to put a header on my files, but sometimes get a bit lazy.
+
+BG_Flood will ignore any line starting with `#`.
+
 ```
-to begin one hour after the reference time (used in the forcings for example).
+################
+## My BG_Flood simple rain model
+#################
 
-!!! note
-    The code was initially designed to consider time only through duration in second. We can now use dates to defined time in the forcings and the param file, including a time reference. 
-
-### Outputs
-There is two types of outputs:
-
- - map outputs of 2D variables regularly through time
- - time-serie (TS) output of basic values, at a chosen point position, at each time step.
-
-#### Map outputs
-By default, there is only a map output at the begining and end of the simulation.
-
-The map output can be modify by:
-
-- defining a timestep (in s) for these outputs:
-``` txt 
-outputtimestep = 3600.0;
-```
-- changing the set of variables in the output file (from the list given in the manual)
-``` txt 
-outvars = zs,h,u,v,zb,hmax,Umax,hUmax,twet;
-```
-The "max" variables will be the maximum value during the whole simulation. To reset it between the outputs, see the resetmax variable.
-There is also special variables for risk assesment after inundation (Umax, hmax, hUmax, twet)
-- changing the name of the output file:
-``` txt 
-outfile = Results_tuto_basicRun.nc;
-```
-- saving the output as float (variables are saved as short integer by default.):
-``` txt 
-smallnc = 0;
+# Port Charles stress test 
 ```
 
-#### Time-Serie outputs
-For each TS output needed, a line with the destination file and the postition is needed:
+### Tell the model about the DEM
 
-``` txt 
-TSnodesout=Offshore.txt,1482120,53814890;
+BG_Flood parameters are always on the left of an `=` sign and the value of the parameters on the right. Beware that some parameters expect several values (normally separated with a comma).
+
+For NetCDF input like a DEM, you need to specify the name of the variable in the NetCDF file (often `z` or `band1`). This is done by appending a `?` to the file name followed by the variable name.
+
 ```
-corresponding to `TSnodesout=filename.txt,x_p,y_p;`
-The file contains 5 colums $(t, zs, h, u,v)$ with the value at the nearest grid point (to the position defined by the user).
+##########
+# DEM
+##########
 
-### Resolution
-For a first test, we will modify the resolution and set it to 40m to decrease the computational time:
-``` txt 
-dx=40;
-```
-
-### Basic fluvial innundation results
-This the shell output:
-![shell2](../figure/Shell_output2.png)
-It shows that 1 river has been added to the model, and also the time progression with 5 map outputs (in addition to the initial time step).
-
-In the outputs, we get the different fields requested, for 6 different times.
-![output2](../figure/outputs_v2.png)
-
-The Time-Serie output is:
-![TS2](../figure/offshore.png)
-
-
-## Completing the set-up
-### Adding boundary conditions
-Boundaries' conditions are refered by their position, using 'top/bottom/right/left' keywords. They are associated to a boundary type ( 0:wall; 1: Neumann (Default); 2:Dirichlet (zs); 3: abs1d) and possibly a file containing a time serie. In this case, the file name is placed before the type, coma-separated. 
-
-In this case, we will use tide boundaries at when at least a part of the boundary is open on the sea, i.e. for the top, left and right boundaries.
-At the bottom, we will conserve the default value: 1.
-``` txt
-left = tide_westport.txt,2; 
-right = tide_westport.txt,2; 
-top = tide_westport.txt,2; 
+dem = PortCharles_DEM.nc?z
 ```
 
-In this case, as the boundaries are relatively small compared to the time wave length, we will used the same value along all the boundaries. We will then have only two columns in the file: Time and one elevation.
-tide_file
-``` txt title="tide_westport.txt"
-0.000000 	0.714714 
-600.000000 	0.794714 
-1200.000000 	0.864714 
-1800.000000 	0.934714 
-2400.000000 	0.994714 
-3000.000000 	1.054714 
-3600.000000 	1.104714 
-4200.000000 	1.144714 
-4800.000000 	1.174714 
-5400.000000 	1.194714 
-6000.000000 	1.214714 
-6600.000000 	1.214714 
-7200.000000 	1.214714 
-7800.000000 	1.204714 
-8400.000000 	1.184714 
-          ...
-336600.000000 	-0.635286 
-337200.000000 	-0.705286 
-337800.000000 	-0.765286 
-338400.000000 	-0.825286 
-339000.000000 	-0.875286 
-339600.000000 	-0.915286 
-340200.000000 	-0.955286 
+CF-compliant NetCDF files are self-describing, so BG_Flood takes care of the rest.
+
+> **Tip:** BG_Flood can accept multiple DEMs to be superposed on top of each other. One classic example is a mildly coarse model with bathymetry superposed with a high-resolution DEM of just the land. 
+
+### Defining the model domain
+By default, BG_Flood will use the extent and resolution of the first `dem` parameter given by the user and will build a uniform grid with these parameters. 
+
+> **Larger domain:** If you leave this default behaviour, you may notice the actual domain is slightly extended to the right and top of your DEM domain. This is because BG_Flood builds quadtree blocks that are 16x16 cells, and if the domain cuts across one block, it is automatically extended to fit the block. BG_Flood then repeats the values from the innermost cell to extrapolate.
+
+Because this is a simple test, I do not want to run at full DEM resolution (4 m), and you shouldn't start any model at high resolution. BG_Flood makes it easy to build a coarse model, and then, once you are confident this is right, switch to fine resolution. The easiest way to do this is to force the base resolution of the model via:
+
+```
+##########
+# Domain
+##########
+
+dx = 32.0
 ```
 
-They correspond to a classic time Serie observed offshore of the river mouth.
+Now this is a bit coarser than my input resolution. BG_Flood will automatically average 4x4 cells to make the 32m cells.
 
-![Tide](../figure/tide_westport.png)
+### Specify your rain file
 
-!!! note 
-    If more values are added to the file (more columns), they will be regularly spread along the boundary and the forcing will be linearly interpolated between these values. 
+```
+##########
+# Forcing
+##########
 
-
-### Bottom friction
-Different models from bottom friction are available.
-By default, the model used is -1 corresponding to a Manning model.
-Here, we will use the model 1 corresponding to a roughness length (see manual for more information on the Bottom friction models).
-The associated field (ASC or netCDF) or value must be enter with the key word
-``` txt
-frictionmodel=1;
-cf=z0_100423_rec3.asc; #cf=0.01;  #If using a uniform value
+rain = rain.txt
 ```
 
-![Friction](../figure/Bottom_friction_zo.png)
+### Adding a realistic friction
+BG_Flood includes several roughness formulations. You can used Mannings (very commonly used but somewhat flawed) `frictionmodel = -1`. You can use a quadratic friction (The default `frictionmodel = 0`, quick and easy but not very realistic). You can also use the Smart friction which requires a roughness length (not as common as manning but less flawed) `frictionmodel = 1`.
 
-!!! warning
-    The model allows a roughness heigh or manning number map smaller than the computational domain and will extrapolate outside of the map.
+For this example we are using a zo of 0.04 with the Smart formulation:
 
-### Initialisation
-By default, the model is initialised by a plane water surface located at $z=0.0$.
+```
+##########
+# Roughness
+##########
 
-This water level can be modify, depending of the local mean sea level and the vertical projection used to create the DEM, using:
-``` txt 
-zsinit=-1.39; #in metre
-```
-The model can also be initialised using a restart/hot start.
-A file containing a least the files zb, h or zs, u and v must be provided, with the steps (and no the time value) to use for the restart.
-``` txt 
-hotstartfile = output_4.nc;
-hotstep=5;
-```
-!!! warning
-    the code can be restarted only from an uniform grid (and not from results with multi-level of resolutions).
+frictionmodel = 1
 
-### Model controls
-Some variables can be used to adjust the model (see Manual for more details):
+roughness = 0.04
 
-- run on CPU (or choose a GPU to run on):
-``` txt 
-gpudevice=0;
-```
-By default, the code will detect if there is a suitable GPU on the machine.
-- Double precision instead of a float precision during the computation:
-``` txt 
-doubleprecision = 1;
-```
-- Minmod limiter parameter (to tune momentum dissipation $\in [1,2]$)
-``` txt 
-theta=1.3; #default value=1.3
-```
-- Minimum heigh to concidere a cell wet (m)
-``` txt 
-eps = 0.00010000; #default=0.0001
 ```
 
+### Optional but useful
 
+While we could stop there, it is not very useful to let BG_Flood's default behaviour run the show. In particular, we want to specify what to output, how often, how long and where.
 
-
-## ... Adding the rain
-
-The model allows rain on grid forcing to model pluvial inundations.
-
-### Rain forcing
-A rain intensity in $mm.h^{-1}$, time and space varying can be forced in the model.
-
-The rain can be forced with a time serie (with uniform values on the domain) or a netCDF file if a spacial file is available:
-
-- Time serie forcing:
-``` txt 
-rainfall=rain_westport.txt
 ```
-- Spacial file forcing:
-``` txt 
-rainfile=VCSN_buller_202107_dailynzcsmcov_disaggdaily_500m_nztm_clipped.nc?depth;
-```
-Here, we will use a time serie:
-![RainTS](../figure/rain_westport.png)
+##########
+# output
+##########
 
-If the data is given in "rain height", a post-processing to turn it in rain intensity will be needed (at least at this stage of development).
-
-Using the rain on grid forcing will activate all the cells of the domain and will increase the computational time of the simulation. 
-Part of the domain can be "de-activate" (the blocs memory will not be allocated for this area) using different methods:
-
-- using the `x0` / `xmax` / `y0` / `ymax` keywords to restrain the extend of the computational domain (but still rectangular)
-``` txt 
-x0=1475000; #m
-```
-- a manual mask with values 999 in the bathymetry will be read by the code as "non-active" area
-- masking all the bloc with all cells having an elevation superior to some value:
-``` txt 
-mask=250; #m
-```
-- using a shape file to define a "area of interest":
-``` txt  
-AOI=Domain_buffered-sea2.gmt;
-```
-!!! note "Method advised"
-     The last method, consisting in using a contour to identify the area we want to include, is advised as the method allows for example to select a catchment, or any complex contour shape. The expected shape is a *.gmt file that can be generated from a contour using [GMT](https://www.generic-mapping-tools.org/) tools or directly as a column of x,y points looped (first point = last point).
-
-
-
-## Refining the grid in area of interest
-The code is based on a Block-uniform quadtree mesh. Each block, actually a 16 by 16 cells, is one unit of computation in the GPU.
-These blocks can have different resolutions (but resolution does not change during the computation at this stage).
-
-The initial resolution of the grid is the resolution of the bathymetry/topographic data. To refine or coarsen the grid, you can weather use the "dx" key word and choose a new resolution for the whole domain; wether use the levels of resolution. The reference level, correponding to the bathymetry resolution will be the level 0. Levels of resolution are then defined in relation to the reference levels using positive integers to increase the resolution or refine and negative integer to coarsen the grid by a multiple of two. For a given level  $n$ , the resolution  $dx_n$ will be:
-$$
-dx_n=\frac{dx_0}{2^n}
-$$
- 
-with  $dx_0$ the resolution at level 0. 
-
-When refinning using the level implementation, different key words are expected:
-
-- `Initlevel`: level used to create the first mesh created by the code in the mesh refinement process
-- `Maxlevel`: maximim level of refinement (over-ruling other commands)
-- `Minlevel`: minimum level of refinement (over-ruling other commands)
-
-The grid can also be unregular with an adaptition of the grid to the model (variables at initialisation step or user-defined refinement map). In this case, the cells will be devided in 4 cells for refinement, or 4 cells merged in one for coarsening. The code will ensure a progressive change of resolution (no cell should have a neighbour with more than 1 level of resolution of difference.)
-
-The different methods of refinement available in the code are called using the key word "Adaptation". The refinement can be based on a classical input variable or a variable calculated during the initialisation:
-
-- `Threshold`: impose a threshold for a different level of resolution
-- `Inrange`: impose a range for a different level of resolutuion or it can be defined using a map of target levels for refinement:
-- `Targetlevel`: the levels of resolution will be targeted but will be overruled by the maxlevel, minlevel entrance.
-
-To refine the grid for this case, we will use the *former coarse simulation* and create a map for values where hmax is strictly positive (and/or $umax$,$vmax$ different from zero), after removing the sea area. 
-
-Here, the bathymetry map resolution is a 10m resolution ($dx=10m$). We will impose:
-
-- a level -3 resolution ( $dx_{-3}=80m$) in the background domain, 
-- a level 1 resolution ( $dx_1=5m$) in the flooded area
-- a level 2 resolution ( $dx_2=2.5m$)  in the main river bed area. 
-
-<figure markdown="span">
-  ![coarseRun](../figure/coarse.png){ width="400" }
-  <figcaption>Maximum water depth obtained using a coarse uniform mesh, used to inform refinement.</figcaption>
-</figure>
-
-<figure markdown="span">
-  ![refine](../figure/refine.png){ width="400" }
-  <figcaption>Refinement map obtained based on coarse model, used to enforce refinement.</figcaption>
-</figure>
-
-<figure markdown="span">
-  ![meshrefine](../figure/test_1.png){ width="400" }
-  <figcaption>Mesh refinement generated by the code.</figcaption>
-</figure>
-
-
-To use it, the following options need to be added to the param file:
-``` txt  
-initlevel = -3 ;
-maxlevel = 2 ;
-minlevel = -3 ;
-Adaptation = Targetlevel,refin_mask.nc?z ;
+endtime = 36000.0
+outputtimestep = 600.00
+outvars = hmax, zsmax, hUmax, h, zs, u, v, Umax
+outfile = StressTest_Port_Charles.nc
 ```
 
+> **Tip:** BG_Flood will **never** overwrite an existing file. Instead, it will add an incremental number to the end of the filename each time it runs (e.g., `StressTest_Port_Charles_1.nc`).
 
-!!! note
-     In order to optimise the results when using a refined grid, different bathymetry files can be provided. A higher resolution one with smaller extend can be provided as a second DEM and will be use by the code when refining the grid (the code will use the last entered, having the info available):
-     ```{txt}
-     DEM = Wesport_DEM_8m.nc?z;
-     DEM = Wesport_DEM_2m_zoomed.nc?z;
-     ``` 
-	 Similarly, different input files can be used for the roughness coefficient.
+### Use non-default engine
+
+BG_Flood default engine is great for many use but doesn't do too well with heavy rain on steep catchment (i.e. this tutorial). so to get better results we will change the engine to a more suitable one. Also, when using Rain-on-grid, steep topography can lead to waterfalls and out-of-control flow velocity. We want to prevent that by adding the `vmax` parameter that will prevent flow velocity exceeding 16 m/s in our case.
+
+```
+#################
+## Use the engine 5 for rain-on-grid
+#################
+
+engine = 5
+
+vmax = 16.0
+
+```
+
+## Full BG_param.txt
+
+```
+################
+## My BG_Flood simple rain model
+#################
+
+# Port Charles stress test 
+
+##########
+# DEM
+##########
+
+dem = PortCharles_DEM.nc?z
+
+##########
+# Domain
+##########
+
+dx = 32.0
+
+##########
+# Forcing
+##########
+
+rain = rain.txt
+
+##########
+# Roughness
+##########
+
+frictionmodel = 1
+
+roughness = 0.04
+
+#################
+## Use the multi-layer engine with just 1 layer
+#################
+
+engine = 5
+
+vmax = 16.0
 
 
-!!! note "Note again ..."
-     The code also allows for zone outputs: the output of different zones defined by the user (`output-file-name,x1,x2,y1,y2`):
-     ``` txt
-     outzone=zoomed.nc,5.3,5.4,0.5,0.8;
-     ``` 
+##########
+# output
+##########
 
-### Results:
-This is the logfile:
-``` txt title="BG_log.txt"
+endtime = 36000.0
+outputtimestep = 600.00
+outvars = hmax, zsmax, hUmax, h, zs, u, v, Umax
+
+outfile = StressTest_Port_Charles.nc
+```
+
+## Run the model
+
+To run BG_Flood simply launch the executable by double click or via a terminal. 
+
+> **Tip:** BG_Flood looks for a `BG_param.txt` file by default, but when launching via a terminal you can use whatever file name you want just specify it as argument to BG_Flood when you launch. This is useful when keeping several setof parameter for a similar area or for running scenarios.
+
+### Screen log and file log
+
+After launching BG_Flood you should see a bunch of info scrolling on the screen. an almost identical amount of information is generated in a `BG_log.txt` file. This should be your go-to file for info when things do go as planned. if there is an error you should get your clues here. My screen shows this:
+
+```
 #################################
-BG_Flood v0.8
+BG_Flood v0.95
 #################################
 #################################
 #
-model started at 21-02-2023 21:22:53
 
 Reading parameter file: BG_param.txt ...
 
 Reading bathymetry grid data...
-Reading forcing metadata. file: Westport_DEM_8m.nc extension: nc
-Forcing grid info: nx=2604 ny=3137 dx=8.000000 grdalpha=0.000000 xo=1474101.125000 xmax=1494925.125000 yo=5364343.000000 ymax=5389431.000000
+Reading forcing metadata. file: PortCharles_DEM.nc extension: nc
+Forcing grid info: nx=3152 ny=2127 dx=4.000000 dy=4.000000 grdalpha=0.000000 xo=1815197.000000 xmax=1827801.000000 yo=5950097.000000 ymax=5958601.000000
+Reading CRS information from forcing metadata (file: PortCharles_DEM.nc)
+grid info detected: grid_mapping
+CRS_info: PROJCS["NZGD2000 / New Zealand Transverse Mercator 2000",GEOGCS["NZGD2000",DATUM["New_Zealand_Geodetic_Datum_2000",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6167"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4167"]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",173],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",1600000],PARAMETER["false_northing",10000000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Northing",NORTH],AXIS["Easting",EAST],AUTHORITY["EPSG","2193"]]
 
 Reading boundary data...
 
-Read Roughness map (cf) data...
-Reading forcing metadata. file: z0_100423_rec3.asc extension: asc
-For asc of bathy file please specify grdalpha in the BG_param.txt (default 0)
-Forcing grid info: nx=1724 ny=2420 dx=4.800000 grdalpha=0.000000 xo=1480847.600000 xmax=1489118.000000 yo=5369291.600000 ymax=5380902.800000
-
-Read Target level data...
-Reading forcing metadata. file: refin_mask.nc extension: nc
-Forcing grid info: nx=624 ny=400 dx=50.000000 grdalpha=0.000000 xo=1469074.407363 xmax=1500224.407363 yo=5364597.770576 ymax=5384547.770576
-
-Preparing rivers (1 rivers)
-
 Preparing Rain forcing
 
-Adjusted model domain (xo/xmax/yo/ymax): 
-	1474097.125000/1495057.125000/5364339.000000/5389459.000000
-	 Initial resolution (level 2) = 10.000000
+Adjusted model domain (xo/xmax/yo/ymax):
+        1815195.000000/1827995.000000/5950095.000000/5958799.000000
+         Initial resolution (level 0) = 32.000000
+Reference time: 2000-01-01T00:00:00
+Model Initial time: 0.000000 ;
+
+Model Initial time: 0.000000 ;
+Model end time: 36000.000000
 There are 1 GPU devices on this machine
-Using Device: NVIDIA T500
+Using Device: NVIDIA T1000 8GB
 
 Initializing mesh
-	Initial number of blocks: 20567; Will be allocating 21596 in memory.
+        Initial number of blocks: 425; Will be allocating 447 in memory.
 
 Initial condition:
-	Warm start
-	Initializing rivers
-Adapting mesh
-	 Iteration 1
-		There are 20567 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 4723 blocks to be coarsen (with neighbour); 1675 blocks untouched; 14169 blocks to be freed (1029 are already available) 0 new blocks will be created
-	 Iteration 2
-		There are 6398 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 1023 blocks to be coarsen (with neighbour); 2306 blocks untouched; 3069 blocks to be freed (15198 are already available) 0 new blocks will be created
-	 Iteration 3
-		There are 3329 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 179 blocks to be coarsen (with neighbour); 2613 blocks untouched; 537 blocks to be freed (18267 are already available) 0 new blocks will be created
-	 Iteration 4
-		There are 2792 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 18 blocks to be coarsen (with neighbour); 2720 blocks untouched; 54 blocks to be freed (18804 are already available) 0 new blocks will be created
-	 Iteration 5
-		There are 2738 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 1 blocks to be coarsen (with neighbour); 2734 blocks untouched; 3 blocks to be freed (18858 are already available) 0 new blocks will be created
-	 Iteration 6
-		There are 2735 active blocks (21596 blocks allocated in memory), 0 blocks to be refined, 0 blocks to be coarsen (with neighbour); 2735 blocks untouched; 0 blocks to be freed (18861 are already available) 0 new blocks will be created
+        Cold start
 
-Initial condition:
-	Warm start
-	Initializing rivers
+Boundary Segment 0 :  has 80 blocks
+Output Times:
+0.000000e+00, 6.000000e+02, 1.200000e+03, 1.800000e+03, 2.400000e+03, 3.000000e+03, 3.600000e+03, 4.200000e+03, 4.800000e+03, 5.400000e+03, 6.000000e+03, 6.600000e+03, 7.200000e+03, 7.800000e+03, 8.400000e+03, 9.000000e+03, 9.600000e+03, 1.020000e+04, 1.080000e+04, 1.140000e+04, 1.200000e+04, 1.260000e+04, 1.320000e+04, 1.380000e+04, 1.440000e+04, 1.500000e+04, 1.560000e+04, 1.620000e+04, 1.680000e+04, 1.740000e+04, 1.800000e+04, 1.860000e+04, 1.920000e+04, 1.980000e+04, 2.040000e+04, 2.100000e+04, 2.160000e+04, 2.220000e+04, 2.280000e+04, 2.340000e+04, 2.400000e+04, 2.460000e+04, 2.520000e+04, 2.580000e+04, 2.640000e+04, 2.700000e+04, 2.760000e+04, 2.820000e+04, 2.880000e+04, 2.940000e+04, 3.000000e+04, 3.060000e+04, 3.120000e+04, 3.180000e+04, 3.240000e+04, 3.300000e+04, 3.360000e+04, 3.420000e+04, 3.480000e+04, 3.540000e+04, 3.600000e+04,
 Setting up GPU
 
 Model setup complete
 #################################
 Initialising model main loop
 Create netCDF output file...
-Warning! Output file name already exist   
-New file name: Results_tuto_basicRun_2.nc
-		Completed
+Warning! Output file name already exist
+                Completed
 Model Running...
-Output to map. Totaltime = 7200.000000 s; Mean dt = 2.230207e-01 s
-
-```
-In the model output, each resolution is store independently. 
-When open with pyncview, we can visualise each layer. QGIS can merge all these layer togather or a postratement steps will be needed.
-
-![output_v3](../figure/outputs_v3.png)
-
-
-## How to incorporate more complex inputs
-Some more complex inputs can be used in this type of realistic model:
-
-### Date as time reference
-Up to here, the time was define as a duration in second from an arbitrary reference (begining of the simulation for example). All the inputs and the BG_param.txt file used this definition. Due to this convention, most of the inputs had to be modified to change date to duration in seconds, and the resluts are also in second (which can be confusing).
-The solver can use dates in the inputs (same time zone for all dates) and in the BG_param.txt, as:
-
-``` txt
-reftime = 2018-02-16T01:00:00
-
-starttime = 2018-02-16T02:00:00
-
-outputtimestep = 3600.000000
-
-endtime = 2018-02-18T17:00:00
-```
-
-where:
-
-- `reftime` is the reference time for the simulation
-- time convention is : $yyyy-mm-dd\textbf{T}hh:mm:ss$
-
-### Map boundary conditions
-To improve the boundary forcing, there is possibility to use a netcdf file associated to contours to define the boundary based on a time evolving 2D surface. It can be use to impose water elevation to impose tide or any open-water forcing for example, specially in a nested configuration.
-
-``` txt
-bndseg = tidebndpoly.bnd,tidebnd.nc,3;
-
-bndtaper = 7200.000000
-```
-where:
--  `tidebnb.nc` is a 2D time varying map of water surface elevation.
-- `3` is the type of boundary (absorbing boundary).
-- `tidebndpoly.bnd` is a polygon where the boundary is applied
-- `bndtaper` is the duration of the relaxation of the boundary ($s$)
-
-As mention earlier, the computationnal domain can be define (or more specifically reduce from default DEM based domain) using an "aoi" (area of interest) which consist in a looped list of points.
-The boundary by default along it is a wall but can be modified by the following parameter `aoibnd`:
-
-``` txt
-aoi = aoi_BGFLOOD.txt
-
-aoibnd = 3;
-```
-
-
-### Multi DEM/roughness inputs
-The code support different inputs of DEMs or roughness maps. It will use the first DEM to define the computational extend by default. Then, for each grid point, it will use the last DEM provided where a valide value is defined at this location.
-One can for example provide a low resolution DEM of all the domain then add a high resolution of a given urban area if higher resolution will be sought after there. Similar set-up is also allowed for roughness maps.
-``` txt
-# DEM for the full domain, 8m resolution
-topofile = geofabric_8m_rupp_and_smart.nc?z;
-
-# DEM for the urban center, 2m resolution
-topofile = geofabric_2m_town.nc?z;
-```
-
-### Multi river injection
-Any number of river injection can be added (tested up to a thousand).
-Just repeat the river injection line as many times as needed.
-
-
-### Full BG_param.txt file
-
-``` txt
-##########
-# DEM    #
-##########
-
-# DEM for the full domain, 8m resolution
-topofile = geofabric_8m_rupp_and_smart.nc?z;
-
-# DEM for the urban center, 2m resolution
-topofile = geofabric_2m_town.nc?z;
-
-
-xmin = 1465335.000000
-xmax = 1497847.000000
-ymin = 5351567.000000
-ymax = 5388175.000000
-aoi = aoi_BGFLOOD.txt
-dx = 64.000000
-
-##############
-# Forcing    #
-##############
-
-zsoffset = 0.000000
-zsinit = -1.000000
-frictionmodel = 1
-cfmap = Roughness.nc?zo
-
-rainfile =outputrain_test.nc?depth
-
-##########
-# Rivers #
-##########
-
-
-
-
-###############
-# Adaptation  #
-###############
-
-initlevel = 0
-Adaptation = Targetlevel,refine_mask_town.nc
-minlevel = 0
-maxlevel = 4
-
-################
-# Boundaries   #
-################
-
-aoibnd = 3;
-bndseg = tidebndpoly.bnd,tidebnd.nc,3;
-
-#############
-# Timing    #
-#############
-
-bndtaper = 7200.000000
-
-reftime = 2018-02-16T01:00:00
-
-starttime = 2018-02-16T02:00:00
-
-outputtimestep = 3600.000000
-
-endtime = 2018-02-18T17:00:00
-
-#############
-# Others    #
-#############
-
-gpudevice = 0
-
-vmax = 10.000000
-
-#############
-# Output    #
-#############
-
-smallnc = 0
-
-savebyblk= false
-
-outvars = zs, u, v, h, hmax, zsmax, U, hUmax, Umax;
-
-outfile = Westport_Inundation.nc
 
 ```
 
-!!! note
-    This is a real configuration run that would take about 15h on a A100 GPU. Not to be run on laptop GPU, but can be tested locally with decreased resolution (`dx`)
+And if I'm patient enough (about 3 min on my T1000) the model is finished and I can look at the results.
 
+## Looking at results
 
+For this part I normally use GMT and QGIS to look at the result and make a quick screenshot. There are plenty of other option for reading CCF-compliant NetCDF. pick your favorite.
 
+### Convert the results to plot ready geotiff
 
+You can drage and drop BG_FLood results in your favorite netcdf viewer and visualise the results but for making the results more portable I like to export the results to Geotiff. With GMT it is just one line of code and another line to make the results look better.
 
+First extract the maximum flood depth but ignore any flooding under 10 cm. 
 
+```
+gmt grdmath myBGF_outputfile.nc?hmax_P0[9] DUP 0.1 GT 0 NAN MUL = maxflood.nc
 
+gmt grdconvert maxflood.nc -Gmaxflood.tif=gd:GTIFF
+```
 
+ > **Tip:** With Rain-on-grid there is water everywhere that's why it is important to remove small flood depth from visualisation.
 
-## Ground infiltration losses (Basic ILCL model)
-An Initial Loss, Continuous Loss model has been implemented in the code (see ILCL page). 
-![ILCL_tuto](../figure/Ex_Merge.png)
+### What's with the variable name and `_P0`
 
-
-To use it, provide maps for the two coefficient as follow:
-
-``` txt
-initialloss=InitialLoss.asc;
-continuousloss=ContinuousLoss.asc;
-``` 
-NetCDF files can also be used for these inputs.
-
-
-
-#
+BG_Flood can handle variable grid size. This is tricky can be annoying to handle in Netcdf format. One way is to save the data in a unstructured format but that would not be easy to visualise and manipulate. Instead we save each level of refinement in a separate variable with it's own grid. that way each level of refinement is a raster in itself and can be stacked with other level of refinement allowing the display of the true grid as a stack of regular grids. Clever... but that requires multiple output variable for the same model variable. the simplest way is to extend the model variable name with its level of refinement `_P0` is level 0, `_P1` is level 1, `_N1` is level -1 etc...

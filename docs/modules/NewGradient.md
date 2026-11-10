@@ -3,9 +3,9 @@ Halo and gradient
 Using multi-resolution in BG_Flood, we need to keep track of how blocks with different resolutions talk to each other. This page tries to explain how this is done.
 
 ## Why halo
-In BUQ grid we keep track of a ring of cells (halo) on every edge of the block. These cells store the information corresponding to the neighbor cells on the neighbor block. If the neighbor block is at the same level of refinement, the values in the halo are a simple copy otherwise they are calculated using the operations described below. The point of the halo is that, when doing operations on a block, the model doesn't need to look at other blocks. It also makes it cleaner and avoid repeating the costly calculation needed when two blocks are at a different levels of refinment.
+In BUQ grid we keep track of a ring of cells (halo) on every edge of the block. These cells store the information corresponding to the neighbour cells on the neighbour block. If the neighbour block is at the same level of refinement, the values in the halo are a simple copy otherwise they are calculated using the operations described below. The point of the halo is that, when doing operations on a block, the model doesn't need to look at other blocks. It also makes it cleaner and avoid repeating the costly calculation needed when two blocks are at a different levels of refinement.
 
-The halo cells exist for all variables including gradients so, even when looking at immediate neighbor cells we can make 2nd order calculations. 
+The halo cells exist for all variables including gradients so, even when looking at immediate neighbour cells we can make 2nd order calculations.
 
 Here is a diagram for a block of 16x16 cells:
 
@@ -41,7 +41,7 @@ $$
 ## Filling the Halo: The chicken and the egg.
 When doing a prolongation operation one needs the gradient of the variable but to calculate gradient the halo needs to be filled. This is a chicken and egg situation.
 
-The naive way of doing this is to first do restiction, calculate a gradient (everywhere), then doing the prolongation and then recalculating the gradient (everywhere) to fix the gradient in the cell neighboring prologation cells. This is inefficient!
+The naive way of doing this is to first do restriction, calculate a gradient (everywhere), then doing the prolongation and then recalculating the gradient (everywhere) to fix the gradient in the cell neighbouring prolongation cells. This is inefficient!
 
 Instead we first fill the halo for straight copy cells and restriction cells. Then calculate gradient (everywhere) and then do the prolongation where needed and then recalculating the gradient on cells near halo only.
 
