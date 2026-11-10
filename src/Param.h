@@ -41,6 +41,9 @@ public:
 	int doubleprecision = 0; // 0: float precision, 1: double precision (for the solver and math)
 	bool savebyblk = true;
 	bool asyncsave = true; // GPU runs only: write map outputs to disk in a background CPU thread so the model can carry on (false: blocking write)
+	// Pending background map output write (see Save2NetcdfAsync / WaitForMapSave)
+	// This is a shared pointer so that all the copies of XParam refer to the same pending write
+	std::shared_ptr<std::future<void>> mapsave = std::make_shared<std::future<void>>();
 
 	int engine = 1; // 1: Buttinger-Kreuzhuber et al. 2019, 2: Kurganov (Popinet 2011), 3: KurganovATMP same as Kurganov but with atmospheric forcing terms 
 

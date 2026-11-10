@@ -26,6 +26,9 @@
 #include <sstream>
 #include <limits> 
 #include <thread>
+#include <future>
+#include <memory>
+#include <stdexcept>
 
 // End of global definition
 #endif

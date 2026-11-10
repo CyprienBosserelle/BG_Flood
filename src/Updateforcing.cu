@@ -104,7 +104,7 @@ void Forcingthisstep(Param XParam, double totaltime, DynForcingP<float> &XDynFor
 
 			// The NetCDF library is not thread safe: make sure no map output is
 			// being written in the background before reading the forcing file
-			WaitForMapSave();
+			WaitForMapSave(XParam);
 			readvardata(XDynForcing.inputfile, XDynForcing.varname, readfirststep + 1, XDynForcing.after, XDynForcing.flipxx, XDynForcing.flipyy);
 			if (XParam.GPUDEVICE >= 0)
 			{

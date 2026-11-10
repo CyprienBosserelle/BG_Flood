@@ -98,14 +98,25 @@ int main(int argc, char* argv[])
 	Model<float> XModel_f; // For CPU float pointers
 	Model<float> XModel_gf; // For GPU float pointers
 
-	if (XParam.doubleprecision < 1)
+	try
 	{
-		// Call the Float precision run
-		mainwork(XParam, XForcing, XModel_f, XModel_gf);
+		if (XParam.doubleprecision < 1)
+		{
+			// Call the Float precision run
+			mainwork(XParam, XForcing, XModel_f, XModel_gf);
+		}
+		else
+		{
+			mainwork(XParam, XForcing, XModel_d, XModel_gd);
+		}
 	}
-	else
+	catch (const std::exception& e)
 	{
-		mainwork(XParam, XForcing, XModel_d, XModel_gd);
+		// e.g. NetCDF errors (see handle_ncerror), including those raised
+		// while writing map outputs in the background thread
+		fprintf(stderr, "%s\n", e.what());
+		log(e.what());
+		return 2;
 	}
 
 }

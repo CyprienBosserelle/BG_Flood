@@ -86,7 +86,7 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 	}
 	
 	// Make sure the last map output is fully written to disk
-	WaitForMapSave();
+	WaitForMapSave(XParam);
 
 }
 template void MainLoop<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel, Model<float>& XModel_g);
@@ -185,7 +185,7 @@ template <class T> void DebugLoop(Param& XParam, Forcing<float> XForcing, Model<
 	}
 
 	// Make sure the last map output is fully written to disk
-	WaitForMapSave();
+	WaitForMapSave(XParam);
 
 
 
@@ -330,7 +330,7 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop, Model<T>& XModel
 			// The previous map output may still be being written to disk by the
 			// background thread from the host buffers: wait for it to complete
 			// before overwriting the host buffers with the new GPU data.
-			WaitForMapSave();
+			WaitForMapSave(XParam);
 			for (int ivar = 0; ivar < XParam.outvars.size(); ivar++)
 			{
 				CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
@@ -679,7 +679,7 @@ template <class T> void CrashDetection(Param& XParam, Loop<T> XLoop, Model<T> XM
 
 		// Wait for any pending background map output: the host buffers are about to be
 		// overwritten and the NetCDF library is not thread safe
-		WaitForMapSave();
+		WaitForMapSave(XParam);
 
 		std::vector<std::string> outvi = { "zb","h","zs","u","v","ho","vo","uo","zso" };
 		std::vector<std::string> outvold = XParam.outvars;
