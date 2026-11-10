@@ -335,9 +335,16 @@ template <class T> void mapoutput(Param XParam, Loop<T> &XLoop, Model<T>& XModel
 			{
 				CUDA_CHECK(cudaMemcpy(XModel.OutputVarMap[XParam.outvars[ivar]], XModel_g.OutputVarMap[XParam.outvars[ivar]], XParam.nblkmem * XParam.blksize * sizeof(T), cudaMemcpyDeviceToHost));
 			}
-			// Write to disk in a background CPU thread, the model can carry on
-			// computing on the GPU in the meantime.
-			Save2NetcdfAsync(XParam, XLoop, XModel);
+			if (XParam.asyncsave)
+			{
+				// Write to disk in a background CPU thread, the model can carry on
+				// computing on the GPU in the meantime.
+				Save2NetcdfAsync(XParam, XLoop, XModel);
+			}
+			else
+			{
+				Save2Netcdf(XParam, XLoop, XModel);
+			}
 		}
 		else
 		{

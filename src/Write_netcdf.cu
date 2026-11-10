@@ -1,14 +1,27 @@
 #include "Write_netcdf.h"
+#include <stdexcept>
 #include "Util_CPU.h"
 #include "General.h"
 
 /**
  * @brief Handle NetCDF errors.
  */
+// True only in the background thread writing map outputs (see Save2NetcdfAsync)
+static thread_local bool InMapSaveThread = false;
+
 void handle_ncerror(int status) {
 
 
 	if (status != NC_NOERR) {
+		if (InMapSaveThread)
+		{
+			// Never call exit() from the background writer thread: exit() would tear down
+			// the process (CUDA runtime, static objects) while the main thread is still
+			// running, which can deadlock. Instead unwind back to the thread entry point,
+			// the error is reported and the program exits from the main thread
+			// in WaitForMapSave().
+			throw std::runtime_error(nc_strerror(status));
+		}
 		fprintf(stderr, "Netcdf %s\n", nc_strerror(status));
 		std::ostringstream stringStream;
 		stringStream << nc_strerror(status);
@@ -1833,9 +1846,62 @@ static std::thread MapSaveThread;
  *  - any other NetCDF library call on the main thread (the NetCDF library is not thread safe);
  *  - the end of the simulation / program.
  */
+// Error message from the background writer (empty if no error)
+// Only read by the main thread after the writer thread was joined
+static std::string MapSaveError;
+
 void WaitForMapSave()
 {
+	if (InMapSaveThread)
+	{
+		// Should never happen, but a thread cannot join itself
+		return;
+	}
 	if (MapSaveThread.joinable())
+	{
+		MapSaveThread.join();
+	}
+	if (!MapSaveError.empty())
+	{
+		std::string err = MapSaveError;
+		MapSaveError.clear();
+		fprintf(stderr, "Netcdf %s\n", err.c_str());
+		log("Netcdf error (while writing map output):" + err);
+		exit(2);
+	}
+}
+
+/**
+ * @brief Entry point of the background writer thread.
+ * Writes the job and catches any error so the thread never terminates the program itself.
+ */
+template <class T> void MapSaveThreadMain(MapSaveJob<T> job)
+{
+	InMapSaveThread = true;
+	try
+	{
+		WriteMapSaveJob(job);
+	}
+	catch (const std::exception& e)
+	{
+		MapSaveError = e.what();
+		if (MapSaveError.empty())
+		{
+			MapSaveError = "unknown error";
+		}
+	}
+	catch (...)
+	{
+		MapSaveError = "unknown error";
+	}
+}
+
+// Make sure a pending write is completed if the program calls exit() from the main
+// thread while a map output is still being written (e.g. after a CUDA error)
+// otherwise the destructor of the still running std::thread would abort the program.
+static void WaitForMapSaveAtExit()
+{
+	if (MapSaveThread.joinable() && !InMapSaveThread)
 	{
 		MapSaveThread.join();
 	}
@@ -1856,7 +1922,13 @@ template <class T> void Save2NetcdfAsync(Param XParam, Loop<T> XLoop, Model<T>& 
 	MapSaveJob<T> job = PrepSave2Netcdf(XParam, XLoop, XModel);
 	if (!job.zones.empty())
 	{
-		MapSaveThread = std::thread(WriteMapSaveJob<T>, job);
+		static bool atexitregistered = false;
+		if (!atexitregistered)
+		{
+			atexit(WaitForMapSaveAtExit);
+			atexitregistered = true;
+		}
+		MapSaveThread = std::thread(MapSaveThreadMain<T>, job);
 	}
 }
 template void Save2NetcdfAsync<float>(Param XParam, Loop<float> XLoop, Model<float>& XModel);

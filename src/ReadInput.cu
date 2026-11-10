@@ -871,6 +871,13 @@ Param readparamstr(std::string line, Param param)
 		param.savebyblk = readparambool(parametervalue, param.savebyblk);
 	}
 
+	paramvec = { "asyncsave", "asyncwrite", "asyncoutput" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.asyncsave = readparambool(parametervalue, param.asyncsave);
+	}
+
 	return param;
 }
 
