@@ -477,14 +477,16 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare, int eng
 	//double ZsVerification[8] = { 0.100000008904, 0.187920326216, 0.152329657390, 0.117710230042, 0.0828616638138, 0.0483274739972, 0.0321501737555, 0.0307609731288 };
 	//double ZsVerification[8] = { 0.100000008904, 0.187920326216, 0.152329657390, 0.117710230042, 0.0828616638138, 0.0483274739972, 0.0321501737555, 0.0307609731288 };
 	double ZsVerifML[8] = { 0.100000000067, 0.100000115531, 0.100133955622, 0.191131915213, 0.134547876957, 0.0854242010962, 0.066553872453, 0.0638724233535 };
+
 	double ZsVerifButtinger[8] = { 0.100000000023, 0.100000063119, 0.100093580546, 0.195088199869, 0.136767978925, 0.0850706353898, 0.0663028448129, 0.063727949607 };
+	double ZsVerifBeng4[8] = { 0.100000000023, 0.100000063119, 0.100096098348, 0.195187821420, 0.1369165254250, 0.0850907990598, 0.0663374600829, 0.063780586457 };
 
 
 	double ZsVerif[8];
 
 	XParam.engine = engine;
 
-	if (XParam.engine >= 3 && XParam.engine <= 4)
+	if (XParam.engine == 3 )
 	{
 		XParam.engine = 2;
 	}
@@ -498,6 +500,12 @@ template <class T> bool GaussianHumptest(T zsnit, int gpu, bool compare, int eng
 	{
 		for (int i = 0; i < 8; i++) {
 			ZsVerif[i] = ZsVerifButtinger[i];
+		}
+	}
+	if (XParam.engine == 4)
+	{
+		for (int i = 0; i < 8; i++) {
+			ZsVerif[i] = ZsVerifBeng4[i];
 		}
 	}
 	else if (XParam.engine == 2)

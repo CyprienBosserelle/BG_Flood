@@ -164,7 +164,7 @@ template <class T> void gradientGPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 				conserveElevationGradHaloGPU(XParam, XBlock, XEv.h, XEv.zs, zb, XGrad.dhdx, XGrad.dzsdx, XGrad.dhdy, XGrad.dzsdy);
 			}
 		}
-		if (XParam.engine == 1)
+		if ( (XParam.engine == 1) || (XParam.engine == 4) )
 		{
 			//  wet slope limiter
 			WetsloperesetXGPU <<< gridDim, blockDim, 0 >>> (XParam, XBlock, XEv, XGrad, zb);
@@ -373,7 +373,7 @@ template <class T> void gradientGPUnew(Param XParam, BlockP<T>XBlock, EvolvingP<
 			conserveElevationGradHaloGPU(XParam, XBlock, XEv.h, XEv.zs, zb, XGrad.dhdx, XGrad.dzsdx, XGrad.dhdy, XGrad.dzsdy);
 		}
 	}
-	if (XParam.engine == 1)
+	if ( (XParam.engine == 1) || (XParam.engine == 4) )
 	{
 		//  wet slope limiter
 		WetsloperesetXGPU <<< gridDim, blockDim, 0 >>> (XParam, XBlock, XEv, XGrad, zb);
@@ -1207,7 +1207,7 @@ template <class T> void gradientCPU(Param XParam, BlockP<T>XBlock, EvolvingP<T> 
 
 	}
 	
-	if (XParam.engine == 1)
+	if ( (XParam.engine == 1) || (XParam.engine == 4) )
 	{
 		WetsloperesetCPU(XParam, XBlock, XEv, XGrad, zb);
 

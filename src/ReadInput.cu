@@ -207,6 +207,20 @@ Param readparamstr(std::string line, Param param)
 			}
 
 		}
+		std::vector<std::string> buttingercorrstr = { "bc","buttcorr","buttingercorrected","4" };
+		if (!foo)
+		{
+			for (int ii = 0; ii < buttingercorrstr.size(); ii++)
+			{
+				found = case_insensitive_compare(parametervalue, buttingercorrstr[ii]);// it needs to strictly compare
+				if (found == 0)
+				{
+					param.engine = 4;
+					foo = true;
+				}
+
+			}
+		}
 		if (!foo)
 		{
 			param.engine = std::stoi(parametervalue);
