@@ -13,7 +13,10 @@ No adaptivity is ued as we want to remain at the native resolution and as close 
 We force the left boundary with the provided model input. BG_Flood interpolates linearly to what it needs.We are using a Dirichlet boundary (type = 2) because absorbing boundary are not suitable for tsunami wave forcing.
 
 
-## Comparison 
+## Gauge Comparison 
+
+
+
 All the available engines in BG_Flood perform really well. Note that the second peak for gauge 2 is nicely captured (not all model reproduce this one). Engine 5 produce more oscillations. See in-depth for discussion on that. 
 
 ## Reference
