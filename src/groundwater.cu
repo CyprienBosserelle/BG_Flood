@@ -140,17 +140,17 @@ template <class T> __host__ T CalctimestepGWGPU(Param XParam, Loop<T> XLoop, Blo
 /**
  * @brief Effective hydraulic head (elevation) used to drive Darcy flow.
  *
- * The head is the water-table elevation (aquifer bed + groundwater thickness).
- * Surface water only adds to the head when the soil column is saturated
- * (water table at the topography), i.e. when the pond is hydraulically connected
- * to the aquifer. If there is an unsaturated gap, ponded water does not push on
- * the aquifer and only reaches it through (rate-limited) infiltration.
+ * H = z_aqb + hgw + hsw, i.e. water-table elevation plus ponded surface water.
+ * Using elevations (not thickness) keeps the head on a common datum when the aquifer
+ * bed is not flat.
+ * NOTE: the head must stay continuous across the saturation threshold. Switching the
+ * ponded depth on/off when the column saturates creates a jump of hsw in the head that
+ * acts as a numerical pump (water is pushed into a slightly unsaturated cell, overshoots,
+ * and the excess is removed as seepage), draining the aquifer into the surface water.
  */
 template <class T> __device__ __forceinline__ T GWHead(T hgw, T hsw, T zb, T z_aqb)
 {
-    const T eps = T(1e-4); // tolerance on saturation (seepage caps zs_gw at zb, allow round-off)
-    T zsgw = z_aqb + hgw;
-    return (zsgw >= zb - eps) ? zb + hsw : zsgw;
+    return z_aqb + hgw + hsw;
 }
 
 /**
