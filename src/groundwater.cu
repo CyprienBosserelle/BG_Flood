@@ -255,24 +255,8 @@ template <class T> __global__ void GroundwaterMassBalanceGPU(Param XParam, T dt,
 
     T levdx = calcres(T(XParam.dx), XBlock.level[ib]);
 
-    // Fluxes are stored on the right/top face of each cell, so the left/bottom face flux
-    // comes from the halo. At the domain boundary fillHaloGPU copies the interior value
-    // (Qx[ix=0]) into the halo, which makes the boundary cell a pass-through (constant flux)
-    // instead of no-flux. Right/top get zero flux naturally because the Neumann halo of h
-    // gives a zero head gradient. Enforce no-flux explicitly on left/bottom for consistency.
-    T Qx_l = Qx[idx_l];
-    T Qy_b = Qy[idx_b];
-    if (ix == 0 && XBlock.LeftBot[ib] == ib)
-    {
-        Qx_l = T(0.0);
-    }
-    if (iy == 0 && XBlock.BotLeft[ib] == ib)
-    {
-        Qy_b = T(0.0);
-    }
-
     // net_lateral = -(dQx/dx + dQy/dy)
-    T net_lateral =  -((Qx[idx] - Qx_l) / levdx + (Qy[idx] - Qy_b) / levdx);
+    T net_lateral =  -((Qx[idx] - Qx[idx_l]) / levdx + (Qy[idx] - Qy[idx_b]) / levdx);
 
     T fsfac = T(1.0) / 1000 / 3600;
 
