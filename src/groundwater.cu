@@ -138,6 +138,22 @@ template <class T> __host__ T CalctimestepGWGPU(Param XParam, Loop<T> XLoop, Blo
 
 
 /**
+ * @brief Effective hydraulic head (elevation) used to drive Darcy flow.
+ *
+ * The head is the water-table elevation (aquifer bed + groundwater thickness).
+ * Surface water only adds to the head when the soil column is saturated
+ * (water table at the topography), i.e. when the pond is hydraulically connected
+ * to the aquifer. If there is an unsaturated gap, ponded water does not push on
+ * the aquifer and only reaches it through (rate-limited) infiltration.
+ */
+template <class T> __device__ __forceinline__ T GWHead(T hgw, T hsw, T zb, T z_aqb)
+{
+    const T eps = T(1e-4); // tolerance on saturation (seepage caps zs_gw at zb, allow round-off)
+    T zsgw = z_aqb + hgw;
+    return (zsgw >= zb - eps) ? zb + hsw : zsgw;
+}
+
+/**
  * @brief CUDA kernel to calculate Darcy flux in the x-direction.
  *
  * @tparam T Data type (float or double)
@@ -173,10 +189,10 @@ template <class T> __global__ void DarcyFluxXGPU(Param XParam, BlockP<T> XBlock,
     T thick_R = utils::max(T(0.0), utils::min(hgw[idx_r], bed_R));
     T avg_thick = T(0.5) * (thick_L + thick_R);
 
-    // Qx = -K * avg_thick * ((h_gw[idx+1] + h_sw[idx+1]) - (h_gw[idx] + h_sw[idx])) / dx
+    // Qx = -K * avg_thick * (H[idx+1] - H[idx]) / dx, with H an elevation head (see GWHead)
     T K_avg = T(0.5) * (K_gw[idx] + K_gw[idx_r]);
-    T H_eff_L = hgw[idx] + hsw[idx];
-    T H_eff_R = hgw[idx_r] + hsw[idx_r];
+    T H_eff_L = GWHead(hgw[idx], hsw[idx], zb[idx], z_aqb[idx]);
+    T H_eff_R = GWHead(hgw[idx_r], hsw[idx_r], zb[idx_r], z_aqb[idx_r]);
 
     Qx[idx] = -K_avg * avg_thick * (H_eff_R - H_eff_L) / levdx;
 }
@@ -218,8 +234,8 @@ template <class T> __global__ void DarcyFluxYGPU(Param XParam, BlockP<T> XBlock,
     T avg_thick = T(0.5) * (thick_B + thick_T);
 
     T K_avg = T(0.5) * (K_gw[idx] + K_gw[idx_t]);
-    T H_eff_B = hgw[idx] + hsw[idx]; // Should be calculated with z!
-    T H_eff_T = hgw[idx_t] + hsw[idx_t];
+    T H_eff_B = GWHead(hgw[idx], hsw[idx], zb[idx], z_aqb[idx]);
+    T H_eff_T = GWHead(hgw[idx_t], hsw[idx_t], zb[idx_t], z_aqb[idx_t]);
 
     Qy[idx] = -K_avg * avg_thick * (H_eff_T - H_eff_B) / levdx;
 }
@@ -317,6 +333,8 @@ template <class T> void GroundwaterStepGPU(Param XParam, Loop<T>& XLoop, Model<T
         
         // Fill halo for groundwater head
         fillHaloGPU(XParam, XModel.blocks, XModel.gw.h);
+        // Surface water depth is modified by infiltration/seepage at each substep and now enters the head
+        fillHaloGPU(XParam, XModel.blocks, XModel.evolv.h);
         
         // Calculate Darcy Fluxes
         DarcyFluxXGPU << <gridDim, blockDim, 0 >> > (XParam, XModel.blocks, XModel.gw.h, XModel.evolv.h, XModel.zb, XModel.gw.K, XModel.gw.zb, XModel.gw.Qx);
