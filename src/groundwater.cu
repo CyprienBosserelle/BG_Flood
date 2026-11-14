@@ -256,7 +256,7 @@ template <class T> __global__ void DarcyFluxYGPU(Param XParam, BlockP<T> XBlock,
  * @param Qx Darcy flux array (x-direction)
  * @param Qy Darcy flux array (y-direction)
  */
-template <class T> __global__ void GroundwaterMassBalanceGPU(Param XParam, T dt, BlockP<T> XBlock, T* h_gw,T* zs_gw,T* zb_gw, T* h_sw, T* zs, T* topo, T* fs_gw, T* Sy_gw, T* Qx, T* Qy)
+template <class T> __global__ void GroundwaterMassBalanceGPU(Param XParam, T dt, BlockP<T> XBlock, T* h_gw,T* zs_gw,T* zb_gw, T* h_sw, T* zs, T* topo, T* fs_gw, T* K_gw, T* Sy_gw, T* Qx, T* Qy)
 {
     int halowidth = XParam.halowidth;
     int blkmemwidth = blockDim.x + halowidth * 2;
@@ -276,8 +276,17 @@ template <class T> __global__ void GroundwaterMassBalanceGPU(Param XParam, T dt,
 
     T fsfac = T(1.0) / 1000 / 3600;
 
-    // actual_inf = min(h_sw, fs * dt)
-    T actual_inf = utils::min(h_sw[idx], fs_gw[idx] * fsfac * dt);
+    // Infiltration capacity: fs (mm/h) on wet ground, but under ponded water the exchange with
+    // the aquifer is not allowed to be slower than the aquifer conductivity K (m/s). Otherwise a
+    // low fs acts as a sealed bed and lateral Darcy flow can desaturate the aquifer under the pond/sea.
+    T inf_rate = fs_gw[idx] * fsfac; // m/s
+    if (h_sw[idx] > T(XParam.eps))
+    {
+        inf_rate = utils::max(inf_rate, K_gw[idx]);
+    }
+
+    // actual_inf = min(h_sw, rate * dt)
+    T actual_inf = utils::min(h_sw[idx], inf_rate * dt);
 
     // Update surface water depth
     h_sw[idx] -= actual_inf;
@@ -346,7 +355,7 @@ template <class T> void GroundwaterStepGPU(Param XParam, Loop<T>& XLoop, Model<T
         fillHaloGPU(XParam, XModel.blocks, XModel.gw.Qy);
         
         // Update Mass Balance and Seepage
-        GroundwaterMassBalanceGPU << <gridDim, blockDim, 0 >> > (XParam, dtgw, XModel.blocks, XModel.gw.h, XModel.gw.zs, XModel.gw.zb, XModel.evolv.h, XModel.evolv.zs, XModel.zb, XModel.gw.fs, XModel.gw.Sy, XModel.gw.Qx, XModel.gw.Qy);
+        GroundwaterMassBalanceGPU << <gridDim, blockDim, 0 >> > (XParam, dtgw, XModel.blocks, XModel.gw.h, XModel.gw.zs, XModel.gw.zb, XModel.evolv.h, XModel.evolv.zs, XModel.zb, XModel.gw.fs, XModel.gw.K, XModel.gw.Sy, XModel.gw.Qx, XModel.gw.Qy);
         CUDA_CHECK(cudaDeviceSynchronize());
         
     }
