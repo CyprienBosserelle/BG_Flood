@@ -276,14 +276,14 @@ template <class T> __global__ void GroundwaterMassBalanceGPU(Param XParam, T dt,
 
     T fsfac = T(1.0) / 1000 / 3600;
 
-    // Infiltration capacity: fs (mm/h) on wet ground, but under ponded water the exchange with
-    // the aquifer is not allowed to be slower than the aquifer conductivity K (m/s). Otherwise a
-    // low fs acts as a sealed bed and lateral Darcy flow can desaturate the aquifer under the pond/sea.
-    T inf_rate = fs_gw[idx] * fsfac; // m/s
-    if (h_sw[idx] > T(XParam.eps))
-    {
-        inf_rate = utils::max(inf_rate, K_gw[idx]);
-    }
+    // Infiltration capacity: fs (mm/h) for shallow surface water, transitioning linearly to the
+    // aquifer conductivity K (m/s) for deep ponding. A low fs otherwise acts as a sealed bed under
+    // deep water (e.g. the sea) and lateral Darcy flow can desaturate the aquifer underneath.
+    // h_sw <= 0.05 m : fs ;  h_sw >= 1.0 m : K ;  linear in between.
+    const T h_fs = T(0.05);
+    const T h_K = T(1.0);
+    T w = utils::min(T(1.0), utils::max(T(0.0), (h_sw[idx] - h_fs) / (h_K - h_fs)));
+    T inf_rate = (T(1.0) - w) * fs_gw[idx] * fsfac + w * K_gw[idx]; // m/s
 
     // actual_inf = min(h_sw, rate * dt)
     T actual_inf = utils::min(h_sw[idx], inf_rate * dt);
