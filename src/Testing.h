@@ -44,6 +44,7 @@ template <class T> bool TestMultiBathyRough(int gpu, T ref, int secnario);
 
 template <class T> bool TestCulvert(int gpu, T ref, int scenario);
 template <class T> bool TestFlexibleOutputTimes(int gpu, T ref, int scenario);
+template <class T> bool TestGWmodel(T zs);
 
 bool TestCulvertInletControl(int gpu);
 bool TestCulvertOutletControl(int gpu);
