@@ -296,7 +296,7 @@ template <class T> __host__ void DischargeCulvertCPU(Param XParam, double dt, st
 		{
 			if (XCulvertF.zs1[cc] >= XCulvertF.zs2[cc] && XCulvertF.h1[cc] > 0.0)
 			{
-				CulvertDischarge(XCulverts[cc].shape, T(XCULVERTS[cc].width), T(XCULVERTS[cc].height), T(XCULVERTS[cc].length), T(XCULVERTS[cc].zb1), T(XCULVERTS[cc].zb2), T(XCULVERTS[cc].k_ex), T(XCULVERTS[cc].k_en), T(XCULVERTS[cc].C_d), T(XCULVERTS[cc].n), XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
+				CulvertDischarge(XCulverts[cc].shape, T(XCulverts[cc].width), T(XCulverts[cc].height), T(XCulverts[cc].length), T(XCulverts[cc].zb1), T(XCulverts[cc].zb2), T(XCulverts[cc].k_ex), T(XCulverts[cc].k_en), T(XCulverts[cc].C_d), T(XCulverts[cc].n), XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
 			}
 			else
 			{
