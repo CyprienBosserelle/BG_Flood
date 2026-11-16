@@ -1,36 +1,22 @@
 #include "Culverts.h"
 
 
-template <class T> void AddCulverts(Param XParam, double dt, std::vector<Culvert> XCulverts, Model<T> XModel)
+template <class T> void AddCulverts(Param XParam, double dt, const std::vector<Culvert>& XCulverts, Model<T> XModel)
 {
-	dim3 gridDimCulvert(1, 1, 1);
-	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
-	T Qmax, Vol1, Q;
-	int cc;
-	int i;
-
 	//printf("nblkculvert = %d, XCulverts.size() = %zu\n", XModel.bndblk.nblkculvert, XCulverts.size());
 	// Get the elevation/water column for each culvert edge and put it in the culvert structure (loop on concerned blocks)
 	
+	// GPU: one thread per culvert, all culverts in a single kernel launch.
+	// This reads the water state at both ends and computes the discharge.
+	int nculverts = int(XCulverts.size());
+	dim3 blockDimCulv(32, 1, 1);
+	dim3 gridDimCulv((nculverts + blockDimCulv.x - 1) / blockDimCulv.x, 1, 1);
+	dim3 gridDimCulvPass((XModel.culvertsF.ncpassmax + blockDimCulv.x - 1) / blockDimCulv.x, 1, 1);
+
 	if (XParam.GPUDEVICE >= 0)
 	{
-		for (cc = 0; cc < XCulverts.size(); cc++)
-		{
-		    //GetCulvertElevGPU <<< gridDimCulvert, blockDim, 0 >>> (XParam, cc, XCulverts[cc].block1, XCulverts[cc].ix1, XCulverts[cc].iy1, XCulverts[cc].block2, XCulverts[cc].ix2, XCulverts[cc].iy2, XModel.culvertsF, XModel.bndblk.culvert, XModel.evolv);
-			//CUDA_CHECK(cudaDeviceSynchronize());
-			//XCulvertF.h1[cc] = XEv.h[i];
-			i = memloc(XParam.halowidth, XParam.blkmemwidth, XCulverts[cc].ix1, XCulverts[cc].iy1, XCulverts[cc].block1);
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.h1 + cc, XModel.evolv.h+i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.zs1 + cc, XModel.evolv.zs+i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.u1 + cc, XModel.evolv.u + i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.v1 + cc, XModel.evolv.v + i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
-
-			i = memloc(XParam.halowidth, XParam.blkmemwidth, XCulverts[cc].ix2, XCulverts[cc].iy2, XCulverts[cc].block2);
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.h2 + cc, XModel.evolv.h+i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.zs2 + cc, XModel.evolv.zs+i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.u2 + cc, XModel.evolv.u + i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.v2 + cc, XModel.evolv.v + i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
-		}
+		ManyCulvertsDischargeGPU <<< gridDimCulv, blockDimCulv, 0 >>> (XParam, nculverts, dt, XModel.culvertsF, XModel.evolv);
+		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else
 	{
@@ -39,21 +25,9 @@ template <class T> void AddCulverts(Param XParam, double dt, std::vector<Culvert
 
 	// Calculation of the transfert of water (depending of the type of culvert)(loop on culverts)
 
-	if (XParam.GPUDEVICE >= 0)
+	if (XParam.GPUDEVICE < 0)
 	{
-		
-		for (cc = 0; cc < XCulverts.size(); cc++)
-		{
-			//int cc = 0;
-			DischargeCulvertGPU << < gridDimCulvert, blockDim, 0 >> > (XParam, cc, dt, XModel.culvertsF, XCulverts[cc]);
-			//DischargeCulvertGPU <<< gridDimCulvert, blockDim, 0 >>> (XParam, XCulverts, XModel.culvertsF);
-			CUDA_CHECK(cudaDeviceSynchronize());
-		}
-		
-		
-	}
-	else
-	{
+		// (on the GPU this is done in ManyCulvertsDischargeGPU above)
 		DischargeCulvertCPU(XParam, dt, XCulverts, XModel.culvertsF, XModel.bndblk.nblkculvert, XModel.bndblk.culvert);
 	}
 
@@ -141,32 +115,28 @@ template <class T> void AddCulverts(Param XParam, double dt, std::vector<Culvert
 
 	if (XParam.GPUDEVICE >= 0)
 	{
-		if (XParam.engine == 5)
+		// Culverts are grouped in passes where no two culverts share a cell (see InitCulverts)
+		// so each pass is race free. Passes are launched sequentially (same stream => serialised).
+		for (int ipass = 0; ipass < XModel.culvertsF.ncpass; ipass++)
 		{
-			for (cc = 0; cc < XCulverts.size(); cc++)
+			if (XParam.engine == 5)
 			{
-				InjectCulvertImplicitGPU<< <gridDimCulvert, blockDim, 0 >> > (XParam, T(dt), cc, XCulverts[cc], XModel.culvertsF, XModel.bndblk.culvert, XModel.blocks, XModel.evolv);
-				CUDA_CHECK(cudaDeviceSynchronize()); 
+				InjectManyCulvertsImplicitGPU <<< gridDimCulvPass, blockDimCulv, 0 >>> (XParam, T(dt), ipass, XModel.culvertsF, XModel.evolv);
 			}
-			CUDA_CHECK(cudaDeviceSynchronize());
-		}
-		else
-		{
-			for (cc = 0; cc < XCulverts.size(); cc++)
+			else
 			{
-				InjectCulvertGPU << <gridDimCulvert, blockDim, 0 >> > (XParam, cc, XCulverts[cc], XModel.culvertsF, XModel.bndblk.culvert, XModel.blocks, XModel.adv);
-				CUDA_CHECK(cudaDeviceSynchronize());
+				InjectManyCulvertsGPU <<< gridDimCulvPass, blockDimCulv, 0 >>> (XParam, ipass, XModel.culvertsF, XModel.adv);
 			}
-			CUDA_CHECK(cudaDeviceSynchronize());
 		}
+		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else
 	{
 		InjectCulvertCPU(XParam, XCulverts, XModel.culvertsF, XModel.bndblk.nblkculvert, XModel.bndblk.culvert, XModel.blocks, XModel.adv);
 	}
 }
-template __host__ void AddCulverts<float>(Param XParam, double dt, std::vector<Culvert> XCulverts, Model<float> XModel);
-template __host__ void AddCulverts<double>(Param XParam, double dt, std::vector<Culvert> XCulverts, Model<double> XModel);
+template __host__ void AddCulverts<float>(Param XParam, double dt, const std::vector<Culvert>& XCulverts, Model<float> XModel);
+template __host__ void AddCulverts<double>(Param XParam, double dt, const std::vector<Culvert>& XCulverts, Model<double> XModel);
 
 
 template <class T> __global__ void InjectCulvertGPU(Param XParam, int cc, Culvert XCulvert, CulvertF<T> XCulvertF, int* Culvertblks, BlockP<T> XBlock, AdvanceP<T> XAdv)
@@ -328,16 +298,8 @@ template __host__ void GetCulvertElevCPU<float>(Param XParam, std::vector<Culver
 template __host__ void GetCulvertElevCPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double>& XCulvertF,  int nblkculvert, int* Culvertblks, BlockP<double> XBlock, EvolvingP<double> XEv);
 
 
-template <class T> __global__ void DischargeCulvertGPU(Param XParam, int cc, double dt, CulvertF<T> XCulvertF, Culvert XCulvert)
+template <class T> __device__ void DischargeCulvertDev(Param XParam, int cc, double dt, CulvertF<T> XCulvertF, const Culvert & XCulvert)
 {
-	int ix = threadIdx.x;
-	int iy = threadIdx.y;
-	//int cci = blockIdx.x;
-	//int cc = 0;
-	//unsigned int ib = Culvertblks[ibl];
-
-	//for (int cc = 0; cc < XCulverts.size(); cc++)
-	if(ix==0 && iy==0)
 	{
 	//printf("DischargeCulvertGPU:");
 	//printf("DischargeCulvertGPU: cc=%i, type=%i, Qmax=%f, dx1=%f, h1=%f\n", cci, XCulvertF.type[cci], XCulvertF.Qmax[cci], XCulvertF.dx1[cci], XCulvertF.h1[cci]);
@@ -392,8 +354,108 @@ template <class T> __global__ void DischargeCulvertGPU(Param XParam, int cc, dou
 	}
 }
 
+template <class T> __global__ void DischargeCulvertGPU(Param XParam, int cc, double dt, CulvertF<T> XCulvertF, Culvert XCulvert)
+{
+	int ix = threadIdx.x;
+	int iy = threadIdx.y;
+
+	if (ix == 0 && iy == 0)
+	{
+		DischargeCulvertDev(XParam, cc, dt, XCulvertF, XCulvert);
+	}
+}
+
 template __global__ void DischargeCulvertGPU<float>(Param XParam, int cc, double dt, CulvertF<float>  XCulvertF, Culvert XCulvert);
 template __global__ void DischargeCulvertGPU<double>(Param XParam, int cc, double dt, CulvertF<double>  XCulvertF, Culvert XCulvert);
+
+
+/**
+ * @brief Read the water state at both ends of every culvert and compute the culvert discharge.
+ * One thread per culvert: all culverts are processed in a single kernel launch.
+ * This is race free since each thread only reads the evolving variables and writes to its own culvert entry.
+ */
+template <class T> __global__ void ManyCulvertsDischargeGPU(Param XParam, int nculverts, double dt, CulvertF<T> XCulvertF, EvolvingP<T> XEv)
+{
+	int cc = blockIdx.x * blockDim.x + threadIdx.x;
+	if (cc >= nculverts)
+	{
+		return;
+	}
+
+	const Culvert& XCulvert = XCulvertF.culv[cc];
+
+	int i1 = memloc(XParam.halowidth, XParam.blkmemwidth, XCulvert.ix1, XCulvert.iy1, XCulvert.block1);
+	int i2 = memloc(XParam.halowidth, XParam.blkmemwidth, XCulvert.ix2, XCulvert.iy2, XCulvert.block2);
+
+	XCulvertF.h1[cc] = XEv.h[i1];
+	XCulvertF.zs1[cc] = XEv.zs[i1];
+	XCulvertF.u1[cc] = XEv.u[i1];
+	XCulvertF.v1[cc] = XEv.v[i1];
+
+	XCulvertF.h2[cc] = XEv.h[i2];
+	XCulvertF.zs2[cc] = XEv.zs[i2];
+	XCulvertF.u2[cc] = XEv.u[i2];
+	XCulvertF.v2[cc] = XEv.v[i2];
+
+	DischargeCulvertDev(XParam, cc, dt, XCulvertF, XCulvert);
+}
+template __global__ void ManyCulvertsDischargeGPU<float>(Param XParam, int nculverts, double dt, CulvertF<float> XCulvertF, EvolvingP<float> XEv);
+template __global__ void ManyCulvertsDischargeGPU<double>(Param XParam, int nculverts, double dt, CulvertF<double> XCulvertF, EvolvingP<double> XEv);
+
+/**
+ * @brief Inject the discharge of many culverts into dh in a single kernel launch.
+ * One thread per culvert of pass ipass. Culverts in the same pass never share a cell
+ * (see InitCulverts) so there is no race condition. Passes are launched sequentially.
+ */
+template <class T> __global__ void InjectManyCulvertsGPU(Param XParam, int ipass, CulvertF<T> XCulvertF, AdvanceP<T> XAdv)
+{
+	int ic = blockIdx.x * blockDim.x + threadIdx.x;
+	if (ic >= XCulvertF.ncpassmax)
+	{
+		return;
+	}
+
+	int cc = XCulvertF.Xcpass[ic + ipass * XCulvertF.ncpassmax];
+	if (cc < 0)
+	{
+		return;
+	}
+
+	const Culvert& XCulvert = XCulvertF.culv[cc];
+
+	int iinlet = memloc(XParam.halowidth, XParam.blkmemwidth, XCulvert.ix1, XCulvert.iy1, XCulvert.block1);
+	int ioutlet = memloc(XParam.halowidth, XParam.blkmemwidth, XCulvert.ix2, XCulvert.iy2, XCulvert.block2);
+
+	XAdv.dh[iinlet] -= XCulvertF.dq[cc] / (XCulvert.dx1 * XCulvert.dx1);
+	XAdv.dh[ioutlet] += XCulvertF.dq[cc] / (XCulvert.dx2 * XCulvert.dx2);
+}
+template __global__ void InjectManyCulvertsGPU<float>(Param XParam, int ipass, CulvertF<float> XCulvertF, AdvanceP<float> XAdv);
+template __global__ void InjectManyCulvertsGPU<double>(Param XParam, int ipass, CulvertF<double> XCulvertF, AdvanceP<double> XAdv);
+
+template <class T> __global__ void InjectManyCulvertsImplicitGPU(Param XParam, T dt, int ipass, CulvertF<T> XCulvertF, EvolvingP<T> XEv)
+{
+	int ic = blockIdx.x * blockDim.x + threadIdx.x;
+	if (ic >= XCulvertF.ncpassmax)
+	{
+		return;
+	}
+
+	int cc = XCulvertF.Xcpass[ic + ipass * XCulvertF.ncpassmax];
+	if (cc < 0)
+	{
+		return;
+	}
+
+	const Culvert& XCulvert = XCulvertF.culv[cc];
+
+	int iinlet = memloc(XParam.halowidth, XParam.blkmemwidth, XCulvert.ix1, XCulvert.iy1, XCulvert.block1);
+	int ioutlet = memloc(XParam.halowidth, XParam.blkmemwidth, XCulvert.ix2, XCulvert.iy2, XCulvert.block2);
+
+	XEv.h[iinlet] -= XCulvertF.dq[cc] * dt / (XCulvert.dx1 * XCulvert.dx1);
+	XEv.h[ioutlet] += XCulvertF.dq[cc] * dt / (XCulvert.dx2 * XCulvert.dx2);
+}
+template __global__ void InjectManyCulvertsImplicitGPU<float>(Param XParam, float dt, int ipass, CulvertF<float> XCulvertF, EvolvingP<float> XEv);
+template __global__ void InjectManyCulvertsImplicitGPU<double>(Param XParam, double dt, int ipass, CulvertF<double> XCulvertF, EvolvingP<double> XEv);
 
 template <class T> __host__ void DischargeCulvertCPU(Param XParam, double dt, std::vector<Culvert> XCulverts, CulvertF<T>& XCulvertF, int nblkculvert, int* Culvertblks)
 {

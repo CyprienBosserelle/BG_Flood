@@ -18,6 +18,7 @@
 
 #include "InitialConditions.h"
 #include "Input.h"
+#include <set>
 
 /**
  * @brief Initializes model parameters, bathymetry, friction, initial conditions, and output variables.
@@ -691,6 +692,64 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 					XForcing.culverts[cc].C_d = 0.62;
 				}
 			}
+		}
+
+		// Setup the flattened culvert info so all culverts can be processed in a single kernel launch.
+		// Injection of the culvert discharge (dh or h update) could cause a race condition if two culverts
+		// share a cell (inlet or outlet). Culverts are therefore grouped in "passes" where no cell is
+		// shared between culverts of the same pass. Each pass is launched sequentially (similar to rivers).
+		{
+			int nculv = int(XForcing.culverts.size());
+			std::vector<std::vector<int>> passculv; // culvert ids in each pass
+			std::vector<std::set<int>> passcells; // cells already used in each pass
+
+			for (int cc = 0; cc < nculv; cc++)
+			{
+				int i1 = memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1);
+				int i2 = memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2);
+
+				size_t ip = 0;
+				for (ip = 0; ip < passcells.size(); ip++)
+				{
+					if (passcells[ip].count(i1) == 0 && passcells[ip].count(i2) == 0)
+					{
+						break;
+					}
+				}
+				if (ip == passcells.size())
+				{
+					passcells.push_back(std::set<int>());
+					passculv.push_back(std::vector<int>());
+				}
+				passcells[ip].insert(i1);
+				passcells[ip].insert(i2);
+				passculv[ip].push_back(cc);
+			}
+
+			int ncpass = int(passculv.size());
+			int ncpassmax = 0;
+			for (int ip = 0; ip < ncpass; ip++)
+			{
+				ncpassmax = max(ncpassmax, int(passculv[ip].size()));
+			}
+
+			XModel.culvertsF.ncpass = ncpass;
+			XModel.culvertsF.ncpassmax = ncpassmax;
+
+			AllocateCPU(ncpass, ncpassmax, XModel.culvertsF.Xcpass);
+			FillCPU(ncpass, ncpassmax, -1, XModel.culvertsF.Xcpass);
+			for (int ip = 0; ip < ncpass; ip++)
+			{
+				for (int ic = 0; ic < passculv[ip].size(); ic++)
+				{
+					XModel.culvertsF.Xcpass[ic + ip * ncpassmax] = passculv[ip][ic];
+				}
+			}
+
+			// On the CPU the culvert parameters live in XForcing; a device copy is made in SetupGPU
+			XModel.culvertsF.culv = XForcing.culverts.data();
+
+			log("\t" + std::to_string(nculv) + " culverts processed in " + std::to_string(ncpass) + " injection pass(es)");
 		}
 
 		//Now identify sort and unique blocks where culverts are being inserted

@@ -309,6 +309,12 @@ struct CulvertF
 	int* type;
 	double* Qmax;
 	double* dx1;
+
+	// Flattened culvert info so that all culverts can be processed in a single kernel launch
+	Culvert* culv; // array of culvert parameters, size(nculverts) (device copy on GPU model)
+	int ncpass; // number of sequential injection passes needed to avoid race conditions (culverts sharing a cell)
+	int ncpassmax; // max number of culverts in a single pass
+	int* Xcpass; // culvert id for each pass, size(ncpassmax, ncpass), padded with -1
 };
 
 

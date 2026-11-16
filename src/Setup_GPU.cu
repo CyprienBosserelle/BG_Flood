@@ -182,6 +182,17 @@ template <class T> void SetupGPU(Param &XParam, Model<T> XModel,Forcing<float> &
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.Qmax, XModel_g.culvertsF.Qmax);
 			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.dx1);
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.dx1, XModel_g.culvertsF.dx1);
+
+			// Flattened culvert info (all culverts processed in a single kernel launch)
+			int ncpass = XModel.culvertsF.ncpass;
+			int ncpassmax = XModel.culvertsF.ncpassmax;
+			XModel_g.culvertsF.ncpass = ncpass;
+			XModel_g.culvertsF.ncpassmax = ncpassmax;
+			AllocateGPU(ncpass, ncpassmax, XModel_g.culvertsF.Xcpass);
+			CopytoGPU(ncpass, ncpassmax, XModel.culvertsF.Xcpass, XModel_g.culvertsF.Xcpass);
+
+			CUDA_CHECK(cudaMalloc((void**)&XModel_g.culvertsF.culv, XForcing.culverts.size() * sizeof(Culvert)));
+			CUDA_CHECK(cudaMemcpy(XModel_g.culvertsF.culv, XForcing.culverts.data(), XForcing.culverts.size() * sizeof(Culvert), cudaMemcpyHostToDevice));
 		}
 
 	}
