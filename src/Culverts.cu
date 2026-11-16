@@ -1,5 +1,33 @@
 #include "Culverts.h"
 
+// Add near top of file (before kernels)
+__device__ inline float atomicAddCompat(float* address, float val)
+{
+	return atomicAdd(address, val);
+}
+
+__device__ inline double atomicAddCompat(double* address, double val)
+{
+#if __CUDA_ARCH__ >= 600
+	return atomicAdd(address, val);
+#else
+	unsigned long long int* address_as_ull = reinterpret_cast<unsigned long long int*>(address);
+	unsigned long long int old = *address_as_ull, assumed;
+
+	do
+	{
+		assumed = old;
+		old = atomicCAS(
+			address_as_ull,
+			assumed,
+			__double_as_longlong(val + __longlong_as_double(assumed))
+		);
+	} while (assumed != old);
+
+	return __longlong_as_double(old);
+#endif
+}
+
 
 template <class T> void AddCulverts(Param XParam, double dt, std::vector<Culvert> XCulverts, Model<T> XModel)
 {
@@ -883,8 +911,8 @@ template <class T> __global__ void ApplyCulvertsExplicitGPU(int nculverts, Culve
 	if (cc >= nculverts) return;
 
 	const T dq = XCulvertF.dq[cc];
-	atomicAdd(&XAdv.dh[XCulvertF.mem1[cc]], -dq * XCulvertF.invA1[cc]);
-	atomicAdd(&XAdv.dh[XCulvertF.mem2[cc]],  dq * XCulvertF.invA2[cc]);
+	atomicAddCompat(&XAdv.dh[XCulvertF.mem1[cc]], -dq * XCulvertF.invA1[cc]);
+	atomicAddCompat(&XAdv.dh[XCulvertF.mem2[cc]],  dq * XCulvertF.invA2[cc]);
 }
 
 template <class T> __global__ void ApplyCulvertsImplicitGPU(int nculverts, T dt, CulvertF<T> XCulvertF, EvolvingP<T> XEv)
@@ -893,8 +921,8 @@ template <class T> __global__ void ApplyCulvertsImplicitGPU(int nculverts, T dt,
 	if (cc >= nculverts) return;
 
 	const T vol = XCulvertF.dq[cc] * dt;
-	atomicAdd(&XEv.h[XCulvertF.mem1[cc]], -vol * XCulvertF.invA1[cc]);
-	atomicAdd(&XEv.h[XCulvertF.mem2[cc]],  vol * XCulvertF.invA2[cc]);
+	atomicAddCompat(&XEv.h[XCulvertF.mem1[cc]], -vol * XCulvertF.invA1[cc]);
+	atomicAddCompat(&XEv.h[XCulvertF.mem2[cc]],  vol * XCulvertF.invA2[cc]);
 }
 
 template <class T>
