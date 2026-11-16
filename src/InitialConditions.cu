@@ -598,18 +598,23 @@ template <class T> void InitCulverts(Param& XParam, Forcing<float>& XForcing, Mo
 		int removedCulverts = 0;
 
 		log("\tInitializing culverts");
-		//For each culvert
+
+		std::vector<Culvert> validCulverts;
+		validCulverts.reserve(XForcing.culverts.size());
+
+		// Build valid culvert list (no erase inside loop)
 		for (int cc = 0; cc < static_cast<int>(XForcing.culverts.size()); cc++)
 		{
-			// find the cell where the culvert well / source will be applied
-			x1 = (T)XForcing.culverts[cc].x1;
-			x2 = (T)XForcing.culverts[cc].x2;
-			y1 = (T)XForcing.culverts[cc].y1;
-			y2 = (T)XForcing.culverts[cc].y2;
+			Culvert culv = XForcing.culverts[cc];
+
+			x1 = (T)culv.x1;
+			x2 = (T)culv.x2;
+			y1 = (T)culv.y1;
+			y2 = (T)culv.y2;
 
 			// Reset endpoint block indices before searching
-			XForcing.culverts[cc].block1 = -1;
-			XForcing.culverts[cc].block2 = -1;
+			culv.block1 = -1;
+			culv.block2 = -1;
 
 			for (int ibl = 0; ibl < XParam.nblk; ibl++)
 			{
@@ -626,24 +631,23 @@ template <class T> void InitCulverts(Param& XParam, Forcing<float>& XForcing, Mo
 
 				if (x1 > blkxmin && x1 <= blkxmax && y1 > blkymin && y1 <= blkymax)
 				{
-					XForcing.culverts[cc].block1 = ib;
-					XForcing.culverts[cc].ix1 = min(max((int)round((x1 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
-					XForcing.culverts[cc].iy1 = min(max((int)round((y1 - (XParam.yo + XModel.blocks.yo[ib])) / levdx), 0), XParam.blkwidth - 1);
-					XForcing.culverts[cc].dx1 = levdx;
+					culv.block1 = ib;
+					culv.ix1 = min(max((int)round((x1 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					culv.iy1 = min(max((int)round((y1 - (XParam.yo + XModel.blocks.yo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					culv.dx1 = levdx;
 				}
 
 				if (x2 > blkxmin && x2 <= blkxmax && y2 > blkymin && y2 <= blkymax)
 				{
-					XForcing.culverts[cc].block2 = ib;
-					XForcing.culverts[cc].ix2 = min(max((int)round((x2 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
-					XForcing.culverts[cc].iy2 = min(max((int)round((y2 - (XParam.yo + XModel.blocks.yo[ib])) / levdx), 0), XParam.blkwidth - 1);
-					XForcing.culverts[cc].dx2 = levdx;
+					culv.block2 = ib;
+					culv.ix2 = min(max((int)round((x2 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					culv.iy2 = min(max((int)round((y2 - (XParam.yo + XModel.blocks.yo[ib])) / levdx), 0), XParam.blkwidth - 1);
+					culv.dx2 = levdx;
 				}
 			}
 
-			// Reject culverts with an unmatched endpoint
-			const bool missingInlet = XForcing.culverts[cc].block1 < 0;
-			const bool missingOutlet = XForcing.culverts[cc].block2 < 0;
+			const bool missingInlet = culv.block1 < 0;
+			const bool missingOutlet = culv.block2 < 0;
 
 			if (missingInlet || missingOutlet)
 			{
@@ -654,85 +658,97 @@ template <class T> void InitCulverts(Param& XParam, Forcing<float>& XForcing, Mo
 				const std::string message =
 					"WARNING: skipping culvert: " + missing +
 					" outside the active computational mesh. Inlet=(" +
-					std::to_string(XForcing.culverts[cc].x1) + ", " +
-					std::to_string(XForcing.culverts[cc].y1) +
+					std::to_string(culv.x1) + ", " +
+					std::to_string(culv.y1) +
 					"), outlet=(" +
-					std::to_string(XForcing.culverts[cc].x2) + ", " +
-					std::to_string(XForcing.culverts[cc].y2) + ").";
+					std::to_string(culv.x2) + ", " +
+					std::to_string(culv.y2) + ").";
 
 				log(message);
 				std::cerr << message << std::endl;
 
-				XForcing.culverts.erase(XForcing.culverts.begin() + cc);
 				removedCulverts++;
-				--cc;
 				continue;
 			}
 
-			//Calculate the bottom elevation of the culvert
-			if (XForcing.culverts[cc].zb1 < -998.0) // i.e. not set by user so use the ground elevation
+			// Calculate bottom elevations
+			if (culv.zb1 < -998.0)
 			{
-				XForcing.culverts[cc].zb1 = XModel.zb[memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1)];
+				culv.zb1 = XModel.zb[memloc(XParam, culv.ix1, culv.iy1, culv.block1)];
 			}
-			else
+			else if (XModel.zb[memloc(XParam, culv.ix1, culv.iy1, culv.block1)] > culv.zb1)
 			{
-				if (XModel.zb[memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1)] > XForcing.culverts[cc].zb1)
-				{
-					// Make sure ground elevation is at least zb
-					XModel.zb[memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1)] = static_cast<T>(XForcing.culverts[cc].zb1);
-				}
-			}
-			if (XForcing.culverts[cc].zb2 < -998.0) // i.e. not set by user so use the ground elevation
-			{
-				XForcing.culverts[cc].zb2 = XModel.zb[memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2)];
-			}
-			else
-			{
-				if (XModel.zb[memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2)] > XForcing.culverts[cc].zb2)
-				{
-					// Make sure ground elevation is at least zb
-					XModel.zb[memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2)] = static_cast<T>(XForcing.culverts[cc].zb2);
-				}
+				XModel.zb[memloc(XParam, culv.ix1, culv.iy1, culv.block1)] = static_cast<T>(culv.zb1);
 			}
 
-			//Calculate the length of the culvert
-			if (XForcing.culverts[cc].type > 0)
+			if (culv.zb2 < -998.0)
 			{
-				zb1 = XForcing.culverts[cc].zb1;
-				zb2 = XForcing.culverts[cc].zb2;
-				XForcing.culverts[cc].length = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (zb2 - zb1) * (zb2 - zb1));
+				culv.zb2 = XModel.zb[memloc(XParam, culv.ix2, culv.iy2, culv.block2)];
 			}
-			//initialise the height if not set (circulare or square culvert)
-			if (XForcing.culverts[cc].type > 0)
+			else if (XModel.zb[memloc(XParam, culv.ix2, culv.iy2, culv.block2)] > culv.zb2)
 			{
-				if (XForcing.culverts[cc].height == 0.0)
-				{
-					XForcing.culverts[cc].height = XForcing.culverts[cc].width;
-				}
+				XModel.zb[memloc(XParam, culv.ix2, culv.iy2, culv.block2)] = static_cast<T>(culv.zb2);
 			}
-			//Adjust the Discharge coefficient for submerged inlet based on the shape if not user defined
-			if (XForcing.culverts[cc].C_d < -998.0)
+
+			// Length
+			if (culv.type > 0)
 			{
-				if (XForcing.culverts[cc].shape == 1) //circular
-				{
-					XForcing.culverts[cc].C_d = 1.0;
-				}
-				if (XForcing.culverts[cc].shape == 0) //rectangular
-				{
-					XForcing.culverts[cc].C_d = 0.62;
-				}
+				zb1 = culv.zb1;
+				zb2 = culv.zb2;
+				culv.length = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1) + (zb2 - zb1) * (zb2 - zb1));
 			}
+
+			// Height defaults
+			if (culv.type > 0 && culv.height == 0.0)
+			{
+				culv.height = culv.width;
+			}
+
+			// Cd defaults
+			if (culv.C_d < -998.0)
+			{
+				if (culv.shape == 1) culv.C_d = 1.0;  // circular
+				if (culv.shape == 0) culv.C_d = 0.62; // rectangular
+			}
+
+			validCulverts.push_back(culv);
 		}
 
-		// Keep the culvert count synchronized
+		// Commit filtered culverts
+		XForcing.culverts.swap(validCulverts);
+
+		// Keep count synchronized
 		XParam.nculverts = static_cast<int>(XForcing.culverts.size());
+
+		// Build active culvert block list (river-like summary)
+		std::vector<int> activeCulvertBlk;
+		activeCulvertBlk.reserve(static_cast<size_t>(2 * XParam.nculverts));
+		for (int cc = 0; cc < XParam.nculverts; cc++)
+		{
+			activeCulvertBlk.push_back(XForcing.culverts[cc].block1);
+			activeCulvertBlk.push_back(XForcing.culverts[cc].block2);
+		}
+		std::sort(activeCulvertBlk.begin(), activeCulvertBlk.end());
+		activeCulvertBlk.erase(std::unique(activeCulvertBlk.begin(), activeCulvertBlk.end()), activeCulvertBlk.end());
+
+		if (static_cast<int>(activeCulvertBlk.size()) > XModel.bndblk.nblkculvert)
+		{
+			ReallocArray(static_cast<int>(activeCulvertBlk.size()), 1, XModel.bndblk.culvert);
+		}
+		XModel.bndblk.nblkculvert = static_cast<int>(activeCulvertBlk.size());
+
+		for (int b = 0; b < static_cast<int>(activeCulvertBlk.size()); b++)
+		{
+			XModel.bndblk.culvert[b] = activeCulvertBlk[b];
+		}
 
 		log("\tCulverts implemented: " + std::to_string(XParam.nculverts) +
 			"; removed due to endpoint/mesh errors: " + std::to_string(removedCulverts) +
-			"; requested: " + std::to_string(requestedCulverts));
+			"; requested: " + std::to_string(requestedCulverts) +
+			"; active blocks: " + std::to_string(XModel.bndblk.nblkculvert));
 
-		//Initialisation of the culvert states variables (and other needed on the GPUs)
-		for (int cc = 0; cc < static_cast<int>(XForcing.culverts.size()); cc++)
+		// Initialise culvert state variables
+		for (int cc = 0; cc < XParam.nculverts; cc++)
 		{
 			XModel.culvertsF.dq[cc] = 0.0;
 			XModel.culvertsF.h1[cc] = 0.0;
