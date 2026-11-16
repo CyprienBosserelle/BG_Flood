@@ -219,8 +219,9 @@ template <class T> __host__ void InjectCulvertCPU(Param XParam, std::vector<Culv
 
 	for (cc = 0; cc < XCulverts.size(); cc++)
 	{
-		i1 = memloc(XParam, XCulverts[cc].ix1, XCulverts[cc].iy1, XBlock.active[XCulverts[cc].block1]);
-		i2 = memloc(XParam, XCulverts[cc].ix2, XCulverts[cc].iy2, XBlock.active[XCulverts[cc].block2]);
+		// block1/block2 are already block ids (ib), not indices in the active list
+		i1 = memloc(XParam, XCulverts[cc].ix1, XCulverts[cc].iy1, XCulverts[cc].block1);
+		i2 = memloc(XParam, XCulverts[cc].ix2, XCulverts[cc].iy2, XCulverts[cc].block2);
 		//printf("before adding: i1=%i, b1=%i, x1=%i, y1=%i\n", i1, XCulverts[cc].block1, XCulverts[cc].ix1, XCulverts[cc].iy1);
 		//printf("before adding: i2=%i, b2=%i, x2=%i, y2=%i\n", i2, XCulverts[cc].block2, XCulverts[cc].ix2, XCulverts[cc].iy2);
 
@@ -287,10 +288,13 @@ template <class T> __host__ void GetCulvertElevCPU(Param XParam, std::vector<Cul
 
 		XCulvertF.h1[cc] = XEv.h[i1];
 		XCulvertF.zs1[cc] = XEv.zs[i1];
-
+		XCulvertF.u1[cc] = XEv.u[i1];
+		XCulvertF.v1[cc] = XEv.v[i1];
 
 		XCulvertF.h2[cc] = XEv.h[i2];
 		XCulvertF.zs2[cc] = XEv.zs[i2];
+		XCulvertF.u2[cc] = XEv.u[i2];
+		XCulvertF.v2[cc] = XEv.v[i2];
 	}
 
 }

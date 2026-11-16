@@ -158,29 +158,19 @@ template <class T> void SetupGPU(Param &XParam, Model<T> XModel,Forcing<float> &
 			AllocateGPU(XModel.bndblk.nblkculvert, 1, XModel_g.bndblk.culvert);
 			CopytoGPU(XModel.bndblk.nblkculvert, 1, XModel.bndblk.culvert, XModel_g.bndblk.culvert);
 
-			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.dq);
+			// culvertsF state arrays are already allocated in AllocateGPU(..., XModel_g) above, only copy here
+
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.dq, XModel_g.culvertsF.dq);
-			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.zs1);
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.zs1, XModel_g.culvertsF.zs1);
-			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.zs2);
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.zs2, XModel_g.culvertsF.zs2);
-			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.h1);
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.h1, XModel_g.culvertsF.h1);
-			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.h2);
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.h2, XModel_g.culvertsF.h2);
-			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.u1);
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.u1, XModel_g.culvertsF.u1);
-			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.u2);
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.u2, XModel_g.culvertsF.u2);
-			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.v1);
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.v1, XModel_g.culvertsF.v1);
-			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.v2);
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.v2, XModel_g.culvertsF.v2);
-			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.type);
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.type, XModel_g.culvertsF.type);
-			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.Qmax);
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.Qmax, XModel_g.culvertsF.Qmax);
-			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.dx1);
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.dx1, XModel_g.culvertsF.dx1);
 
 			// Flattened culvert info (all culverts processed in a single kernel launch)
