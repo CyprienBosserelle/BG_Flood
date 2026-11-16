@@ -1,4 +1,3 @@
-
 #ifndef INPUT_H
 #define INPUT_H
 
@@ -71,6 +70,12 @@ public:
 	double C_d = -999.0; //Discharge coefficient for the submerged culvert (default of 1.0 for circular, 0.62 for rectangular)
 	double zb1 = -999.0; //Bottom elevation of the inlet / outlet given by the user or zb.
 	double zb2 = -999.0; //Bottom elevation of the inlet / outlet given by the user or zb.
+
+	// Precomputed runtime helpers (phase 2 perf)
+	int mem1 = -1;
+	int mem2 = -1;
+	double invA1 = 0.0;
+	double invA2 = 0.0;
 };
 
 class inputmap {

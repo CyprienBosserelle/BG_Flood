@@ -1,4 +1,3 @@
-
 #ifndef ARRAYS_H
 #define ARRAYS_H
 
@@ -309,6 +308,26 @@ struct CulvertF
 	int* type;
 	double* Qmax;
 	double* dx1;
+
+	// Precomputed runtime helpers (phase 2 perf)
+	int* mem1;
+	int* mem2;
+	T* invA1;
+	T* invA2;
+
+	// stage 3 (batched discharge constants)
+	int* shape;
+	double* width;
+	double* height;
+	double* length;
+	double* zb1;
+	double* zb2;
+	double* k_ex;
+	double* k_en;
+	double* C_d;
+	double* n;
+	double* fac;
+	double* dx2;
 };
 
 

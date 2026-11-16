@@ -1,4 +1,3 @@
-
 #include "MemManagement.h"
 
 
@@ -349,6 +348,22 @@ void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.type);
 		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.Qmax);
 		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.dx1);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.mem1);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.mem2);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.invA1);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.invA2);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.shape);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.width);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.height);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.length);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.zb1);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.zb2);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.k_ex);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.k_en);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.C_d);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.n);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.fac);
+		AllocateCPU(XParam.nculverts, 1, XModel.culvertsF.dx2);
 	}
 	// preallocate 1 block along all bnds
 	//this will be eventually reallocated later
@@ -584,6 +599,25 @@ void ReallocArray(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.v1);
 		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.v2);
 		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.dq);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.type);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.Qmax);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.dx1);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.mem1);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.mem2);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.invA1);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.invA2);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.shape);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.width);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.height);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.length);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.zb1);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.zb2);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.k_ex);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.k_en);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.C_d);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.n);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.fac);
+		ReallocArray(XParam.nculverts, 1, XModel.culvertsF.dx2);
 	}
 
 }
@@ -913,6 +947,22 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.type);
 		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.Qmax);
 		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.dx1);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.mem1);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.mem2);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.invA1);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.invA2);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.shape);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.width);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.height);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.length);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.zb1);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.zb2);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.k_ex);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.k_en);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.C_d);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.n);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.fac);
+		AllocateGPU(XParam.nculverts, 1, XModel.culvertsF.dx2);
 	}
 	
 	/*if (XParam.outvort)
