@@ -11,8 +11,9 @@ connected in a "snake" chain by culverts, plus the matching BG_param.txt.
     (so there are exactly N culverts for N basins and the system keeps running).
   - A river injects a constant discharge into basin 0.
 
-Default: 8 x 8 = 64 basins and 64 culverts. Scale up with --nbx/--nby
-(e.g. --nbx 32 --nby 32 gives 1024 culverts).
+Default: 8 x 8 = 64 basins and 64 culverts. Scale up either with more basins
+(--nbx 32 --nby 32 gives 1024 culverts on a bigger DEM) or with more culverts per
+wall on the same DEM (--per-wall 16 gives 63*16 culverts + 16 return pumps = 1024).
 
 With --share-cells the outlet of culvert k is placed on the same cell as the inlet
 of culvert k+1. That forces the GPU injection to use 2 sequential passes
@@ -38,6 +39,8 @@ def main():
     p.add_argument("--width", type=float, default=0.8, help="culvert width/diameter [m]")
     p.add_argument("--endtime", type=float, default=3600.0, help="simulation end time [s]")
     p.add_argument("--gpu", type=int, default=0, help="GPU device (-1 for CPU)")
+    p.add_argument("--per-wall", type=int, default=1, help="parallel culverts across each wall (and number of return pumps)")
+    p.add_argument("--param", default=None, help="name of the param file (default <prefix>BG_param.txt)")
     p.add_argument("--share-cells", action="store_true", help="outlet of culvert k == inlet of culvert k+1")
     p.add_argument("--prefix", default="", help="prefix for output file names")
     a = p.parse_args()
@@ -74,39 +77,55 @@ def main():
     off = 2  # distance of inlet/outlet cell from the wall [cells]
     mid = L // 2
 
-    def port(r, c, towards):
-        """cell next to the wall of basin (r,c) facing direction 'towards' (dr,dc)"""
+    npw = a.per_wall
+    if npw < 1 or npw > L:
+        raise SystemExit("--per-wall must be between 1 and L")
+    # positions along the wall of the parallel culverts (npw = 1 -> middle of the wall)
+    along = [int((m + 0.5) * L / npw) for m in range(npw)]
+
+    def port(r, c, towards, s):
+        """cell next to the wall of basin (r,c) facing direction 'towards' (dr,dc), at position s along the wall"""
         i0, i1, j0, j1 = basin_box(r, c)
         dr, dc = towards
         if dc == 1:
-            return i1 - 1 - off, j0 + mid
+            return i1 - 1 - off, j0 + s
         if dc == -1:
-            return i0 + off, j0 + mid
+            return i0 + off, j0 + s
         if dr == 1:
-            return i0 + mid, j1 - 1 - off
-        return i0 + mid, j0 + off
+            return i0 + s, j1 - 1 - off
+        return i0 + s, j0 + off
 
-    culverts = []
+    chain = []  # chain[k][m]: m-th parallel culvert from basin k to basin k+1
     for k in range(nb - 1):
         (r1, c1), (r2, c2) = order[k], order[k + 1]
         d = (r2 - r1, c2 - c1)
-        ia, ja = port(r1, c1, d)
-        ib, jb = port(r2, c2, (-d[0], -d[1]))
-        culverts.append((2, cell_xy(ia, ja), cell_xy(ib, jb)))
+        row = []
+        for s in along:
+            ia, ja = port(r1, c1, d, s)
+            ib, jb = port(r2, c2, (-d[0], -d[1]), s)
+            row.append([2, cell_xy(ia, ja), cell_xy(ib, jb)])
+        chain.append(row)
 
     if a.share_cells:
-        # move the outlet of culvert k onto the inlet cell of culvert k+1
+        # move the outlet of culvert (k, m) onto the inlet cell of culvert (k+1, m)
         for k in range(nb - 2):
-            t, p1, _ = culverts[k]
-            culverts[k] = (t, p1, culverts[k + 1][1])
+            for m in range(npw):
+                chain[k][m][2] = chain[k + 1][m][1]
 
-    # closing pump: last basin -> basin 0 (centre of the basins)
+    culverts = [tuple(c) for row in chain for c in row]
+
+    # closing pumps: last basin -> basin 0 (around the centre of the basins)
     (rl, cl), (r0, c0) = order[-1], order[0]
-    i0, _, j0, _ = basin_box(rl, cl)
-    pin = cell_xy(i0 + mid + 5, j0 + mid + 5)
-    i0, _, j0, _ = basin_box(r0, c0)
-    pout = cell_xy(i0 + mid, j0 + mid)
-    culverts.append((0, pin, pout))
+    il0, _, jl0, _ = basin_box(rl, cl)
+    ib0, _, jb0, _ = basin_box(r0, c0)
+    if npw == 1:
+        pumps = [((mid + 5, mid + 5), (mid, mid))]
+    else:
+        ng = int(np.ceil(np.sqrt(npw)))
+        grid = [(mid + 3 * (gi - ng // 2), mid + 3 * (gj - ng // 2)) for gj in range(ng) for gi in range(ng)][:npw]
+        pumps = [(g, g) for g in grid]
+    for (pi, pj), (qi, qj) in pumps:
+        culverts.append((0, cell_xy(il0 + pi, jl0 + pj), cell_xy(ib0 + qi, jb0 + qj)))
 
     # river area in basin 0 (5 x 5 m patch away from the culvert ports)
     i0, _, j0, _ = basin_box(r0, c0)
@@ -116,7 +135,7 @@ def main():
     pre = a.prefix
     bathyfile = f"{pre}basins.nc"
     riverfile = f"{pre}river_inflow.txt"
-    paramfile = f"{pre}BG_param.txt"
+    paramfile = a.param if a.param else f"{pre}BG_param.txt"
 
     with Dataset(bathyfile, "w") as nc:
         nc.createDimension("x", nx)
@@ -135,7 +154,7 @@ def main():
         f.write(f"0.0 {a.Q}\n{10 * a.endtime + 1e6:.1f} {a.Q}\n")
 
     with open(paramfile, "w") as f:
-        f.write(f"# Culvert benchmark: {nbx}x{nby} = {nb} basins, {len(culverts)} culverts"
+        f.write(f"# Culvert benchmark: {nbx}x{nby} = {nb} basins, {len(culverts)} culverts ({npw} per wall)"
                 f"{' (shared cells -> 2 injection passes)' if a.share_cells else ''}\n")
         f.write(f"# Generated by make_basins.py; domain {nx} x {ny} cells at dx = {dx} m\n\n")
         f.write(f"bathy = {bathyfile}?z;\n")
@@ -151,7 +170,7 @@ def main():
         f.write(f"river = {riverfile},{rx0},{rx1},{ry0},{ry1};\n\n")
         f.write("# culvert = type,x1,y1,x2,y2,width|Qmax\n")
         for t, (x1, y1), (x2, y2) in culverts:
-            w = a.Q if t == 0 else a.width
+            w = a.Q / npw if t == 0 else a.width
             f.write(f"culvert = {t},{x1:.2f},{y1:.2f},{x2:.2f},{y2:.2f},{w};\n")
 
     print(f"{bathyfile}: {nx} x {ny} cells, {nb} basins")

@@ -5,6 +5,7 @@ Synthetic test: 8 x 8 = 64 basins (40 m square, 4 m walls, 1 m grid, 356 x 356 c
 Files:
 - `basins.nc`: topography (`z`, with `x`/`y` at cell centres)
 - `BG_param.txt`: matching parameter file (64 `culvert =` lines, 1 river)
+- `BG_param_1024.txt`: same DEM and river with 1024 culverts. There are 16 parallel culverts across each of the 63 walls (1008) and 16 return pumps (each with Qmax = Q/16). All 2048 culvert ends are on distinct cells, so the GPU injection runs in 1 pass.
 - `river_inflow.txt`: constant inflow
 - `make_basins.py`: generator (needs numpy and netCDF4)
 
@@ -12,14 +13,15 @@ Files:
 
 ```bash
 python make_basins.py                       # default 8x8 = 64 culverts
-python make_basins.py --nbx 32 --nby 32     # 1024 culverts (1412 x 1412 cells)
+python make_basins.py --per-wall 16 --param BG_param_1024.txt   # 1024 culverts on the same DEM
+python make_basins.py --nbx 32 --nby 32     # 1024 culverts on a bigger DEM (1412 x 1412 cells)
 python make_basins.py --share-cells         # outlet of culvert k = inlet of culvert k+1 -> 2 GPU injection passes
 python make_basins.py --prefix big_ --nbx 16 --nby 16   # write files with a prefix
 ```
 
 ## Timing old vs new
 
-Run the same `BG_param.txt` with a build of each commit and compare `Model runtime` in `BG_log.txt`:
+Comparing `BG_param.txt` and `BG_param_1024.txt` on the same build shows how the cost scales with the number of culverts, with the grid held fixed. Run each param file with a build of each commit and compare `Model runtime` in `BG_log.txt`:
 
 - old (one kernel launch per culvert): `e513787`
 - new (batched culverts): `FasterCulverts` HEAD
