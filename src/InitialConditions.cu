@@ -763,6 +763,14 @@ template <class T> void InitCulverts(Param& XParam, Forcing<float>& XForcing, Mo
 			XModel.culvertsF.Qmax[cc] = XForcing.culverts[cc].Qmax;
 			XModel.culvertsF.dx1[cc] = XForcing.culverts[cc].dx1;
 		}
+
+		for (int cc = 0; cc < XParam.nculverts; cc++)
+		{
+			XModel.culvertsF.mem1[cc] = memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1);
+			XModel.culvertsF.mem2[cc] = memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2);
+			XModel.culvertsF.invA1[cc] = T(1.0 / (XForcing.culverts[cc].dx1 * XForcing.culverts[cc].dx1));
+			XModel.culvertsF.invA2[cc] = T(1.0 / (XForcing.culverts[cc].dx2 * XForcing.culverts[cc].dx2));
+		}
 	}
 }
 

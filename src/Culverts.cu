@@ -5,160 +5,61 @@ template <class T> void AddCulverts(Param XParam, double dt, std::vector<Culvert
 {
 	dim3 gridDimCulvert(1, 1, 1);
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
-	T Qmax, Vol1, Q;
 	int cc;
 	int i;
 
-	//printf("nblkculvert = %d, XCulverts.size() = %zu\n", XModel.bndblk.nblkculvert, XCulverts.size());
-	// Get the elevation/water column for each culvert edge and put it in the culvert structure (loop on concerned blocks)
-	
+	const int nculverts = static_cast<int>(XCulverts.size());
+	if (nculverts == 0)
+	{
+		return;
+	}
+
+	//=====================================
+	// 1) Gather culvert endpoint states
 	if (XParam.GPUDEVICE >= 0)
 	{
-		for (cc = 0; cc < XCulverts.size(); cc++)
-		{
-		    //GetCulvertElevGPU <<< gridDimCulvert, blockDim, 0 >>> (XParam, cc, XCulverts[cc].block1, XCulverts[cc].ix1, XCulverts[cc].iy1, XCulverts[cc].block2, XCulverts[cc].ix2, XCulverts[cc].iy2, XModel.culvertsF, XModel.bndblk.culvert, XModel.evolv);
-			//CUDA_CHECK(cudaDeviceSynchronize());
-			//XCulvertF.h1[cc] = XEv.h[i];
-			i = memloc(XParam.halowidth, XParam.blkmemwidth, XCulverts[cc].ix1, XCulverts[cc].iy1, XCulverts[cc].block1);
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.h1 + cc, XModel.evolv.h+i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.zs1 + cc, XModel.evolv.zs+i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.u1 + cc, XModel.evolv.u + i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.v1 + cc, XModel.evolv.v + i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
+		const int threads = 128;
+		const int blocks = (nculverts + threads - 1) / threads;
 
-			i = memloc(XParam.halowidth, XParam.blkmemwidth, XCulverts[cc].ix2, XCulverts[cc].iy2, XCulverts[cc].block2);
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.h2 + cc, XModel.evolv.h+i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.zs2 + cc, XModel.evolv.zs+i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.u2 + cc, XModel.evolv.u + i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
-			CUDA_CHECK(cudaMemcpy(XModel.culvertsF.v2 + cc, XModel.evolv.v + i, 1 * sizeof(T), cudaMemcpyDeviceToDevice));
-		}
+		GatherCulvertStateGPU<<<blocks, threads>>>(nculverts, XModel.culvertsF, XModel.evolv);
+		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else
 	{
 		GetCulvertElevCPU(XParam, XCulverts, XModel.culvertsF, XModel.bndblk.nblkculvert, XModel.bndblk.culvert, XModel.blocks, XModel.evolv);
 	}
 
-	// Calculation of the transfert of water (depending of the type of culvert)(loop on culverts)
-
+	//=====================================
+	// 2) Discharge computation (keep existing physics)
 	if (XParam.GPUDEVICE >= 0)
 	{
-		
-		for (cc = 0; cc < XCulverts.size(); cc++)
+		for (cc = 0; cc < nculverts; cc++)
 		{
-			//int cc = 0;
-			DischargeCulvertGPU << < gridDimCulvert, blockDim, 0 >> > (XParam, cc, dt, XModel.culvertsF, XCulverts[cc]);
-			//DischargeCulvertGPU <<< gridDimCulvert, blockDim, 0 >>> (XParam, XCulverts, XModel.culvertsF);
-			CUDA_CHECK(cudaDeviceSynchronize());
+			DischargeCulvertGPU<<<1, 1>>>(XParam, cc, dt, XModel.culvertsF, XCulverts[cc]);
 		}
-		
-		
+		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else
 	{
 		DischargeCulvertCPU(XParam, dt, XCulverts, XModel.culvertsF, XModel.bndblk.nblkculvert, XModel.bndblk.culvert);
 	}
 
-	
-//	reducemin3 << <gridDimLine, blockDimLine, smemSize >> > (XTime.dtmax, XTime.arrmin, s);
-
-
-	/*
-	for (cc = 0; cc < XCulverts.size(); cc++)
-	{
-
-
-
-
-		//ib1 = XCulverts[cc].block1;
-		printf("XCulverts size=%f\n", XCulverts.size());
-		printf("XCulverts size dx=%f\n", XCulverts[cc].dx1);
-
-		//printf("XCulvertsF size h1=%i\n", XModel.culvertsF.h1.size());
-
-
-		//Pump system
-		if (XCulverts[cc].type == 0)
-		{
-			DischargeCulvert(XCulverts[cc], XModel.culvertsF.h1[cc], XModel.culvertsF.h2[cc], XModel.culvertsF.zs1[cc], XModel.culvertsF.zs2[cc])
-				 
-			printf("Qmax=%f\n", XCulverts[cc].Qmax);
-			Qmax = XCulverts[cc].Qmax;
-			printf("dx1=%f\n", XCulverts[cc].dx1);
-			printf("h1=%f\n", XModel.culvertsF.h1[cc]);
-			Vol1 = XModel.culvertsF.h1[cc] * XCulverts[cc].dx1 * XCulverts[cc].dx1;
-			Q = T(Vol1 * dt);
-			if (Q > Qmax)
-			{
-				XModel.culvertsF.dq[cc] = Qmax;
-			}
-			else
-			{
-				XModel.culvertsF.dq[cc] = Q;
-			}
-		}
-		printf("H1=%f , H2=%f, DQ=%f \n", XModel.culvertsF.h1[cc], XModel.culvertsF.h2[cc], XModel.culvertsF.dq[cc]);
-		
-		//One way (clapped) culvert
-		if (XCulverts[cc].type == 1)
-		{
-			if (XModel.culvertsF.zs1[cc] >= XModel.culvertsF.zs2[cc] && XModel.culvertsF.h1[cc] > 0.0)
-			{
-				XModel.culvertsF.dq[cc] = 0;
-			}
-			else
-			{
-				XModel.culvertsF.dq[cc] = 0;
-			}
-			
-			
-			
-			Qmax = T(XCulverts[cc].Qmax);
-			Vol1 = XModel.culvertsF.h1[cc] * XCulverts[cc].dx1 * XCulverts[cc].dx1;
-			Q = T(Vol1 * dt);
-			if (Q > Qmax)
-			{
-				XModel.culvertsF.dq[cc] = Qmax;
-			}
-			else
-			{
-				XModel.culvertsF.dq[cc] = Q;
-			}
-		}
-		printf("H1=%f , H2=%f, DQ=%f \n", XModel.culvertsF.h1[cc], XModel.culvertsF.h2[cc], XModel.culvertsF.dq[cc]);
-		//Basic 2way culvert
-		if (XCulverts[cc].type == 2)
-		{
-			//TODO: to be completed
-		}
-
-	}
-	*/
-	/*
-
-	Application of the result to h:
-	(Loop on blocks)
-
-	*/
-
+	//=====================================
+	// 3) Apply discharge to model
 	if (XParam.GPUDEVICE >= 0)
 	{
+		const int threads = 128;
+		const int blocks = (nculverts + threads - 1) / threads;
+
 		if (XParam.engine == 5)
 		{
-			for (cc = 0; cc < XCulverts.size(); cc++)
-			{
-				InjectCulvertImplicitGPU<< <gridDimCulvert, blockDim, 0 >> > (XParam, T(dt), cc, XCulverts[cc], XModel.culvertsF, XModel.bndblk.culvert, XModel.blocks, XModel.evolv);
-				CUDA_CHECK(cudaDeviceSynchronize()); 
-			}
-			CUDA_CHECK(cudaDeviceSynchronize());
+			ApplyCulvertsImplicitGPU<<<blocks, threads>>>(nculverts, T(dt), XModel.culvertsF, XModel.evolv);
 		}
 		else
 		{
-			for (cc = 0; cc < XCulverts.size(); cc++)
-			{
-				InjectCulvertGPU << <gridDimCulvert, blockDim, 0 >> > (XParam, cc, XCulverts[cc], XModel.culvertsF, XModel.bndblk.culvert, XModel.blocks, XModel.adv);
-				CUDA_CHECK(cudaDeviceSynchronize());
-			}
-			CUDA_CHECK(cudaDeviceSynchronize());
+			ApplyCulvertsExplicitGPU<<<blocks, threads>>>(nculverts, XModel.culvertsF, XModel.adv);
 		}
+		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else
 	{
@@ -243,27 +144,14 @@ template __global__ void InjectCulvertImplicitGPU<double>(Param XParam, double d
 
 template <class T> __host__ void InjectCulvertCPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T>& XCulvertF, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, AdvanceP<T> XAdv)
 {
-
-	T delta1, delta2;
-	int cc, i1, i2;
-
-	for (cc = 0; cc < XCulverts.size(); cc++)
+	for (int cc = 0; cc < static_cast<int>(XCulverts.size()); cc++)
 	{
-		i1 = memloc(XParam, XCulverts[cc].ix1, XCulverts[cc].iy1, XBlock.active[XCulverts[cc].block1]);
-		i2 = memloc(XParam, XCulverts[cc].ix2, XCulverts[cc].iy2, XBlock.active[XCulverts[cc].block2]);
-		//printf("before adding: i1=%i, b1=%i, x1=%i, y1=%i\n", i1, XCulverts[cc].block1, XCulverts[cc].ix1, XCulverts[cc].iy1);
-		//printf("before adding: i2=%i, b2=%i, x2=%i, y2=%i\n", i2, XCulverts[cc].block2, XCulverts[cc].ix2, XCulverts[cc].iy2);
+		const int i1 = XCulverts[cc].mem1;
+		const int i2 = XCulverts[cc].mem2;
 
-		delta1 = XCulverts[cc].dx1; // calcres(T(XParam.dx), XBlock.level[XCulverts[cc].block1]);
-		delta2 = XCulverts[cc].dx2; // calcres(T(XParam.dx), XBlock.level[XCulverts[cc].block2]);
-		//printf("before adding: dh1=%f, dh2=%f\n", XAdv.dh[i1], XAdv.dh[i2]);
-
-		XAdv.dh[i1] -= XCulvertF.dq[cc] / (delta1 * delta1);
-		XAdv.dh[i2] += XCulvertF.dq[cc] / (delta2 * delta2);
-		//printf("Vars: dq=%f, delta2=%f, delta2=%f\n", XCulvertF.dq[cc], delta2, delta1);
-		//printf("After adding: dh1=%f, dh2=%f\n", XAdv.dh[i1], XAdv.dh[i2]);
+		XAdv.dh[i1] -= XCulvertF.dq[cc] * T(XCulverts[cc].invA1);
+		XAdv.dh[i2] += XCulvertF.dq[cc] * T(XCulverts[cc].invA2);
 	}
-
 }
 template __host__ void InjectCulvertCPU<float>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<float>& XCulvertF, int nblkculvert, int* Culvertblks, BlockP<float> XBlock, AdvanceP<float> XAdv);
 template __host__ void InjectCulvertCPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double>& XCulvertF, int nblkculvert, int* Culvertblks, BlockP<double> XBlock, AdvanceP<double> XAdv);
@@ -307,22 +195,16 @@ template __global__ void GetCulvertElevGPU<double>(Param XParam, int cc, int b1,
 
 template <class T> __host__ void GetCulvertElevCPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T>& XCulvertF, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, EvolvingP<T> XEv)
 {
-	int cc, i1, i2;
-
-	for (cc = 0; cc < XCulverts.size(); cc++)
+	for (int cc = 0; cc < static_cast<int>(XCulverts.size()); cc++)
 	{
-		//printf("GetCulvertElevCPU: block=%i, ix1=%i, iy1=%i, ix2=%i, iy2=%i\n", XCulverts[cc].block1, XCulverts[cc].ix1, XCulverts[cc].iy1, XCulverts[cc].ix2, XCulverts[cc].iy2);
-		i1 = memloc(XParam, XCulverts[cc].ix1, XCulverts[cc].iy1, XCulverts[cc].block1);
-		i2 = memloc(XParam, XCulverts[cc].ix2, XCulverts[cc].iy2, XCulverts[cc].block2);
+		const int i1 = XCulverts[cc].mem1;
+		const int i2 = XCulverts[cc].mem2;
 
 		XCulvertF.h1[cc] = XEv.h[i1];
 		XCulvertF.zs1[cc] = XEv.zs[i1];
-
-
 		XCulvertF.h2[cc] = XEv.h[i2];
 		XCulvertF.zs2[cc] = XEv.zs[i2];
 	}
-
 }
 template __host__ void GetCulvertElevCPU<float>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<float>& XCulvertF, int nblkculvert, int* Culvertblks, BlockP<float> XBlock, EvolvingP<float> XEv);
 template __host__ void GetCulvertElevCPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double>& XCulvertF,  int nblkculvert, int* Culvertblks, BlockP<double> XBlock, EvolvingP<double> XEv);
@@ -379,7 +261,7 @@ template <class T> __global__ void DischargeCulvertGPU(Param XParam, int cc, dou
 			else if (XCulvertF.zs2[cc] > XCulvertF.zs1[cc] && XCulvertF.h2[cc] > 0.0)
 			{
 				Vol = XCulvertF.h2[cc] * XCulvert.dx2 * XCulvert.dx2;
-				Qmax = T(Vol / XParam.dt);
+			 Qmax = T(Vol / XParam.dt);
 				CulvertDischarge(XCulvert.shape, T(XCulvert.width), T(XCulvert.height), T(XCulvert.length), T(XCulvert.zb2), T(XCulvert.zb1), T(XCulvert.k_ex), T(XCulvert.k_en), T(XCulvert.C_d), T(XCulvert.n), XCulvertF.zs2[cc], XCulvertF.zs1[cc], XCulvertF.u2[cc], XCulvertF.u1[cc], XCulvertF.v2[cc], XCulvertF.v1[cc], Q);
 				Q = -1*min(Qmax, max(Q, T(0.0)));
 			}
@@ -458,7 +340,7 @@ template <class T> __host__ __device__ void CulvertPump(double Qmax, double dx1,
 }
 template __host__ __device__ void CulvertPump<float>(double Qmax, double dx1, float h1, float h2, float zs1, float zs2, float& dq, double dt);
 template __host__ __device__ void CulvertPump<double>(double Qmax, double dx1, double h1, double h2, double zs1, double zs2, double& dq, double dt);
-
+//
 //template <class T> __host__ __device__ void CulvertOneWay(double Qmax, double dx1, T h1, T h2, T zs1, T zs2, T& dq, double dt)
 //{
 //	//One way (clapped) culvert
@@ -506,7 +388,7 @@ template __host__ __device__ void CulvertPump<double>(double Qmax, double dx1, d
 //		else
 //		{
 //			Vol2 = h2 * T(dx2 * dx2);
-//			Q = T(Vol2 * T(dt));
+//		 Q = T(Vol2 * T(dt));
 //			if (Q > Qmax)
 //			{
 //				dq = -Qmax;
@@ -536,7 +418,7 @@ template <class T> __host__ __device__ void CulvertDischarge(int shape, T width,
 	//printf("height = %f\n", height);
 
 	T h_wet;
-	T A_wet = T(0.0), P_wet = T(0.0), R_wet = T(0.0), A = T(0.0), P = T(0.0), R = T(0.0); T(width / 2);
+	T A_wet = T(0.0), P_wet = T(0.0), R_wet = T(0.0), A = T(0.0), P = T(0.0), R = h_culvert / 2;
 	T Q_inlet= T(0.0), Q_outlet= T(0.0), Q_estimated= T(0.0);
 	T S; //slope
 	T H_L; //head loss
@@ -707,8 +589,17 @@ template <class T> __host__ __device__ void OutletControled(T& Q, double k_ex, d
 	if (H_L > 0.0)
 	{
 		//Alice Eq? Something's wrong but maybe because Q should not depend on V22 ?
-		//Q = A_wet * sqrt(H_L + k_ex / (2 * g) * V22 / (n * n * L / pow(R_wet, 4.0 / 3.0) + (k_en + k_ex) / (2 * g)));
-		
+		//Q = A_wet * sqrt(2 * g * (H_inlet-h_c));
+		// Unsubmerged - Form 1
+		//	# Q = A * D ^ 0.5 * [((HW / D) - (Hc / D) + 0.5 * S) / K] ^ (1 / M)
+		//	numerator = (HW / D) - (Hc / D) + (0.5 * S)
+		//T numerator = (H_L + k_ex / (2 * g) * V22 / (n * n * L / pow(R_wet, 4.0 / 3.0) + (k_en + k_ex) / (2 * g)));
+		//printf("Outletcontrol: Hl=%f\n", H_L);
+		//printf("Outletcontrol: Q=%f, Awet=%f\n", Q, A_wet);
+		//Q = Q * pow(H_L / (1 + T(0.87) * pow(numerator, -2.0)), 0.5);
+		//Q = A_wet * sqrt(H_L / (1 + (friction_const * n * n * L) / (pow(R_wet, T(4.0 / 3.0))) + (k_ex + k_en) / (2 * g)));
+
+
 		//USGS type 4 formula seem to work OK
 		//T friction_term = (T(2.0) * g * n *n * L) / (pow(R_wet, T(4.0 / 3.0)));
 		//Q = C * A_wet * sqrt((T(2.0) * g * H_L) / (1 + friction_term));
@@ -966,3 +857,42 @@ template <class T> __host__ __device__ void critical_depth_circular(T Q, T h_cul
 }
 template __host__ __device__ void critical_depth_circular<float>(float Q, float h_culvert, float& h_critical);
 template __host__ __device__ void critical_depth_circular<double>(double Q, double h_culvert, double& h_critical);
+
+template <class T> __global__ void GatherCulvertStateGPU(int nculverts, CulvertF<T> XCulvertF, EvolvingP<T> XEv)
+{
+	int cc = blockIdx.x * blockDim.x + threadIdx.x;
+	if (cc >= nculverts) return;
+
+	const int i1 = XCulvertF.mem1[cc];
+	const int i2 = XCulvertF.mem2[cc];
+
+	XCulvertF.h1[cc] = XEv.h[i1];
+	XCulvertF.zs1[cc] = XEv.zs[i1];
+	XCulvertF.u1[cc] = XEv.u[i1];
+	XCulvertF.v1[cc] = XEv.v[i1];
+
+	XCulvertF.h2[cc] = XEv.h[i2];
+	XCulvertF.zs2[cc] = XEv.zs[i2];
+	XCulvertF.u2[cc] = XEv.u[i2];
+	XCulvertF.v2[cc] = XEv.v[i2];
+}
+
+template <class T> __global__ void ApplyCulvertsExplicitGPU(int nculverts, CulvertF<T> XCulvertF, AdvanceP<T> XAdv)
+{
+	int cc = blockIdx.x * blockDim.x + threadIdx.x;
+	if (cc >= nculverts) return;
+
+	const T dq = XCulvertF.dq[cc];
+	atomicAdd(&XAdv.dh[XCulvertF.mem1[cc]], -dq * XCulvertF.invA1[cc]);
+	atomicAdd(&XAdv.dh[XCulvertF.mem2[cc]],  dq * XCulvertF.invA2[cc]);
+}
+
+template <class T> __global__ void ApplyCulvertsImplicitGPU(int nculverts, T dt, CulvertF<T> XCulvertF, EvolvingP<T> XEv)
+{
+	int cc = blockIdx.x * blockDim.x + threadIdx.x;
+	if (cc >= nculverts) return;
+
+	const T vol = XCulvertF.dq[cc] * dt;
+	atomicAdd(&XEv.h[XCulvertF.mem1[cc]], -vol * XCulvertF.invA1[cc]);
+	atomicAdd(&XEv.h[XCulvertF.mem2[cc]],  vol * XCulvertF.invA2[cc]);
+}
