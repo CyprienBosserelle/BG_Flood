@@ -21,7 +21,7 @@ template <class T> __global__ void InjectCulvertImplicitGPU(Param XParam, T dt, 
 template <class T> __global__ void GetCulvertElevGPU(Param XParam, int cc, int b1, int ix1, int iy1, int b2, int ix2, int iy2, CulvertF<T>& XCulvertF, int* Culvertblks, EvolvingP<T> XEv);
 template <class T> __host__ void GetCulvertElevCPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T>& XCulvertF, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, EvolvingP<T> XEv);
 
-template <class T> __host__ void DischargeCulvertCPU(Param XParam, int cc, double dt, std::vector<Culvert> XCulverts, CulvertF<T>& XCulvertF, int nblkculvert, int* Culvertblks);
+template <class T> __host__ void DischargeCulvertCPU(Param XParam, double dt, std::vector<Culvert> XCulverts, CulvertF<T>& XCulvertF, int nblkculvert, int* Culvertblks);
 template <class T> __global__ void DischargeCulvertGPU(Param XParam, int cc, double dt, CulvertF<T> XCulvertF, Culvert XCulvert);
 template <class T> __global__ void DischargeManyCulvertsGPU(Param XParam, int nculverts, double dt, CulvertF<T> XCulvertF);
 

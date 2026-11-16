@@ -418,7 +418,7 @@ template <class T> __host__ __device__ void CulvertDischarge(int shape, T width,
 	//printf("height = %f\n", height);
 
 	T h_wet;
-	T A_wet = T(0.0), P_wet = T(0.0), R_wet = T(0.0), A = T(0.0), P = T(0.0), R = h_culvert / 2;
+	T A_wet = T(0.0), P_wet = T(0.0), R_wet = T(0.0), A = T(0.0), P = T(0.0), R = T(width / 2);
 	T Q_inlet= T(0.0), Q_outlet= T(0.0), Q_estimated= T(0.0);
 	T S; //slope
 	T H_L; //head loss
