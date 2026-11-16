@@ -762,14 +762,20 @@ template <class T> void InitCulverts(Param& XParam, Forcing<float>& XForcing, Mo
 			XModel.culvertsF.type[cc] = XForcing.culverts[cc].type;
 			XModel.culvertsF.Qmax[cc] = XForcing.culverts[cc].Qmax;
 			XModel.culvertsF.dx1[cc] = XForcing.culverts[cc].dx1;
-		}
 
-		for (int cc = 0; cc < XParam.nculverts; cc++)
-		{
-			XModel.culvertsF.mem1[cc] = memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1);
-			XModel.culvertsF.mem2[cc] = memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2);
-			XModel.culvertsF.invA1[cc] = T(1.0 / (XForcing.culverts[cc].dx1 * XForcing.culverts[cc].dx1));
-			XModel.culvertsF.invA2[cc] = T(1.0 / (XForcing.culverts[cc].dx2 * XForcing.culverts[cc].dx2));
+			// improved structure (stage 3)
+			XModel.culvertsF.shape[cc] = XForcing.culverts[cc].shape;
+			XModel.culvertsF.width[cc] = XForcing.culverts[cc].width;
+			XModel.culvertsF.height[cc] = XForcing.culverts[cc].height;
+			XModel.culvertsF.length[cc] = XForcing.culverts[cc].length;
+			XModel.culvertsF.zb1[cc] = XForcing.culverts[cc].zb1;
+			XModel.culvertsF.zb2[cc] = XForcing.culverts[cc].zb2;
+			XModel.culvertsF.k_ex[cc] = XForcing.culverts[cc].k_ex;
+			XModel.culvertsF.k_en[cc] = XForcing.culverts[cc].k_en;
+			XModel.culvertsF.C_d[cc] = XForcing.culverts[cc].C_d;
+			XModel.culvertsF.n[cc] = XForcing.culverts[cc].n;
+			XModel.culvertsF.fac[cc] = XForcing.culverts[cc].fac;
+			XModel.culvertsF.dx2[cc] = XForcing.culverts[cc].dx2;
 		}
 	}
 }
@@ -1450,7 +1456,7 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 		ReallocArray(topcount, XParam.blkwidth, XForcing.bndseg[s].top.qmean);
 		ReallocArray(botcount, XParam.blkwidth, XForcing.bndseg[s].bot.qmean);
 
-		FillCPU(leftcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].left.qmean);
+			FillCPU(leftcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].left.qmean);
 		FillCPU(rightcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].right.qmean);
 		FillCPU(topcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].top.qmean);
 		FillCPU(botcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].bot.qmean);

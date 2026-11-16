@@ -1,4 +1,3 @@
-
 #include "Setup_GPU.h"
 
 
@@ -182,6 +181,55 @@ template <class T> void SetupGPU(Param &XParam, Model<T> XModel,Forcing<float> &
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.Qmax, XModel_g.culvertsF.Qmax);
 			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.dx1);
 			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.dx1, XModel_g.culvertsF.dx1);
+
+
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.mem1);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.mem1, XModel_g.culvertsF.mem1);
+
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.mem2);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.mem2, XModel_g.culvertsF.mem2);
+
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.invA1);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.invA1, XModel_g.culvertsF.invA1);
+
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.invA2);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.invA2, XModel_g.culvertsF.invA2);
+
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.shape);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.shape, XModel_g.culvertsF.shape);
+
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.width);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.width, XModel_g.culvertsF.width);
+
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.height);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.height, XModel_g.culvertsF.height);
+
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.length);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.length, XModel_g.culvertsF.length);
+
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.zb1);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.zb1, XModel_g.culvertsF.zb1);
+
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.zb2);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.zb2, XModel_g.culvertsF.zb2);
+
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.k_ex);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.k_ex, XModel_g.culvertsF.k_ex);
+
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.k_en);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.k_en, XModel_g.culvertsF.k_en);
+
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.C_d);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.C_d, XModel_g.culvertsF.C_d);
+
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.n);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.n, XModel_g.culvertsF.n);
+
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.fac);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.fac, XModel_g.culvertsF.fac);
+
+			AllocateGPU(XParam.nculverts, 1, XModel_g.culvertsF.dx2);
+			CopytoGPU(XParam.nculverts, 1, XModel.culvertsF.dx2, XModel_g.culvertsF.dx2);
 		}
 
 	}
@@ -397,6 +445,10 @@ template <class T> void CopytoGPU(int nblk, int blksize, Param XParam, Model<T> 
 		CopytoGPU(XParam.nculverts, 1, XModel_cpu.culvertsF.h1, XModel_gpu.culvertsF.h1);
 		CopytoGPU(XParam.nculverts, 1, XModel_cpu.culvertsF.h2, XModel_gpu.culvertsF.h2);
 		CopytoGPU(XParam.nculverts, 1, XModel_cpu.culvertsF.dq, XModel_gpu.culvertsF.dq);
+		CopytoGPU(XParam.nculverts, 1, XModel_cpu.culvertsF.mem1, XModel_gpu.culvertsF.mem1);
+		CopytoGPU(XParam.nculverts, 1, XModel_cpu.culvertsF.mem2, XModel_gpu.culvertsF.mem2);
+		CopytoGPU(XParam.nculverts, 1, XModel_cpu.culvertsF.invA1, XModel_gpu.culvertsF.invA1);
+		CopytoGPU(XParam.nculverts, 1, XModel_cpu.culvertsF.invA2, XModel_gpu.culvertsF.invA2);
 	}
 }
 template void CopytoGPU<float>(int nblk, int blksize, Param XParam, Model<float> XModel_cpu, Model<float> XModel_gpu);
@@ -503,6 +555,20 @@ void AllocateBndTEX(bndparam & side)
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

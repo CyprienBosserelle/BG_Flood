@@ -33,10 +33,10 @@ template <class T> void AddCulverts(Param XParam, double dt, std::vector<Culvert
 	// 2) Discharge computation (keep existing physics)
 	if (XParam.GPUDEVICE >= 0)
 	{
-		for (cc = 0; cc < nculverts; cc++)
-		{
-			DischargeCulvertGPU<<<1, 1>>>(XParam, cc, dt, XModel.culvertsF, XCulverts[cc]);
-		}
+		const int threads = 128;
+		const int blocks = (nculverts + threads - 1) / threads;
+
+		DischargeManyCulvertsGPU<<<blocks, threads>>>(XParam, nculverts, dt, XModel.culvertsF);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 	else
@@ -296,7 +296,7 @@ template <class T> __host__ void DischargeCulvertCPU(Param XParam, double dt, st
 		{
 			if (XCulvertF.zs1[cc] >= XCulvertF.zs2[cc] && XCulvertF.h1[cc] > 0.0)
 			{
-				CulvertDischarge(XCulverts[cc].shape, T(XCulverts[cc].width), T(XCulverts[cc].height), T(XCulverts[cc].length), T(XCulverts[cc].zb1), T(XCulverts[cc].zb2), T(XCulverts[cc].k_ex), T(XCulverts[cc].k_en), T(XCulverts[cc].C_d), T(XCulverts[cc].n), XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
+				CulvertDischarge(XCulverts[cc].shape, T(XCULVERTS[cc].width), T(XCULVERTS[cc].height), T(XCULVERTS[cc].length), T(XCULVERTS[cc].zb1), T(XCULVERTS[cc].zb2), T(XCULVERTS[cc].k_ex), T(XCULVERTS[cc].k_en), T(XCULVERTS[cc].C_d), T(XCULVERTS[cc].n), XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
 			}
 			else
 			{
@@ -896,3 +896,89 @@ template <class T> __global__ void ApplyCulvertsImplicitGPU(int nculverts, T dt,
 	atomicAdd(&XEv.h[XCulvertF.mem1[cc]], -vol * XCulvertF.invA1[cc]);
 	atomicAdd(&XEv.h[XCulvertF.mem2[cc]],  vol * XCulvertF.invA2[cc]);
 }
+
+template <class T>
+__global__ void DischargeManyCulvertsGPU(Param XParam, int nculverts, double dt, CulvertF<T> XCulvertF)
+{
+	int cc = blockIdx.x * blockDim.x + threadIdx.x;
+	if (cc >= nculverts) return;
+
+	const int type = XCulvertF.type[cc];
+
+	if (type == 0)
+	{
+		CulvertPump(XCulvertF.Qmax[cc], XCulvertF.dx1[cc], XCulvertF.h1[cc], XCulvertF.h2[cc], XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.dq[cc], dt);
+	}
+	else if (type == 1)
+	{
+		T Q = T(0.0);
+		if (XCulvertF.zs1[cc] > XCulvertF.zs2[cc] && XCulvertF.h1[cc] > 0.0)
+		{
+			CulvertDischarge(
+				XCulvertF.shape[cc],
+				T(XCulvertF.width[cc]),
+				T(XCulvertF.height[cc]),
+				T(XCulvertF.length[cc]),
+				T(XCulvertF.zb1[cc]),
+				T(XCulvertF.zb2[cc]),
+				T(XCulvertF.k_ex[cc]),
+				T(XCulvertF.k_en[cc]),
+				T(XCulvertF.C_d[cc]),
+				T(XCulvertF.n[cc]),
+				XCulvertF.zs1[cc], XCulvertF.zs2[cc],
+				XCulvertF.u1[cc], XCulvertF.u2[cc],
+				XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
+		}
+		T Vol1 = XCulvertF.h1[cc] * T(XCulvertF.dx1[cc] * XCulvertF.dx1[cc]);
+		T Qmax = T(Vol1 / T(XParam.dt));
+		XCulvertF.dq[cc] = min(Qmax, max(Q, T(0.0)));
+	}
+	else if (type == 2)
+	{
+		T Q = T(0.0);
+		T Vol, Qmax;
+		if (XCulvertF.zs1[cc] > XCulvertF.zs2[cc] && XCulvertF.h1[cc] > 0.0)
+		{
+			Vol = XCulvertF.h1[cc] * T(XCulvertF.dx1[cc] * XCulvertF.dx1[cc]);
+			Qmax = T(Vol / T(XParam.dt));
+			CulvertDischarge(
+				XCulvertF.shape[cc],
+				T(XCulvertF.width[cc]),
+				T(XCulvertF.height[cc]),
+				T(XCulvertF.length[cc]),
+				T(XCulvertF.zb1[cc]),
+				T(XCulvertF.zb2[cc]),
+				T(XCulvertF.k_ex[cc]),
+				T(XCulvertF.k_en[cc]),
+				T(XCulvertF.C_d[cc]),
+				T(XCulvertF.n[cc]),
+				XCulvertF.zs1[cc], XCulvertF.zs2[cc],
+				XCulvertF.u1[cc], XCulvertF.u2[cc],
+				XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
+			Q = min(Qmax, max(Q, T(0.0)));
+		}
+		else if (XCulvertF.zs2[cc] > XCulvertF.zs1[cc] && XCulvertF.h2[cc] > 0.0)
+		{
+			Vol = XCulvertF.h2[cc] * T(XCulvertF.dx2[cc] * XCulvertF.dx2[cc]);
+			Qmax = T(Vol / T(XParam.dt));
+			CulvertDischarge(
+				XCulvertF.shape[cc],
+				T(XCulvertF.width[cc]),
+				T(XCulvertF.height[cc]),
+				T(XCulvertF.length[cc]),
+				T(XCulvertF.zb2[cc]),
+				T(XCulvertF.zb1[cc]),
+				T(XCulvertF.k_ex[cc]),
+				T(XCulvertF.k_en[cc]),
+				T(XCulvertF.C_d[cc]),
+				T(XCulvertF.n[cc]),
+				XCulvertF.zs2[cc], XCulvertF.zs1[cc],
+				XCulvertF.u2[cc], XCulvertF.u1[cc],
+				XCulvertF.v2[cc], XCulvertF.v1[cc], Q);
+			Q = -min(Qmax, max(Q, T(0.0)));
+		}
+		XCulvertF.dq[cc] = Q * T(XCulvertF.fac[cc]);
+	}
+}
+template __global__ void DischargeManyCulvertsGPU<float>(Param XParam, int nculverts, double dt, CulvertF<float> XCulvertF);
+template __global__ void DischargeManyCulvertsGPU<double>(Param XParam, int nculverts, double dt, CulvertF<double> XCulvertF);
