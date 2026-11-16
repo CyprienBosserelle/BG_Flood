@@ -302,7 +302,10 @@ template __host__ void GetCulvertElevCPU<float>(Param XParam, std::vector<Culver
 template __host__ void GetCulvertElevCPU<double>(Param XParam, std::vector<Culvert> XCulverts, CulvertF<double>& XCulvertF,  int nblkculvert, int* Culvertblks, BlockP<double> XBlock, EvolvingP<double> XEv);
 
 
-template <class T> __device__ void DischargeCulvertDev(Param XParam, int cc, double dt, CulvertF<T> XCulvertF, const Culvert & XCulvert)
+// Note: Param is NOT passed to this __device__ function. Passing Param by value to a device function
+// runs its copy constructor in device code (Param holds std::string/std::vector members) which caused
+// illegal memory accesses (seen with MSVC debug builds). Only XParam.dt is needed so it is passed as a value.
+template <class T> __device__ void DischargeCulvertDev(double paramdt, int cc, double dt, CulvertF<T> XCulvertF, const Culvert & XCulvert)
 {
 	{
 	//printf("DischargeCulvertGPU:");
@@ -326,7 +329,7 @@ template <class T> __device__ void DischargeCulvertDev(Param XParam, int cc, dou
 			//printf("zs1 = %f; zs2 = %f; h1 = %f; Q = %f\n", XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.h1[cc],  Q );
 
 			T Vol1 = XCulvertF.h1[cc] * XCulvert.dx1 * XCulvert.dx1;
-			T Qmax = T(Vol1 / XParam.dt);
+			T Qmax = T(Vol1 / paramdt);
 			XCulvertF.dq[cc] = min(Qmax, max(Q,T(0.0)));
 		}
 		else if (XCulvertF.type[cc] == 2)
@@ -336,7 +339,7 @@ template <class T> __device__ void DischargeCulvertDev(Param XParam, int cc, dou
 			if (XCulvertF.zs1[cc] > XCulvertF.zs2[cc] && XCulvertF.h1[cc] > 0.0)
 			{
 				Vol = XCulvertF.h1[cc] * XCulvert.dx1 * XCulvert.dx1;
-				Qmax = T(Vol / XParam.dt);
+				Qmax = T(Vol / paramdt);
 				//printf("Sanitycheck: h1=%f zs1=%f, h2=%f, zs2=%f\n", XCulvertF.h1[cc], XCulvertF.zs1[cc], XCulvertF.h2[cc], XCulvertF.zs2[cc]);
 				CulvertDischarge(XCulvert.shape, T(XCulvert.width), T(XCulvert.height), T(XCulvert.length), T(XCulvert.zb1), T(XCulvert.zb2), T(XCulvert.k_ex), T(XCulvert.k_en), T(XCulvert.C_d), T(XCulvert.n), XCulvertF.zs1[cc], XCulvertF.zs2[cc], XCulvertF.u1[cc], XCulvertF.u2[cc], XCulvertF.v1[cc], XCulvertF.v2[cc], Q);
 				Q = min(Qmax, max(Q, T(0.0)));
@@ -345,7 +348,7 @@ template <class T> __device__ void DischargeCulvertDev(Param XParam, int cc, dou
 			else if (XCulvertF.zs2[cc] > XCulvertF.zs1[cc] && XCulvertF.h2[cc] > 0.0)
 			{
 				Vol = XCulvertF.h2[cc] * XCulvert.dx2 * XCulvert.dx2;
-				Qmax = T(Vol / XParam.dt);
+				Qmax = T(Vol / paramdt);
 				CulvertDischarge(XCulvert.shape, T(XCulvert.width), T(XCulvert.height), T(XCulvert.length), T(XCulvert.zb2), T(XCulvert.zb1), T(XCulvert.k_ex), T(XCulvert.k_en), T(XCulvert.C_d), T(XCulvert.n), XCulvertF.zs2[cc], XCulvertF.zs1[cc], XCulvertF.u2[cc], XCulvertF.u1[cc], XCulvertF.v2[cc], XCulvertF.v1[cc], Q);
 				Q = -1*min(Qmax, max(Q, T(0.0)));
 			}
@@ -365,7 +368,7 @@ template <class T> __global__ void DischargeCulvertGPU(Param XParam, int cc, dou
 
 	if (ix == 0 && iy == 0)
 	{
-		DischargeCulvertDev(XParam, cc, dt, XCulvertF, XCulvert);
+		DischargeCulvertDev(XParam.dt, cc, dt, XCulvertF, XCulvert);
 	}
 }
 
@@ -401,7 +404,7 @@ template <class T> __global__ void ManyCulvertsDischargeGPU(Param XParam, int nc
 	XCulvertF.u2[cc] = XEv.u[i2];
 	XCulvertF.v2[cc] = XEv.v[i2];
 
-	DischargeCulvertDev(XParam, cc, dt, XCulvertF, XCulvert);
+	DischargeCulvertDev(XParam.dt, cc, dt, XCulvertF, XCulvert);
 }
 template __global__ void ManyCulvertsDischargeGPU<float>(Param XParam, int nculverts, double dt, CulvertF<float> XCulvertF, EvolvingP<float> XEv);
 template __global__ void ManyCulvertsDischargeGPU<double>(Param XParam, int nculverts, double dt, CulvertF<double> XCulvertF, EvolvingP<double> XEv);
