@@ -776,6 +776,22 @@ template <class T> void InitCulverts(Param& XParam, Forcing<float>& XForcing, Mo
 			XModel.culvertsF.n[cc] = XForcing.culverts[cc].n;
 			XModel.culvertsF.fac[cc] = XForcing.culverts[cc].fac;
 			XModel.culvertsF.dx2[cc] = XForcing.culverts[cc].dx2;
+
+			// New attributes for culvert endpoints and inverse areas
+			const int mem1 = memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1);
+const int mem2 = memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2);
+const T invA1 = T(1.0 / (XForcing.culverts[cc].dx1 * XForcing.culverts[cc].dx1));
+const T invA2 = T(1.0 / (XForcing.culverts[cc].dx2 * XForcing.culverts[cc].dx2));
+
+XForcing.culverts[cc].mem1 = mem1;
+XForcing.culverts[cc].mem2 = mem2;
+XForcing.culverts[cc].invA1 = static_cast<double>(invA1);
+XForcing.culverts[cc].invA2 = static_cast<double>(invA2);
+
+XModel.culvertsF.mem1[cc] = mem1;
+XModel.culvertsF.mem2[cc] = mem2;
+XModel.culvertsF.invA1[cc] = invA1;
+XModel.culvertsF.invA2[cc] = invA2;
 		}
 	}
 }
