@@ -357,8 +357,8 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 			for (int ibl = 0; ibl < XParam.nblk; ibl++)
 			{
 				ib = XModel.blocks.active[ibl];
-				levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
-				levdelta = calcres(XParam.delta, XModel.blocks.level[ib]);
+				levdx = static_cast<double>(calcres(XParam.dx, XModel.blocks.level[ib]));
+				levdelta = static_cast<double>(calcres(XParam.delta, XModel.blocks.level[ib]));
 				for (int j = 0; j < XParam.blkwidth; j++)
 				{
 					for (int i = 0; i < XParam.blkwidth; i++)
@@ -430,10 +430,11 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		}
 		std::sort(activeRiverBlk.begin(), activeRiverBlk.end());
 		activeRiverBlk.erase(std::unique(activeRiverBlk.begin(), activeRiverBlk.end()), activeRiverBlk.end());
-		if (activeRiverBlk.size() > size_t(XModel.bndblk.nblkriver))
+		const int nActiveRiverBlk = static_cast<int>(activeRiverBlk.size());
+		if (nActiveRiverBlk > XModel.bndblk.nblkriver)
 		{
-			ReallocArray(activeRiverBlk.size(), 1, XModel.bndblk.river);
-			XModel.bndblk.nblkriver = int(activeRiverBlk.size());
+			ReallocArray(nActiveRiverBlk, 1, XModel.bndblk.river);
+			XModel.bndblk.nblkriver = nActiveRiverBlk;
 		}
 
 		
@@ -471,7 +472,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 		}
 
 		// Allocate Qnow as pinned memory
-		AllocateMappedMemCPU(XForcing.rivers.size(), 1, XParam.GPUDEVICE,XModel.bndblk.Riverinfo.qnow);
+		AllocateMappedMemCPU(static_cast<int>(XForcing.rivers.size()), 1, XParam.GPUDEVICE, XModel.bndblk.Riverinfo.qnow);
 		AllocateCPU(nribmax, nburmax, XModel.bndblk.Riverinfo.xstart, XModel.bndblk.Riverinfo.xend, XModel.bndblk.Riverinfo.ystart, XModel.bndblk.Riverinfo.yend);
 		FillCPU(nribmax, nburmax, T(-1.0), XModel.bndblk.Riverinfo.xstart);
 		FillCPU(nribmax, nburmax, T(-1.0), XModel.bndblk.Riverinfo.xend);
@@ -501,7 +502,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 
 		std::vector<RiverBlk> blocksalreadyin;
 		RiverBlk emptyvec;
-		for (int iblk = 0; iblk < nribmax; iblk++)
+		for (int iribm = 0; iribm < nribmax; iribm++)
 		{
 
 			blocksalreadyin.push_back(emptyvec);
@@ -545,7 +546,7 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 						blocksalreadyin[iribm].block.push_back(uniqblockforriver[bir]);
 
 						
-
+						
 						break;
 					}
 				}
@@ -561,10 +562,10 @@ template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model
 				int Rin = XModel.bndblk.Riverinfo.Xridib[indx];
 				if (Rin > -1)
 				{
-					XModel.bndblk.Riverinfo.xstart[indx] = XForcing.rivers[Rin].xstart;
-					XModel.bndblk.Riverinfo.xend[indx] = XForcing.rivers[Rin].xend;
-					XModel.bndblk.Riverinfo.ystart[indx] = XForcing.rivers[Rin].ystart;
-					XModel.bndblk.Riverinfo.yend[indx] = XForcing.rivers[Rin].yend;
+					XModel.bndblk.Riverinfo.xstart[indx] = static_cast<T>(XForcing.rivers[Rin].xstart);
+					XModel.bndblk.Riverinfo.xend[indx] = static_cast<T>(XForcing.rivers[Rin].xend);
+					XModel.bndblk.Riverinfo.ystart[indx] = static_cast<T>(XForcing.rivers[Rin].ystart);
+					XModel.bndblk.Riverinfo.yend[indx] = static_cast<T>(XForcing.rivers[Rin].yend);
 				}
 			}
 		}
@@ -581,30 +582,34 @@ template void InitRivers<float>(Param XParam, Forcing<float> &XForcing, Model<fl
 template void InitRivers<double>(Param XParam, Forcing<float> &XForcing, Model<double> &XModel);
 
 
-template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Model<T>& XModel)
+template <class T> void InitCulverts(Param& XParam, Forcing<float>& XForcing, Model<T>& XModel)
 {
 	//========================
 	// Culvert set-up
 
 	if (XForcing.culverts.size() > 0)
 	{
-		//
-		double x1,x2,y1,y2,zb1,zb2;
+		double x1, x2, y1, y2, zb1, zb2;
 		int ib;
 		double levdx, dxblk;
 		double blkxmin, blkxmax, blkymin, blkymax;
 
+		const int requestedCulverts = static_cast<int>(XForcing.culverts.size());
+		int removedCulverts = 0;
+
 		log("\tInitializing culverts");
 		//For each culvert
-		for (int cc = 0; cc < XForcing.culverts.size(); cc++)
+		for (int cc = 0; cc < static_cast<int>(XForcing.culverts.size()); cc++)
 		{
 			// find the cell where the culvert well / source will be applied
-
 			x1 = (T)XForcing.culverts[cc].x1;
 			x2 = (T)XForcing.culverts[cc].x2;
 			y1 = (T)XForcing.culverts[cc].y1;
 			y2 = (T)XForcing.culverts[cc].y2;
 
+			// Reset endpoint block indices before searching
+			XForcing.culverts[cc].block1 = -1;
+			XForcing.culverts[cc].block2 = -1;
 
 			for (int ibl = 0; ibl < XParam.nblk; ibl++)
 			{
@@ -618,12 +623,10 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 
 				blkxmax = (blkxmin + dxblk);
 				blkymax = (blkymin + dxblk);
-				
 
 				if (x1 > blkxmin && x1 <= blkxmax && y1 > blkymin && y1 <= blkymax)
 				{
 					XForcing.culverts[cc].block1 = ib;
-					//XForcing.culverts[cc].i1 = i;
 					XForcing.culverts[cc].ix1 = min(max((int)round((x1 - (XParam.xo + XModel.blocks.xo[ib])) / levdx), 0), XParam.blkwidth - 1);
 					XForcing.culverts[cc].iy1 = min(max((int)round((y1 - (XParam.yo + XModel.blocks.yo[ib])) / levdx), 0), XParam.blkwidth - 1);
 					XForcing.culverts[cc].dx1 = levdx;
@@ -638,6 +641,34 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 				}
 			}
 
+			// Reject culverts with an unmatched endpoint
+			const bool missingInlet = XForcing.culverts[cc].block1 < 0;
+			const bool missingOutlet = XForcing.culverts[cc].block2 < 0;
+
+			if (missingInlet || missingOutlet)
+			{
+				const std::string missing =
+					missingInlet && missingOutlet ? "both endpoints" :
+					missingInlet ? "inlet" : "outlet";
+
+				const std::string message =
+					"WARNING: skipping culvert: " + missing +
+					" outside the active computational mesh. Inlet=(" +
+					std::to_string(XForcing.culverts[cc].x1) + ", " +
+					std::to_string(XForcing.culverts[cc].y1) +
+					"), outlet=(" +
+					std::to_string(XForcing.culverts[cc].x2) + ", " +
+					std::to_string(XForcing.culverts[cc].y2) + ").";
+
+				log(message);
+				std::cerr << message << std::endl;
+
+				XForcing.culverts.erase(XForcing.culverts.begin() + cc);
+				removedCulverts++;
+				--cc;
+				continue;
+			}
+
 			//Calculate the bottom elevation of the culvert
 			if (XForcing.culverts[cc].zb1 < -998.0) // i.e. not set by user so use the ground elevation
 			{
@@ -648,7 +679,7 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 				if (XModel.zb[memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1)] > XForcing.culverts[cc].zb1)
 				{
 					// Make sure ground elevation is at least zb
-					XModel.zb[memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1)] = XForcing.culverts[cc].zb1;
+					XModel.zb[memloc(XParam, XForcing.culverts[cc].ix1, XForcing.culverts[cc].iy1, XForcing.culverts[cc].block1)] = static_cast<T>(XForcing.culverts[cc].zb1);
 				}
 			}
 			if (XForcing.culverts[cc].zb2 < -998.0) // i.e. not set by user so use the ground elevation
@@ -660,7 +691,7 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 				if (XModel.zb[memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2)] > XForcing.culverts[cc].zb2)
 				{
 					// Make sure ground elevation is at least zb
-					XModel.zb[memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2)] = XForcing.culverts[cc].zb2;
+					XModel.zb[memloc(XParam, XForcing.culverts[cc].ix2, XForcing.culverts[cc].iy2, XForcing.culverts[cc].block2)] = static_cast<T>(XForcing.culverts[cc].zb2);
 				}
 			}
 
@@ -693,39 +724,15 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 			}
 		}
 
-		//Now identify sort and unique blocks where culverts are being inserted
-		/*
-		std::vector<int> activeCulvertBlk;
+		// Keep the culvert count synchronized
+		XParam.nculverts = static_cast<int>(XForcing.culverts.size());
 
-		for (int cc = 0; cc < XForcing.culverts.size(); cc++)
-		{
-			activeCulvertBlk.push_back(XForcing.culverts[cc].block1);
-			activeCulvertBlk.push_back(XForcing.culverts[cc].block2);
-		}
-
-		std::sort(activeCulvertBlk.begin(), activeCulvertBlk.end());
-		activeCulvertBlk.erase(std::unique(activeCulvertBlk.begin(), activeCulvertBlk.end()), activeCulvertBlk.end());
-		
-		if (activeCulvertBlk.size() > size_t(XModel.bndblk.nblkculvert))
-		{
-			ReallocArray(activeCulvertBlk.size(), 1, XModel.bndblk.culvert);
-			XModel.bndblk.nblkculvert = int(activeCulvertBlk.size());
-
-			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.dq);
-			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.h1);
-			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.h2);
-			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.zs1);
-			ReallocArray(XForcing.culverts.size(), 1, XModel.culvertsF.zs2);
-		}
-		for (int b = 0; b < activeCulvertBlk.size(); b++)
-		{
-			XModel.bndblk.culvert[b] = activeCulvertBlk[b];
-		}
-		*/
-
+		log("\tCulverts implemented: " + std::to_string(XParam.nculverts) +
+			"; removed due to endpoint/mesh errors: " + std::to_string(removedCulverts) +
+			"; requested: " + std::to_string(requestedCulverts));
 
 		//Initialisation of the culvert states variables (and other needed on the GPUs)
-		for (int cc = 0; cc < XForcing.culverts.size(); cc++)
+		for (int cc = 0; cc < static_cast<int>(XForcing.culverts.size()); cc++)
 		{
 			XModel.culvertsF.dq[cc] = 0.0;
 			XModel.culvertsF.h1[cc] = 0.0;
@@ -739,17 +746,13 @@ template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Mod
 			XModel.culvertsF.type[cc] = XForcing.culverts[cc].type;
 			XModel.culvertsF.Qmax[cc] = XForcing.culverts[cc].Qmax;
 			XModel.culvertsF.dx1[cc] = XForcing.culverts[cc].dx1;
-
-			//printf("Culvert_init =%f \n", XModel.culvertsF.h1[0]);
 		}
-		
 	}
-
 }
 
 
-template void InitCulverts<float>(Param XParam, Forcing<float>& XForcing, Model<float>& XModel);
-template void InitCulverts<double>(Param XParam, Forcing<float>& XForcing, Model<double>& XModel);
+template void InitCulverts<float>(Param& XParam, Forcing<float>& XForcing, Model<float>& XModel);
+template void InitCulverts<double>(Param& XParam, Forcing<float>& XForcing, Model<double>& XModel);
 
 
 
@@ -1219,7 +1222,7 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 		XzoneB.minlevel = minlevel;
 		
 
-		AllocateCPU(blkzone.size(), 1, XzoneB.blk);
+		AllocateCPU(static_cast<int>(blkzone.size()), 1, XzoneB.blk);
 		for (int b = 0; b < blkzone.size(); b++)
 		{
 			XzoneB.blk[b] = blkzone[b];
@@ -1244,6 +1247,7 @@ template <class T> void Findoutzoneblks(Param& XParam, BlockP<T>& XBlock)
 }
 template void Findoutzoneblks<float>(Param& XParam, BlockP<float>& XBlock);
 template void Findoutzoneblks<double>(Param& XParam, BlockP<double>& XBlock);
+
 
 /**
  * @brief Initializes output zones for the simulation domain.
@@ -1281,7 +1285,6 @@ template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock)
 		XzoneB.minlevel = XParam.minlevel;
 		XzoneB.OutputT = { XParam.totaltime, XParam.endtime };
 		AllocateCPU(XParam.nblk, 1, XzoneB.blk);
-		int I = 0;
 		for (int ib = 0; ib < XParam.nblk; ib++)
 		{
 			XzoneB.blk[ib] = XBlock.active[ib];
@@ -1345,10 +1348,10 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 		bool testbot = (XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib) || (XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib) || (XBlock.LeftTop[ib] == ib) || (XBlock.LeftBot[ib] == ib) || (XBlock.RightTop[ib] == ib) || (XBlock.RightBot[ib] == ib);
 		if (testbot)
 		{
-			T dxlev = calcres(XParam.dx, XBlock.level[ib]);
+			T dxlev = static_cast<T>(calcres(XParam.dx, XBlock.level[ib]));
 
 			bndblks.push_back(ib);
-			bndsegment.push_back(XForcing.bndseg.size()-1); // i.e. by default the block doesn't belong to a segment so it belongs to collector (last) segemnt
+			bndsegment.push_back(static_cast<int>(XForcing.bndseg.size()) - 1); // i.e. by default the block doesn't belong to a segment so it belongs to collector (last) segemnt
 			//loop through all but the last bnd seg which is meant for block that are not in any segments
 			for (int s = 0; s < XForcing.bndseg.size()-1; s++)
 			{
@@ -1498,11 +1501,12 @@ template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 
 		T levdx = calcres(XParam.dx, XBlock.level[ib]);
 
+
 		leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
 
-		//leftyo =XBlock.yo[ib];
+		//leftyo = XBlock.yo[ib];
 		rightxo = XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
-		//rightyo = XBlock.yo[ib];
+		//rightyo = XBlock.yo[ibl];
 		//topxo = XBlock.xo[ib];
 		topyo = XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
 		//botxo = XBlock.xo[ib];
@@ -1590,14 +1594,14 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 		//double espdist = 0.00000001;///WARMING
 
 		int ib = XBlock.active[ibl];
-		T levdx = calcres(XParam.dx, XModel.blocks.level[ib]);
+		T levdx = calcres(XParam.dx, XBlock.level[ib]);
 
 
 		leftxo = XBlock.xo[ib]; // in adaptive this shoulbe be a range 
 
 		//leftyo = XBlock.yo[ib];
 		rightxo = XBlock.xo[ib] + (XParam.blkwidth - 1) * levdx;
-		//rightyo = XBlock.yo[ib];
+		//rightyo = XBlock.yo[ibl];
 		//topxo = XBlock.xo[ib];
 		topyo = XBlock.yo[ib] + (XParam.blkwidth - 1) * levdx;
 		//botxo = XBlock.xo[ib];
@@ -1641,12 +1645,11 @@ template <class T> void Findbndblks(Param XParam, Model<T> XModel,Forcing<float>
 
 /*! \fn RectCornerBlk(Param& XParam, BlockP<T>& XBlock, double xo, double yo, double xmax, double ymax, bool isEps, std::vector<int>& cornerblk)
 	* Find the block containing the border of a rectangular box (used for the defining the output zones)
-	* The indice of the blocks are returned through "cornerblk" from bottom left turning in the clockwise direction
 	*/
 /**
- * @brief Finds the blocks containing the corners of a rectangular box (for output zone definition).
+ * @brief Finds the block containing the border of a rectangular box (used for defining output zones).
  *
- * Returns indices of blocks through "cornerblk" at the corners of the rectangle, starting from bottom left and turning clockwise.
+ * Returns the indices of the blocks at the corners of the rectangle, starting from bottom left and turning clockwise.
  *
  * @tparam T Data type
  * @param XParam Simulation parameters
@@ -1670,6 +1673,7 @@ template <class T> void RectCornerBlk(Param& XParam, BlockP<T>& XBlock, double x
 	{
 		ib = XBlock.active[i];
 		levdx = calcres(XParam.dx, XBlock.level[ib]);
+
 
 		// margin to search for block boundaries, to avoid machine error if rectangle corner are supposed to
 		// be on blocks edges
@@ -1807,7 +1811,6 @@ template <class T> void calcactiveCellCPU(Param XParam, BlockP<T> XBlock, Forcin
 			}
 		}
 	}
-	
 }
 
 
@@ -1922,10 +1925,6 @@ std::vector<double> GetTimeOutput(T_output time_info)
  * @brief Compiles and sorts output times for map outputs, including zone outputs.
  *
  * Combines times from the main output structure and all zone outputs, sorts and removes duplicates, and assigns to output arrays.
- * 
- * Creation of a vector for times requiering a map output 
- * Compilations of vectors and independent times from the general input
- * and the different zones outputs
  * 
  * @tparam T Data type
  * @param XParam Simulation parameters
