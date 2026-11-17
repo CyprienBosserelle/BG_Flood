@@ -1,0 +1,7 @@
+scenario,bnd type,extra,R_amp GL5,R_amp GR5,R_E (energy),sqrt(R_E),mean offset [m]
+wall,0,,0.9373,0.9381,0.95757,0.9786,1.04e-02
+neumann,1,,0.0000,0.0000,0.00000,0.0003,-1.07e-05
+dirichlet,2,,-0.6846,-0.6775,0.54395,0.7375,-1.03e-02
+absorbing,3,,-0.3605,-0.3606,0.17388,0.4170,-5.20e-03
+absorbing_filt10,3,bndfiltertime=10,-0.3605,-0.3606,0.17388,0.4170,-5.20e-03
+absorbing_filt600,3,bndfiltertime=600,-0.3605,-0.3606,0.17388,0.4170,-5.20e-03

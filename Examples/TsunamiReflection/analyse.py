@@ -197,7 +197,7 @@ def main():
     ax.set_ylim(1e-8, 3)
     ax.set_xlabel("time / (wavelength / c)")
     ax.set_ylabel("E(test - benchmark) / E incident")
-    ax.legend(ncol=2, fontsize=7, loc="lower right")
+    ax.legend(ncol=2, fontsize=7, loc="center left")
     ax.set_title("Energy of the reflected signal inside the short channel", fontsize=10, color=INK)
     fig.tight_layout()
     fig.savefig(os.path.join(OUT, "reflected_energy.png"))
@@ -210,7 +210,7 @@ def main():
     yy = np.arange(len(rows))[::-1]
     ax.barh(yy, vals, color=[color[n] for n in names], height=0.6)
     for y_, v in zip(yy, vals):
-        ax.text(v + 0.01, y_, f"{100 * v:.1f}%", va="center", color=INK, fontsize=8)
+        ax.text(v + 0.01, y_, f"{100 * v:.1f}%" if v >= 0.01 else f"{100 * v:.2f}%", va="center", color=INK, fontsize=8)
     ax.set_yticks(yy, names)
     ax.set_xlim(0, 1.15)
     ax.grid(axis="y", visible=False)
