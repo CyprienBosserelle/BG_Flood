@@ -306,7 +306,9 @@ double date_string_to_s(std::string datetime, std::string refdate)
 	double diff;
 
 	std::string::size_type n = datetime.find('T');
-	if (std::string::npos == n)
+	//if (std::string::npos == n)
+    std::string::size_type n2 = datetime.find('-'); // Check for date format
+    if (std::string::npos == n && std::string::npos == n2)
 	{
 		diff = std::stod(datetime);
 	}
