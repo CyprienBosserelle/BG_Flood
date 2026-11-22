@@ -58,9 +58,9 @@ template <class T> __host__ void AllocateCPU(int nx, int ny, T *&zb)
 		exit(EXIT_FAILURE);
 	}
 }
-template void AllocateCPU<double>(int nx, int ny, double*& zb)
-template void AllocateCPU<float>(int nx, int ny, float*& zb)
-template void AllocateCPU<int>(int nx, int ny, int*& zb)
+template void AllocateCPU<double>(int nx, int ny, double*& zb);
+template void AllocateCPU<float>(int nx, int ny, float*& zb);
+template void AllocateCPU<int>(int nx, int ny, int*& zb);
 
 /**
  * @brief Fill a CPU array with a specified value.
