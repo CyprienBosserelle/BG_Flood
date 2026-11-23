@@ -610,6 +610,14 @@ int readhotstartfileBG(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb
 template <class T>
 int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 {
+	// Try BG_Flood direct multires hotstart first
+	int bgok = readhotstartfileBG(XParam, XBlock, XEv, zb);
+	if (bgok == 1)
+	{
+		return 1;
+	}
+
+	// Existing legacy interpolation-based hotstart path below
 	int status;
 	int ncid;
 	//int dimids[NC_MAX_VAR_DIMS];   // dimension IDs 
@@ -669,7 +677,7 @@ int readhotstartfile(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
 		readstaticforcing(XParam.hotstep, zbhotstart);
 		interp2BUQ(XParam, XBlock, zbhotstart, zb);
 
-		//because we set the edges around empty blocks we need the set the edges for zs too
+		//because we set the edges around empty blocks we need the edges for zs too
 		// otherwise we create some gitantic waves at the edges of empty blocks
 		setedges(XParam, XBlock, zb);
 
@@ -836,3 +844,295 @@ template int readhotstartfile<double>(Param XParam, BlockP<double> XBlock, Evolv
 //template int readhotstartfile<float>(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, float * &zs, float * &zb, float * &hh, float *&uu, float * &vv);
 
 //template int readhotstartfile<double>(Param XParam, int * leftblk, int *rightblk, int * topblk, int* botblk, double * blockxo, double * blockyo, double * &zs, double * &zb, double * &hh, double *&uu, double * &vv);
+
+
+template <class T>
+static int readncpointscaled(int ncid, int varid, const std::vector<size_t>& start, T& outval)
+{
+	float raw = 0.0f;
+	int status = nc_get_var1_float(ncid, varid, start.data(), &raw);
+	if (status != NC_NOERR)
+	{
+		return status;
+	}
+
+	double scalefac = 1.0;
+	double offset = 0.0;
+	int sferr = nc_get_att_double(ncid, varid, "scale_factor", &scalefac);
+	int oferr = nc_get_att_double(ncid, varid, "add_offset", &offset);
+
+	double val = static_cast<double>(raw);
+	if (sferr == NC_NOERR || oferr == NC_NOERR)
+	{
+		val = val * scalefac + offset;
+	}
+
+	outval = static_cast<T>(val);
+	return NC_NOERR;
+}
+
+template <class T>
+int readhotstartfileBG(Param XParam, BlockP<T> XBlock, EvolvingP<T>& XEv, T*& zb)
+{
+	int status;
+	int ncid;
+
+	status = nc_open(XParam.hotstartfile.c_str(), NC_NOWRITE, &ncid);
+	if (status != NC_NOERR)
+	{
+		return 0;
+	}
+
+	int bgVersion = -1;
+	status = nc_get_att_int(ncid, NC_GLOBAL, "BG_Flood", &bgVersion);
+	if (status != NC_NOERR || bgVersion < 0)
+	{
+		nc_close(ncid);
+		return 0; // not a BG_Flood output
+	}
+
+	struct LevelInfo
+	{
+		bool ready = false;
+		int nx = 0;
+		int ny = 0;
+		double x0 = 0.0;
+		double y0 = 0.0;
+		double dx = 0.0;
+		double dy = 0.0;
+
+		int zb_id = -1, zs_id = -1, h_id = -1, u_id = -1, v_id = -1;
+		int zb_nd = 0, zs_nd = 0, h_nd = 0, u_nd = 0, v_nd = 0;
+	};
+
+	std::map<int, LevelInfo> levelCache;
+
+	auto get_varid_if_exists = [&](const std::string& name) -> int
+	{
+		int varid = -1;
+		int err = nc_inq_varid(ncid, name.c_str(), &varid);
+		return (err == NC_NOERR) ? varid : -1;
+	};
+
+	auto get_ndims_if_exists = [&](int varid) -> int
+	{
+		if (varid < 0)
+		{
+			return 0;
+		}
+		int nd = 0;
+		if (nc_inq_varndims(ncid, varid, &nd) != NC_NOERR)
+		{
+			return 0;
+		}
+		return nd;
+	};
+
+	int timedimid = -1;
+	size_t ntime = 1;
+	if (nc_inq_dimid(ncid, "time", &timedimid) == NC_NOERR)
+	{
+		nc_inq_dimlen(ncid, timedimid, &ntime);
+	}
+	const int hotstep = static_cast<int>(utils::min(utils::max(XParam.hotstep, 0), static_cast<int>(ntime) - 1));
+
+	bool hasZbAny = false;
+	bool hasZsAny = false;
+	bool hasHAny = false;
+	bool hasUAny = false;
+	bool hasVAny = false;
+
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		const int ib = XBlock.active[ibl];
+		const int lev = XBlock.level[ib];
+
+		LevelInfo& L = levelCache[lev];
+		if (!L.ready)
+		{
+			const std::string sign = (lev < 0) ? "N" : "P";
+			const std::string levtag = sign + std::to_string(abs(lev));
+
+			const std::string xxname = "xx_" + levtag;
+			const std::string yyname = "yy_" + levtag;
+
+			int xxid = -1, yyid = -1;
+			if (nc_inq_varid(ncid, xxname.c_str(), &xxid) != NC_NOERR ||
+				nc_inq_varid(ncid, yyname.c_str(), &yyid) != NC_NOERR)
+			{
+				nc_close(ncid);
+				return 0; // cannot do direct multires read without per-level coordinates
+			}
+
+			size_t nx = 0, ny = 0;
+			int xndims = 0, yndims = 0;
+			int xdimids[NC_MAX_VAR_DIMS], ydimids[NC_MAX_VAR_DIMS];
+
+			nc_inq_varndims(ncid, xxid, &xndims);
+			nc_inq_varndims(ncid, yyid, &yndims);
+			nc_inq_vardimid(ncid, xxid, xdimids);
+			nc_inq_vardimid(ncid, yyid, ydimids);
+
+			nc_inq_dimlen(ncid, xdimids[0], &nx);
+			nc_inq_dimlen(ncid, ydimids[0], &ny);
+
+			std::vector<size_t> s0(1, 0), s1(1, 1);
+			double x0 = 0.0, x1 = 0.0, y0 = 0.0, y1 = 0.0;
+			nc_get_var1_double(ncid, xxid, s0.data(), &x0);
+			nc_get_var1_double(ncid, yyid, s0.data(), &y0);
+			if (nx > 1) nc_get_var1_double(ncid, xxid, s1.data(), &x1); else x1 = x0 + calcres(XParam.dx, lev);
+			if (ny > 1) nc_get_var1_double(ncid, yyid, s1.data(), &y1); else y1 = y0 + calcres(XParam.dx, lev);
+
+			L.nx = static_cast<int>(nx);
+			L.ny = static_cast<int>(ny);
+			L.x0 = x0;
+			L.y0 = y0;
+			L.dx = x1 - x0;
+			L.dy = y1 - y0;
+
+			L.zb_id = get_varid_if_exists("zb_" + levtag);
+			L.zs_id = get_varid_if_exists("zs_" + levtag);
+			L.h_id = get_varid_if_exists("h_" + levtag);
+			L.u_id = get_varid_if_exists("u_" + levtag);
+			L.v_id = get_varid_if_exists("v_" + levtag);
+
+			L.zb_nd = get_ndims_if_exists(L.zb_id);
+			L.zs_nd = get_ndims_if_exists(L.zs_id);
+			L.h_nd = get_ndims_if_exists(L.h_id);
+			L.u_nd = get_ndims_if_exists(L.u_id);
+			L.v_nd = get_ndims_if_exists(L.v_id);
+
+			hasZbAny = hasZbAny || (L.zb_id >= 0);
+			hasZsAny = hasZsAny || (L.zs_id >= 0);
+			hasHAny = hasHAny || (L.h_id >= 0);
+			hasUAny = hasUAny || (L.u_id >= 0);
+			hasVAny = hasVAny || (L.v_id >= 0);
+
+			L.ready = true;
+		}
+
+		const double bx = XParam.xo + XBlock.xo[ib];
+		const double by = XParam.yo + XBlock.yo[ib];
+
+		const int io = static_cast<int>(round((bx - L.x0) / L.dx));
+		const int jo = static_cast<int>(round((by - L.y0) / L.dy));
+
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				const int ii = io + i;
+				const int jj = jo + j;
+
+				if (ii < 0 || ii >= L.nx || jj < 0 || jj >= L.ny)
+				{
+					continue;
+				}
+
+				const int n = memloc(XParam, i, j, ib);
+
+				auto build_start = [&](int ndims) -> std::vector<size_t>
+				{
+					if (ndims == 3)
+					{
+						return { static_cast<size_t>(hotstep), static_cast<size_t>(jj), static_cast<size_t>(ii) };
+					}
+					else if (ndims == 2)
+					{
+						return { static_cast<size_t>(jj), static_cast<size_t>(ii) };
+					}
+					return {};
+				};
+
+				if (L.zb_id >= 0)
+				{
+					std::vector<size_t> s = build_start(L.zb_nd);
+					if (!s.empty())
+					{
+						readncpointscaled(ncid, L.zb_id, s, zb[n]);
+					}
+				}
+				if (L.zs_id >= 0)
+				{
+					std::vector<size_t> s = build_start(L.zs_nd);
+					if (!s.empty())
+					{
+						readncpointscaled(ncid, L.zs_id, s, XEv.zs[n]);
+					}
+				}
+				if (L.h_id >= 0)
+				{
+					std::vector<size_t> s = build_start(L.h_nd);
+					if (!s.empty())
+					{
+						readncpointscaled(ncid, L.h_id, s, XEv.h[n]);
+					}
+				}
+				if (L.u_id >= 0)
+				{
+					std::vector<size_t> s = build_start(L.u_nd);
+					if (!s.empty())
+					{
+						readncpointscaled(ncid, L.u_id, s, XEv.u[n]);
+					}
+				}
+				if (L.v_id >= 0)
+				{
+					std::vector<size_t> s = build_start(L.v_nd);
+					if (!s.empty())
+					{
+						readncpointscaled(ncid, L.v_id, s, XEv.v[n]);
+					}
+				}
+			}
+		}
+	}
+
+	nc_close(ncid);
+
+	if (!hasZsAny && !hasHAny)
+	{
+		log("BG hotstart: neither zs nor h found. Falling back to legacy hotstart reader.");
+		return 0;
+	}
+
+	// Reconstruct missing state
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		const int ib = XBlock.active[ibl];
+		for (int j = 0; j < XParam.blkwidth; j++)
+		{
+			for (int i = 0; i < XParam.blkwidth; i++)
+			{
+				const int n = memloc(XParam, i, j, ib);
+
+				if (!hasZsAny && hasHAny)
+				{
+					XEv.zs[n] = zb[n] + XEv.h[n];
+				}
+				if (hasZsAny && !hasHAny)
+				{
+					XEv.h[n] = utils::max(XEv.zs[n] - zb[n], T(0.0));
+				}
+				if (!hasUAny)
+				{
+					XEv.u[n] = T(0.0);
+				}
+				if (!hasVAny)
+				{
+					XEv.v[n] = T(0.0);
+				}
+			}
+		}
+	}
+
+	// Restore edges/halo consistency
+	setedges(XParam, XBlock, zb);
+	setedges(XParam, XBlock, XEv.zs);
+	setedges(XParam, XBlock, XEv.h);
+	setedges(XParam, XBlock, XEv.u);
+	setedges(XParam, XBlock, XEv.v);
+
+	log("BG hotstart: direct multires read successful (no interpolation).");
+	return 1;
+}
