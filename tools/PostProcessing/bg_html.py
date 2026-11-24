@@ -378,7 +378,29 @@ def quantise(a):
     return gzip.compress(shuffled, 9), lo, st
 
 
-def build_package(src, var_list, steps, eps, region=None, verbose=True):
+def _avg_up(children):
+    """{(bj,bi): 16x16} at one level -> {(pj,pi): 16x16} one level coarser (NaN-aware 2x2 mean).
+    Only parents whose 4 children are all present are built."""
+    groups = {}
+    for (bj, bi), a in children.items():
+        groups.setdefault((bj >> 1, bi >> 1), []).append((bj & 1, bi & 1, a))
+    h = BW // 2
+    out = {}
+    for p, lst in groups.items():
+        if len(lst) != 4:
+            continue
+        blk = np.empty((BW, BW), np.float32)
+        for sj, si_, a in lst:
+            r = a.reshape(h, 2, h, 2)
+            fin = np.isfinite(r)
+            n = fin.sum(axis=(1, 3))
+            sm = np.where(fin, r, 0).sum(axis=(1, 3))
+            blk[sj * h:(sj + 1) * h, si_ * h:(si_ + 1) * h] = np.where(n > 0, sm / np.maximum(n, 1), np.nan)
+        out[p] = blk
+    return out
+
+
+def build_package(src, var_list, steps, eps, region=None, max_level=None, verbose=True):
     levs = src.levlist
     # block index bounding box per level (region crop)
     bbox = {}
@@ -393,6 +415,8 @@ def build_package(src, var_list, steps, eps, region=None, verbose=True):
                          max(0, int((x0 - L.x0) // bw)), min(L.nbx, int(-(-(x1 - L.x0) // bw))))
 
     ref = next((v for v in ("h", "zs", "hmax", "zsmax") if v in src.vars), var_list[0])
+    ref_levs = src.vars[ref]
+    Lm = ref_levs[-1] if max_level is None else min(max(max_level, ref_levs[0]), ref_levs[-1])
     blobs, meshes, mesh_index, step_mesh, fields = {}, [], {}, [], {v: [] for v in var_list}
     samples = {v: [] for v in var_list}
     depth_of = {}
@@ -402,18 +426,20 @@ def build_package(src, var_list, steps, eps, region=None, verbose=True):
         else:
             pref = ["hmax", "h"] if v.lower().endswith("max") else ["h", "hmax"]
             depth_of[v] = next((p for p in pref if p in src.vars), None)
+    # depth variables first, so their arrays are ready for masking the range samples
+    order = [v for v in ("h", "hmax") if v in var_list] + [v for v in var_list if v not in ("h", "hmax")]
+    NANB = np.full((BW, BW), np.nan, np.float32)
 
     for si, t in enumerate(steps):
         if verbose:
             print(f"  step {t + 1}/{src.nt} ({src.time_label(t)[0]})", flush=True)
-        # --- mesh: active blocks of the reference variable, finest wins
-        cache = {}
-        act = {}
-        for lev in src.vars[ref]:
-            cache[(ref, lev)] = src.level_blocks(ref, t, lev, bbox[lev])
-            act[lev] = set(cache[(ref, lev)])
+        # --- mesh: active blocks of the reference variable; a block fully covered by finer blocks is dropped
+        ref_blocks, act = {}, {}
+        for lev in ref_levs:
+            ref_blocks[lev] = src.level_blocks(ref, t, lev, bbox[lev])
+            act[lev] = set(ref_blocks[lev])
         covered = {lev: set() for lev in levs}
-        for lev in reversed(src.vars[ref][:-1]):
+        for lev in reversed(ref_levs[:-1]):
             child = act.get(lev + 1, set()) | covered.get(lev + 1, set())
             cnt = {}
             for (bj, bi) in child:
@@ -421,7 +447,10 @@ def build_package(src, var_list, steps, eps, region=None, verbose=True):
                 cnt[p] = cnt.get(p, 0) + 1
             covered[lev] = {p for p, n in cnt.items() if n == 4}
             act[lev] -= covered[lev]
-        keys = [(lev, bj, bi) for lev in src.vars[ref] for (bj, bi) in sorted(act[lev])]
+        # with --max-level, everything finer than Lm is averaged into level-Lm blocks
+        mesh_sets = {lev: set(act[lev]) for lev in ref_levs if lev < Lm}
+        mesh_sets[Lm] = set(act[Lm]) | (covered[Lm] if Lm < ref_levs[-1] else set())
+        keys = [(lev, bj, bi) for lev in sorted(mesh_sets) for (bj, bi) in sorted(mesh_sets[lev])]
         if not keys:
             step_mesh.append(None)
             for v in var_list:
@@ -438,45 +467,61 @@ def build_package(src, var_list, steps, eps, region=None, verbose=True):
             blobs[name] = gzip.compress(bi_a.tobytes() + bj_a.tobytes() + lev_a.tobytes(), 9)
             counts = {int(l): int((lev_a == l).sum()) for l in np.unique(lev_a)}
             meshes.append({"file": name, "nb": len(keys), "counts": counts})
-        mid = mesh_index[sig]
-        step_mesh.append(mid)
+        step_mesh.append(mesh_index[sig])
 
-        # --- fields on this mesh
-        nb = len(keys)
-        arrays = {}
-        for v in var_list:
-            arr = np.full((nb, BW, BW), np.nan, np.float32)
-            for lev in sorted(set(lev_a.tolist())):
+        # --- fields on this mesh, one variable at a time (keeps memory low)
+        depth_arrays = {}
+        for v in order:
+            def read(lev):
                 if lev not in src.vars[v]:
-                    continue
-                lb = cache.get((v, lev))
-                if lb is None:
-                    lb = src.level_blocks(v, t, lev, bbox[lev])
-                for k in np.nonzero(lev_a == lev)[0]:
-                    blk = lb.get((int(bj_a[k]), int(bi_a[k])))
-                    if blk is not None:
-                        arr[k] = blk
-            arrays[v] = arr
-        for v in var_list:
-            arr = arrays[v]
+                    return {}
+                return ref_blocks[lev] if v == ref else src.level_blocks(v, t, lev, bbox[lev])
+            got = {}
+            for lev in sorted(mesh_sets):
+                lb = read(lev)
+                for k in mesh_sets[lev]:
+                    if k in lb:
+                        got[(lev,) + k] = lb[k]
+            if Lm < ref_levs[-1] and covered[Lm]:
+                up = {}
+                for lev in range(ref_levs[-1], Lm, -1):
+                    lb = read(lev)
+                    cur = {k: lb.get(k, NANB) for k in act[lev]}
+                    cur.update(up)
+                    up = _avg_up(cur)
+                for k in covered[Lm]:
+                    if k in up:
+                        got[(Lm,) + k] = up[k]
+            arr = np.full((len(keys), BW, BW), np.nan, np.float32)
+            for i, k in enumerate(keys):
+                b = got.get(k)
+                if b is not None:
+                    arr[i] = b
+            del got
             gz, lo, st = quantise(arr)
             name = f"f_{v}_{si}"
             blobs[name] = gz
             fields[v].append({"file": name, "lo": lo, "st": st, "n": int(arr.size)})
-            # sample for default colour range (dry-masked)
+            # sample for the default colour range (dry-masked)
             d = depth_of.get(v)
             sel = np.isfinite(arr)
-            if d is not None and d in arrays:
-                sel &= arrays[d] >= eps
+            if d is not None and d in depth_arrays:
+                sel &= depth_arrays[d] >= eps
+            elif d == v:
+                sel &= arr >= eps
             vals = arr[sel]
             if vals.size > 200_000:
                 vals = vals[np.random.default_rng(0).choice(vals.size, 200_000, replace=False)]
             samples[v].append(vals)
+            if v in ("h", "hmax"):
+                depth_arrays[v] = arr
+            del arr
+        del ref_blocks, depth_arrays
 
     if all(m is None for m in step_mesh):
         raise SystemExit("No data found: every block of every level is empty for the selected steps "
                          "(the file may have been written before any output, or --region misses the domain).")
-    return blobs, meshes, step_mesh, fields, samples, depth_of
+    return blobs, meshes, step_mesh, fields, samples, depth_of, Lm
 
 
 ########################################################################
@@ -543,6 +588,7 @@ def main(argv=None):
     ap.add_argument("--steps", default="all", help="1-based steps: all | last | 1,3,5 | 2-6 (default all)")
     ap.add_argument("--eps", type=float, default=0.03, help="initial dry threshold on depth, m (default 0.03)")
     ap.add_argument("--region", help="crop to xmin,xmax,ymin,ymax (model CRS)")
+    ap.add_argument("--max-level", type=int, help="average levels finer than this into it (each level dropped cuts size ~4x)")
     ap.add_argument("--crs", help="override CRS, e.g. EPSG:2193")
     ap.add_argument("--title", help="page title (default: file name)")
     ap.add_argument("--linz-key", default="", help="embed a LINZ basemaps API key (visible to anyone with the file)")
@@ -576,7 +622,7 @@ def main(argv=None):
 
     print(f"Reading {a.file}: levels {src.levlist[0]}..{src.levlist[-1]}, "
           f"{len(var_list)} variables, {len(steps)} of {src.nt} steps")
-    blobs, meshes, step_mesh, fields, samples, depth_of = build_package(src, var_list, steps, a.eps, region)
+    blobs, meshes, step_mesh, fields, samples, depth_of, Lm = build_package(src, var_list, steps, a.eps, region, a.max_level)
 
     # keep only steps with data
     keep = [i for i, m in enumerate(step_mesh) if m is not None]
@@ -627,10 +673,9 @@ def main(argv=None):
         "thours": [(x[1] - t0s) / 3600.0 for x in tl], "tunits": src.time_units,
         "stepMesh": step_mesh, "meshes": meshes, "fields": fields, "eps": a.eps,
         "keys": {"linz": a.linz_key, "google": a.google_key}, "googleRegion": a.google_region,
-        "region": region,
+        "region": region, "maxLevel": (Lm if Lm < src.levlist[-1] else None),
     }
 
-    embed = {k: base64.b64encode(v).decode("ascii") for k, v in blobs.items()}
     vend = {k: vendor_text(k, a.vendor_dir) for k in VENDOR}
 
     def script(name):
@@ -639,19 +684,35 @@ def main(argv=None):
     css = vend["leaflet.css"]
     css_tag = f"<style>{css}</style>" if css else f'<link rel="stylesheet" href="{CDN["leaflet.css"]}">'
 
-    meta_json = json.dumps(meta, separators=(",", ":")).replace("</", "<\\/")
-    html = (PAGE.replace("__TITLE__", _html_escape(title))
+    # JSON inside <script>: escape every "<" so nothing in it can end or confuse the tag
+    meta_json = json.dumps(meta, separators=(",", ":")).replace("<", "\\u003c")
+    page = (PAGE.replace("__TITLE__", _html_escape(title))
                 .replace("<!--LEAFLET_CSS-->", css_tag)
                 .replace("<!--LEAFLET_JS-->", script("leaflet.js"))
                 .replace("<!--PROJ4_JS-->", script("proj4.js"))
-                .replace("/*META*/", meta_json)
-                .replace("/*EMBED*/", json.dumps(embed, separators=(",", ":"))))
+                .replace("/*META*/", meta_json))
+    head, tail = page.split("<!--DATA-->")
     out = a.out or os.path.splitext(a.file)[0] + ".html"
+    # Each blob goes in its own non-executed tag, split into parts well below the
+    # browser's ~512 M-character string limit, and the file is written as a stream.
+    PART = 32 * 2**20
     with open(out, "w", encoding="utf-8") as fh:
-        fh.write(html)
+        fh.write(head)
+        for k in list(blobs):
+            b64 = base64.b64encode(blobs.pop(k)).decode("ascii")
+            for i in range(0, max(len(b64), 1), PART):
+                fh.write(f'<script type="application/octet-stream" id="d:{k}:{i // PART}">{b64[i:i + PART]}</script>\n')
+            del b64
+        fh.write(tail)
     nb = [m["nb"] for m in meshes]
-    print(f"Wrote {out}: {os.path.getsize(out) / 2**20:.1f} MB, {len(meshes)} mesh(es) of "
+    size = os.path.getsize(out) / 2**20
+    print(f"Wrote {out}: {size:.1f} MB, {len(meshes)} mesh(es) of "
           f"{min(nb):,}-{max(nb):,} blocks, {len(steps_k)} steps x {len(var_list)} variables")
+    big = max(meshes, key=lambda m: m["nb"])["counts"]
+    print("  blocks per level: " + ", ".join(f"L{l} ({src.levels[l].dx:g} m): {n:,}" for l, n in sorted(big.items())))
+    if size > 300:
+        print(f"  warning: {size:.0f} MB is heavy for a browser. Reduce it with --max-level "
+              f"{Lm - 1 if Lm > src.levlist[0] else Lm} (about 4x smaller), --vars, --steps or --region.")
     if a.linz_key or a.google_key:
         print("  note: API keys are embedded in the HTML; anyone with the file can read them.")
     return out
@@ -820,7 +881,7 @@ footer p{max-width:110ch}
 </div>
 
 <script id="meta-json" type="application/json">/*META*/</script>
-<script>window.EMBED=/*EMBED*/;</script>
+<!--DATA-->
 <!--LEAFLET_JS-->
 <!--PROJ4_JS-->
 <script>
@@ -867,7 +928,10 @@ function colIdx(t){t=t<0?0:t>1?1:t;let i=Math.round(t*255);if(S.rev)i=255-i;retu
 
 /* ---------- data ---------- */
 async function bytes(name){
-  const s=atob(EMBED[name]);let buf=new Uint8Array(s.length);for(let i=0;i<s.length;i++)buf[i]=s.charCodeAt(i);
+  const parts=[];for(let i=0;;i++){const el=document.getElementById('d:'+name+':'+i);if(!el)break;parts.push(el.textContent.trim());}
+  if(!parts.length)throw new Error('data block "'+name+'" is missing from this file (was it truncated while copying?)');
+  const arrs=parts.map(p=>{const s=atob(p),u=new Uint8Array(s.length);for(let i=0;i<s.length;i++)u[i]=s.charCodeAt(i);return u;});
+  let buf=arrs[0];if(arrs.length>1){buf=new Uint8Array(arrs.reduce((n,a)=>n+a.length,0));let o=0;for(const a of arrs){buf.set(a,o);o+=a.length;}}
   if(buf[0]===0x1f&&buf[1]===0x8b){
     if(typeof DecompressionStream==='undefined')throw new Error('this browser cannot unpack the data (needs DecompressionStream: current Chrome, Edge, Firefox or Safari)');
     buf=new Uint8Array(await new Response(new Blob([buf]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());}
@@ -1135,7 +1199,7 @@ async function setBasemap(){
 function staticText(){
   const levs=M.levlist.map(l=>`${M.levels[l].dx} m`).join(', ');
   $('kick').textContent=`${M.title} · BG_Flood output · ${M.crs}`;
-  $('subline').textContent=`${M.varorder.length} variables over ${NS} time step${NS>1?'s':''}`+(NS<M.ntFile?` (of ${M.ntFile} in the file)`:'')+`, ${M.tlabels[0]}${NS>1?' to '+M.tlabels[NS-1]:''}. Adaptive mesh with cell sizes ${levs}.`+(M.region?' Cropped to a sub-region.':'');
+  $('subline').textContent=`${M.varorder.length} variables over ${NS} time step${NS>1?'s':''}`+(NS<M.ntFile?` (of ${M.ntFile} in the file)`:'')+`, ${M.tlabels[0]}${NS>1?' to '+M.tlabels[NS-1]:''}. Adaptive mesh with cell sizes ${levs}.`+(M.region?' Cropped to a sub-region.':'')+(M.maxLevel!=null?` Levels finer than ${M.maxLevel} (${M.levels[M.maxLevel].dx} m) are averaged into ${M.levels[M.maxLevel].dx} m blocks.`:'');
   $('howto').textContent=`How to read this. BG_Flood stores each variable once per refinement level (suffix _P n / _N n); every location belongs to the finest level whose 16 × 16-cell block is active there, and that is what is drawn. Cells where the water depth (h, or hmax for “max” variables) is below the dry threshold are hidden when “Hide dry cells” is ticked. Values are stored to 16-bit precision (about 1/65 000 of each field’s range). The CRS ${M.crsSource}: ${M.crs}.`+(M.proj4?' Blocks are reprojected to Web Mercator in the browser to sit on the basemap.':' The CRS could not be converted, so no basemap is available and coordinates are shown in model units.');
   $('srcnote').textContent=`Built ${M.built} from ${M.file} with bg_html.py.`;
   $('var').innerHTML=[...M.varorder,LEV].map(v=>`<option value="${v}">${v===LEV?'Refinement level':`${v}: ${M.vars[v].long}${M.vars[v].units?' ('+M.vars[v].units+')':''}`}</option>`).join('');
