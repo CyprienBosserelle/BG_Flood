@@ -11,7 +11,7 @@
 
 
 
-template <class T> __host__ void AddCulverts(Param XParam, double dt, std::vector<Culvert> XCulverts, Model<T> XModel);
+template <class T> __host__ void AddCulverts(Param XParam, double dt, const std::vector<Culvert>& XCulverts, Model<T> XModel);
 
 template <class T> __global__ void InjectCulvertGPU(Param XParam, int cc, Culvert XCulvert, CulvertF<T> XCulvertF, int* Culvertblks, BlockP<T> XBlock, AdvanceP<T> XAdv);
 template <class T> __host__ void InjectCulvertCPU(Param XParam, std::vector<Culvert> XCulverts, CulvertF<T>& XCulvertF, int nblkculvert, int* Culvertblks, BlockP<T> XBlock, AdvanceP<T> XAdv);
@@ -23,7 +23,7 @@ template <class T> __host__ void GetCulvertElevCPU(Param XParam, std::vector<Cul
 
 template <class T> __host__ void DischargeCulvertCPU(Param XParam, double dt, std::vector<Culvert> XCulverts, CulvertF<T>& XCulvertF, int nblkculvert, int* Culvertblks);
 template <class T> __global__ void DischargeCulvertGPU(Param XParam, int cc, double dt, CulvertF<T> XCulvertF, Culvert XCulvert);
-template <class T> __global__ void DischargeManyCulvertsGPU(Param XParam, int nculverts, double dt, CulvertF<T> XCulvertF);
+template <class T> __global__ void DischargeManyCulvertsGPU(int nculverts, double dt, CulvertF<T> XCulvertF, EvolvingP<T> XEv);
 
 template <class T> __host__ __device__ void CulvertPump(double Qmax, double dx1, T h1, T h2, T zs1, T zs2, T& dq, double dt);
 
