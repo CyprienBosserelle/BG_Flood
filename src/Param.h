@@ -42,6 +42,7 @@ public:
 	bool savebyblk = true;
 
 	int engine = 1; // 1: Buttinger-Kreuzhuber et al. 2019, 2: Kurganov (Popinet 2011), 3: KurganovATMP same as Kurganov but with atmospheric forcing terms 
+	bool flowmodel = true; // Switch to run the flow (shallow water) model. Set to false to run the wave model only (see WaveParam.h, "wavemodel" keyword)
 
 	//*Grid parameters
 	double dx = nan(""); // Grid resolution, in m for a metric grid or in decimal degree for a sperical grid.

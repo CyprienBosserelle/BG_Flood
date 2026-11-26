@@ -363,6 +363,55 @@ template void AllocateCPU<float>(int nblk, int blksize, Param XParam, Model<floa
 template void AllocateCPU<double>(int nblk, int blksize, Param XParam, Model<double>& XModel);
 
 
+/**
+ * @brief Allocate all wave model arrays on the CPU.
+ *
+ * Wave equivalent of AllocateCPU(nblk, blksize, XParam, XModel). Spectral arrays hold nspec "flow-like" arrays
+ * of size nblk*blksize (see WaveArrays.h for the memory layout).
+ *
+ * @tparam T Data type (float or double)
+ * @param nblk Number of blocks (allocated in memory, i.e. nblkmem)
+ * @param blksize Block size
+ * @param XWaveParam Wave model parameters
+ * @param XWave Wave model structure to allocate
+ */
+template <class T>
+void AllocateCPU(int nblk, int blksize, WaveParam XWaveParam, WaveModel<T>& XWave)
+{
+	// Spectral grid
+	AllocateCPU(XWaveParam.nfreq, 1, XWave.spec.sigma);
+	AllocateCPU(XWaveParam.nfreq, 1, XWave.spec.dsigma);
+	AllocateCPU(XWaveParam.ndir, 1, XWave.spec.theta);
+	AllocateCPU(XWaveParam.ndir, 1, XWave.spec.costh);
+	AllocateCPU(XWaveParam.ndir, 1, XWave.spec.sinth);
+
+	// Spectral arrays
+	AllocateCPU(nblk * XWaveParam.nspec, blksize, XWave.action.N);
+	AllocateCPU(nblk * XWaveParam.nspec, blksize, XWave.action_o.N);
+	AllocateCPU(nblk * XWaveParam.nspec, blksize, XWave.adv.dN);
+
+	// Bulk parameters
+	AllocateCPU(nblk, blksize, XWave.bulk.Hs, XWave.bulk.Tm01, XWave.bulk.Tm02, XWave.bulk.Tp);
+	AllocateCPU(nblk, blksize, XWave.bulk.Dir, XWave.bulk.Dspr, XWave.bulk.km, XWave.bulk.Urms);
+	AllocateCPU(nblk, blksize, XWave.bulk.Qb);
+
+	// Dissipation
+	AllocateCPU(nblk, blksize, XWave.dissip.Dbr);
+	AllocateCPU(nblk, blksize, XWave.dissip.Dfr);
+	AllocateCPU(nblk, blksize, XWave.dissip.Dwc);
+
+	// Coupling arrays
+	AllocateCPU(nblk, blksize, XWave.force.Sxx, XWave.force.Sxy, XWave.force.Syy, XWave.force.Fx);
+	AllocateCPU(nblk, blksize, XWave.force.Fy);
+
+	// Time step arrays
+	AllocateCPU(nblk, blksize, XWave.time.dtmax);
+	AllocateCPU(nblk, blksize, XWave.time.arrmin);
+}
+template void AllocateCPU<float>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<float>& XWave);
+template void AllocateCPU<double>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<double>& XWave);
+
+
 
 
 /**
@@ -939,4 +988,52 @@ void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel)
 
 template void AllocateGPU<float>(int nblk, int blksize, Param XParam, Model<float>& XModel);
 template void AllocateGPU<double>(int nblk, int blksize, Param XParam, Model<double>& XModel);
+
+
+/**
+ * @brief Allocate all wave model arrays on the GPU.
+ *
+ * Wave equivalent of AllocateGPU(nblk, blksize, XParam, XModel).
+ *
+ * @tparam T Data type (float or double)
+ * @param nblk Number of blocks (allocated in memory, i.e. nblkmem)
+ * @param blksize Block size
+ * @param XWaveParam Wave model parameters
+ * @param XWave Wave model structure to allocate
+ */
+template <class T>
+void AllocateGPU(int nblk, int blksize, WaveParam XWaveParam, WaveModel<T>& XWave)
+{
+	// Spectral grid
+	AllocateGPU(XWaveParam.nfreq, 1, XWave.spec.sigma);
+	AllocateGPU(XWaveParam.nfreq, 1, XWave.spec.dsigma);
+	AllocateGPU(XWaveParam.ndir, 1, XWave.spec.theta);
+	AllocateGPU(XWaveParam.ndir, 1, XWave.spec.costh);
+	AllocateGPU(XWaveParam.ndir, 1, XWave.spec.sinth);
+
+	// Spectral arrays
+	AllocateGPU(nblk * XWaveParam.nspec, blksize, XWave.action.N);
+	AllocateGPU(nblk * XWaveParam.nspec, blksize, XWave.action_o.N);
+	AllocateGPU(nblk * XWaveParam.nspec, blksize, XWave.adv.dN);
+
+	// Bulk parameters
+	AllocateGPU(nblk, blksize, XWave.bulk.Hs, XWave.bulk.Tm01, XWave.bulk.Tm02, XWave.bulk.Tp);
+	AllocateGPU(nblk, blksize, XWave.bulk.Dir, XWave.bulk.Dspr, XWave.bulk.km, XWave.bulk.Urms);
+	AllocateGPU(nblk, blksize, XWave.bulk.Qb);
+
+	// Dissipation
+	AllocateGPU(nblk, blksize, XWave.dissip.Dbr);
+	AllocateGPU(nblk, blksize, XWave.dissip.Dfr);
+	AllocateGPU(nblk, blksize, XWave.dissip.Dwc);
+
+	// Coupling arrays
+	AllocateGPU(nblk, blksize, XWave.force.Sxx, XWave.force.Sxy, XWave.force.Syy, XWave.force.Fx);
+	AllocateGPU(nblk, blksize, XWave.force.Fy);
+
+	// Time step arrays (used by the GPU time step reduction)
+	AllocateGPU(nblk, blksize, XWave.time.dtmax);
+	AllocateGPU(nblk, blksize, XWave.time.arrmin);
+}
+template void AllocateGPU<float>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<float>& XWave);
+template void AllocateGPU<double>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<double>& XWave);
 

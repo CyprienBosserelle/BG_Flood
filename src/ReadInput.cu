@@ -103,6 +103,22 @@ template deformmap<float> readfileinfo<deformmap<float>>(std::string input, defo
  */
 void Readparamfile(Param& XParam, Forcing<float>& XForcing, std::string Paramfile)
 {
+	// Flow only version: the wave parameters are read but discarded
+	WaveParam XWaveParam;
+	Readparamfile(XParam, XForcing, XWaveParam, Paramfile);
+}
+
+/**
+ * @brief Read and parse the parameter file (flow, forcing and wave parameters).
+ * Opens the specified parameter file (default: BG_param.txt file), reads its contents, and updates the provided
+ * parameter structures: Param class (XParam), Forcing class (XForcing) and WaveParam class (XWaveParam).
+ * @param XParam Reference to the parameter structure to be updated
+ * @param XForcing Reference to the forcing structure to be updated
+ * @param XWaveParam Reference to the wave parameter structure to be updated
+ * @param Paramfile Name of the parameter file to read
+ */
+void Readparamfile(Param& XParam, Forcing<float>& XForcing, WaveParam& XWaveParam, std::string Paramfile)
+{
 	//
 	log("\nReading parameter file: " + Paramfile + " ...");
 	//std::ifstream fs("BG_param.txt");
@@ -128,6 +144,7 @@ void Readparamfile(Param& XParam, Forcing<float>& XForcing, std::string Paramfil
 			{
 				XParam = readparamstr(line, XParam);
 				XForcing = readparamstr(line, XForcing);
+				XWaveParam = readparamstr(line, XWaveParam);
 
 				//std::cout << line << std::endl;
 			}
@@ -226,6 +243,13 @@ Param readparamstr(std::string line, Param param)
 			param.engine = std::stoi(parametervalue);
 		}
 	}
+	paramvec = { "flowmodel", "runflow", "flow" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		param.flowmodel = readparambool(parametervalue, param.flowmodel);
+	}
+
 	///////////////////////////////////////////////////////
 	// Adaptation
 	//
@@ -531,6 +555,9 @@ Param readparamstr(std::string line, Param param)
 
 
 			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","zso","uo","vo","ho","hmean","zsmean","umean","vmean","hUmean","Umean","hmax","zsmax","umax","vmax","hUmax","Umax","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw","hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy" };
+			// Wave model outputs (see WaveParam.h)
+			std::vector<std::string> WaveVarNames = WaveOutputVarNames();
+			SupportedVarNames.insert(SupportedVarNames.end(), WaveVarNames.begin(), WaveVarNames.end());
 
 
 
@@ -888,6 +915,408 @@ Param readparamstr(std::string line, Param param)
 	return param;
 }
 
+
+
+/**
+ * @brief Parse a parameter string and update the wave parameter structure.
+ *
+ * Wave equivalent of readparamstr(line, Param). Parses a line from the parameter file (BG_param.txt)
+ * and updates the given wave parameter structure.
+ * Wave keywords are chosen so they do not conflict with the flow keywords (e.g. "wavedt" vs "dt").
+ *
+ * @param line Input line from parameter file
+ * @param wparam Wave parameter structure to update
+ * @return Updated wave parameter structure
+ */
+WaveParam readparamstr(std::string line, WaveParam wparam)
+{
+	std::string parameterstr, parametervalue;
+	std::vector<std::string> paramvec;
+
+	///////////////////////////////////////////////////////
+	// Wave model switches
+	//
+	paramvec = { "wavemodel", "runwave", "wave", "waves" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavemodel = readparambool(parametervalue, wparam.wavemodel);
+	}
+
+	paramvec = { "wavecurrent", "wavecurrentinteraction" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavecurrent = readparambool(parametervalue, wparam.wavecurrent);
+	}
+
+	paramvec = { "wavewaterlevel", "wavedepth" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavewaterlevel = readparambool(parametervalue, wparam.wavewaterlevel);
+	}
+
+	paramvec = { "waveflowcoupling", "wavecoupling", "waveforcing" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.waveflowcoupling = readparambool(parametervalue, wparam.waveflowcoupling);
+	}
+
+	paramvec = { "wavesolver", "wavescheme" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavesolver = std::stoi(parametervalue);
+	}
+
+	///////////////////////////////////////////////////////
+	// Spectral grid
+	//
+	paramvec = { "nfreq", "wavenfreq", "nfrequencies" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.nfreq = std::stoi(parametervalue);
+	}
+
+	paramvec = { "ndir", "wavendir", "ndirections" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.ndir = std::stoi(parametervalue);
+	}
+
+	paramvec = { "fmin", "wavefmin", "flow_freq" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.fmin = std::stod(parametervalue);
+	}
+
+	paramvec = { "fmax", "wavefmax", "fhigh_freq" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.fmax = std::stod(parametervalue);
+	}
+
+	paramvec = { "dirstart", "wavedirstart" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.dirstart = std::stod(parametervalue);
+	}
+
+	///////////////////////////////////////////////////////
+	// Time stepping
+	//
+	paramvec = { "wavedt", "dtwave" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavedt = std::stod(parametervalue);
+	}
+
+	paramvec = { "waveCFL", "CFLwave" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.waveCFL = std::stod(parametervalue);
+	}
+
+	paramvec = { "dtcouple", "wavedtcouple", "couplinginterval" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.dtcouple = std::stod(parametervalue);
+	}
+
+	paramvec = { "wavedepthmin", "depmin", "depthmin" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavedepthmin = std::stod(parametervalue);
+	}
+
+	///////////////////////////////////////////////////////
+	// Source terms
+	//
+	paramvec = { "windinput", "wavewindinput" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.windinput = std::stoi(parametervalue);
+	}
+
+	paramvec = { "lineargrowth", "agrow" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.lineargrowth = readparambool(parametervalue, wparam.lineargrowth);
+	}
+
+	paramvec = { "whitecapping", "wcap" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.whitecapping = std::stoi(parametervalue);
+	}
+
+	paramvec = { "cds", "wccds" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.cds = std::stod(parametervalue);
+	}
+
+	paramvec = { "stpm", "wcstpm" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.stpm = std::stod(parametervalue);
+	}
+
+	paramvec = { "powst", "wcpowst" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.powst = std::stod(parametervalue);
+	}
+
+	parameterstr = "wcdelta";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wcdelta = std::stod(parametervalue);
+	}
+
+	paramvec = { "powk", "wcpowk" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.powk = std::stod(parametervalue);
+	}
+
+	paramvec = { "quadruplets", "quad" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.quadruplets = std::stoi(parametervalue);
+	}
+
+	paramvec = { "dialambda", "quadlambda" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.dialambda = std::stod(parametervalue);
+	}
+
+	paramvec = { "diaCnl4", "quadCnl4", "Cnl4" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.diaCnl4 = std::stod(parametervalue);
+	}
+
+	paramvec = { "triads", "triad" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.triads = std::stoi(parametervalue);
+	}
+
+	parameterstr = "trfac";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		wparam.trfac = std::stod(parametervalue);
+	}
+
+	parameterstr = "cutfr";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		wparam.cutfr = std::stod(parametervalue);
+	}
+
+	paramvec = { "breaking", "wavebreaking" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.breaking = std::stoi(parametervalue);
+	}
+
+	paramvec = { "alphabr", "breakingalpha" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.alphabr = std::stod(parametervalue);
+	}
+
+	paramvec = { "gammabr", "breakinggamma", "breakerindex" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.gammabr = std::stod(parametervalue);
+	}
+
+	paramvec = { "wavefriction", "wavebotfriction" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavefriction = std::stoi(parametervalue);
+	}
+
+	paramvec = { "cfjon", "wavecfjon" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.cfjon = std::stod(parametervalue);
+	}
+
+	paramvec = { "cfw", "wavecfw" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.cfw = std::stod(parametervalue);
+	}
+
+	paramvec = { "kn", "wavekn" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.kn = std::stod(parametervalue);
+	}
+
+	paramvec = { "wavelimiter", "limiter" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavelimiter = readparambool(parametervalue, wparam.wavelimiter);
+	}
+
+	paramvec = { "limiterfac", "wavelimiterfac" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.limiterfac = std::stod(parametervalue);
+	}
+
+	///////////////////////////////////////////////////////
+	// Initial conditions
+	//
+	paramvec = { "waveinit", "initwave" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.waveinit = std::stoi(parametervalue);
+	}
+
+	paramvec = { "Hsinit", "initHs" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.Hsinit = std::stod(parametervalue);
+	}
+
+	paramvec = { "Tpinit", "initTp" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.Tpinit = std::stod(parametervalue);
+	}
+
+	paramvec = { "Dirinit", "initDir" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.Dirinit = std::stod(parametervalue);
+	}
+
+	paramvec = { "Dsprinit", "initDspr" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.Dsprinit = std::stod(parametervalue);
+	}
+
+	///////////////////////////////////////////////////////
+	// Boundaries
+	//
+	paramvec = { "leftwavebnd", "wavebndleft" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.leftwavebnd = std::stoi(parametervalue);
+	}
+
+	paramvec = { "rightwavebnd", "wavebndright" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.rightwavebnd = std::stoi(parametervalue);
+	}
+
+	paramvec = { "topwavebnd", "wavebndtop" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.topwavebnd = std::stoi(parametervalue);
+	}
+
+	paramvec = { "botwavebnd", "wavebndbot", "bottomwavebnd", "wavebndbottom" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.botwavebnd = std::stoi(parametervalue);
+	}
+
+	paramvec = { "Hsbnd", "bndHs" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.Hsbnd = std::stod(parametervalue);
+	}
+
+	paramvec = { "Tpbnd", "bndTp" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.Tpbnd = std::stod(parametervalue);
+	}
+
+	paramvec = { "Dirbnd", "bndDir" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.Dirbnd = std::stod(parametervalue);
+	}
+
+	paramvec = { "Dsprbnd", "bndDspr" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.Dsprbnd = std::stod(parametervalue);
+	}
+
+	paramvec = { "gammajsp", "jonswapgamma", "gammajonswap" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.gammajsp = std::stod(parametervalue);
+	}
+
+	parameterstr = "wavebndtaper";
+	parametervalue = findparameter(parameterstr, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavebndtaper = std::stod(parametervalue);
+	}
+
+	return wparam;
+}
 
 
 /*! \fn Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
@@ -1679,6 +2108,129 @@ void checkparamsanity(Param& XParam, Forcing<float>& XForcing)
 			}
 		}
 
+	}
+
+}
+
+/**
+ * @brief Check the wave model parameters and calculate the derived parameters.
+ *
+ * Wave equivalent of checkparamsanity. Must be called after checkparamsanity.
+ * - Makes sure at least one of the flow or the wave model is running
+ * - Calculates the spectral grid parameters (nspec, freqfactor, dtheta)
+ * - Removes wave outputs if the wave model is not running
+ * - Turns off wave physics that need a forcing that was not provided (e.g. wind)
+ *
+ * @param XParam Flow parameter structure
+ * @param XWaveParam Wave parameter structure
+ * @param XForcing Forcing structure
+ */
+void checkwaveparamsanity(Param& XParam, WaveParam& XWaveParam, Forcing<float>& XForcing)
+{
+	//Check that at least one model is running
+	if (!XParam.flowmodel && !XWaveParam.wavemodel)
+	{
+		log("WARNING: Both the flow model and the wave model are turned off. The flow model is turned back on.");
+		XParam.flowmodel = true;
+	}
+
+	if (!XWaveParam.wavemodel)
+	{
+		//Remove the wave outputs if requested by the user
+		std::vector<std::string> namestr = WaveOutputVarNames();
+		for (int ii = 0; ii < namestr.size(); ii++)
+		{
+			std::vector<std::string>::iterator itr = std::find(XParam.outvars.begin(), XParam.outvars.end(), namestr[ii]);
+			if (itr != XParam.outvars.end())
+			{
+				log("The output variable associated to the wave model \"" + namestr[ii] + "\" is requested but the wave model is not used. The variable is removed from the outputs.");
+				XParam.outvars.erase(itr);
+			}
+		}
+		return;
+	}
+
+	log("Wave model is ON" + std::string(XParam.flowmodel ? " (coupled with the flow model)" : " (flow model is OFF)"));
+
+	///////////////////////////////////////////
+	// Spectral grid
+	///////////////////////////////////////////
+	if (XWaveParam.nfreq < 1)
+	{
+		log("WARNING: nfreq must be >= 1. nfreq set to 1");
+		XWaveParam.nfreq = 1;
+	}
+	if (XWaveParam.ndir < 1)
+	{
+		log("WARNING: ndir must be >= 1. ndir set to 1");
+		XWaveParam.ndir = 1;
+	}
+	if (XWaveParam.ndir < 8)
+	{
+		log("WARNING: Low directional resolution (ndir = " + std::to_string(XWaveParam.ndir) + "). Refraction will be poorly resolved.");
+	}
+	if (XWaveParam.fmin <= 0.0)
+	{
+		WaveParam DefaultWaveParams;
+		log("WARNING: fmin must be > 0. fmin set to " + std::to_string(DefaultWaveParams.fmin));
+		XWaveParam.fmin = DefaultWaveParams.fmin;
+	}
+
+	XWaveParam.nspec = XWaveParam.nfreq * XWaveParam.ndir;
+	XWaveParam.dtheta = 2.0 * pi / double(XWaveParam.ndir);
+
+	if (XWaveParam.nfreq > 1)
+	{
+		if (XWaveParam.fmax <= XWaveParam.fmin)
+		{
+			log("ERROR: fmax (" + std::to_string(XWaveParam.fmax) + ") must be larger than fmin (" + std::to_string(XWaveParam.fmin) + ")");
+			exit(1);
+		}
+		XWaveParam.freqfactor = pow(XWaveParam.fmax / XWaveParam.fmin, 1.0 / double(XWaveParam.nfreq - 1));
+	}
+	else
+	{
+		XWaveParam.freqfactor = 1.0;
+		XWaveParam.fmax = XWaveParam.fmin;
+	}
+
+	///////////////////////////////////////////
+	// Time stepping
+	///////////////////////////////////////////
+	if (XWaveParam.waveCFL <= 0.0 || XWaveParam.waveCFL > 1.0)
+	{
+		WaveParam DefaultWaveParams;
+		log("WARNING: waveCFL must be in ]0,1]. waveCFL set to " + std::to_string(DefaultWaveParams.waveCFL));
+		XWaveParam.waveCFL = DefaultWaveParams.waveCFL;
+	}
+	XWaveParam.dtcouple = utils::max(XWaveParam.dtcouple, 0.0);
+	XWaveParam.wavedepthmin = utils::max(XWaveParam.wavedepthmin, XParam.eps);
+
+	///////////////////////////////////////////
+	// Physics
+	///////////////////////////////////////////
+	if (XWaveParam.windinput > 0 && XForcing.UWind.inputfile.empty())
+	{
+		log("No wind forcing provided: wave wind input (windinput) is turned off.");
+		XWaveParam.windinput = 0;
+	}
+
+	if (!XParam.flowmodel)
+	{
+		// Nothing to couple to
+		XWaveParam.waveflowcoupling = false;
+	}
+
+	///////////////////////////////////////////
+	// Boundaries
+	///////////////////////////////////////////
+	std::vector<int> bndtypes = { XWaveParam.leftwavebnd, XWaveParam.rightwavebnd, XWaveParam.topwavebnd, XWaveParam.botwavebnd };
+	for (int ib = 0; ib < bndtypes.size(); ib++)
+	{
+		if (bndtypes[ib] == 2)
+		{
+			log("WARNING: Spectral file wave boundary (type 2) is not implemented yet.");
+		}
 	}
 
 }

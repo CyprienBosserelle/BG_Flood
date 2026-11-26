@@ -40,6 +40,10 @@
  * When running with the GPU there is also XModel_g
  * which is the same as XModel but with GPU specific pointers
  *
+ * The (spectral) wave model follows the same structure: XWaveParam (class WaveParam) and XWave (class WaveModel)
+ * and XWave_g for the GPU pointers. The wave model shares the mesh, bathymetry and forcing with the flow model.
+ * The flow and/or the wave model can be turned on/off with the "flowmodel" and "wavemodel" keywords.
+ *
  * This function does:
  * - Reads the inputs to the model
  * - Allocate memory on GPU and CPU
@@ -72,6 +76,7 @@ int main(int argc, char* argv[])
 	//===========================================
 	//  Define the main parameter controling the model (XModels class at produced later) 
 	Param XParam;
+	WaveParam XWaveParam; // Wave model parameters
 	Forcing<float> XForcing; // for reading and storing forcing data (CPU only) // by default we read only float precision!
 	// Start timer to keep track of time
 	XParam.startcputime = clock();
@@ -84,7 +89,7 @@ int main(int argc, char* argv[])
 	// Read Operational file
 	// Also check XParam sanity
 
-	Readparamfile(XParam, XForcing, ParamFile);
+	Readparamfile(XParam, XForcing, XWaveParam, ParamFile);
 
 
 	//============================================
@@ -98,14 +103,20 @@ int main(int argc, char* argv[])
 	Model<float> XModel_f; // For CPU float pointers
 	Model<float> XModel_gf; // For GPU float pointers
 
+	WaveModel<double> XWave_d; // For CPU double wave pointers
+	WaveModel<double> XWave_gd; // For GPU double wave pointers
+
+	WaveModel<float> XWave_f; // For CPU float wave pointers
+	WaveModel<float> XWave_gf; // For GPU float wave pointers
+
 	if (XParam.doubleprecision < 1)
 	{
 		// Call the Float precision run
-		mainwork(XParam, XForcing, XModel_f, XModel_gf);
+		mainwork(XParam, XWaveParam, XForcing, XModel_f, XModel_gf, XWave_f, XWave_gf);
 	}
 	else
 	{
-		mainwork(XParam, XForcing, XModel_d, XModel_gd);
+		mainwork(XParam, XWaveParam, XForcing, XModel_d, XModel_gd, XWave_d, XWave_gd);
 	}
 
 }
@@ -114,22 +125,26 @@ int main(int argc, char* argv[])
  * @brief Main model setup and execution routine for BG_Flood.
  * @tparam T Data type
  * @param XParam Model parameters
+ * @param XWaveParam Wave model parameters
  * @param XForcing Forcing data
  * @param XModel Model structure (CPU)
  * @param XModel_g Model structure (GPU)
+ * @param XWave Wave model structure (CPU)
+ * @param XWave_g Wave model structure (GPU)
  * @return Status code (0 for success)
  *
  * This function performs the main setup and execution steps for the BG_Flood model:
  * - Reads and verifies input/forcing data
  * - Initializes mesh and initial conditions
  * - Performs initial adaptation
+ * - Initializes the wave model (if requested)
  * - Sets up GPU resources
  * - Runs the main simulation loop (MainLoop)
  * - Handles test mode if specified
  *
  * Integrates all major model components and coordinates CPU/GPU execution.
  */
-template < class T > int mainwork(Param XParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g)
+template < class T > int mainwork(Param XParam, WaveParam XWaveParam, Forcing<float> XForcing, Model<T> XModel, Model<T> XModel_g, WaveModel<T> XWave, WaveModel<T> XWave_g)
 {
 	//============================================
 	// Read the forcing data (Including bathymetry)
@@ -138,6 +153,7 @@ template < class T > int mainwork(Param XParam, Forcing<float> XForcing, Model<T
 	//=============================================
 	// Verify Compatibility of forcing and model Parameters
 	checkparamsanity(XParam, XForcing);
+	checkwaveparamsanity(XParam, XWaveParam, XForcing);
 
 	//============================================
 	// Prepare initial mesh layout
@@ -152,8 +168,16 @@ template < class T > int mainwork(Param XParam, Forcing<float> XForcing, Model<T
 	InitialAdaptation(XParam, XForcing, XModel);
 
 	//============================================
+	// Initialise the wave model on CPU (bypassed if the wave model is not used)
+	// This is done after the adaptation so the wave model uses the final mesh
+	InitWaveModel(XParam, XWaveParam, XForcing, XModel, XWave);
+
+	//============================================
 	// Setup GPU (bypassed within the function if no suitable GPU is available)
 	SetupGPU(XParam, XModel,XForcing, XModel_g);
+
+	// Setup wave model on GPU (bypassed if no GPU or no wave model, needs to be after SetupGPU)
+	SetupWaveGPU(XParam, XWaveParam, XModel_g, XWave, XWave_g);
 
 
 
@@ -171,7 +195,7 @@ template < class T > int mainwork(Param XParam, Forcing<float> XForcing, Model<T
 		//============================================
 		// MainLoop
 		//printf("XCulvertsF h1=%f\n", XModel.culvertsF.h1[0]);
-		MainLoop(XParam, XForcing, XModel, XModel_g);
+		MainLoop(XParam, XWaveParam, XForcing, XModel, XModel_g, XWave, XWave_g);
 	}
 	else
 	{

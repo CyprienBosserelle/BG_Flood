@@ -404,6 +404,59 @@ template void CopytoGPU<double>(int nblk, int blksize, Param XParam, Model<doubl
 
 
 /**
+ * @brief Copy the wave model structure from CPU to GPU.
+ *
+ * Wave equivalent of CopytoGPU(nblk, blksize, XParam, XModel_cpu, XModel_gpu).
+ *
+ * @tparam T Data type
+ * @param nblk Number of blocks (allocated in memory, i.e. nblkmem)
+ * @param blksize Block size
+ * @param XWaveParam Wave model parameters
+ * @param XWave_cpu Source wave model structure (CPU)
+ * @param XWave_gpu Destination wave model structure (GPU)
+ */
+template <class T> void CopytoGPU(int nblk, int blksize, WaveParam XWaveParam, WaveModel<T> XWave_cpu, WaveModel<T> XWave_gpu)
+{
+	// Spectral grid
+	CopytoGPU(XWaveParam.nfreq, 1, XWave_cpu.spec.sigma, XWave_gpu.spec.sigma);
+	CopytoGPU(XWaveParam.nfreq, 1, XWave_cpu.spec.dsigma, XWave_gpu.spec.dsigma);
+	CopytoGPU(XWaveParam.ndir, 1, XWave_cpu.spec.theta, XWave_gpu.spec.theta);
+	CopytoGPU(XWaveParam.ndir, 1, XWave_cpu.spec.costh, XWave_gpu.spec.costh);
+	CopytoGPU(XWaveParam.ndir, 1, XWave_cpu.spec.sinth, XWave_gpu.spec.sinth);
+
+	// Spectral arrays
+	CopytoGPU(nblk * XWaveParam.nspec, blksize, XWave_cpu.action.N, XWave_gpu.action.N);
+	CopytoGPU(nblk * XWaveParam.nspec, blksize, XWave_cpu.action_o.N, XWave_gpu.action_o.N);
+	CopytoGPU(nblk * XWaveParam.nspec, blksize, XWave_cpu.adv.dN, XWave_gpu.adv.dN);
+
+	// Bulk parameters
+	CopytoGPU(nblk, blksize, XWave_cpu.bulk.Hs, XWave_gpu.bulk.Hs);
+	CopytoGPU(nblk, blksize, XWave_cpu.bulk.Tm01, XWave_gpu.bulk.Tm01);
+	CopytoGPU(nblk, blksize, XWave_cpu.bulk.Tm02, XWave_gpu.bulk.Tm02);
+	CopytoGPU(nblk, blksize, XWave_cpu.bulk.Tp, XWave_gpu.bulk.Tp);
+	CopytoGPU(nblk, blksize, XWave_cpu.bulk.Dir, XWave_gpu.bulk.Dir);
+	CopytoGPU(nblk, blksize, XWave_cpu.bulk.Dspr, XWave_gpu.bulk.Dspr);
+	CopytoGPU(nblk, blksize, XWave_cpu.bulk.km, XWave_gpu.bulk.km);
+	CopytoGPU(nblk, blksize, XWave_cpu.bulk.Urms, XWave_gpu.bulk.Urms);
+	CopytoGPU(nblk, blksize, XWave_cpu.bulk.Qb, XWave_gpu.bulk.Qb);
+
+	// Dissipation
+	CopytoGPU(nblk, blksize, XWave_cpu.dissip.Dbr, XWave_gpu.dissip.Dbr);
+	CopytoGPU(nblk, blksize, XWave_cpu.dissip.Dfr, XWave_gpu.dissip.Dfr);
+	CopytoGPU(nblk, blksize, XWave_cpu.dissip.Dwc, XWave_gpu.dissip.Dwc);
+
+	// Coupling arrays
+	CopytoGPU(nblk, blksize, XWave_cpu.force.Sxx, XWave_gpu.force.Sxx);
+	CopytoGPU(nblk, blksize, XWave_cpu.force.Sxy, XWave_gpu.force.Sxy);
+	CopytoGPU(nblk, blksize, XWave_cpu.force.Syy, XWave_gpu.force.Syy);
+	CopytoGPU(nblk, blksize, XWave_cpu.force.Fx, XWave_gpu.force.Fx);
+	CopytoGPU(nblk, blksize, XWave_cpu.force.Fy, XWave_gpu.force.Fy);
+}
+template void CopytoGPU<float>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<float> XWave_cpu, WaveModel<float> XWave_gpu);
+template void CopytoGPU<double>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<double> XWave_cpu, WaveModel<double> XWave_gpu);
+
+
+/**
  * @brief Allocate and bind a CUDA texture object.
  *
  * Allocates a CUDA array and creates a texture object for use in GPU kernels.

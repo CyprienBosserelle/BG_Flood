@@ -4,6 +4,7 @@
 
 #include "General.h"
 #include "Param.h"
+#include "WaveParam.h"
 #include "Write_txtlog.h"
 #include "Forcing.h"
 #include "Util_CPU.h"
@@ -15,13 +16,16 @@
 template <class T> T readfileinfo(std::string input, T outinfo);
 
 void Readparamfile(Param& XParam, Forcing<float>& XForcing, std::string Paramfile);
+void Readparamfile(Param& XParam, Forcing<float>& XForcing, WaveParam& XWaveParam, std::string Paramfile);
 
 template <class T> Forcing<T> readparamstr(std::string line, Forcing<T> forcing);
 
 Param readparamstr(std::string line, Param param);
+WaveParam readparamstr(std::string line, WaveParam wparam);
 
 template <class T>Forcing<T> readparamstr(std::string line, Forcing<T> forcing);
 void checkparamsanity(Param& XParam, Forcing<float>& XForcing);
+void checkwaveparamsanity(Param& XParam, WaveParam& XWaveParam, Forcing<float>& XForcing);
 double setendtime(Param XParam, Forcing<float> XForcing);
 std::string findparameter(std::vector<std::string> parameterstr, std::string line);
 std::string findparameter(std::string parameterstr, std::string line);
