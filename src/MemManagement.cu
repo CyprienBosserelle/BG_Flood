@@ -421,9 +421,6 @@ void AllocateCPU(int nblk, int blksize, WaveParam XWaveParam, WaveModel<T>& XWav
 	// Kinematics (per frequency)
 	AllocateCPU(nblk * XWaveParam.nfreq, blksize, XWave.kin.k);
 	AllocateCPU(nblk * XWaveParam.nfreq, blksize, XWave.kin.cg);
-
-	// Boundary spectrum
-	AllocateCPU(XWaveParam.nspec, 1, XWave.bnd.Nbnd);
 }
 template void AllocateCPU<float>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<float>& XWave);
 template void AllocateCPU<double>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<double>& XWave);
@@ -1064,9 +1061,6 @@ void AllocateGPU(int nblk, int blksize, WaveParam XWaveParam, WaveModel<T>& XWav
 	// Kinematics (per frequency)
 	AllocateGPU(nblk * XWaveParam.nfreq, blksize, XWave.kin.k);
 	AllocateGPU(nblk * XWaveParam.nfreq, blksize, XWave.kin.cg);
-
-	// Boundary spectrum
-	AllocateGPU(XWaveParam.nspec, 1, XWave.bnd.Nbnd);
 }
 template void AllocateGPU<float>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<float>& XWave);
 template void AllocateGPU<double>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<double>& XWave);

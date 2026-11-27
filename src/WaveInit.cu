@@ -64,6 +64,16 @@ template <class T> void InitWaveModel(Param XParam, WaveParam& XWaveParam, Forci
 	InitWaveSpecGrid(XWaveParam, XWave.spec);
 
 	//==============================
+	// Boundary blocks of each wave boundary segment (same function as for the flow boundaries)
+	Initsegbndblks(XParam, XForcing.wavebndseg, XModel.blocks, "Wave boundary segment");
+	for (int iseg = 0; iseg < XForcing.wavebndseg.size(); iseg++)
+	{
+		wavebndsegment& seg = XForcing.wavebndseg[iseg];
+		std::vector<std::string> typestr = { "absorbing", "Neumann", "JONSWAP" };
+		log("\tWave boundary segment " + std::to_string(iseg) + " (" + seg.polyfile + "): " + typestr[seg.type] + (seg.on ? (seg.uniform ? " (time series: " : " (maps: ") + seg.inputfile + ")" : std::string("")));
+	}
+
+	//==============================
 	// Initial conditions
 	InitWaveConditions(XParam, XWaveParam, XModel, XWave);
 
@@ -94,11 +104,12 @@ template void InitWaveModel<double>(Param XParam, WaveParam& XWaveParam, Forcing
  * @tparam T Data type (float or double)
  * @param XParam Flow model parameters
  * @param XWaveParam Wave model parameters
+ * @param XForcing Forcing (the wave boundary segment block lists are copied to the GPU)
  * @param XModel_g Flow model (GPU) the wave output variables are registered in
  * @param XWave Wave model (CPU)
  * @param XWave_g Wave model (GPU)
  */
-template <class T> void SetupWaveGPU(Param XParam, WaveParam XWaveParam, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g)
+template <class T> void SetupWaveGPU(Param XParam, WaveParam XWaveParam, Forcing<float>& XForcing, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g)
 {
 	if (!XWaveParam.wavemodel || XParam.GPUDEVICE < 0)
 	{
@@ -111,10 +122,24 @@ template <class T> void SetupWaveGPU(Param XParam, WaveParam XWaveParam, Model<T
 
 	XWave_g.clock = XWave.clock;
 
+	// Wave boundary segments block lists (as for the flow bndseg in SetupGPU)
+	for (int s = 0; s < XForcing.wavebndseg.size(); s++)
+	{
+		bndsegmentside* sides[4] = { &XForcing.wavebndseg[s].left, &XForcing.wavebndseg[s].right, &XForcing.wavebndseg[s].top, &XForcing.wavebndseg[s].bot };
+		for (int is = 0; is < 4; is++)
+		{
+			AllocateGPU(utils::max(sides[is]->nblk, 1), 1, sides[is]->blk_g);
+			if (sides[is]->nblk > 0)
+			{
+				CopytoGPU(sides[is]->nblk, 1, sides[is]->blk, sides[is]->blk_g);
+			}
+		}
+	}
+
 	InitWavemaparray(XModel_g, XWave_g);
 }
-template void SetupWaveGPU<float>(Param XParam, WaveParam XWaveParam, Model<float>& XModel_g, WaveModel<float>& XWave, WaveModel<float>& XWave_g);
-template void SetupWaveGPU<double>(Param XParam, WaveParam XWaveParam, Model<double>& XModel_g, WaveModel<double>& XWave, WaveModel<double>& XWave_g);
+template void SetupWaveGPU<float>(Param XParam, WaveParam XWaveParam, Forcing<float>& XForcing, Model<float>& XModel_g, WaveModel<float>& XWave, WaveModel<float>& XWave_g);
+template void SetupWaveGPU<double>(Param XParam, WaveParam XWaveParam, Forcing<float>& XForcing, Model<double>& XModel_g, WaveModel<double>& XWave, WaveModel<double>& XWave_g);
 
 
 /**
@@ -162,7 +187,7 @@ template void InitWaveSpecGrid<double>(WaveParam XWaveParam, WaveSpecGridP<doubl
  * E(f) ~ f^-5 exp(-5/4 (fp/f)^4) gamma^exp(-(f-fp)^2/(2 s^2 fp^2)) (s = 0.07 for f<=fp and 0.09 for f>fp)
  * D(theta) ~ cos^2s((theta-theta_m)/2) with s = 2/dspr^2 - 1 (dspr in rad, Kuik et al. 1988)
  * The discrete spectrum is scaled so that 4*sqrt(m0) = Hs exactly on the model spectral grid.
- * This is used for the initial condition (waveinit=1) and will be used for parametric boundary conditions.
+ * This is used for the initial condition (waveinit=1). It uses WaveJonswapN, the function used for the JONSWAP boundaries.
  *
  * @tparam T Data type (float or double)
  * @param XWaveParam Wave model parameters
@@ -176,65 +201,11 @@ template void InitWaveSpecGrid<double>(WaveParam XWaveParam, WaveSpecGridP<doubl
  */
 template <class T> void JonswapSpectrum(WaveParam XWaveParam, WaveSpecGridP<T> XSpec, double Hs, double Tp, double Dir, double Dspr, double gamma, std::vector<T>& Nspec)
 {
-	int nfreq = XWaveParam.nfreq;
-	int ndir = XWaveParam.ndir;
-	double dth = XWaveParam.dtheta;
-	double twopi = 2.0 * pi;
-
+	// Same function as the one used for the JONSWAP boundaries (WaveJonswapN)
 	Nspec.assign(XWaveParam.nspec, T(0.0));
-
-	if (Hs <= 0.0 || Tp <= 0.0)
+	for (int ispec = 0; ispec < XWaveParam.nspec; ispec++)
 	{
-		return;
-	}
-
-	// Frequency distribution E(sigma) (unscaled)
-	double fp = 1.0 / Tp;
-	std::vector<double> Esig(nfreq, 0.0);
-	for (int ifreq = 0; ifreq < nfreq; ifreq++)
-	{
-		double f = double(XSpec.sigma[ifreq]) / twopi;
-		double sj = (f <= fp) ? 0.07 : 0.09;
-		double r = exp(-1.0 * (f - fp) * (f - fp) / (2.0 * sj * sj * fp * fp));
-		double Ef = pow(f, -5.0) * exp(-1.25 * pow(fp / f, 4.0)) * pow(gamma, r);
-		Esig[ifreq] = Ef / twopi;
-	}
-	if (nfreq == 1)
-	{
-		Esig[0] = 1.0; // single representative frequency: all the energy in the only bin
-	}
-
-	// Directional distribution D(theta) normalised so that sum(D dtheta) = 1
-	double thm = (270.0 - Dir) * pi / 180.0;
-	double dsprrad = Dspr * pi / 180.0;
-	double spow = utils::max(2.0 / (dsprrad * dsprrad) - 1.0, 0.0);
-	std::vector<double> D(ndir, 0.0);
-	double Dsum = 0.0;
-	for (int idir = 0; idir < ndir; idir++)
-	{
-		D[idir] = pow(std::abs(cos(0.5 * (double(XSpec.theta[idir]) - thm))), 2.0 * spow);
-		Dsum += D[idir] * dth;
-	}
-	if (Dsum <= 0.0)
-	{
-		return;
-	}
-
-	// Scale to Hs
-	double m0 = 0.0;
-	for (int ifreq = 0; ifreq < nfreq; ifreq++)
-	{
-		m0 += Esig[ifreq] * double(XSpec.dsigma[ifreq]);
-	}
-	double scale = (Hs * Hs / 16.0) / m0;
-
-	for (int ifreq = 0; ifreq < nfreq; ifreq++)
-	{
-		for (int idir = 0; idir < ndir; idir++)
-		{
-			double E = scale * Esig[ifreq] * D[idir] / Dsum;
-			Nspec[ifreq * ndir + idir] = T(E / double(XSpec.sigma[ifreq]));
-		}
+		Nspec[ispec] = WaveJonswapN(XWaveParam, XSpec, ispec, T(Hs), T(Tp), T(Dir), T(Dspr), T(gamma));
 	}
 }
 template void JonswapSpectrum<float>(WaveParam XWaveParam, WaveSpecGridP<float> XSpec, double Hs, double Tp, double Dir, double Dspr, double gamma, std::vector<float>& Nspec);
@@ -279,21 +250,6 @@ template <class T> void InitWaveConditions(Param XParam, WaveParam XWaveParam, M
 	Param XParamW = WaveLightParam(XParam, XParam.theta);
 	WavePrepCPU(XParamW, XWaveParam, 0.0, XModel, XWave);
 
-	//==============================
-	// Boundary spectrum (parametric JONSWAP)
-	{
-		std::vector<T> Nbnd;
-		JonswapSpectrum(XWaveParam, XWave.spec, XWaveParam.Hsbnd, XWaveParam.Tpbnd, XWaveParam.Dirbnd, XWaveParam.Dsprbnd, XWaveParam.gammajsp, Nbnd);
-		for (int ispec = 0; ispec < nspec; ispec++)
-		{
-			XWave.bnd.Nbnd[ispec] = Nbnd[ispec];
-		}
-		std::vector<int> bndtypes = { XWaveParam.leftwavebnd, XWaveParam.rightwavebnd, XWaveParam.topwavebnd, XWaveParam.botwavebnd };
-		if (std::find(bndtypes.begin(), bndtypes.end(), 1) != bndtypes.end())
-		{
-			log("\tWave boundary: JONSWAP spectrum Hs=" + std::to_string(XWaveParam.Hsbnd) + "m, Tp=" + std::to_string(XWaveParam.Tpbnd) + "s, Dir=" + std::to_string(XWaveParam.Dirbnd) + "deg, Dspr=" + std::to_string(XWaveParam.Dsprbnd) + "deg (left/right/top/bot type: " + std::to_string(XWaveParam.leftwavebnd) + "/" + std::to_string(XWaveParam.rightwavebnd) + "/" + std::to_string(XWaveParam.topwavebnd) + "/" + std::to_string(XWaveParam.botwavebnd) + ")");
-		}
-	}
 
 	//==============================
 	// Initial spectrum

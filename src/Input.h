@@ -101,6 +101,17 @@ public:
 
 };
 
+// Spatially uniform wave boundary forcing (one line of a wave boundary time series file)
+class WaveBndIn {
+public:
+	double time = 0.0;
+	double Hs = 0.0; // Significant wave height (m)
+	double Tp = 10.0; // Peak period (s)
+	double Dir = 0.0; // Mean direction (degrees nautical, coming from)
+	double Dspr = 30.0; // Directional spreading (degrees)
+	double gamma = -1.0; // JONSWAP peak enhancement factor (<0: use the gammajsp parameter)
+};
+
 class Windin {
 public:
 	double time;

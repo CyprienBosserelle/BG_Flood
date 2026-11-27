@@ -41,6 +41,9 @@ bool readparambool(std::string paramstr, bool defaultval);
 void InitialiseToutput(T_output& Toutput, Param XParam);
 bndsegment readbndline(std::string parametervalue);
 bndsegment readbndlineside(std::string parametervalue, std::string side);
+wavebndsegment readwavebndline(std::string parametervalue);
+wavebndsegment readwavebndlineside(std::string parametervalue, std::string side);
+void setwavebndforcinginfo(wavebndsegment& bnd);
 
 //T_output ReadToutput(std::vector<std::string> paramstr, Param XParam);
 std::vector<double> ReadToutput(std::vector<std::string> paramstr, Param XParam);

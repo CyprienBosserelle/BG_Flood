@@ -185,17 +185,6 @@ struct WaveWorkP
 };
 
 /**
- * @brief Wave boundary conditions.
- * @tparam T Data type
- */
-template <class T>
-struct WaveBndP
-{
-	/** Parametric (JONSWAP) boundary action density spectrum, size(nspec) */
-	T* Nbnd;
-};
-
-/**
  * @brief Wave time keeping (scalar only, kept on the CPU structure).
  */
 struct WaveTimeP
@@ -230,11 +219,11 @@ struct WaveModel
 	WaveSpectrumP<T> action_o; // action density at the previous step (for predictor/corrector, iterative or limiter)
 	WaveAdvanceP<T> adv;
 
-	// Medium, kinematics, propagation work arrays and boundaries
+	// Medium, kinematics and propagation work arrays
+	// (the wave boundaries are held in XForcing.wavebndseg)
 	WaveMediumP<T> medium;
 	WaveKinP<T> kin;
 	WaveWorkP<T> work;
-	WaveBndP<T> bnd;
 
 	// 2D arrays
 	WaveBulkP<T> bulk;

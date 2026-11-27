@@ -221,14 +221,13 @@ template <class T> void WaveStep(Param XParam, WaveParam XWaveParam, Loop<T>& XL
 
 	for (int isub = 0; isub < nsub; isub++)
 	{
-		T bndfac = T(WaveBndTaper(XParam, XWaveParam, XWave.clock.totaltime));
 		if (XParam.GPUDEVICE >= 0)
 		{
-			WaveGPU(XParamW, XWaveParam, T(XWave.clock.dt), bndfac, XForcing, XModelW_g, XWave_g);
+			WaveGPU(XParamW, XWaveParam, T(XWave.clock.dt), XWave.clock.totaltime, XForcing, XModelW_g, XWave_g);
 		}
 		else
 		{
-			WaveCPU(XParamW, XWaveParam, T(XWave.clock.dt), bndfac, XForcing, XModelW, XWave);
+			WaveCPU(XParamW, XWaveParam, T(XWave.clock.dt), XWave.clock.totaltime, XForcing, XModelW, XWave);
 		}
 		XWave.clock.totaltime = XWave.clock.totaltime + XWave.clock.dt;
 		XWave.clock.nstep++;

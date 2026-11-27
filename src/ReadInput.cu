@@ -1273,60 +1273,11 @@ WaveParam readparamstr(std::string line, WaveParam wparam)
 	///////////////////////////////////////////////////////
 	// Boundaries
 	//
-	paramvec = { "leftwavebnd", "wavebndleft" };
+	paramvec = { "waveaoibnd", "waveremainderbnd" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		wparam.leftwavebnd = std::stoi(parametervalue);
-	}
-
-	paramvec = { "rightwavebnd", "wavebndright" };
-	parametervalue = findparameter(paramvec, line);
-	if (!parametervalue.empty())
-	{
-		wparam.rightwavebnd = std::stoi(parametervalue);
-	}
-
-	paramvec = { "topwavebnd", "wavebndtop" };
-	parametervalue = findparameter(paramvec, line);
-	if (!parametervalue.empty())
-	{
-		wparam.topwavebnd = std::stoi(parametervalue);
-	}
-
-	paramvec = { "botwavebnd", "wavebndbot", "bottomwavebnd", "wavebndbottom" };
-	parametervalue = findparameter(paramvec, line);
-	if (!parametervalue.empty())
-	{
-		wparam.botwavebnd = std::stoi(parametervalue);
-	}
-
-	paramvec = { "Hsbnd", "bndHs" };
-	parametervalue = findparameter(paramvec, line);
-	if (!parametervalue.empty())
-	{
-		wparam.Hsbnd = std::stod(parametervalue);
-	}
-
-	paramvec = { "Tpbnd", "bndTp" };
-	parametervalue = findparameter(paramvec, line);
-	if (!parametervalue.empty())
-	{
-		wparam.Tpbnd = std::stod(parametervalue);
-	}
-
-	paramvec = { "Dirbnd", "bndDir" };
-	parametervalue = findparameter(paramvec, line);
-	if (!parametervalue.empty())
-	{
-		wparam.Dirbnd = std::stod(parametervalue);
-	}
-
-	paramvec = { "Dsprbnd", "bndDspr" };
-	parametervalue = findparameter(paramvec, line);
-	if (!parametervalue.empty())
-	{
-		wparam.Dsprbnd = std::stod(parametervalue);
+		wparam.waveaoibnd = std::stoi(parametervalue);
 	}
 
 	paramvec = { "gammajsp", "jonswapgamma", "gammajonswap" };
@@ -1431,6 +1382,42 @@ Forcing<T> readparamstr(std::string line, Forcing<T> forcing)
 	{
 		//forcing.bot = readbndline(parametervalue);
 		forcing.bndseg.push_back(readbndline(parametervalue));
+	}
+
+	// Wave boundaries (same syntax as the flow boundaries)
+	paramvec = { "wavebndseg","wavebnd" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		forcing.wavebndseg.push_back(readwavebndline(parametervalue));
+	}
+
+	paramvec = { "waveleft","leftwave","waveleftbnd" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		forcing.wavebndseg.push_back(readwavebndlineside(parametervalue, "left"));
+	}
+
+	paramvec = { "waveright","rightwave","waverightbnd" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		forcing.wavebndseg.push_back(readwavebndlineside(parametervalue, "right"));
+	}
+
+	paramvec = { "wavetop","topwave","wavetopbnd" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		forcing.wavebndseg.push_back(readwavebndlineside(parametervalue, "top"));
+	}
+
+	paramvec = { "wavebot","botwave","wavebotbnd","wavebottom" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		forcing.wavebndseg.push_back(readwavebndlineside(parametervalue, "bot"));
 	}
 
 
@@ -2175,6 +2162,10 @@ void checkwaveparamsanity(Param& XParam, WaveParam& XWaveParam, Forcing<float>& 
 				XParam.outvars.erase(itr);
 			}
 		}
+		if (XForcing.wavebndseg.size() > 0)
+		{
+			log("Wave boundaries are defined but the wave model is not used. They are ignored.");
+		}
 		return;
 	}
 
@@ -2277,13 +2268,59 @@ void checkwaveparamsanity(Param& XParam, WaveParam& XWaveParam, Forcing<float>& 
 	///////////////////////////////////////////
 	// Boundaries
 	///////////////////////////////////////////
-	std::vector<int> bndtypes = { XWaveParam.leftwavebnd, XWaveParam.rightwavebnd, XWaveParam.topwavebnd, XWaveParam.botwavebnd };
-	for (int ib = 0; ib < bndtypes.size(); ib++)
+	if (XWaveParam.waveaoibnd != 0 && XWaveParam.waveaoibnd != 1)
 	{
-		if (bndtypes[ib] == 2)
+		log("WARNING: waveaoibnd must be 0 (absorbing) or 1 (Neumann). waveaoibnd set to 0");
+		XWaveParam.waveaoibnd = 0;
+	}
+	for (int iseg = 0; iseg < XForcing.wavebndseg.size(); iseg++)
+	{
+		wavebndsegment& seg = XForcing.wavebndseg[iseg];
+		if (seg.type < 0 || seg.type > 2)
 		{
-			log("WARNING: Spectral file wave boundary (type 2) is not implemented yet.");
+			log("ERROR: wave boundary segment " + std::to_string(iseg) + " (" + seg.polyfile + "): unknown type " + std::to_string(seg.type) + " (0: absorbing, 1: Neumann, 2: JONSWAP)");
+			exit(1);
 		}
+		if (seg.type == 2 && !seg.on)
+		{
+			log("ERROR: wave boundary segment " + std::to_string(iseg) + " (" + seg.polyfile + "): a JONSWAP boundary (type 2) needs a forcing file");
+			exit(1);
+		}
+
+		// Polygon (reusing the flow boundary function)
+		bndsegment tmpseg;
+		tmpseg.polyfile = seg.polyfile;
+		tmpseg.WLmap = seg.Hs;
+		tmpseg.WLmap.uniform = seg.uniform ? 1 : 0;
+		seg.poly = readbndpolysegment(tmpseg, XParam);
+
+		seg.left.isright = -1; seg.left.istop = 0;
+		seg.right.isright = 1; seg.right.istop = 0;
+		seg.top.isright = 0; seg.top.istop = 1;
+		seg.bot.isright = 0; seg.bot.istop = -1;
+	}
+
+	// Collector segment for the boundary blocks that are not in any wave boundary segment
+	wavebndsegment remainderseg;
+	remainderseg.left.isright = -1; remainderseg.left.istop = 0;
+	remainderseg.right.isright = 1; remainderseg.right.istop = 0;
+	remainderseg.top.isright = 0; remainderseg.top.istop = 1;
+	remainderseg.bot.isright = 0; remainderseg.bot.istop = -1;
+	remainderseg.type = XWaveParam.waveaoibnd;
+	remainderseg.polyfile = "remainder";
+	XForcing.wavebndseg.push_back(remainderseg);
+
+	for (int iseg = 0; iseg < XForcing.wavebndseg.size(); iseg++)
+	{
+		AllocateCPU(1, 1, XForcing.wavebndseg[iseg].left.blk);
+		AllocateCPU(1, 1, XForcing.wavebndseg[iseg].right.blk);
+		AllocateCPU(1, 1, XForcing.wavebndseg[iseg].top.blk);
+		AllocateCPU(1, 1, XForcing.wavebndseg[iseg].bot.blk);
+
+		AllocateCPU(1, 1, XForcing.wavebndseg[iseg].left.qmean);
+		AllocateCPU(1, 1, XForcing.wavebndseg[iseg].right.qmean);
+		AllocateCPU(1, 1, XForcing.wavebndseg[iseg].top.qmean);
+		AllocateCPU(1, 1, XForcing.wavebndseg[iseg].bot.qmean);
 	}
 
 }
@@ -2748,6 +2785,126 @@ bndsegment readbndline(std::string parametervalue)
 			bnd.uniform = 1;
 		}
 	}
+	return bnd;
+}
+
+
+/**
+ * @brief Set the forcing information of a wave boundary segment from its forcing file name.
+ *
+ * Text file: spatially uniform time series (time, Hs, Tp, Dir, Dspr[, gamma]).
+ * Netcdf file: time slices of the Hs, Tp, Dir and Dspr maps (the variable names are checked when the file is read).
+ */
+void setwavebndforcinginfo(wavebndsegment& bnd)
+{
+	if (!bnd.on)
+	{
+		return;
+	}
+	std::vector<std::string> extvec = split(bnd.inputfile, '.');
+	std::string ext = extvec.empty() ? "" : trim(extvec.back(), " ");
+	bnd.uniform = !(ext.compare("nc") == 0);
+
+	if (!bnd.uniform)
+	{
+		// Find the name of the wave parameter variables in the netcdf file
+		int ncid;
+		int status = nc_open(bnd.inputfile.c_str(), NC_NOWRITE, &ncid);
+		if (status != NC_NOERR)
+		{
+			log("ERROR: wave boundary file " + bnd.inputfile + " could not be opened");
+			exit(1);
+		}
+		std::string hsname = checkncvarname(ncid, "Hs", "hs", "hm0", "swh", "VHM0");
+		std::string tpname = checkncvarname(ncid, "Tp", "tp", "tps", "fp", "VTPK");
+		std::string dirname = checkncvarname(ncid, "Dir", "dir", "mwd", "th1m", "VMDR");
+		std::string dsprname = checkncvarname(ncid, "Dspr", "dspr", "spr", "sth1m", "VSPR");
+		nc_close(ncid);
+
+		if (hsname.empty() || tpname.empty() || dirname.empty() || dsprname.empty())
+		{
+			log("ERROR: wave boundary file " + bnd.inputfile + " must contain the Hs, Tp, Dir and Dspr variables (see the wavebndseg documentation for the accepted names)");
+			exit(1);
+		}
+		if (tpname.compare("fp") == 0)
+		{
+			log("ERROR: wave boundary file " + bnd.inputfile + ": peak frequency (fp) is not supported, please provide the peak period (Tp)");
+			exit(1);
+		}
+
+		bnd.Hs = readfileinfo(bnd.inputfile + "?" + hsname, bnd.Hs);
+		bnd.Tp = readfileinfo(bnd.inputfile + "?" + tpname, bnd.Tp);
+		bnd.Dir = readfileinfo(bnd.inputfile + "?" + dirname, bnd.Dir);
+		bnd.Dspr = readfileinfo(bnd.inputfile + "?" + dsprname, bnd.Dspr);
+		bnd.Hs.uniform = 0; bnd.Tp.uniform = 0; bnd.Dir.uniform = 0; bnd.Dspr.uniform = 0;
+	}
+}
+
+/**
+ * @brief Read a wave boundary segment from a parameter value string (wave equivalent of readbndline).
+ * wavebndseg = polygon, forcingfile, type ;  or  wavebndseg = polygon, type ;
+ */
+wavebndsegment readwavebndline(std::string parametervalue)
+{
+	wavebndsegment bnd;
+	std::vector<std::string> items = split(parametervalue, ',');
+	for (int ii = 0; ii < items.size(); ii++)
+	{
+		items[ii] = trim(items[ii], " ");
+	}
+	if (items.size() == 1)
+	{
+		// only a polygon was given
+		bnd.polyfile = items[0];
+	}
+	else if (items.size() == 2)
+	{
+		bnd.polyfile = items[0];
+		bnd.type = std::stoi(items[1]);
+	}
+	else if (items.size() >= 3)
+	{
+		bnd.polyfile = items[0];
+		bnd.inputfile = items[1];
+		bnd.type = std::stoi(items[2]);
+		bnd.on = true;
+	}
+	setwavebndforcinginfo(bnd);
+	return bnd;
+}
+
+/**
+ * @brief Read a wave boundary segment covering a whole side of the domain (wave equivalent of readbndlineside).
+ * waveleft = forcingfile, type ;  or  waveleft = type, forcingfile ;  or  waveleft = type ;
+ */
+wavebndsegment readwavebndlineside(std::string parametervalue, std::string side)
+{
+	wavebndsegment bnd;
+	std::vector<std::string> items = split(parametervalue, ',');
+	for (int ii = 0; ii < items.size(); ii++)
+	{
+		items[ii] = trim(items[ii], " ");
+	}
+	if (items.size() == 1)
+	{
+		bnd.type = std::stoi(items[0]);
+	}
+	else if (items.size() >= 2)
+	{
+		if (isdigit(items[1].c_str()[0]))
+		{
+			bnd.type = std::stoi(items[1]);
+			bnd.inputfile = items[0];
+		}
+		else
+		{
+			bnd.type = std::stoi(items[0]);
+			bnd.inputfile = items[1];
+		}
+		bnd.on = true;
+	}
+	bnd.polyfile = side;
+	setwavebndforcinginfo(bnd);
 	return bnd;
 }
 

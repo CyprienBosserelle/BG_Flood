@@ -1324,14 +1324,19 @@ template void Initoutzone<double>(Param& XParam, BlockP<double>& XBlock);
  *
  * 5. fill segment and side arrays for each segments
  * 
+ * This is a template on the segment type (S) so it is used for both the flow (bndsegment) and the wave (wavebndsegment) boundaries.
+ * The last segment of segs is the collector segment for the boundary blocks that are not in any segment.
+ *
  * @tparam T Data type
+ * @tparam S Segment type (bndsegment or wavebndsegment)
  * @param XParam Simulation parameters
- * @param XForcing Forcing data (float)
+ * @param segs Boundary segments
  * @param XBlock Block parameters
+ * @param label Label used in the log
  */
-template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock)
+template <class T, class S> void Initsegbndblks(Param& XParam, std::vector<S>& segs, BlockP<T> XBlock, std::string label)
 {
-	//if(XForcing.bndseg.size()>0)
+	//if(segs.size()>0)
 
 	std::vector<int> bndblks;
 	std::vector<int> bndsegment;
@@ -1348,11 +1353,11 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 			T dxlev = calcres(XParam.dx, XBlock.level[ib]);
 
 			bndblks.push_back(ib);
-			bndsegment.push_back(XForcing.bndseg.size()-1); // i.e. by default the block doesn't belong to a segment so it belongs to collector (last) segemnt
+			bndsegment.push_back(segs.size()-1); // i.e. by default the block doesn't belong to a segment so it belongs to collector (last) segemnt
 			//loop through all but the last bnd seg which is meant for block that are not in any segments
-			for (int s = 0; s < XForcing.bndseg.size()-1; s++)
+			for (int s = 0; s < segs.size()-1; s++)
 			{
-				bool inpoly=blockinpoly(T(XParam.xo + XBlock.xo[ib]), T(XParam.yo + XBlock.yo[ib]), dxlev, XParam.blkwidth, XForcing.bndseg[s].poly);
+				bool inpoly=blockinpoly(T(XParam.xo + XBlock.xo[ib]), T(XParam.yo + XBlock.yo[ib]), dxlev, XParam.blkwidth, segs[s].poly);
 
 				if (inpoly)
 				{
@@ -1369,7 +1374,7 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 	}
 
 	
-	for (int s = 0; s < XForcing.bndseg.size(); s++)
+	for (int s = 0; s < segs.size(); s++)
 	{
 		int segcount = 0;
 		int leftcount = 0;
@@ -1402,31 +1407,31 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 				}
 			}
 		}
-		XForcing.bndseg[s].nblk = segcount;
+		segs[s].nblk = segcount;
 
-		log("\nBoundary Segment " + std::to_string(s) + " : " + XForcing.bndseg[s].inputfile + " has " + std::to_string(segcount) + " blocks ");
+		log("\n" + label + " " + std::to_string(s) + " : " + segs[s].inputfile + " has " + std::to_string(segcount) + " blocks ");
 
-		XForcing.bndseg[s].left.nblk = leftcount;
-		XForcing.bndseg[s].right.nblk = rightcount;
-		XForcing.bndseg[s].top.nblk = topcount;
-		XForcing.bndseg[s].bot.nblk = botcount;
+		segs[s].left.nblk = leftcount;
+		segs[s].right.nblk = rightcount;
+		segs[s].top.nblk = topcount;
+		segs[s].bot.nblk = botcount;
 
 		//allocate array
 		//ReallocArray(int nblk, int blksize, T * &zb)
-		ReallocArray(leftcount, 1, XForcing.bndseg[s].left.blk);
-		ReallocArray(rightcount, 1, XForcing.bndseg[s].right.blk);
-		ReallocArray(topcount, 1, XForcing.bndseg[s].top.blk);
-		ReallocArray(botcount, 1, XForcing.bndseg[s].bot.blk);
+		ReallocArray(leftcount, 1, segs[s].left.blk);
+		ReallocArray(rightcount, 1, segs[s].right.blk);
+		ReallocArray(topcount, 1, segs[s].top.blk);
+		ReallocArray(botcount, 1, segs[s].bot.blk);
 
-		ReallocArray(leftcount, XParam.blkwidth, XForcing.bndseg[s].left.qmean);
-		ReallocArray(rightcount, XParam.blkwidth, XForcing.bndseg[s].right.qmean);
-		ReallocArray(topcount, XParam.blkwidth, XForcing.bndseg[s].top.qmean);
-		ReallocArray(botcount, XParam.blkwidth, XForcing.bndseg[s].bot.qmean);
+		ReallocArray(leftcount, XParam.blkwidth, segs[s].left.qmean);
+		ReallocArray(rightcount, XParam.blkwidth, segs[s].right.qmean);
+		ReallocArray(topcount, XParam.blkwidth, segs[s].top.qmean);
+		ReallocArray(botcount, XParam.blkwidth, segs[s].bot.qmean);
 
-		FillCPU(leftcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].left.qmean);
-		FillCPU(rightcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].right.qmean);
-		FillCPU(topcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].top.qmean);
-		FillCPU(botcount, XParam.blkwidth, 0.0f, XForcing.bndseg[s].bot.qmean);
+		FillCPU(leftcount, XParam.blkwidth, 0.0f, segs[s].left.qmean);
+		FillCPU(rightcount, XParam.blkwidth, 0.0f, segs[s].right.qmean);
+		FillCPU(topcount, XParam.blkwidth, 0.0f, segs[s].top.qmean);
+		FillCPU(botcount, XParam.blkwidth, 0.0f, segs[s].bot.qmean);
 
 		leftcount = 0;
 		rightcount = 0;
@@ -1441,22 +1446,22 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 			{
 				if ((XBlock.BotLeft[ib] == ib) || (XBlock.BotRight[ib] == ib))
 				{
-					XForcing.bndseg[s].bot.blk[botcount] = ib;
+					segs[s].bot.blk[botcount] = ib;
 					botcount++;
 				}
 				if ((XBlock.TopLeft[ib] == ib) || (XBlock.TopRight[ib] == ib))
 				{
-					XForcing.bndseg[s].top.blk[topcount] = ib;
+					segs[s].top.blk[topcount] = ib;
 					topcount++;
 				}
 				if ((XBlock.LeftBot[ib] == ib) || (XBlock.LeftTop[ib] == ib))
 				{
-					XForcing.bndseg[s].left.blk[leftcount] = ib;
+					segs[s].left.blk[leftcount] = ib;
 					leftcount++;
 				}
 				if ((XBlock.RightBot[ib] == ib) || (XBlock.RightTop[ib] == ib))
 				{
-					XForcing.bndseg[s].right.blk[rightcount] = ib;
+					segs[s].right.blk[rightcount] = ib;
 					rightcount++;
 				}
 
@@ -1470,6 +1475,20 @@ template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, Blo
 
 
 }
+template void Initsegbndblks<float, bndsegment>(Param& XParam, std::vector<bndsegment>& segs, BlockP<float> XBlock, std::string label);
+template void Initsegbndblks<double, bndsegment>(Param& XParam, std::vector<bndsegment>& segs, BlockP<double> XBlock, std::string label);
+template void Initsegbndblks<float, wavebndsegment>(Param& XParam, std::vector<wavebndsegment>& segs, BlockP<float> XBlock, std::string label);
+template void Initsegbndblks<double, wavebndsegment>(Param& XParam, std::vector<wavebndsegment>& segs, BlockP<double> XBlock, std::string label);
+
+/**
+ * @brief Find the boundary blocks of each flow boundary segment (see Initsegbndblks).
+ */
+template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock)
+{
+	Initsegbndblks(XParam, XForcing.bndseg, XBlock, "Boundary Segment");
+}
+template void Initbndblks<float>(Param& XParam, Forcing<float>& XForcing, BlockP<float> XBlock);
+template void Initbndblks<double>(Param& XParam, Forcing<float>& XForcing, BlockP<double> XBlock);
 
 /**
  * @brief Calculates the number of blocks on each boundary of the domain.

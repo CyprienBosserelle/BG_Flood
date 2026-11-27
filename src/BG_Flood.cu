@@ -177,7 +177,7 @@ template < class T > int mainwork(Param XParam, WaveParam XWaveParam, Forcing<fl
 	SetupGPU(XParam, XModel,XForcing, XModel_g);
 
 	// Setup wave model on GPU (bypassed if no GPU or no wave model, needs to be after SetupGPU)
-	SetupWaveGPU(XParam, XWaveParam, XModel_g, XWave, XWave_g);
+	SetupWaveGPU(XParam, XWaveParam, XForcing, XModel_g, XWave, XWave_g);
 
 
 

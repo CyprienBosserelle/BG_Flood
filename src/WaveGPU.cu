@@ -115,33 +115,91 @@ template __global__ void WaveKinGPU<double>(Param XParam, WaveParam XWaveParam, 
 /**
  * @brief Action density fluxes through the left faces (GPU). Launched with blockDim = (blkwidth + halowidth, blkwidth).
  */
-template <class T> __global__ void WaveFluxXGPU(Param XParam, WaveParam XWaveParam, int ispec, T bndfac, BlockP<T> XBlock, WaveModel<T> XWave)
+template <class T> __global__ void WaveFluxXGPU(Param XParam, WaveParam XWaveParam, int ispec, BlockP<T> XBlock, WaveModel<T> XWave)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
 	int ibl = blockIdx.x;
 	int ib = XBlock.active[ibl];
 
-	WaveFluxXCell(XParam, XWaveParam, ix, iy, ib, ispec, bndfac, XBlock, XWave);
+	WaveFluxXCell(XParam, XWaveParam, ix, iy, ib, ispec, XBlock, XWave);
 }
-template __global__ void WaveFluxXGPU<float>(Param XParam, WaveParam XWaveParam, int ispec, float bndfac, BlockP<float> XBlock, WaveModel<float> XWave);
-template __global__ void WaveFluxXGPU<double>(Param XParam, WaveParam XWaveParam, int ispec, double bndfac, BlockP<double> XBlock, WaveModel<double> XWave);
+template __global__ void WaveFluxXGPU<float>(Param XParam, WaveParam XWaveParam, int ispec, BlockP<float> XBlock, WaveModel<float> XWave);
+template __global__ void WaveFluxXGPU<double>(Param XParam, WaveParam XWaveParam, int ispec, BlockP<double> XBlock, WaveModel<double> XWave);
 
 
 /**
  * @brief Action density fluxes through the bottom faces (GPU). Launched with blockDim = (blkwidth, blkwidth + halowidth).
  */
-template <class T> __global__ void WaveFluxYGPU(Param XParam, WaveParam XWaveParam, int ispec, T bndfac, BlockP<T> XBlock, WaveModel<T> XWave)
+template <class T> __global__ void WaveFluxYGPU(Param XParam, WaveParam XWaveParam, int ispec, BlockP<T> XBlock, WaveModel<T> XWave)
 {
 	int ix = threadIdx.x;
 	int iy = threadIdx.y;
 	int ibl = blockIdx.x;
 	int ib = XBlock.active[ibl];
 
-	WaveFluxYCell(XParam, XWaveParam, ix, iy, ib, ispec, bndfac, XBlock, XWave);
+	WaveFluxYCell(XParam, XWaveParam, ix, iy, ib, ispec, XBlock, XWave);
 }
-template __global__ void WaveFluxYGPU<float>(Param XParam, WaveParam XWaveParam, int ispec, float bndfac, BlockP<float> XBlock, WaveModel<float> XWave);
-template __global__ void WaveFluxYGPU<double>(Param XParam, WaveParam XWaveParam, int ispec, double bndfac, BlockP<double> XBlock, WaveModel<double> XWave);
+template __global__ void WaveFluxYGPU<float>(Param XParam, WaveParam XWaveParam, int ispec, BlockP<float> XBlock, WaveModel<float> XWave);
+template __global__ void WaveFluxYGPU<double>(Param XParam, WaveParam XWaveParam, int ispec, BlockP<double> XBlock, WaveModel<double> XWave);
+
+
+/**
+ * @brief Wave boundary conditions on one side of one segment for one spectral bin (GPU). Wave equivalent of bndFluxGPUSide.
+ * Launched with gridDim = side.nblk and blockDim = blkwidth. See WavebndFaceCell.
+ * For spatially varying segments the bulk parameters are interpolated from the forcing maps (textures) at each face.
+ */
+template <class T> __global__ void WavebndFluxGPU(Param XParam, WaveParam XWaveParam, bndsegmentside side, int type, bool interpmaps, T Hs, T Tp, T Dir, T Dspr, T gamma, TexSetP texHs, TexSetP texTp, TexSetP texDir, TexSetP texDspr, T bndfac, int ispec, BlockP<T> XBlock, WaveModel<T> XWave)
+{
+	int ibl = blockIdx.x;
+	int tx = threadIdx.x;
+	int ib = side.blk_g[ibl];
+
+	if (interpmaps)
+	{
+		T delta = calcres(T(XParam.dx), XBlock.level[ib]);
+		int ix = (side.isright == 0) ? tx : ((side.isright < 0) ? 0 : XParam.blkwidth);
+		int iy = (side.isright == 0) ? ((side.istop < 0) ? 0 : XParam.blkwidth) : tx;
+		T xx = T(XParam.xo) + XBlock.xo[ib] + ix * delta;
+		T yy = T(XParam.yo) + XBlock.yo[ib] + iy * delta;
+		Hs = interpDyn2BUQ(xx, yy, texHs);
+		Tp = interpDyn2BUQ(xx, yy, texTp);
+		Dir = interpDyn2BUQ(xx, yy, texDir);
+		Dspr = interpDyn2BUQ(xx, yy, texDspr);
+	}
+
+	WavebndFaceCell(XParam, XWaveParam, side.isright, side.istop, ib, tx, ispec, type, Hs, Tp, Dir, Dspr, gamma, bndfac, XBlock, XWave);
+}
+template __global__ void WavebndFluxGPU<float>(Param XParam, WaveParam XWaveParam, bndsegmentside side, int type, bool interpmaps, float Hs, float Tp, float Dir, float Dspr, float gamma, TexSetP texHs, TexSetP texTp, TexSetP texDir, TexSetP texDspr, float bndfac, int ispec, BlockP<float> XBlock, WaveModel<float> XWave);
+template __global__ void WavebndFluxGPU<double>(Param XParam, WaveParam XWaveParam, bndsegmentside side, int type, bool interpmaps, double Hs, double Tp, double Dir, double Dspr, double gamma, TexSetP texHs, TexSetP texTp, TexSetP texDir, TexSetP texDspr, double bndfac, int ispec, BlockP<double> XBlock, WaveModel<double> XWave);
+
+
+/**
+ * @brief Wave boundary conditions for one segment and one spectral bin (GPU). Wave equivalent of FlowbndFlux.
+ */
+template <class T> void WavebndFluxGPUseg(Param XParam, WaveParam XWaveParam, const wavebndsegment& seg, double time, T bndfac, int ispec, BlockP<T> XBlock, WaveModel<T> XWave)
+{
+	double Hs = 0.0, Tp = 10.0, Dir = 0.0, Dspr = 30.0, gamma = XWaveParam.gammajsp;
+	if (seg.type == 2 && seg.on && seg.uniform)
+	{
+		WaveBndValues(seg, time, XWaveParam.gammajsp, Hs, Tp, Dir, Dspr, gamma);
+	}
+	bool interpmaps = (seg.type == 2 && seg.on && !seg.uniform);
+
+	dim3 blockDim(XParam.blkwidth, 1, 1);
+	const bndsegmentside* sides[4] = { &seg.left, &seg.right, &seg.top, &seg.bot };
+	for (int is = 0; is < 4; is++)
+	{
+		if (sides[is]->nblk > 0)
+		{
+			dim3 gridDim(sides[is]->nblk, 1, 1);
+			WavebndFluxGPU <<< gridDim, blockDim, 0 >>> (XParam, XWaveParam, *sides[is], seg.type, interpmaps, T(Hs), T(Tp), T(Dir), T(Dspr), T(gamma), seg.Hs.GPU, seg.Tp.GPU, seg.Dir.GPU, seg.Dspr.GPU, bndfac, ispec, XBlock, XWave);
+		}
+	}
+	CUDA_CHECK(cudaDeviceSynchronize());
+}
+template void WavebndFluxGPUseg<float>(Param XParam, WaveParam XWaveParam, const wavebndsegment& seg, double time, float bndfac, int ispec, BlockP<float> XBlock, WaveModel<float> XWave);
+template void WavebndFluxGPUseg<double>(Param XParam, WaveParam XWaveParam, const wavebndsegment& seg, double time, double bndfac, int ispec, BlockP<double> XBlock, WaveModel<double> XWave);
 
 
 /**
@@ -284,7 +342,7 @@ template void WavePrepGPU<double>(Param XParam, WaveParam XWaveParam, double tad
  *
  * @param XParamN Light copy of XParam with theta = wavetheta (used for the limited gradients of N)
  */
-template <class T> void WaveGeoPropGPU(Param XParam, Param XParamN, WaveParam XWaveParam, T bndfac, BlockP<T> XBlock, WaveModel<T> XWave)
+template <class T> void WaveGeoPropGPU(Param XParam, Param XParamN, WaveParam XWaveParam, const std::vector<wavebndsegment>& segs, double time, T bndfac, BlockP<T> XBlock, WaveModel<T> XWave)
 {
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 blockDimKX(XParam.blkwidth + XParam.halowidth, XParam.blkwidth, 1);
@@ -305,9 +363,15 @@ template <class T> void WaveGeoPropGPU(Param XParam, Param XParamN, WaveParam XW
 			gradientHaloGPU(XParamN, XBlock, Nbin, XWave.work.dNdx, XWave.work.dNdy);
 		}
 
-		WaveFluxXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XWaveParam, ispec, bndfac, XBlock, XWave);
-		WaveFluxYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XWaveParam, ispec, bndfac, XBlock, XWave);
+		WaveFluxXGPU <<< gridDim, blockDimKX, 0 >>> (XParam, XWaveParam, ispec, XBlock, XWave);
+		WaveFluxYGPU <<< gridDim, blockDimKY, 0 >>> (XParam, XWaveParam, ispec, XBlock, XWave);
 		CUDA_CHECK(cudaDeviceSynchronize());
+
+		// Boundary conditions: overwrite the fluxes through the faces on the domain boundary
+		for (int iseg = 0; iseg < segs.size(); iseg++)
+		{
+			WavebndFluxGPUseg(XParam, XWaveParam, segs[iseg], time, bndfac, ispec, XBlock, XWave);
+		}
 
 		fillHaloLeftRightGPUnew(XParam, XBlock, 0, XWave.work.Fx);
 		fillHaloBotTopGPUnew(XParam, XBlock, 0, XWave.work.Fy);
@@ -317,15 +381,17 @@ template <class T> void WaveGeoPropGPU(Param XParam, Param XParamN, WaveParam XW
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
 }
-template void WaveGeoPropGPU<float>(Param XParam, Param XParamN, WaveParam XWaveParam, float bndfac, BlockP<float> XBlock, WaveModel<float> XWave);
-template void WaveGeoPropGPU<double>(Param XParam, Param XParamN, WaveParam XWaveParam, double bndfac, BlockP<double> XBlock, WaveModel<double> XWave);
+template void WaveGeoPropGPU<float>(Param XParam, Param XParamN, WaveParam XWaveParam, const std::vector<wavebndsegment>& segs, double time, float bndfac, BlockP<float> XBlock, WaveModel<float> XWave);
+template void WaveGeoPropGPU<double>(Param XParam, Param XParamN, WaveParam XWaveParam, const std::vector<wavebndsegment>& segs, double time, double bndfac, BlockP<double> XBlock, WaveModel<double> XWave);
 
 
 /**
  * @brief Right hand side of the action balance equation dN = L(N) (GPU): propagation (+ sources, to be implemented).
  */
-template <class T> void WaveRHSGPU(Param XParam, Param XParamN, WaveParam XWaveParam, T dt, T bndfac, Forcing<float> XForcing, Model<T> XModel, WaveModel<T> XWave)
+template <class T> void WaveRHSGPU(Param XParam, Param XParamN, WaveParam XWaveParam, T dt, double time, Forcing<float> XForcing, Model<T> XModel, WaveModel<T> XWave)
 {
+	T bndfac = T(WaveBndTaper(XParam, XWaveParam, time));
+
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
 
@@ -333,7 +399,7 @@ template <class T> void WaveRHSGPU(Param XParam, Param XParamN, WaveParam XWaveP
 	CUDA_CHECK(cudaDeviceSynchronize());
 
 	// Geographic propagation
-	WaveGeoPropGPU(XParam, XParamN, XWaveParam, bndfac, XModel.blocks, XWave);
+	WaveGeoPropGPU(XParam, XParamN, XWaveParam, XForcing.wavebndseg, time, bndfac, XModel.blocks, XWave);
 
 	// Spectral propagation
 	WaveSpecPropGPU <<< gridDim, blockDim, 0 >>> (XParam, XWaveParam, dt, XModel.blocks, XWave);
@@ -342,8 +408,8 @@ template <class T> void WaveRHSGPU(Param XParam, Param XParamN, WaveParam XWaveP
 	// Source terms
 	// TODO
 }
-template void WaveRHSGPU<float>(Param XParam, Param XParamN, WaveParam XWaveParam, float dt, float bndfac, Forcing<float> XForcing, Model<float> XModel, WaveModel<float> XWave);
-template void WaveRHSGPU<double>(Param XParam, Param XParamN, WaveParam XWaveParam, double dt, double bndfac, Forcing<float> XForcing, Model<double> XModel, WaveModel<double> XWave);
+template void WaveRHSGPU<float>(Param XParam, Param XParamN, WaveParam XWaveParam, float dt, double time, Forcing<float> XForcing, Model<float> XModel, WaveModel<float> XWave);
+template void WaveRHSGPU<double>(Param XParam, Param XParamN, WaveParam XWaveParam, double dt, double time, Forcing<float> XForcing, Model<double> XModel, WaveModel<double> XWave);
 
 
 /**
@@ -355,12 +421,12 @@ template void WaveRHSGPU<double>(Param XParam, Param XParamN, WaveParam XWavePar
  * @param XParam Light copy of the flow model parameters (see WaveLightParam)
  * @param XWaveParam Wave model parameters
  * @param dt Wave time step (s)
- * @param bndfac Boundary taper factor (0 to 1)
+ * @param time Wave model time at the start of the step (s), used for the boundary conditions
  * @param XForcing Forcing (wind is used by the wave model)
  * @param XModel Flow model GPU structure (mesh, bathy, water depth and currents)
  * @param XWave Wave model GPU structure
  */
-template <class T> void WaveGPU(Param XParam, WaveParam XWaveParam, T dt, T bndfac, Forcing<float> XForcing, Model<T> XModel, WaveModel<T> XWave)
+template <class T> void WaveGPU(Param XParam, WaveParam XWaveParam, T dt, double time, Forcing<float> XForcing, Model<T> XModel, WaveModel<T> XWave)
 {
 	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 	dim3 gridDim(XParam.nblk, 1, 1);
@@ -373,7 +439,7 @@ template <class T> void WaveGPU(Param XParam, WaveParam XWaveParam, T dt, T bndf
 
 	//============================================
 	// First stage (forward Euler)
-	WaveRHSGPU(XParam, XParamN, XWaveParam, dt, bndfac, XForcing, XModel, XWave);
+	WaveRHSGPU(XParam, XParamN, XWaveParam, dt, time, XForcing, XModel, XWave);
 	UpdateWaveActionGPU <<< gridDim, blockDim, 0 >>> (XParam, XWaveParam, XModel.blocks, dt, T(0.0), XWave);
 	CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -381,7 +447,7 @@ template <class T> void WaveGPU(Param XParam, WaveParam XWaveParam, T dt, T bndf
 	// Second stage (Heun / SSP-RK2)
 	if (XWaveParam.wavesolver == 2)
 	{
-		WaveRHSGPU(XParam, XParamN, XWaveParam, dt, bndfac, XForcing, XModel, XWave);
+		WaveRHSGPU(XParam, XParamN, XWaveParam, dt, time + double(dt), XForcing, XModel, XWave);
 		UpdateWaveActionGPU <<< gridDim, blockDim, 0 >>> (XParam, XWaveParam, XModel.blocks, dt, T(0.5), XWave);
 		CUDA_CHECK(cudaDeviceSynchronize());
 	}
@@ -395,5 +461,5 @@ template <class T> void WaveGPU(Param XParam, WaveParam XWaveParam, T dt, T bndf
 	// Wave forces on the flow
 	// TODO
 }
-template void WaveGPU<float>(Param XParam, WaveParam XWaveParam, float dt, float bndfac, Forcing<float> XForcing, Model<float> XModel, WaveModel<float> XWave);
-template void WaveGPU<double>(Param XParam, WaveParam XWaveParam, double dt, double bndfac, Forcing<float> XForcing, Model<double> XModel, WaveModel<double> XWave);
+template void WaveGPU<float>(Param XParam, WaveParam XWaveParam, float dt, double time, Forcing<float> XForcing, Model<float> XModel, WaveModel<float> XWave);
+template void WaveGPU<double>(Param XParam, WaveParam XWaveParam, double dt, double time, Forcing<float> XForcing, Model<double> XModel, WaveModel<double> XWave);

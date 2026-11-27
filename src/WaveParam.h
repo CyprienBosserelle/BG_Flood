@@ -103,16 +103,9 @@ public:
 	double Dsprinit = 30.0; // Initial directional spreading (degrees, directional standard deviation) for waveinit=1
 
 	//*Boundaries
-	// Wave boundary type for each side (0: no incoming waves (fully absorbing) [Default]; 1: parametric JONSWAP spectrum (Hsbnd,Tpbnd,Dirbnd,Dsprbnd); 2: spectral file (to be implemented))
-	int leftwavebnd = 0;
-	int rightwavebnd = 0;
-	int topwavebnd = 0;
-	int botwavebnd = 0;
-	double Hsbnd = 0.0; // Boundary significant wave height (m)
-	double Tpbnd = 10.0; // Boundary peak period (s)
-	double Dirbnd = 0.0; // Boundary mean wave direction (degrees nautical, coming from)
-	double Dsprbnd = 30.0; // Boundary directional spreading (degrees, directional standard deviation)
-	double gammajsp = 3.3; // JONSWAP peak enhancement factor used for parametric spectra (initial and boundary conditions)
+	// The wave boundaries are defined in the forcing (wavebndseg, waveleft, waveright, wavetop, wavebot keywords, see Forcing.h)
+	int waveaoibnd = 0; // Wave boundary type for the boundary blocks that are not in any wave boundary segment (0: absorbing i.e. no incoming waves [Default], 1: Neumann i.e. zero gradient)
+	double gammajsp = 3.3; // JONSWAP peak enhancement factor used for parametric spectra (initial condition, and boundary conditions when the forcing file does not provide gamma)
 	double wavebndtaper = 0.0; // Number of seconds to taper the wave boundary from 0 to full value (similar to bndtaper for the flow)
 
 };

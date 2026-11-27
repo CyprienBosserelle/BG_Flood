@@ -27,6 +27,8 @@ void InitTSOutput(Param XParam);
 template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, BndblockP<T>& bnd);
 template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock);
 template <class T> void Findbndblks(Param XParam, Model<T> XModel, Forcing<float>& XForcing);
+template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock);
+template <class T, class S> void Initsegbndblks(Param& XParam, std::vector<S>& segs, BlockP<T> XBlock, std::string label);
 template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock);
 
 template <class T> void InitzbgradientCPU(Param XParam, Model<T> XModel);

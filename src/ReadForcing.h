@@ -21,6 +21,7 @@ std::vector<SLTS> readNestfile(std::string ncfile, std::string varname, int hor,
 
 std::vector<Flowin> readFlowfile(std::string Flowfilename, std::string &refdate);
 std::vector<Windin> readINfileUNI(std::string filename, std::string &refdate);
+std::vector<WaveBndIn> readWaveBndfileUNI(std::string filename, std::string& refdate);
 std::vector<Windin> readWNDfileUNI(std::string filename, std::string & refdate, double grdalpha);
 
 void denan(int nx, int ny, float denanval, int* z);

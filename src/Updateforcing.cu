@@ -33,6 +33,16 @@ template <class T> void updateforcing(Param XParam, Loop<T> XLoop, Forcing<float
 			Forcingthisstep(XParam, double(XLoop.totaltime), XForcing.bndseg[iseg].WLmap);
 		}
 	}
+	for (int iseg = 0; iseg < XForcing.wavebndseg.size(); iseg++)
+	{
+		if (XForcing.wavebndseg[iseg].on && !XForcing.wavebndseg[iseg].uniform)
+		{
+			Forcingthisstep(XParam, double(XLoop.totaltime), XForcing.wavebndseg[iseg].Hs);
+			Forcingthisstep(XParam, double(XLoop.totaltime), XForcing.wavebndseg[iseg].Tp);
+			Forcingthisstep(XParam, double(XLoop.totaltime), XForcing.wavebndseg[iseg].Dir);
+			Forcingthisstep(XParam, double(XLoop.totaltime), XForcing.wavebndseg[iseg].Dspr);
+		}
+	}
 
 	
 }
