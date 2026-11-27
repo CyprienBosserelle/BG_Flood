@@ -134,6 +134,68 @@ struct WaveFlowForcingP
 };
 
 /**
+ * @brief Medium seen by the wave model (2D arrays): water depth, currents and their gradients.
+ * Updated from the flow model every time the wave model is advanced (see WavePrep).
+ * @tparam T Data type
+ */
+template <class T>
+struct WaveMediumP
+{
+	/** Water depth used by the wave model (m) (halo filled) */
+	T* h;
+	/** Water depth at the previous wave update (m) */
+	T* ho;
+	/** Rate of change of the water depth (m/s) */
+	T* dhdt;
+	/** Current velocity in x direction (m/s) (0 if wavecurrent is false, halo filled) */
+	T* u;
+	/** Current velocity in y direction (m/s) (0 if wavecurrent is false, halo filled) */
+	T* v;
+	/** Depth and current gradients */
+	T* dhdx, * dhdy, * dudx, * dudy, * dvdx, * dvdy;
+};
+
+/**
+ * @brief Linear wave kinematics for each frequency and each cell (including halo cells).
+ * Arrays of size nfreq*specstride, stored with the same layout as the spectral arrays (ifreq instead of ispec).
+ * @tparam T Data type
+ */
+template <class T>
+struct WaveKinP
+{
+	/** Wave number (rad/m) */
+	T* k;
+	/** Group velocity (m/s) */
+	T* cg;
+};
+
+/**
+ * @brief Work arrays (2D) used for the geographic propagation of one spectral bin at a time.
+ * Same layout and convention as the flow FluxP: Fx[i] is the flux through the left face of cell i
+ * and Fy[i] the flux through the bottom face of cell i.
+ * @tparam T Data type
+ */
+template <class T>
+struct WaveWorkP
+{
+	/** Limited gradients of the action density of the current bin */
+	T* dNdx, * dNdy;
+	/** Action density fluxes through the left (Fx) and bottom (Fy) faces of each cell */
+	T* Fx, * Fy;
+};
+
+/**
+ * @brief Wave boundary conditions.
+ * @tparam T Data type
+ */
+template <class T>
+struct WaveBndP
+{
+	/** Parametric (JONSWAP) boundary action density spectrum, size(nspec) */
+	T* Nbnd;
+};
+
+/**
  * @brief Wave time keeping (scalar only, kept on the CPU structure).
  */
 struct WaveTimeP
@@ -167,6 +229,12 @@ struct WaveModel
 	WaveSpectrumP<T> action;
 	WaveSpectrumP<T> action_o; // action density at the previous step (for predictor/corrector, iterative or limiter)
 	WaveAdvanceP<T> adv;
+
+	// Medium, kinematics, propagation work arrays and boundaries
+	WaveMediumP<T> medium;
+	WaveKinP<T> kin;
+	WaveWorkP<T> work;
+	WaveBndP<T> bnd;
 
 	// 2D arrays
 	WaveBulkP<T> bulk;

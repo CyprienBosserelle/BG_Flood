@@ -2848,7 +2848,7 @@ template <class T> void gradientHaloGPUnew(Param XParam, BlockP<T>XBlock, T* a, 
 	
 	dim3 blockDimL(2, XParam.blkwidth, 1);
 	dim3 blockDimB(XParam.blkwidth, 2, 1);
-	dim3 gridDim(ceil(XParam.nblk/2), 1, 1);
+	dim3 gridDim((XParam.nblk + 1) / 2, 1, 1); // 2 blocks per thread block (round up so the last block is not skipped when nblk is odd)
 
 
 	gradientHaloLeftGPUnew <<< gridDim, blockDimL, 0, streams[0] >>> (XParam, XBlock, a, dadx, dady);

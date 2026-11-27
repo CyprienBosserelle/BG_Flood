@@ -33,7 +33,7 @@ template <class T> void AllocateMappedMemCPU(int nx, int ny, int gpudevice, T*& 
 
 template <class T> __host__ void FillCPU(int nx, int ny, T fillval, T*& zb);
 
-int memloc(Param XParam, int i, int j, int ib);
+int memloc(const Param& XParam, int i, int j, int ib);
 //__device__ int memloc(int halowidth, int blkmemwidth, int  blksize, int i, int j, int ib);
 __host__ __device__ int memloc(int halowidth, int blkmemwidth, int i, int j, int ib);
 

@@ -16,7 +16,7 @@
  * @param ib Block index
  * @return Linear memory index
  */
-__host__ int memloc(Param XParam, int i, int j, int ib)
+__host__ int memloc(const Param& XParam, int i, int j, int ib)
 {
 	return (i+XParam.halowidth) + (j + XParam.halowidth) * XParam.blkmemwidth + ib * XParam.blksize;
 }
@@ -407,6 +407,23 @@ void AllocateCPU(int nblk, int blksize, WaveParam XWaveParam, WaveModel<T>& XWav
 	// Time step arrays
 	AllocateCPU(nblk, blksize, XWave.time.dtmax);
 	AllocateCPU(nblk, blksize, XWave.time.arrmin);
+
+	// Medium
+	AllocateCPU(nblk, blksize, XWave.medium.h, XWave.medium.ho, XWave.medium.dhdt, XWave.medium.u);
+	AllocateCPU(nblk, blksize, XWave.medium.v, XWave.medium.dhdx, XWave.medium.dhdy, XWave.medium.dudx);
+	AllocateCPU(nblk, blksize, XWave.medium.dudy, XWave.medium.dvdx, XWave.medium.dvdy, XWave.work.dNdx);
+
+	// Propagation work arrays
+	AllocateCPU(nblk, blksize, XWave.work.dNdy);
+	AllocateCPU(nblk, blksize, XWave.work.Fx);
+	AllocateCPU(nblk, blksize, XWave.work.Fy);
+
+	// Kinematics (per frequency)
+	AllocateCPU(nblk * XWaveParam.nfreq, blksize, XWave.kin.k);
+	AllocateCPU(nblk * XWaveParam.nfreq, blksize, XWave.kin.cg);
+
+	// Boundary spectrum
+	AllocateCPU(XWaveParam.nspec, 1, XWave.bnd.Nbnd);
 }
 template void AllocateCPU<float>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<float>& XWave);
 template void AllocateCPU<double>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<double>& XWave);
@@ -1033,6 +1050,23 @@ void AllocateGPU(int nblk, int blksize, WaveParam XWaveParam, WaveModel<T>& XWav
 	// Time step arrays (used by the GPU time step reduction)
 	AllocateGPU(nblk, blksize, XWave.time.dtmax);
 	AllocateGPU(nblk, blksize, XWave.time.arrmin);
+
+	// Medium
+	AllocateGPU(nblk, blksize, XWave.medium.h, XWave.medium.ho, XWave.medium.dhdt, XWave.medium.u);
+	AllocateGPU(nblk, blksize, XWave.medium.v, XWave.medium.dhdx, XWave.medium.dhdy, XWave.medium.dudx);
+	AllocateGPU(nblk, blksize, XWave.medium.dudy, XWave.medium.dvdx, XWave.medium.dvdy, XWave.work.dNdx);
+
+	// Propagation work arrays
+	AllocateGPU(nblk, blksize, XWave.work.dNdy);
+	AllocateGPU(nblk, blksize, XWave.work.Fx);
+	AllocateGPU(nblk, blksize, XWave.work.Fy);
+
+	// Kinematics (per frequency)
+	AllocateGPU(nblk * XWaveParam.nfreq, blksize, XWave.kin.k);
+	AllocateGPU(nblk * XWaveParam.nfreq, blksize, XWave.kin.cg);
+
+	// Boundary spectrum
+	AllocateGPU(XWaveParam.nspec, 1, XWave.bnd.Nbnd);
 }
 template void AllocateGPU<float>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<float>& XWave);
 template void AllocateGPU<double>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<double>& XWave);

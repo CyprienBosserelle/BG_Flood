@@ -319,7 +319,7 @@ template <class T> void fillHaloGPUnew(Param XParam, BlockP<T> XBlock, cudaStrea
 
 	dim3 blockDimHaloLRx2(2, XParam.blkwidth, 1);
 	dim3 blockDimHaloBTx2(XParam.blkwidth, 2, 1);
-	dim3 gridDimx2(ceil(XParam.nblk/2), 1, 1);
+	dim3 gridDimx2((XParam.nblk + 1) / 2, 1, 1);
 
 	//fillLeftnew <<<gridDimx2, blockDimHaloLRx2, 0>>> (XParam.halowidth, XParam.nblk, XBlock.active, XBlock.level, XBlock.LeftBot, XBlock.LeftTop, XBlock.RightBot, XBlock.BotRight, XBlock.TopRight, z);
 	fillLeft <<<gridDim, blockDimHaloLR, 0 >>> (XParam.halowidth, XBlock.active, XBlock.level, XBlock.LeftBot, XBlock.LeftTop, XBlock.RightBot, XBlock.BotRight, XBlock.TopRight, z);
@@ -507,7 +507,7 @@ template <class T> void fillHaloLeftRightGPUnew(Param XParam, BlockP<T> XBlock, 
 
 	dim3 blockDimHaloLR(2, 16, 1);
 	//dim3 blockDimHaloBT(16, 1, 1);
-	dim3 gridDim(ceil(XParam.nblk/2), 1, 1);
+	dim3 gridDim((XParam.nblk + 1) / 2, 1, 1); // 2 blocks per thread block (round up so the last block is not skipped when nblk is odd)
 
 	HaloFluxGPULRnew <<<gridDim, blockDimHaloLR, 0, stream >>> (XParam, XBlock, z);
 
@@ -567,7 +567,7 @@ template <class T> void fillHaloBotTopGPUnew(Param XParam, BlockP<T> XBlock, cud
 
 	//dim3 blockDimHaloLR(1, 16, 1);
 	dim3 blockDimHaloBT(16, 2, 1);
-	dim3 gridDim(ceil(XParam.nblk/2), 1, 1);
+	dim3 gridDim((XParam.nblk + 1) / 2, 1, 1); // 2 blocks per thread block (round up so the last block is not skipped when nblk is odd)
 
 
 	HaloFluxGPUBTnew <<<gridDim, blockDimHaloBT, 0, stream >>> (XParam, XBlock, z);

@@ -51,8 +51,8 @@ template <class T> void InitWaveModel(Param XParam, WaveParam& XWaveParam, Forci
 		exit(1);
 	}
 
-	// 3 spectral arrays + 21 2D arrays
-	double memMB = double(3 * nspecmem + 21 * size_t(XWaveParam.specstride)) * sizeof(T) / 1024.0 / 1024.0;
+	// 3 spectral arrays + 2 frequency arrays (k, cg) + 36 2D arrays
+	double memMB = double(3 * nspecmem + 2 * size_t(XWaveParam.nfreq) * size_t(XWaveParam.specstride) + 36 * size_t(XWaveParam.specstride)) * sizeof(T) / 1024.0 / 1024.0;
 	log("\tSpectral grid: " + std::to_string(XWaveParam.nfreq) + " frequencies x " + std::to_string(XWaveParam.ndir) + " directions; Wave model memory: " + std::to_string(memMB) + " MB");
 
 	//==============================
@@ -263,10 +263,36 @@ template <class T> void InitWaveConditions(Param XParam, WaveParam XWaveParam, M
 	std::vector<T*> arr2D = { XWave.bulk.Hs, XWave.bulk.Tm01, XWave.bulk.Tm02, XWave.bulk.Tp, XWave.bulk.Dir, XWave.bulk.Dspr, XWave.bulk.km, XWave.bulk.Urms, XWave.bulk.Qb,
 		XWave.dissip.Dbr, XWave.dissip.Dfr, XWave.dissip.Dwc,
 		XWave.force.Sxx, XWave.force.Sxy, XWave.force.Syy, XWave.force.Fx, XWave.force.Fy,
-		XWave.time.dtmax, XWave.time.arrmin };
+		XWave.time.dtmax, XWave.time.arrmin,
+		XWave.medium.h, XWave.medium.ho, XWave.medium.dhdt, XWave.medium.u, XWave.medium.v,
+		XWave.medium.dhdx, XWave.medium.dhdy, XWave.medium.dudx, XWave.medium.dudy, XWave.medium.dvdx, XWave.medium.dvdy,
+		XWave.work.dNdx, XWave.work.dNdy, XWave.work.Fx, XWave.work.Fy };
 	for (int ia = 0; ia < arr2D.size(); ia++)
 	{
 		FillCPU(nblkmem, blksize, T(0.0), arr2D[ia]);
+	}
+	FillCPU(nblkmem * XWaveParam.nfreq, blksize, T(0.0), XWave.kin.k);
+	FillCPU(nblkmem * XWaveParam.nfreq, blksize, T(0.0), XWave.kin.cg);
+
+	//==============================
+	// Medium (depth, currents) and kinematics: dh/dt = 0 at the start
+	Param XParamW = WaveLightParam(XParam, XParam.theta);
+	WavePrepCPU(XParamW, XWaveParam, 0.0, XModel, XWave);
+
+	//==============================
+	// Boundary spectrum (parametric JONSWAP)
+	{
+		std::vector<T> Nbnd;
+		JonswapSpectrum(XWaveParam, XWave.spec, XWaveParam.Hsbnd, XWaveParam.Tpbnd, XWaveParam.Dirbnd, XWaveParam.Dsprbnd, XWaveParam.gammajsp, Nbnd);
+		for (int ispec = 0; ispec < nspec; ispec++)
+		{
+			XWave.bnd.Nbnd[ispec] = Nbnd[ispec];
+		}
+		std::vector<int> bndtypes = { XWaveParam.leftwavebnd, XWaveParam.rightwavebnd, XWaveParam.topwavebnd, XWaveParam.botwavebnd };
+		if (std::find(bndtypes.begin(), bndtypes.end(), 1) != bndtypes.end())
+		{
+			log("\tWave boundary: JONSWAP spectrum Hs=" + std::to_string(XWaveParam.Hsbnd) + "m, Tp=" + std::to_string(XWaveParam.Tpbnd) + "s, Dir=" + std::to_string(XWaveParam.Dirbnd) + "deg, Dspr=" + std::to_string(XWaveParam.Dsprbnd) + "deg (left/right/top/bot type: " + std::to_string(XWaveParam.leftwavebnd) + "/" + std::to_string(XWaveParam.rightwavebnd) + "/" + std::to_string(XWaveParam.topwavebnd) + "/" + std::to_string(XWaveParam.botwavebnd) + ")");
+		}
 	}
 
 	//==============================

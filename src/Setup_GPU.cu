@@ -451,6 +451,16 @@ template <class T> void CopytoGPU(int nblk, int blksize, WaveParam XWaveParam, W
 	CopytoGPU(nblk, blksize, XWave_cpu.force.Syy, XWave_gpu.force.Syy);
 	CopytoGPU(nblk, blksize, XWave_cpu.force.Fx, XWave_gpu.force.Fx);
 	CopytoGPU(nblk, blksize, XWave_cpu.force.Fy, XWave_gpu.force.Fy);
+
+	// Medium (the kinematics and work arrays are recalculated on the GPU)
+	CopytoGPU(nblk, blksize, XWave_cpu.medium.h, XWave_gpu.medium.h);
+	CopytoGPU(nblk, blksize, XWave_cpu.medium.ho, XWave_gpu.medium.ho);
+	CopytoGPU(nblk, blksize, XWave_cpu.medium.dhdt, XWave_gpu.medium.dhdt);
+	CopytoGPU(nblk, blksize, XWave_cpu.medium.u, XWave_gpu.medium.u);
+	CopytoGPU(nblk, blksize, XWave_cpu.medium.v, XWave_gpu.medium.v);
+
+	// Boundary spectrum
+	CopytoGPU(XWaveParam.nspec, 1, XWave_cpu.bnd.Nbnd, XWave_gpu.bnd.Nbnd);
 }
 template void CopytoGPU<float>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<float> XWave_cpu, WaveModel<float> XWave_gpu);
 template void CopytoGPU<double>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<double> XWave_cpu, WaveModel<double> XWave_gpu);

@@ -34,7 +34,11 @@ public:
 	bool wavecurrent = true; // Include wave-current interaction (Doppler shift and current refraction) using the flow model velocities u,v
 	bool wavewaterlevel = true; // Use the flow model water depth (h) for wave propagation. If false the depth is calculated using zsinit (or 0.0) and zb
 	bool waveflowcoupling = true; // Feed the wave forces (radiation stress gradient) back to the flow model (only relevant when both models are running)
-	int wavesolver = 1; // Propagation scheme for the action balance equation (1: first order upwind explicit (WW3-like) [Default], other schemes may be added later)
+	int wavesolver = 2; // Explicit propagation scheme for the action balance equation (1: first order upwind with forward Euler time stepping, 2: second order upwind (MUSCL reconstruction with a limiter) with second order (Heun / SSP-RK2) time stepping [Default])
+	double wavetheta = 1.0; // Slope limiter parameter for the second order upwind scheme, wavetheta in [1,2] (1: minmod, the most diffusive but most robust [Default], 2: superbee, the least diffusive)
+	bool refraction = true; // Switch for depth and current induced refraction (propagation in theta-space, SWAN REFRAC)
+	bool freqshift = true; // Switch for the frequency shift due to time varying depth and currents (propagation in sigma-space, SWAN FSHIFT)
+	double ctmax = 0.5; // Maximum Courant number allowed for the refraction and frequency shift (cth*dt/dtheta and csig*dt/dsigma are clipped to this value, similar to the WW3 CTMAX refraction limiter)
 
 	//*Spectral grid
 	int nfreq = 25; // Number of (logarithmically distributed) frequency bins

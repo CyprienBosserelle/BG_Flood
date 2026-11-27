@@ -971,6 +971,34 @@ WaveParam readparamstr(std::string line, WaveParam wparam)
 		wparam.wavesolver = std::stoi(parametervalue);
 	}
 
+	paramvec = { "wavetheta", "wavelimitertheta" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavetheta = std::stod(parametervalue);
+	}
+
+	paramvec = { "refraction", "refrac", "waverefraction" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.refraction = readparambool(parametervalue, wparam.refraction);
+	}
+
+	paramvec = { "freqshift", "fshift", "frequencyshift" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.freqshift = readparambool(parametervalue, wparam.freqshift);
+	}
+
+	paramvec = { "ctmax", "wavectmax" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.ctmax = std::stod(parametervalue);
+	}
+
 	///////////////////////////////////////////////////////
 	// Spectral grid
 	//
@@ -2204,6 +2232,31 @@ void checkwaveparamsanity(Param& XParam, WaveParam& XWaveParam, Forcing<float>& 
 		XWaveParam.waveCFL = DefaultWaveParams.waveCFL;
 	}
 	XWaveParam.dtcouple = utils::max(XWaveParam.dtcouple, 0.0);
+
+	///////////////////////////////////////////
+	// Propagation scheme
+	///////////////////////////////////////////
+	if (XWaveParam.wavesolver != 1 && XWaveParam.wavesolver != 2)
+	{
+		WaveParam DefaultWaveParams;
+		log("WARNING: wavesolver must be 1 (first order upwind) or 2 (second order upwind). wavesolver set to " + std::to_string(DefaultWaveParams.wavesolver));
+		XWaveParam.wavesolver = DefaultWaveParams.wavesolver;
+	}
+	XWaveParam.wavetheta = utils::min(utils::max(XWaveParam.wavetheta, 1.0), 2.0);
+	if (XWaveParam.ctmax <= 0.0 || XWaveParam.ctmax > 1.0)
+	{
+		WaveParam DefaultWaveParams;
+		log("WARNING: ctmax must be in ]0,1]. ctmax set to " + std::to_string(DefaultWaveParams.ctmax));
+		XWaveParam.ctmax = DefaultWaveParams.ctmax;
+	}
+	if (XParam.spherical)
+	{
+		log("WARNING: The wave model propagation is only implemented for cartesian grids (the spherical metric terms are ignored).");
+	}
+	if (std::abs(XParam.grdalpha) > 0.0 && !std::isnan(XParam.grdalpha))
+	{
+		log("WARNING: The wave directions are relative to the model grid (grid rotation grdalpha is ignored by the wave model).");
+	}
 	XWaveParam.wavedepthmin = utils::max(XWaveParam.wavedepthmin, XParam.eps);
 
 	///////////////////////////////////////////

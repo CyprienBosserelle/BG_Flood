@@ -203,15 +203,32 @@ template <class T> void WaveStep(Param XParam, WaveParam XWaveParam, Loop<T>& XL
 	int nsub = utils::max(1, int(ceil(tadv / XWave.clock.dtmax - tiny)));
 	XWave.clock.dt = tadv / double(nsub);
 
+	// Light copies of the parameters and of the flow model (the block functions take Param and BlockP by value
+	// and are called for every spectral bin)
+	Param XParamW = WaveLightParam(XParam, XParam.theta);
+	Model<T> XModelW = WaveLightModel(XModel);
+	Model<T> XModelW_g = WaveLightModel(XModel_g);
+
+	// Update the medium seen by the waves (depth, dh/dt, currents and their gradients) and the kinematics (k, cg)
+	if (XParam.GPUDEVICE >= 0)
+	{
+		WavePrepGPU(XParamW, XWaveParam, XParam.flowmodel ? tadv : 0.0, XModelW_g, XWave_g);
+	}
+	else
+	{
+		WavePrepCPU(XParamW, XWaveParam, XParam.flowmodel ? tadv : 0.0, XModelW, XWave);
+	}
+
 	for (int isub = 0; isub < nsub; isub++)
 	{
+		T bndfac = T(WaveBndTaper(XParam, XWaveParam, XWave.clock.totaltime));
 		if (XParam.GPUDEVICE >= 0)
 		{
-			WaveGPU(XParam, XWaveParam, T(XWave.clock.dt), XForcing, XModel_g, XWave_g);
+			WaveGPU(XParamW, XWaveParam, T(XWave.clock.dt), bndfac, XForcing, XModelW_g, XWave_g);
 		}
 		else
 		{
-			WaveCPU(XParam, XWaveParam, T(XWave.clock.dt), XForcing, XModel, XWave);
+			WaveCPU(XParamW, XWaveParam, T(XWave.clock.dt), bndfac, XForcing, XModelW, XWave);
 		}
 		XWave.clock.totaltime = XWave.clock.totaltime + XWave.clock.dt;
 		XWave.clock.nstep++;

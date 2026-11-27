@@ -27,6 +27,10 @@ template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, GradientsP<T> G
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, GradientsP<T> Grad);
 
 template <class T> void fillHalo(Param XParam, BlockP<T> XBlock, FluxP<T> Flux);
+template <class T> void fillHaloLRFluxC(Param XParam, BlockP<T> XBlock, T* z);
+template <class T> void fillHaloBTFluxC(Param XParam, BlockP<T> XBlock, T* z);
+template <class T> void fillHaloLeftRightGPUnew(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z);
+template <class T> void fillHaloBotTopGPUnew(Param XParam, BlockP<T> XBlock, cudaStream_t stream, T* z);
 template <class T> void fillHaloGPU(Param XParam, BlockP<T> XBlock, FluxP<T> Flux);
 
 template <class T> void fillHaloTopRightC(Param XParam, BlockP<T> XBlock, T* z);
