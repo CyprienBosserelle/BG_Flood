@@ -74,8 +74,9 @@ public:
 
 	//*Physics (source terms)
 	// Wind input (Uses the wind forcing given to the flow model: "Wind" keyword)
-	int windinput = 1; // Wind input formulation (0: off, 1: Komen et al. (1984) / Snyder (1981) [Default], 2: Janssen (1991) - to be implemented)
-	bool lineargrowth = false; // Cavaleri & Malanotte-Rizzoli (1981) linear growth term (SWAN AGROW)
+	int windinput = 1; // Wind input formulation (0: off, 1: Komen et al. (1984) / Snyder (1981) [Default]). Uses the flow model wind forcing ("Wind" keyword), turned off if no wind is given
+	double rhoair = 1.225; // Air density (kg/m3) used by the wind input
+	bool lineargrowth = true; // Cavaleri & Malanotte-Rizzoli (1981) linear growth term (SWAN AGROW). On by default so that waves can grow from a calm sea (the exponential wind input is proportional to the existing energy)
 
 	// Whitecapping
 	int whitecapping = 1; // Whitecapping formulation (0: off, 1: Komen et al. 1984 [Default])
@@ -86,12 +87,12 @@ public:
 	double powk = 1.0; // Komen power of wavenumber normalized with the mean wave number (SWAN powk)
 
 	// Quadruplet wave-wave interaction
-	int quadruplets = 1; // Quadruplet formulation (0: off, 1: Discrete Interaction Approximation (DIA) [Default])
+	int quadruplets = 0; // Quadruplet formulation (0: off [Default], 1: Discrete Interaction Approximation (DIA) - not implemented yet)
 	double dialambda = 0.25; // DIA lambda (SWAN lambda, WW3 LAMBDA)
 	double diaCnl4 = 3.0e7; // DIA proportionality coefficient (SWAN Cnl4, WW3 NLPROP=2.78e7)
 
 	// Triad wave-wave interaction
-	int triads = 0; // Triad formulation (0: off [Default], 1: Lumped Triad Approximation (LTA))
+	int triads = 0; // Triad formulation (0: off [Default], 1: Lumped Triad Approximation (LTA) - not implemented yet)
 	double trfac = 0.8; // LTA proportionality coefficient (SWAN trfac)
 	double cutfr = 2.5; // LTA maximum frequency as a factor of the mean frequency (SWAN cutfr)
 
@@ -101,13 +102,13 @@ public:
 	double gammabr = 0.73; // Breaker index Hmax/d (SWAN gamma)
 
 	// Bottom friction
-	int wavefriction = 1; // Bottom friction formulation (0: off, 1: JONSWAP (Hasselmann et al. 1973) [Default], 2: Collins (1972), 3: Madsen et al. (1988))
+	int wavefriction = 1; // Bottom friction formulation (0: off, 1: JONSWAP (Hasselmann et al. 1973) [Default], 2: Collins (1972))
 	double cfjon = 0.038; // JONSWAP bottom friction coefficient in m2/s3 (SWAN default 0.038, WW3 SBT1 0.067)
 	double cfw = 0.015; // Collins friction coefficient
 	double kn = 0.05; // Madsen equivalent roughness length (m)
 
 	// Action density limiter
-	bool wavelimiter = true; // Limit the change of action density per time step (SWAN/WW3 style limiter, Hersbach & Janssen 1999)
+	bool wavelimiter = true; // Limit the change of action density per time step / iteration when the wind input is active (SWAN/WW3 style limiter, Hersbach & Janssen 1999): |dN| <= limiterfac * Phillips level
 	double limiterfac = 0.1; // Fraction of the Phillips (PM) level used by the limiter (SWAN qb=0.1)
 
 	//*Initial conditions

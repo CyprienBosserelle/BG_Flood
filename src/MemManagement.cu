@@ -416,6 +416,8 @@ void AllocateCPU(int nblk, int blksize, WaveParam XWaveParam, WaveModel<T>& XWav
 	AllocateCPU(nblk, blksize, XWave.medium.dudy);
 	AllocateCPU(nblk, blksize, XWave.medium.dvdx);
 	AllocateCPU(nblk, blksize, XWave.medium.dvdy);
+	AllocateCPU(nblk, blksize, XWave.medium.uwind);
+	AllocateCPU(nblk, blksize, XWave.medium.vwind);
 
 	// Propagation work arrays for a batch of nchunk bins (explicit solver only)
 	int nwork = (XWaveParam.wavemodel == 2) ? XWaveParam.nchunk : 1;
@@ -1063,6 +1065,8 @@ void AllocateGPU(int nblk, int blksize, WaveParam XWaveParam, WaveModel<T>& XWav
 	AllocateGPU(nblk, blksize, XWave.medium.dudy);
 	AllocateGPU(nblk, blksize, XWave.medium.dvdx);
 	AllocateGPU(nblk, blksize, XWave.medium.dvdy);
+	AllocateGPU(nblk, blksize, XWave.medium.uwind);
+	AllocateGPU(nblk, blksize, XWave.medium.vwind);
 
 	// Propagation work arrays for a batch of nchunk bins (explicit solver only)
 	int nwork = (XWaveParam.wavemodel == 2) ? XWaveParam.nchunk : 1;

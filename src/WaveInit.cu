@@ -52,7 +52,7 @@ template <class T> void InitWaveModel(Param XParam, WaveParam& XWaveParam, Forci
 	}
 
 	// 3 spectral arrays + 3 frequency arrays (k, cg, dsdd) + 4 batch work arrays + 34 2D arrays
-	double memMB = double(3 * nspecmem + (3 * size_t(XWaveParam.nfreq) + 4 * size_t(XWaveParam.wavemodel == 2 ? XWaveParam.nchunk : 1) + 36) * size_t(XWaveParam.specstride)) * sizeof(T) / 1024.0 / 1024.0;
+	double memMB = double(3 * nspecmem + (3 * size_t(XWaveParam.nfreq) + 4 * size_t(XWaveParam.wavemodel == 2 ? XWaveParam.nchunk : 1) + 38) * size_t(XWaveParam.specstride)) * sizeof(T) / 1024.0 / 1024.0;
 	log("\tSpectral grid: " + std::to_string(XWaveParam.nfreq) + " frequencies x " + std::to_string(XWaveParam.ndir) + " directions; " + std::string(XWaveParam.wavemodel == 1 ? "implicit solver" : "explicit solver, " + std::to_string(XWaveParam.nchunk) + " bins propagated per batch") + "; Wave model memory: " + std::to_string(memMB) + " MB");
 	if (XWaveParam.staticmedium)
 	{
@@ -327,7 +327,8 @@ template <class T> void InitWaveConditions(Param XParam, WaveParam XWaveParam, M
 		XWave.force.Sxx, XWave.force.Sxy, XWave.force.Syy, XWave.force.Fx, XWave.force.Fy,
 		XWave.time.dtmax, XWave.time.arrmin,
 		XWave.medium.h, XWave.medium.ho, XWave.medium.dhdt, XWave.medium.u, XWave.medium.v,
-		XWave.medium.dhdx, XWave.medium.dhdy, XWave.medium.dudx, XWave.medium.dudy, XWave.medium.dvdx, XWave.medium.dvdy };
+		XWave.medium.dhdx, XWave.medium.dhdy, XWave.medium.dudx, XWave.medium.dudy, XWave.medium.dvdx, XWave.medium.dvdy,
+		XWave.medium.uwind, XWave.medium.vwind };
 	for (int ia = 0; ia < arr2D.size(); ia++)
 	{
 		FillCPU(nblkmem, blksize, T(0.0), arr2D[ia]);

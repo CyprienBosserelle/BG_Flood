@@ -157,6 +157,8 @@ struct WaveMediumP
 	T* v;
 	/** Depth and current gradients */
 	T* dhdx, * dhdy, * dudx, * dudy, * dvdx, * dvdy;
+	/** 10 m wind velocity components (m/s) from the flow model wind forcing (updated at each wave update, 0 without wind) */
+	T* uwind, * vwind;
 };
 
 /**

@@ -159,6 +159,31 @@ template double WaveDtmax<double>(Param XParam, WaveParam XWaveParam, Model<doub
 
 
 /**
+ * @brief Update the 10 m wind seen by the wave model (wind input source term) from the flow model wind forcing.
+ */
+template <class T> void WaveUpdateWind(Param XParam, WaveParam XWaveParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g)
+{
+	if (XWaveParam.windinput <= 0 || XForcing.UWind.inputfile.empty())
+	{
+		return;
+	}
+	if (XParam.GPUDEVICE >= 0)
+	{
+		dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+		dim3 gridDim(XParam.nblk, 1, 1);
+		WaveWindGPU <<< gridDim, blockDim, 0 >>> (XParam, XWaveParam, XForcing.UWind, XForcing.VWind, XModel_g.blocks, XWave_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	else
+	{
+		WaveWindCPU(XParam, XWaveParam, XForcing, XModel.blocks, XWave);
+	}
+}
+template void WaveUpdateWind<float>(Param XParam, WaveParam XWaveParam, Forcing<float> XForcing, Model<float>& XModel, Model<float>& XModel_g, WaveModel<float>& XWave, WaveModel<float>& XWave_g);
+template void WaveUpdateWind<double>(Param XParam, WaveParam XWaveParam, Forcing<float> XForcing, Model<double>& XModel, Model<double>& XModel_g, WaveModel<double>& XWave, WaveModel<double>& XWave_g);
+
+
+/**
  * @brief Update the medium seen by the wave model and the maximum stable wave time step.
  *
  * Recalculates the depth, dh/dt, currents and their gradients, the kinematics (k, cg, dsigma/dh for each frequency)
@@ -243,6 +268,7 @@ template <class T> void WaveStep(Param XParam, WaveParam XWaveParam, Loop<T>& XL
 		}
 
 		Param XParamW = WaveLightParam(XParam, XParam.theta);
+		WaveUpdateWind(XParamW, XWaveParam, XForcing, XModel, XModel_g, XWave, XWave_g);
 		double convpct = 0.0;
 		int niter;
 		if (XParam.GPUDEVICE >= 0)
@@ -292,6 +318,9 @@ template <class T> void WaveStep(Param XParam, WaveParam XWaveParam, Loop<T>& XL
 	Param XParamW = WaveLightParam(XParam, XParam.theta);
 	Model<T> XModelW = WaveLightModel(XModel);
 	Model<T> XModelW_g = WaveLightModel(XModel_g);
+
+	// Wind seen by the waves at this update
+	WaveUpdateWind(XParamW, XWaveParam, XForcing, XModel, XModel_g, XWave, XWave_g);
 
 	for (int isub = 0; isub < nsub; isub++)
 	{

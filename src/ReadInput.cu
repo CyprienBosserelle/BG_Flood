@@ -1149,6 +1149,13 @@ WaveParam readparamstr(std::string line, WaveParam wparam)
 		wparam.windinput = std::stoi(parametervalue);
 	}
 
+	paramvec = { "rhoair", "waverhoair" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.rhoair = std::stod(parametervalue);
+	}
+
 	paramvec = { "lineargrowth", "agrow" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
@@ -2371,6 +2378,22 @@ void checkwaveparamsanity(Param& XParam, WaveParam& XWaveParam, Forcing<float>& 
 		// Nothing to couple to
 		XWaveParam.waveflowcoupling = false;
 	}
+	if (XWaveParam.quadruplets > 0)
+	{
+		log("WARNING: quadruplet wave-wave interactions (DIA) are not implemented yet: quadruplets turned off.");
+		XWaveParam.quadruplets = 0;
+	}
+	if (XWaveParam.triads > 0)
+	{
+		log("WARNING: triad wave-wave interactions (LTA) are not implemented yet: triads turned off.");
+		XWaveParam.triads = 0;
+	}
+	if (XWaveParam.wavefriction > 2)
+	{
+		log("WARNING: wavefriction must be 0 (off), 1 (JONSWAP) or 2 (Collins). JONSWAP is used.");
+		XWaveParam.wavefriction = 1;
+	}
+	log("Wave source terms: wind input " + std::to_string(XWaveParam.windinput) + ", whitecapping " + std::to_string(XWaveParam.whitecapping) + ", depth induced breaking " + std::to_string(XWaveParam.breaking) + ", bottom friction " + std::to_string(XWaveParam.wavefriction));
 
 	///////////////////////////////////////////
 	// Boundaries

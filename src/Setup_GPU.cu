@@ -460,6 +460,8 @@ template <class T> void CopytoGPU(int nblk, int blksize, WaveParam XWaveParam, W
 	CopytoGPU(nblk, blksize, XWave_cpu.medium.dhdt, XWave_gpu.medium.dhdt);
 	CopytoGPU(nblk, blksize, XWave_cpu.medium.u, XWave_gpu.medium.u);
 	CopytoGPU(nblk, blksize, XWave_cpu.medium.v, XWave_gpu.medium.v);
+	CopytoGPU(nblk, blksize, XWave_cpu.medium.uwind, XWave_gpu.medium.uwind);
+	CopytoGPU(nblk, blksize, XWave_cpu.medium.vwind, XWave_gpu.medium.vwind);
 }
 template void CopytoGPU<float>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<float> XWave_cpu, WaveModel<float> XWave_gpu);
 template void CopytoGPU<double>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<double> XWave_cpu, WaveModel<double> XWave_gpu);

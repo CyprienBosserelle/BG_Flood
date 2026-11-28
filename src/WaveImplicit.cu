@@ -39,6 +39,7 @@
 */
 
 #include "WaveImplicit.h"
+#include "WaveSource.h"
 
 
 // Sweep directions: s=0 (+x,+y), s=1 (-x,+y), s=2 (-x,-y), s=3 (+x,-y)
@@ -351,6 +352,14 @@ template <class T> __host__ __device__ void WaveImplicitCell(const Param& XParam
 	T delta = calcres(T(XParam.delta), XBlock.level[ib]);
 	T invdelta = T(1.0) / delta;
 
+	// Source terms: integral quantities from the latest spectrum of the cell (Picard linearisation, as in SWAN)
+	const bool dosrc = WaveAnySource<T>(XWaveParam);
+	WaveSrcCell<T> sc;
+	if (dosrc)
+	{
+		WaveSourceIntegrals(XParam, XWaveParam, i, XWave, sc);
+	}
+
 	int inb[4];
 	inb[0] = memloc(halowidth, blkmemwidth, ix - 1, iy, ib); // left
 	inb[1] = memloc(halowidth, blkmemwidth, ix + 1, iy, ib); // right
@@ -473,6 +482,16 @@ template <class T> __host__ __device__ void WaveImplicitCell(const Param& XParam
 				Ug[m] = T(0.0);
 
 				//===========================
+				// Source terms: sinks on the diagonal (implicit), wind growth on the right hand side (latest value)
+				if (dosrc)
+				{
+					T Dsink, Bgrow, Alin;
+					WaveSourceBin(XParam, XWaveParam, XWave, sc, i, ifreq, d, Dsink, Bgrow, Alin);
+					Dg[m] += Dsink;
+					Rg[m] += Bgrow * N[is] + Alin;
+				}
+
+				//===========================
 				// Spectral space: sigma (Gauss-Seidel: lower frequency already updated, higher frequency lagged)
 				if (dofshift)
 				{
@@ -564,12 +583,22 @@ template <class T> __host__ __device__ void WaveImplicitCell(const Param& XParam
 				Dg[m] = Dg[m] - w * Ug[m - 1];
 				Rg[m] = Rg[m] + w * Rg[m - 1];
 			}
+			// Limiter of the change of action density per iteration (with wind input, as SWAN)
+			T lim = WaveLimiterN(XWaveParam, XWave, i, ifreq);
 			T x = Rg[ql - 1] / Dg[ql - 1];
-			N[specloc(stride, ifreq * nd + (qs + ql - 1) % nd, i)] = utils::max(x, T(0.0));
-			for (int m = ql - 2; m >= 0; m--)
+			for (int m = ql - 1; m >= 0; m--)
 			{
-				x = (Rg[m] + Ug[m] * x) / Dg[m];
-				N[specloc(stride, ifreq * nd + (qs + m) % nd, i)] = utils::max(x, T(0.0));
+				if (m < ql - 1)
+				{
+					x = (Rg[m] + Ug[m] * x) / Dg[m];
+				}
+				size_t isn = specloc(stride, ifreq * nd + (qs + m) % nd, i);
+				T Nn = x;
+				if (lim > T(0.0))
+				{
+					Nn = utils::min(utils::max(Nn, N[isn] - lim), N[isn] + lim);
+				}
+				N[isn] = utils::max(Nn, T(0.0));
 			}
 			break;
 		}

@@ -16,6 +16,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 #include "WaveGPU.h"
+#include "WaveSource.h"
 
 
 /**
@@ -475,6 +476,13 @@ template <class T> void WaveGPU(Param XParam, WaveParam XWaveParam, T dt, double
 
 	//============================================
 	// Bulk parameters and radiation stresses
+	// Source terms (operator splitting: sinks implicit, wind growth explicit)
+	if (WaveAnySource<T>(XWaveParam))
+	{
+		WaveSourceStepGPU <<< gridDim, blockDim, 0 >>> (XParam, XWaveParam, dt, XModel.blocks, XWave);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+
 	if (dobulk)
 	{
 		CalcWaveBulkGPU <<< gridDim, blockDim, 0 >>> (XParam, XWaveParam, XModel.blocks, XModel.evolv, XModel.zb, XWave);

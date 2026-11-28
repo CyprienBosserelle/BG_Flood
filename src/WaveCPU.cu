@@ -16,6 +16,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 #include "WaveCPU.h"
+#include "WaveSource.h"
 
 
 /**
@@ -241,6 +242,12 @@ template <class T> __host__ __device__ void CalcWaveBulkCell(const Param& XParam
 	XWave.force.Sxx[i] = rho * g * Sxx;
 	XWave.force.Sxy[i] = rho * g * Sxy;
 	XWave.force.Syy[i] = rho * g * Syy;
+
+	// Dissipation diagnostics (Dbr, Dwc, Dfr) and fraction of breaking waves (Qb)
+	if (WaveAnySource<T>(XWaveParam))
+	{
+		WaveSourceDiagCell(XParam, XWaveParam, i, XWave);
+	}
 }
 template __host__ __device__ void CalcWaveBulkCell<float>(const Param& XParam, const WaveParam& XWaveParam, int i, float h, const WaveModel<float>& XWave);
 template __host__ __device__ void CalcWaveBulkCell<double>(const Param& XParam, const WaveParam& XWaveParam, int i, double h, const WaveModel<double>& XWave);
@@ -1423,8 +1430,7 @@ template <class T> void WaveRHSCPU(Param XParam, Param XParamN, WaveParam XWaveP
 	// Spectral propagation: dN -= d(csigma N)/dsigma + d(ctheta N)/dtheta
 	WaveSpecPropCPU(XParam, XWaveParam, dt, XModel.blocks, XWave);
 
-	// Source terms: dN += Stot/sigma
-	// TODO (wind input uses XForcing.UWind / XForcing.VWind)
+	// Source terms: applied after the propagation step (see WaveCPU)
 }
 template void WaveRHSCPU<float>(Param XParam, Param XParamN, WaveParam XWaveParam, float dt, double time, Forcing<float> XForcing, Model<float> XModel, WaveModel<float> XWave);
 template void WaveRHSCPU<double>(Param XParam, Param XParamN, WaveParam XWaveParam, double dt, double time, Forcing<float> XForcing, Model<double> XModel, WaveModel<double> XWave);
@@ -1437,7 +1443,8 @@ template void WaveRHSCPU<double>(Param XParam, Param XParamN, WaveParam XWavePar
  * - wavesolver = 1: first order upwind in space, forward Euler in time
  * - wavesolver = 2: second order upwind (MUSCL with limiter) in space, Heun (SSP-RK2) in time:
  *       N* = N^n + dt L(N^n) ;  N^{n+1} = 0.5 N^n + 0.5 (N* + dt L(N*))
- * Then the bulk parameters and radiation stresses are updated.
+ * Then the source terms are applied (operator splitting, see WaveSourceStepCell) and the bulk parameters and
+ * radiation stresses are updated.
  *
  * @tparam T Data type (float or double)
  * @param XParam Light copy of the flow model parameters (see WaveLightParam)
@@ -1468,6 +1475,13 @@ template <class T> void WaveCPU(Param XParam, WaveParam XWaveParam, T dt, double
 	{
 		WaveRHSCPU(XParam, XParamN, XWaveParam, dt, time + double(dt), XForcing, XModel, XWave);
 		UpdateWaveActionCPU(XParam, XWaveParam, XModel.blocks, dt, T(0.5), XWave);
+	}
+
+	//============================================
+	// Source terms (operator splitting: sinks implicit, wind growth explicit)
+	if (WaveAnySource<T>(XWaveParam))
+	{
+		WaveSourceStepCPU(XParam, XWaveParam, dt, XModel.blocks, XWave);
 	}
 
 	//============================================
