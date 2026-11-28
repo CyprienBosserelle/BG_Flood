@@ -144,6 +144,33 @@ public:
 };
 
 
+/**
+ * Wave boundary segment. Wave equivalent of bndsegment (same polygon / side / block list logic).
+ * The boundary forcing is either a text file (time series of Hs, Tp, Dir, Dspr [and gamma], spatially uniform)
+ * or a netcdf file with time slices of the Hs, Tp, Dir and Dspr maps (spatially varying).
+ */
+class wavebndsegment {
+public:
+	std::string inputfile; // Forcing file (.txt time series or .nc maps)
+	Polygon poly;
+	std::string polyfile; // Polygon file or keyword ("left","right","top","bot","all","file")
+	bool on = false; // true if a forcing file is given
+	bool uniform = true; // true for a text (time series) file, false for a netcdf file
+	int type = 0; // 0: absorbing (no incoming waves) [Default]; 1: Neumann (zero gradient); 2: JONSWAP spectrum from the forcing file
+
+	std::vector<WaveBndIn> data; // Uniform forcing (text file)
+
+	DynForcingP<float> Hs, Tp, Dir, Dspr; // Spatially varying forcing (netcdf file)
+
+	int nblk = 0; //number of blocks where this bnd applies
+
+	bndsegmentside left;
+	bndsegmentside right;
+	bndsegmentside top;
+	bndsegmentside bot;
+};
+
+
 class AOIinfo {
 public:
 	std::string file;
@@ -281,6 +308,19 @@ struct Forcing
 	std::vector<bndsegment> bndseg;
 	/* boundary segment; Only applies to AOI bnds
 	Ex: bndseg=area.txt,waterlevelforcing,1;
+	Default: none
+	*/
+
+	std::vector<wavebndsegment> wavebndseg;
+	/* Wave boundary segment (wave model only). Same logic as bndseg: a polygon (or "left","right","top","bot","all"), an optional forcing file and a type.
+	The forcing file is either a text file with columns: time, Hs, Tp, Dir, Dspr[, gamma] (spatially uniform)
+	or a netcdf file with time slices of the Hs, Tp, Dir and Dspr maps (variable names Hs/hs/hm0/swh/VHM0, Tp/tp/tps/VTPK, Dir/dir/mwd/th1m/VMDR, Dspr/dspr/spr/sth1m/VSPR).
+	As for the other forcing maps, the edges of the maps are overwritten (Hs=0) so the maps should extend beyond the model domain.
+	Types: 0: absorbing (no incoming waves); 1: Neumann (zero gradient); 2: JONSWAP spectrum from the forcing file.
+	The keywords waveleft, waveright, wavetop and wavebot are shortcuts for a whole side of the domain (e.g. "wavetop = bnd.txt,2").
+	Boundary blocks that are not in any wave boundary segment use waveaoibnd (default 0: absorbing).
+	Ex: wavebndseg=offshore.txt,wavebnd.txt,2;
+	Ex: waveleft=wavebnd.nc,2;
 	Default: none
 	*/
 

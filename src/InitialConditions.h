@@ -8,6 +8,7 @@
 #include "MemManagement.h"
 #include "Util_CPU.h"
 #include "Arrays.h"
+#include "WaveArrays.h"
 #include "Write_txtlog.h"
 #include "GridManip.h"
 #include "InitEvolv.h"
@@ -20,6 +21,7 @@ template <class T> void InitialConditions(Param &XParam, Forcing<float> &XForcin
 template <class T> void InitRivers(Param XParam, Forcing<float> &XForcing, Model<T> &XModel);
 template <class T> void InitCulverts(Param XParam, Forcing<float>& XForcing, Model<T>& XModel);
 template<class T> void Initmaparray(Model<T> &XModel);
+template<class T> void Initmaparray(Model<T>& XModel, WaveModel<T> XWave);
 template <class T> void initoutput(Param &XParam, Model<T>& XModel);
 void InitTSOutput(Param XParam);
 //template <class T> void Initbnds(Param XParam, Forcing<float> XForcing, Model<T>& XModel);
@@ -27,6 +29,8 @@ void InitTSOutput(Param XParam);
 template <class T> void FindTSoutNodes(Param& XParam, BlockP<T> XBlock, BndblockP<T>& bnd);
 template <class T> void Calcbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock);
 template <class T> void Findbndblks(Param XParam, Model<T> XModel, Forcing<float>& XForcing);
+template <class T> void Initbndblks(Param& XParam, Forcing<float>& XForcing, BlockP<T> XBlock);
+template <class T, class S> void Initsegbndblks(Param& XParam, std::vector<S>& segs, BlockP<T> XBlock, std::string label);
 template <class T> void Initoutzone(Param& XParam, BlockP<T>& XBlock);
 
 template <class T> void InitzbgradientCPU(Param XParam, Model<T> XModel);

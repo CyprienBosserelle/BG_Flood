@@ -2848,7 +2848,7 @@ template <class T> void gradientHaloGPUnew(Param XParam, BlockP<T>XBlock, T* a, 
 	
 	dim3 blockDimL(2, XParam.blkwidth, 1);
 	dim3 blockDimB(XParam.blkwidth, 2, 1);
-	dim3 gridDim(ceil(XParam.nblk/2), 1, 1);
+	dim3 gridDim((XParam.nblk + 1) / 2, 1, 1); // 2 blocks per thread block (round up so the last block is not skipped when nblk is odd)
 
 
 	gradientHaloLeftGPUnew <<< gridDim, blockDimL, 0, streams[0] >>> (XParam, XBlock, a, dadx, dady);
@@ -2887,7 +2887,7 @@ template void gradientHaloGPUnew<double>(Param XParam, BlockP<double>XBlock, dou
  * @param dady Array to store the computed y-derivative gradients
  * @note This function handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement
  */
-template <class T> void gradientHaloLeft(Param XParam, BlockP<T>XBlock, int ib, int iy, T* a, T* dadx, T* dady)
+template <class T> void gradientHaloLeft(const Param& XParam, const BlockP<T>& XBlock, int ib, int iy, T* a, T* dadx, T* dady)
 {
 	int i, ix, jj, ii, ir, it, itr;
 	int xplus, read;
@@ -3032,7 +3032,7 @@ template <class T> void gradientHaloLeft(Param XParam, BlockP<T>XBlock, int ib, 
  * @param dady Array to store the computed y-derivative gradients
  * @note This function handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement
  */
-template <class T> void gradientHaloRight(Param XParam, BlockP<T>XBlock, int ib, int iy, T* a, T* dadx, T* dady)
+template <class T> void gradientHaloRight(const Param& XParam, const BlockP<T>& XBlock, int ib, int iy, T* a, T* dadx, T* dady)
 {
 	int i, ix, jj, ii, ir, it, itr;
 	int xminus, read;
@@ -3176,7 +3176,7 @@ template <class T> void gradientHaloRight(Param XParam, BlockP<T>XBlock, int ib,
  * @param dady Array to store the computed y-derivative gradients
  * @note This function handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement
  */
-template <class T> void gradientHaloBot(Param XParam, BlockP<T>XBlock, int ib, int ix, T* a, T* dadx, T* dady)
+template <class T> void gradientHaloBot(const Param& XParam, const BlockP<T>& XBlock, int ib, int ix, T* a, T* dadx, T* dady)
 {
 	int i, iy, jj, ii, ir, it, itr;
 	int yplus, read;
@@ -3323,7 +3323,7 @@ template <class T> void gradientHaloBot(Param XParam, BlockP<T>XBlock, int ib, i
  * @param dady Array to store the computed y-derivative gradients
  * @note This function handles various configurations of neighboring blocks, including cases where neighboring blocks are at different levels of refinement
  */
-template <class T> void gradientHaloTop(Param XParam, BlockP<T>XBlock, int ib, int ix, T* a, T* dadx, T* dady)
+template <class T> void gradientHaloTop(const Param& XParam, const BlockP<T>& XBlock, int ib, int ix, T* a, T* dadx, T* dady)
 {
 	int i, iy, jj, ii, ir, it, itr;
 	int yminus, read;

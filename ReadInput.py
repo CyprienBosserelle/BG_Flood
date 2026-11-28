@@ -8,7 +8,7 @@ Creation of a md table containing the input parameters and their description.
 This table is based only on BG_Flood files used to read, allocate and initiate 
 the code variables.
 First, the ReadInput.cu file is used to get the list of available input keys
-and code variable associated to the "param" and "forcing" objects. We concidere 
+and code variable associated to the "param", "forcing" and "wparam" (wave model) objects. We concidere 
 that the fist input key correspond to the variable name.
 Then, having the list of keys and their associated variable, the "Param.h"/"Forcing.h"
 files are used to get the description of the variable, default value, and possibly 
@@ -24,6 +24,7 @@ import re;
 BG_ReadInput="src/ReadInput.cu"
 BG_Params_h="src/Param.h"
 BG_Forcing_h="src/Forcing.h"
+BG_WaveParams_h="src/WaveParam.h"
 ParamListFile="docs/ParametersList-py.md"
 
 #%% Getting the list of the available entry keys
@@ -33,6 +34,7 @@ keys=[]
 ref_name=[]
 Params=[]
 Forcings=[]
+WaveParams=[]
 R=open(BG_ReadInput,'r')
 lines = R.readlines()
 R.close()
@@ -40,7 +42,10 @@ R.close()
 
 for line in lines:
 #    if not(re.findall('^\s*(//).*',line)):
-    if (('param.' in line) or ('XParam.' in line)):
+    if (('wparam.' in line) or ('XWaveParam.' in line)):
+        # Wave model parameters (checked first since "wparam." and "XWaveParam." also contain "param.")
+        WaveParams.append(re.findall(r'(?:wparam\.|XWaveParam\.)(\w+)', line, re.IGNORECASE)[0])
+    elif (('param.' in line) or ('XParam.' in line)):
         Params.append(re.findall(r'(?:param\.|XParam\.)(\w+)', line, re.IGNORECASE)[0])
         #Params.append(re.findall("\.*(param.|XParam.)(\w+)\.*", line, re.IGNORECASE)[0][1])
     if (('forcing.' in line) or ('XForcing.' in line)):
@@ -61,6 +66,7 @@ for line in lines:
 
 myParams=list(set(Params))
 myForcings=list(set(Forcings))
+myWaveParams=list(set(WaveParams))
 
 #%% Getting the information from the others files
 
@@ -79,6 +85,9 @@ F=open(BG_Forcing_h,'r')
 F_lines = F.readlines()
 F.close()
 P.close() 
+W=open(BG_WaveParams_h,'r')
+W_lines = W.readlines()
+W.close()
 
 
 class InfoTable:
@@ -93,6 +102,46 @@ class InfoTable:
 ParamTable=InfoTable()
 ForcingTable=InfoTable()
 NonIdTable=InfoTable()
+WaveParamTable=InfoTable()
+
+def FindParamInfo(refword, lines):
+    """Find the default value and description of a class member in a header file (Param.h or WaveParam.h)"""
+    com=[]
+    Line=-1
+    Default=''
+    Comment=''
+    for i in range(len(lines)):
+        line=lines[i]
+        if 'std' in line:
+            found=re.findall(rf"\s*std.*\s* {re.escape(refword)}\s*=*(.*);\s*(\/\/)*\s*(.*)" , line)
+        else:
+            found=re.findall(rf"\s*\w\s* {re.escape(refword)} \s*=*(.*);\s*(\/\/)*\s*(.*)" , line)
+        if len(found) > 0:
+            com=found[0]
+            Line=i
+            Default=''
+            Comment=''
+            if (i+1 < len(lines)) and (re.search(r'\s*\/\*', lines[i+1])):
+                j=1
+                while j > 0:
+                    line=lines[i+j]
+                    j=j+1
+                    DEF=re.search(r'\.*Default:\s*(.*)',line);
+                    ENDCOM=re.search(r'\.*\*\/\s*',line);
+                    line=re.sub(r"[\t\n]*","",line)
+                    line=line.replace("*/","")
+                    line=line.replace("/*","")
+                    if (DEF):
+                        Default=Default + '<br>' + DEF[1]
+                    else:
+                        if (re.search(r'\w',line)):
+                            Comment = Comment + '<br>' + line
+                    if (ENDCOM):
+                        j=-1
+    if com:
+        Comment=Comment + '<br>' + com[2]
+        Default=Default + '<br>' + com[0]
+    return Line, Default, Comment
 
 
 ##Creation of the variables for the tables
@@ -181,7 +230,14 @@ for ind in range(len(ref_name)):
         ForcingTable.Default.append(Default)
         ForcingTable.Example.append(Example)
         ForcingTable.Comment.append(Comment)
-    if not ((refword in myForcings) or (refword in myParams)):
+    if (refword in myWaveParams):
+        Line, Default, Comment = FindParamInfo(refword, W_lines)
+        WaveParamTable.Reference.append(refword)
+        WaveParamTable.Keys.append(key)
+        WaveParamTable.Default.append(Default)
+        WaveParamTable.Comment.append(Comment)
+        WaveParamTable.Line.append(Line)
+    if not ((refword in myForcings) or (refword in myParams) or (refword in myWaveParams)):
         NonIdTable.Reference.append(refword)
         NonIdTable.Keys.append(key)
 
@@ -193,6 +249,14 @@ for i in range(len(P_lines)):
     if '//*' in line:
         found=re.findall(r"\s*(\/\/\*)(.*)", line, re.IGNORECASE)
         SubTitle[i]=found[0][1]
+
+
+WaveSubTitle={}
+for i in range(len(W_lines)):
+    line=W_lines[i]
+    if '//*' in line:
+        found=re.findall(r"\s*(\/\/\*)(.*)", line, re.IGNORECASE)
+        WaveSubTitle[i]=found[0][1]
 
 
 #%% Creation of the output file
@@ -234,6 +298,23 @@ Out.write('|---|---|---|---|---|\n')
 for ind in range(len(ForcingTable.Reference)):
     mystr= "|" + str(ForcingTable.Reference[ind]) + "|" + str(ForcingTable.Keys[ind]) + "|" + str(ForcingTable.Default[ind][4:]) + "|" + str(ForcingTable.Example[ind][4:]) + "|"+ str(ForcingTable.Comment[ind][4:]) + "|\n"
     Out.write(mystr)
+Out.write('\n\n')
+
+
+#Creation of the wave model parameter table in MD
+#####Wave parameters
+Out.write('## List of the wave model Parameters\n\n')
+for ii in range(len(W_lines)):
+    if ii in WaveSubTitle:
+        Out.write('\n')
+        Out.write("### " + str(WaveSubTitle[ii]) + "\n")
+        Out.write('|_Reference_|_Keys_|_default_|_Explanation_|\n')
+        Out.write('|---|---|---|---|\n')
+    else:
+        for ind in range(len(WaveParamTable.Reference)):
+            if WaveParamTable.Line[ind] == ii:
+                mystr= "|" + str(WaveParamTable.Reference[ind]) + "|" + str(WaveParamTable.Keys[ind]) + "|" + str(WaveParamTable.Default[ind][4:]) + "|" + str(WaveParamTable.Comment[ind][4:]) + "|\n"
+                Out.write(mystr)
 Out.write('\n\n')
 
 

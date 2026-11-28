@@ -15,8 +15,20 @@
 #include "Meanmax.h"
 #include "Updateforcing.h"
 #include "FlowMLGPU.h"
+#include "WaveParam.h"
+#include "WaveArrays.h"
+#include "WaveCPU.h"
+#include "WaveGPU.h"
+#include "WaveImplicit.h"
+#include "WaveSource.h"
 
 template <class T> void MainLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g);
+template <class T> void MainLoop(Param& XParam, WaveParam& XWaveParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g);
+
+template <class T> void WaveStep(Param XParam, WaveParam XWaveParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g);
+template <class T> void WaveUpdateWind(Param XParam, WaveParam XWaveParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g);
+template <class T> void WaveUpdateMedium(Param XParam, WaveParam XWaveParam, double tadv, Model<T>& XModel, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g);
+template <class T> double WaveDtmax(Param XParam, WaveParam XWaveParam, Model<T>& XModel, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g);
 
 template <class T> void DebugLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g);
 

@@ -96,6 +96,37 @@ void readforcing(Param & XParam, Forcing<T> & XForcing)
 		}
 	}
 
+	//=================
+	// Read wave bnd files
+	for (int iseg = 0; iseg < XForcing.wavebndseg.size(); iseg++)
+	{
+		wavebndsegment& seg = XForcing.wavebndseg[iseg];
+		if (seg.on)
+		{
+			if (seg.uniform)
+			{
+				seg.data = readWaveBndfileUNI(seg.inputfile, XParam.reftime);
+				if ((XParam.endtime < std::numeric_limits<double>::max() && seg.data.back().time < XParam.endtime) || seg.data.front().time > XParam.totaltime)
+				{
+					log("\nWARNING: the wave boundary file " + seg.inputfile + " does not cover the whole simulation: the first/last values are used outside its time range");
+				}
+			}
+			else
+			{
+				// As for the other dynamic forcing maps, NaNs are replaced by denanval and the edges of the maps are
+				// set to clampedge (so the maps should extend beyond the model domain)
+				seg.Hs.denanval = 0.0; seg.Hs.clampedge = 0.0f;
+				seg.Tp.denanval = 10.0; seg.Tp.clampedge = 10.0f;
+				seg.Dir.denanval = 0.0; seg.Dir.clampedge = 0.0f;
+				seg.Dspr.denanval = 30.0; seg.Dspr.clampedge = 30.0f;
+				InitDynforcing(gpgpu, XParam, seg.Hs);
+				InitDynforcing(gpgpu, XParam, seg.Tp);
+				InitDynforcing(gpgpu, XParam, seg.Dir);
+				InitDynforcing(gpgpu, XParam, seg.Dspr);
+			}
+		}
+	}
+
 	/*
 	AllocateCPU(1, 1, XForcing.left.blks, XForcing.right.blks, XForcing.top.blks, XForcing.bot.blks);
 	
@@ -1422,6 +1453,71 @@ std::vector<Windin> readINfileUNI(std::string filename, std::string &refdate)
 	fs.close();
 
 	return wndinput;
+}
+
+
+/**
+ * @brief Read a spatially uniform wave boundary file (time series).
+ *
+ * Each line: time, Hs (m), Tp (s), Dir (degrees nautical, coming from), Dspr (degrees)[, gamma]
+ * (tab, space or comma delimited, lines starting with # are ignored). Same conventions as readINfileUNI.
+ *
+ * @param filename Name of the wave boundary file
+ * @param refdate Reference date for time adjustment
+ * @return Vector of WaveBndIn
+ */
+std::vector<WaveBndIn> readWaveBndfileUNI(std::string filename, std::string& refdate)
+{
+	std::vector<WaveBndIn> wbinput;
+
+	std::ifstream fs(filename);
+	if (fs.fail())
+	{
+		log("ERROR: Wave bnd file could not be opened : " + filename);
+		exit(1);
+	}
+
+	std::string line;
+	std::vector<std::string> lineelements;
+	while (std::getline(fs, line))
+	{
+		if (!line.empty() && line.substr(0, 1).compare("#") != 0)
+		{
+			lineelements = split(line, '\t');
+			if (lineelements.size() < 5)
+			{
+				lineelements.clear();
+				lineelements = split(line, ' ');
+			}
+			if (lineelements.size() < 5)
+			{
+				lineelements.clear();
+				lineelements = split(line, ',');
+			}
+			if (lineelements.size() < 5)
+			{
+				log("ERROR: Wave bnd file (" + filename + ") format error. only " + std::to_string(lineelements.size()) + " columns where at least 5 (time, Hs, Tp, Dir, Dspr) were expected. Exiting.");
+				log(line);
+				exit(1);
+			}
+			WaveBndIn wb;
+			wb.time = readinputtimetxt(lineelements[0], refdate);
+			wb.Hs = std::stod(lineelements[1]);
+			wb.Tp = std::stod(lineelements[2]);
+			wb.Dir = std::stod(lineelements[3]);
+			wb.Dspr = std::stod(lineelements[4]);
+			wb.gamma = (lineelements.size() > 5) ? std::stod(lineelements[5]) : -1.0;
+			wbinput.push_back(wb);
+		}
+	}
+	fs.close();
+
+	if (wbinput.empty())
+	{
+		log("ERROR: Wave bnd file (" + filename + ") is empty. Exiting.");
+		exit(1);
+	}
+	return wbinput;
 }
 
 

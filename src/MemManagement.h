@@ -5,6 +5,8 @@
 #include "General.h"
 #include "Param.h"
 #include "Arrays.h"
+#include "WaveParam.h"
+#include "WaveArrays.h"
 #include "Setup_GPU.h"
 
 
@@ -16,6 +18,7 @@ template <class T> void AllocateCPU(int nx, int ny, GradientsP<T>& Grad);
 template <class T> void AllocateCPU(int nblk, int blksize, EvolvingP<T> &Ev);
 template <class T> void AllocateCPU(int nblk, int blksize, EvolvingP_M<T>& Ev);
 template <class T> void AllocateCPU(int nblk, int blksize, Param XParam, Model<T>& XModel);
+template <class T> void AllocateCPU(int nblk, int blksize, WaveParam XWaveParam, WaveModel<T>& XWave);
 
 
 template <class T> void ReallocArray(int nblk, int blksize, T*& zb);
@@ -30,11 +33,12 @@ template <class T> void AllocateMappedMemCPU(int nx, int ny, int gpudevice, T*& 
 
 template <class T> __host__ void FillCPU(int nx, int ny, T fillval, T*& zb);
 
-int memloc(Param XParam, int i, int j, int ib);
+int memloc(const Param& XParam, int i, int j, int ib);
 //__device__ int memloc(int halowidth, int blkmemwidth, int  blksize, int i, int j, int ib);
 __host__ __device__ int memloc(int halowidth, int blkmemwidth, int i, int j, int ib);
 
 template <class T> void AllocateGPU(int nblk, int blksize, Param XParam, Model<T>& XModel);
+template <class T> void AllocateGPU(int nblk, int blksize, WaveParam XWaveParam, WaveModel<T>& XWave);
 template <class T> void AllocateGPU(int nx, int ny, T*& z_g);
 template <class T> void AllocateMappedMemGPU(int nx, int ny, int gpudevice, T*& z_g, T* z);
 // End of global definition

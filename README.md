@@ -7,6 +7,7 @@ The model is under constant development with features added to extend the proces
 * New engine
 * Culverts
 * groundwater module
+* Wind Waves and swell group
  
 The code is open source under a GPL License:
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-brightgreen.svg)](https://www.gnu.org/licenses/gpl-3.0)

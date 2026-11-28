@@ -3,10 +3,9 @@
 
 
 /**
- * @brief Main simulation loop for the flood model.
+ * @brief Main simulation loop for the flood model (flow only).
  *
- * Advances the simulation in time, applying boundary conditions, forcing, core engine, output, and crash detection.
- * Handles both CPU and GPU execution paths.
+ * Kept for backward compatibility (e.g. Testing): runs the main loop without the wave model.
  *
  * @tparam T Data type (float or double)
  * @param XParam Model parameters
@@ -16,6 +15,33 @@
  */
 template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T> &XModel_g)
 {
+	WaveParam XWaveParam; // wavemodel = false by default
+	WaveModel<T> XWave, XWave_g;
+	MainLoop(XParam, XWaveParam, XForcing, XModel, XModel_g, XWave, XWave_g);
+}
+template void MainLoop<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel, Model<float>& XModel_g);
+template void MainLoop<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel, Model<double>& XModel_g);
+
+/**
+ * @brief Main simulation loop for the flood and wave models.
+ *
+ * Advances the simulation in time, applying boundary conditions, forcing, core engine(s), output, and crash detection.
+ * Handles both CPU and GPU execution paths.
+ * - flowmodel=true, wavemodel=false: flow only (time step from the flow CFL)
+ * - flowmodel=true, wavemodel=true: coupled, the wave model is advanced to the flow time (sub-cycling if needed, or every dtcouple)
+ * - flowmodel=false, wavemodel=true: wave only (time step from the wave CFL)
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Model parameters
+ * @param XWaveParam Wave model parameters
+ * @param XForcing Forcing data (float)
+ * @param XModel Model state (CPU)
+ * @param XModel_g Model state (GPU)
+ * @param XWave Wave model state (CPU)
+ * @param XWave_g Wave model state (GPU)
+ */
+template <class T> void MainLoop(Param &XParam, WaveParam& XWaveParam, Forcing<float> XForcing, Model<T>& XModel, Model<T> &XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g)
+{
 	
 	log("Initialising model main loop");
 	
@@ -23,6 +49,16 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 
 	//Define some useful variables 
 	Initmeanmax(XParam, XLoop, XModel, XModel_g);
+
+	// Implicit wave model: first wave update at the start of the simulation (before the initial output) for a
+	// stationary run or a warm start (stationary first update, the following updates are nonstationary)
+	if (XWaveParam.wavemodel == 1 && (XWaveParam.wavestationary || XWaveParam.wavewarmstart))
+	{
+		double dtsave = XLoop.dt;
+		XLoop.dt = 0.0;
+		WaveStep(XParam, XWaveParam, XLoop, XForcing, XModel, XModel_g, XWave, XWave_g);
+		XLoop.dt = dtsave;
+	}
 
 	// Check for map output (output initialisation if needed)
 	mapoutput(XParam, XLoop, XModel, XModel_g);
@@ -40,20 +76,36 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		updateforcing(XParam, XLoop, XForcing);
 
 		// Core engine
-		if (XParam.GPUDEVICE >= 0)
+		if (XParam.flowmodel)
 		{
-			if (XParam.engine == 5)
+			if (XParam.GPUDEVICE >= 0)
 			{
-				FlowMLGPU(XParam, XLoop, XForcing, XModel_g);
+				if (XParam.engine == 5)
+				{
+					FlowMLGPU(XParam, XLoop, XForcing, XModel_g);
+				}
+				else
+				{
+					FlowGPU(XParam, XLoop, XForcing, XModel_g);
+				}
 			}
 			else
 			{
-				FlowGPU(XParam, XLoop, XForcing, XModel_g);
+				FlowCPU(XParam, XLoop, XForcing, XModel);
 			}
 		}
 		else
 		{
-			FlowCPU(XParam, XLoop, XForcing, XModel);
+			// Wave only: the main loop time step is controlled by the wave model
+			WaveUpdateMedium(XParam, XWaveParam, 0.0, XModel, XModel_g, XWave, XWave_g);
+			XLoop.dt = CalcWavetimestep(XParam, XLoop, XWave);
+			XLoop.dtmax = XLoop.dt;
+		}
+
+		// Wave engine (advance the wave model to totaltime + dt)
+		if (XWaveParam.wavemodel)
+		{
+			WaveStep(XParam, XWaveParam, XLoop, XForcing, XModel, XModel_g, XWave, XWave_g);
 		}
 		
 				
@@ -85,12 +137,237 @@ template <class T> void MainLoop(Param &XParam, Forcing<float> XForcing, Model<T
 		printstatus(XLoop.totaltime, XLoop.dt);
 	}
 	
-
-	
+	if (XWaveParam.wavemodel)
+	{
+		log("\nWave model: " + std::to_string(XWave.clock.nstep) + " wave steps (last wave time step: " + std::to_string(XWave.clock.dt) + " s)");
+	}
 
 }
-template void MainLoop<float>(Param& XParam, Forcing<float> XForcing, Model<float>& XModel, Model<float>& XModel_g);
-template void MainLoop<double>(Param& XParam, Forcing<float> XForcing, Model<double>& XModel, Model<double>& XModel_g);
+template void MainLoop<float>(Param& XParam, WaveParam& XWaveParam, Forcing<float> XForcing, Model<float>& XModel, Model<float>& XModel_g, WaveModel<float>& XWave, WaveModel<float>& XWave_g);
+template void MainLoop<double>(Param& XParam, WaveParam& XWaveParam, Forcing<float> XForcing, Model<double>& XModel, Model<double>& XModel_g, WaveModel<double>& XWave, WaveModel<double>& XWave_g);
+
+
+/**
+ * @brief Maximum stable wave time step (dispatch to the CPU or GPU version).
+ *
+ * @tparam T Data type (float or double)
+ * @return Maximum wave time step (s)
+ */
+template <class T> double WaveDtmax(Param XParam, WaveParam XWaveParam, Model<T>& XModel, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g)
+{
+	if (XParam.GPUDEVICE >= 0)
+	{
+		return CalcWavedtmaxGPU(XParam, XWaveParam, XModel_g, XWave_g);
+	}
+	else
+	{
+		return CalcWavedtmaxCPU(XParam, XWaveParam, XModel, XWave);
+	}
+}
+template double WaveDtmax<float>(Param XParam, WaveParam XWaveParam, Model<float>& XModel, Model<float>& XModel_g, WaveModel<float>& XWave, WaveModel<float>& XWave_g);
+template double WaveDtmax<double>(Param XParam, WaveParam XWaveParam, Model<double>& XModel, Model<double>& XModel_g, WaveModel<double>& XWave, WaveModel<double>& XWave_g);
+
+
+/**
+ * @brief Update the 10 m wind seen by the wave model (wind input source term) from the flow model wind forcing.
+ */
+template <class T> void WaveUpdateWind(Param XParam, WaveParam XWaveParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g)
+{
+	if (XWaveParam.windinput <= 0 || XForcing.UWind.inputfile.empty())
+	{
+		return;
+	}
+	if (XParam.GPUDEVICE >= 0)
+	{
+		dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+		dim3 gridDim(XParam.nblk, 1, 1);
+		WaveWindGPU <<< gridDim, blockDim, 0 >>> (XParam, XWaveParam, XForcing.UWind, XForcing.VWind, XModel_g.blocks, XWave_g);
+		CUDA_CHECK(cudaDeviceSynchronize());
+	}
+	else
+	{
+		WaveWindCPU(XParam, XWaveParam, XForcing, XModel.blocks, XWave);
+	}
+}
+template void WaveUpdateWind<float>(Param XParam, WaveParam XWaveParam, Forcing<float> XForcing, Model<float>& XModel, Model<float>& XModel_g, WaveModel<float>& XWave, WaveModel<float>& XWave_g);
+template void WaveUpdateWind<double>(Param XParam, WaveParam XWaveParam, Forcing<float> XForcing, Model<double>& XModel, Model<double>& XModel_g, WaveModel<double>& XWave, WaveModel<double>& XWave_g);
+
+
+/**
+ * @brief Update the medium seen by the wave model and the maximum stable wave time step.
+ *
+ * Recalculates the depth, dh/dt, currents and their gradients, the kinematics (k, cg, dsigma/dh for each frequency)
+ * and the wave time step. When the medium is static (XWaveParam.staticmedium: no flow model, or no water level and
+ * current coupling) this is only done once, so the propagation velocities (cx, cy, ctheta, csigma) are built from
+ * cached quantities at every step.
+ *
+ * @param tadv Time since the last update, used for dh/dt (0 for no time variation)
+ */
+template <class T> void WaveUpdateMedium(Param XParam, WaveParam XWaveParam, double tadv, Model<T>& XModel, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g)
+{
+	if (XWaveParam.staticmedium && XWave.clock.mediumready)
+	{
+		return;
+	}
+
+	Param XParamW = WaveLightParam(XParam, XParam.theta);
+	if (XParam.GPUDEVICE >= 0)
+	{
+		WavePrepGPU(XParamW, XWaveParam, tadv, WaveLightModel(XModel_g), XWave_g);
+	}
+	else
+	{
+		WavePrepCPU(XParamW, XWaveParam, tadv, WaveLightModel(XModel), XWave);
+	}
+	// The implicit solver is unconditionally stable: its time step is the coupling interval
+	XWave.clock.dtmax = (XWaveParam.wavemodel == 1) ? XWaveParam.dtcouple : WaveDtmax(XParam, XWaveParam, XModel, XModel_g, XWave, XWave_g);
+	XWave.clock.mediumready = true;
+}
+template void WaveUpdateMedium<float>(Param XParam, WaveParam XWaveParam, double tadv, Model<float>& XModel, Model<float>& XModel_g, WaveModel<float>& XWave, WaveModel<float>& XWave_g);
+template void WaveUpdateMedium<double>(Param XParam, WaveParam XWaveParam, double tadv, Model<double>& XModel, Model<double>& XModel_g, WaveModel<double>& XWave, WaveModel<double>& XWave_g);
+
+
+/**
+ * @brief Advance the wave model from its current time to the end of the current main loop step (XLoop.totaltime + XLoop.dt).
+ *
+ * The wave model keeps its own clock (XWave.clock):
+ * - If dtcouple == 0 (default) or the flow model is off, the wave model is advanced every main loop step.
+ * - If dtcouple > 0 and the flow model is on, the wave model is only advanced when the coupling time is reached
+ *   (the wave forcing seen by the flow is then updated every dtcouple seconds).
+ * The interval is split in sub-steps that satisfy the wave CFL (sub-cycling when the wave time step is smaller than the flow time step).
+ *
+ * @tparam T Data type (float or double)
+ * @param XParam Flow model parameters
+ * @param XWaveParam Wave model parameters
+ * @param XLoop Main loop structure (XLoop.dt must already be known)
+ * @param XForcing Forcing data
+ * @param XModel Flow model (CPU)
+ * @param XModel_g Flow model (GPU)
+ * @param XWave Wave model (CPU, holds the wave clock)
+ * @param XWave_g Wave model (GPU)
+ */
+template <class T> void WaveStep(Param XParam, WaveParam XWaveParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g)
+{
+	double tend = XLoop.totaltime + XLoop.dt;
+	double tiny = 0.0000001;
+
+	// Wait for the next coupling time
+	if (XParam.flowmodel && XWaveParam.dtcouple > 0.0 && (tend < (XWave.clock.nextcoupletime - XLoop.dt * tiny)))
+	{
+		return;
+	}
+
+	double tadv = tend - XWave.clock.totaltime;
+	if (tadv <= 0.0 && !(XWaveParam.wavemodel == 1 && XWave.clock.nstep == 0))
+	{
+		return;
+	}
+
+	//============================================
+	// Implicit solver (wavemodel = 1): one implicit solution at the coupling time (loose coupling)
+	if (XWaveParam.wavemodel == 1)
+	{
+		WaveUpdateMedium(XParam, XWaveParam, XParam.flowmodel ? tadv : 0.0, XModel, XModel_g, XWave, XWave_g);
+
+		if (XWaveParam.dtcouple > 0.0)
+		{
+			while (XWave.clock.nextcoupletime <= (tend + XLoop.dt * tiny))
+			{
+				XWave.clock.nextcoupletime = XWave.clock.nextcoupletime + XWaveParam.dtcouple;
+			}
+		}
+
+		Param XParamW = WaveLightParam(XParam, XParam.theta);
+		WaveUpdateWind(XParamW, XWaveParam, XForcing, XModel, XModel_g, XWave, XWave_g);
+
+		// Warm start: the first update is stationary, the following ones nonstationary
+		bool firstupdate = (XWave.clock.nstep == 0);
+		WaveParam XWaveParamS = XWaveParam;
+		if (XWaveParam.wavewarmstart && firstupdate)
+		{
+			XWaveParamS.wavestationary = true;
+		}
+
+		double convpct = 0.0;
+		int niter;
+		if (XParam.GPUDEVICE >= 0)
+		{
+			Model<T> XModelW_g = WaveLightModel(XModel_g);
+			niter = WaveImplicitGPU(XParamW, XWaveParamS, tadv, tend, XForcing, XModelW_g, XWave_g, convpct);
+			dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+			dim3 gridDim(XParam.nblk, 1, 1);
+			CalcWaveBulkGPU <<< gridDim, blockDim, 0 >>> (XParamW, XWaveParam, XModelW_g.blocks, XModelW_g.evolv, XModelW_g.zb, XWave_g);
+			CUDA_CHECK(cudaDeviceSynchronize());
+			if (XParam.flowmodel && XWaveParam.waveflowcoupling)
+			{
+				WaveForceGPU(XParamW, XWaveParam, XModelW_g.blocks, XWave_g);
+			}
+		}
+		else
+		{
+			Model<T> XModelW = WaveLightModel(XModel);
+			niter = WaveImplicitCPU(XParamW, XWaveParamS, tadv, tend, XForcing, XModelW, XWave, convpct);
+			CalcWaveBulkCPU(XParamW, XWaveParam, XModelW, XWave);
+			if (XParam.flowmodel && XWaveParam.waveflowcoupling)
+			{
+				WaveForceCPU(XParamW, XWaveParam, XModelW.blocks, XWave);
+			}
+		}
+		XWave.clock.dt = tadv;
+		XWave.clock.totaltime = tend;
+		XWave.clock.nstep++;
+		log("\nWave model (implicit, " + std::string(XWaveParamS.wavestationary ? "stationary" : "nonstationary") + std::string((XWaveParam.wavewarmstart && firstupdate) ? ", warm start" : "") + ") at t=" + std::to_string(tend) + " s: " + std::to_string(niter) + " iterations, " + std::to_string(convpct) + "% of the wet cells converged");
+		return;
+	}
+
+	// Update the medium seen by the waves (depth, dh/dt, currents, gradients, k, cg, dsigma/dh) and the stable time step
+	// (only done once when the medium is static, e.g. no flow model)
+	WaveUpdateMedium(XParam, XWaveParam, XParam.flowmodel ? tadv : 0.0, XModel, XModel_g, XWave, XWave_g);
+
+	int nsub = utils::max(1, int(ceil(tadv / XWave.clock.dtmax - tiny)));
+	XWave.clock.dt = tadv / double(nsub);
+
+	// Next coupling time
+	if (XWaveParam.dtcouple > 0.0)
+	{
+		while (XWave.clock.nextcoupletime <= (tend + XLoop.dt * tiny))
+		{
+			XWave.clock.nextcoupletime = XWave.clock.nextcoupletime + XWaveParam.dtcouple;
+		}
+	}
+
+	// The bulk parameters are only needed for the flow coupling (radiation stresses) or if a map output happens
+	// before the next wave update. They are calculated at the end of the last sub-step only.
+	double nextupdate = (XParam.flowmodel && XWaveParam.dtcouple > 0.0) ? XWave.clock.nextcoupletime : tend;
+	bool bulkneeded = (XParam.flowmodel && XWaveParam.waveflowcoupling) || (XLoop.nextoutputtime <= nextupdate + XLoop.dt * tiny);
+
+	// Light copies of the parameters and of the flow model (the block functions take Param and BlockP by value)
+	Param XParamW = WaveLightParam(XParam, XParam.theta);
+	Model<T> XModelW = WaveLightModel(XModel);
+	Model<T> XModelW_g = WaveLightModel(XModel_g);
+
+	// Wind seen by the waves at this update
+	WaveUpdateWind(XParamW, XWaveParam, XForcing, XModel, XModel_g, XWave, XWave_g);
+
+	for (int isub = 0; isub < nsub; isub++)
+	{
+		bool dobulk = bulkneeded && (isub == nsub - 1);
+		if (XParam.GPUDEVICE >= 0)
+		{
+			WaveGPU(XParamW, XWaveParam, T(XWave.clock.dt), XWave.clock.totaltime, dobulk, XForcing, XModelW_g, XWave_g);
+		}
+		else
+		{
+			WaveCPU(XParamW, XWaveParam, T(XWave.clock.dt), XWave.clock.totaltime, dobulk, XForcing, XModelW, XWave);
+		}
+		XWave.clock.totaltime = XWave.clock.totaltime + XWave.clock.dt;
+		XWave.clock.nstep++;
+	}
+	// avoid round-off drift between the flow and the wave clocks
+	XWave.clock.totaltime = tend;
+}
+template void WaveStep<float>(Param XParam, WaveParam XWaveParam, Loop<float>& XLoop, Forcing<float> XForcing, Model<float>& XModel, Model<float>& XModel_g, WaveModel<float>& XWave, WaveModel<float>& XWave_g);
+template void WaveStep<double>(Param XParam, WaveParam XWaveParam, Loop<double>& XLoop, Forcing<float> XForcing, Model<double>& XModel, Model<double>& XModel_g, WaveModel<double>& XWave, WaveModel<double>& XWave_g);
 
 
 

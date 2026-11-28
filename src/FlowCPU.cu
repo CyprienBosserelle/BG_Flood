@@ -231,9 +231,15 @@ template <class T> void FlowCPU(Param XParam, Loop<T>& XLoop,Forcing<float> XFor
 
 
 	//============================================
-	// Add bottom friction
-
-	bottomfrictionCPU(XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);
+	// Add bottom friction (and the wave force when the wave model is coupled to the flow)
+	if (XModel.wavefx != nullptr)
+	{
+		bottomfrictionWaveCPU(XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.wavefx, XModel.wavefy, XModel.evolv_o);
+	}
+	else
+	{
+		bottomfrictionCPU(XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);
+	}
 	//XiafrictionCPU(XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv, XModel.evolv_o);
 
 
