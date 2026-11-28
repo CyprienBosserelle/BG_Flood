@@ -24,6 +24,7 @@ template <class T> void MainLoop(Param& XParam, Forcing<float> XForcing, Model<T
 template <class T> void MainLoop(Param& XParam, WaveParam& XWaveParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g);
 
 template <class T> void WaveStep(Param XParam, WaveParam XWaveParam, Loop<T>& XLoop, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g);
+template <class T> void WaveUpdateMedium(Param XParam, WaveParam XWaveParam, double tadv, Model<T>& XModel, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g);
 template <class T> double WaveDtmax(Param XParam, WaveParam XWaveParam, Model<T>& XModel, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g);
 
 template <class T> void DebugLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g);

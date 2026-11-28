@@ -51,9 +51,13 @@ template <class T> void InitWaveModel(Param XParam, WaveParam& XWaveParam, Forci
 		exit(1);
 	}
 
-	// 3 spectral arrays + 2 frequency arrays (k, cg) + 38 2D arrays
-	double memMB = double(3 * nspecmem + 2 * size_t(XWaveParam.nfreq) * size_t(XWaveParam.specstride) + 38 * size_t(XWaveParam.specstride)) * sizeof(T) / 1024.0 / 1024.0;
-	log("\tSpectral grid: " + std::to_string(XWaveParam.nfreq) + " frequencies x " + std::to_string(XWaveParam.ndir) + " directions; Wave model memory: " + std::to_string(memMB) + " MB");
+	// 3 spectral arrays + 3 frequency arrays (k, cg, dsdd) + 4 batch work arrays + 34 2D arrays
+	double memMB = double(3 * nspecmem + (3 * size_t(XWaveParam.nfreq) + 4 * size_t(XWaveParam.nchunk) + 34) * size_t(XWaveParam.specstride)) * sizeof(T) / 1024.0 / 1024.0;
+	log("\tSpectral grid: " + std::to_string(XWaveParam.nfreq) + " frequencies x " + std::to_string(XWaveParam.ndir) + " directions; " + std::to_string(XWaveParam.nchunk) + " bins propagated per batch; Wave model memory: " + std::to_string(memMB) + " MB");
+	if (XWaveParam.staticmedium)
+	{
+		log("\tStatic medium: the wave kinematics and time step are only calculated once");
+	}
 
 	//==============================
 	// Allocate CPU memory
@@ -62,6 +66,11 @@ template <class T> void InitWaveModel(Param XParam, WaveParam& XWaveParam, Forci
 	//==============================
 	// Spectral grid
 	InitWaveSpecGrid(XWaveParam, XWave.spec);
+	XWave.spec_h = XWave.spec;
+
+	//==============================
+	// Virtual blocks for the batches of spectral bins
+	InitWaveVirtualBlocks(XParam, XWaveParam, XModel.blocks, XWave.vblocks);
 
 	//==============================
 	// Boundary blocks of each wave boundary segment (same function as for the flow boundaries)
@@ -97,6 +106,55 @@ template void InitWaveModel<double>(Param XParam, WaveParam& XWaveParam, Forcing
 
 
 /**
+ * @brief Build the virtual block topology used to process a batch of nchunk spectral bins in a single call.
+ *
+ * In the action density array, the bin j (relative to the first bin of a batch) of block ib has exactly the layout of
+ * a flow variable in the block ib + j*nblkmem. vblocks replicates the block information nchunk times with the
+ * neighbours shifted by j*nblkmem, and its active list holds the nchunk copies of the active blocks
+ * (active[j*nblk + ibl] = active[ibl] + j*nblkmem). With XParam.nblk = nblk*nbins, the existing block functions
+ * (fillHaloC/GPU, gradientC/gradient, gradientHalo, fillHaloLRFluxC, ...) then process nbins bins at once.
+ * The domain boundaries (self neighbours) are preserved.
+ */
+template <class T> void InitWaveVirtualBlocks(Param XParam, WaveParam XWaveParam, BlockP<T> XBlock, BlockP<T>& vblocks)
+{
+	int nb = XParam.nblkmem;
+	int nc = XWaveParam.nchunk;
+
+	AllocateCPU(XParam.nblk * nc, 1, vblocks.active);
+	AllocateCPU(nb * nc, 1, vblocks.level);
+	AllocateCPU(nb * nc, 1, vblocks.xo);
+	AllocateCPU(nb * nc, 1, vblocks.yo);
+	AllocateCPU(nb * nc, 1, vblocks.BotLeft, vblocks.BotRight, vblocks.TopLeft, vblocks.TopRight);
+	AllocateCPU(nb * nc, 1, vblocks.LeftBot, vblocks.LeftTop, vblocks.RightBot, vblocks.RightTop);
+
+	for (int j = 0; j < nc; j++)
+	{
+		for (int ibl = 0; ibl < XParam.nblk; ibl++)
+		{
+			vblocks.active[j * XParam.nblk + ibl] = XBlock.active[ibl] + j * nb;
+		}
+		for (int ib = 0; ib < nb; ib++)
+		{
+			int iv = ib + j * nb;
+			vblocks.level[iv] = XBlock.level[ib];
+			vblocks.xo[iv] = XBlock.xo[ib];
+			vblocks.yo[iv] = XBlock.yo[ib];
+			vblocks.BotLeft[iv] = XBlock.BotLeft[ib] + j * nb;
+			vblocks.BotRight[iv] = XBlock.BotRight[ib] + j * nb;
+			vblocks.TopLeft[iv] = XBlock.TopLeft[ib] + j * nb;
+			vblocks.TopRight[iv] = XBlock.TopRight[ib] + j * nb;
+			vblocks.LeftBot[iv] = XBlock.LeftBot[ib] + j * nb;
+			vblocks.LeftTop[iv] = XBlock.LeftTop[ib] + j * nb;
+			vblocks.RightBot[iv] = XBlock.RightBot[ib] + j * nb;
+			vblocks.RightTop[iv] = XBlock.RightTop[ib] + j * nb;
+		}
+	}
+}
+template void InitWaveVirtualBlocks<float>(Param XParam, WaveParam XWaveParam, BlockP<float> XBlock, BlockP<float>& vblocks);
+template void InitWaveVirtualBlocks<double>(Param XParam, WaveParam XWaveParam, BlockP<double> XBlock, BlockP<double>& vblocks);
+
+
+/**
  * @brief Allocate and copy the wave model to the GPU (bypassed if no GPU is used).
  *
  * Wave equivalent of SetupGPU. Must be called after SetupGPU (since SetupGPU resets XModel_g.OutputVarMap).
@@ -121,6 +179,25 @@ template <class T> void SetupWaveGPU(Param XParam, WaveParam XWaveParam, Forcing
 	CopytoGPU(XParam.nblkmem, XParam.blksize, XWaveParam, XWave, XWave_g);
 
 	XWave_g.clock = XWave.clock;
+	XWave_g.spec_h = XWave.spec;
+
+	// Virtual blocks for the batches of spectral bins
+	int nv = XParam.nblkmem * XWaveParam.nchunk;
+	AllocateGPU(XParam.nblk * XWaveParam.nchunk, 1, XWave_g.vblocks.active);
+	CopytoGPU(XParam.nblk * XWaveParam.nchunk, 1, XWave.vblocks.active, XWave_g.vblocks.active);
+	AllocateGPU(nv, 1, XWave_g.vblocks.level);
+	CopytoGPU(nv, 1, XWave.vblocks.level, XWave_g.vblocks.level);
+	AllocateGPU(nv, 1, XWave_g.vblocks.xo);
+	CopytoGPU(nv, 1, XWave.vblocks.xo, XWave_g.vblocks.xo);
+	AllocateGPU(nv, 1, XWave_g.vblocks.yo);
+	CopytoGPU(nv, 1, XWave.vblocks.yo, XWave_g.vblocks.yo);
+	int** nbcpu[8] = { &XWave.vblocks.BotLeft, &XWave.vblocks.BotRight, &XWave.vblocks.TopLeft, &XWave.vblocks.TopRight, &XWave.vblocks.LeftBot, &XWave.vblocks.LeftTop, &XWave.vblocks.RightBot, &XWave.vblocks.RightTop };
+	int** nbgpu[8] = { &XWave_g.vblocks.BotLeft, &XWave_g.vblocks.BotRight, &XWave_g.vblocks.TopLeft, &XWave_g.vblocks.TopRight, &XWave_g.vblocks.LeftBot, &XWave_g.vblocks.LeftTop, &XWave_g.vblocks.RightBot, &XWave_g.vblocks.RightTop };
+	for (int in = 0; in < 8; in++)
+	{
+		AllocateGPU(nv, 1, *nbgpu[in]);
+		CopytoGPU(nv, 1, *nbcpu[in], *nbgpu[in]);
+	}
 
 	// Wave boundary segments block lists (as for the flow bndseg in SetupGPU)
 	for (int s = 0; s < XForcing.wavebndseg.size(); s++)
@@ -236,14 +313,19 @@ template <class T> void InitWaveConditions(Param XParam, WaveParam XWaveParam, M
 		XWave.force.Sxx, XWave.force.Sxy, XWave.force.Syy, XWave.force.Fx, XWave.force.Fy,
 		XWave.time.dtmax, XWave.time.arrmin,
 		XWave.medium.h, XWave.medium.ho, XWave.medium.dhdt, XWave.medium.u, XWave.medium.v,
-		XWave.medium.dhdx, XWave.medium.dhdy, XWave.medium.dudx, XWave.medium.dudy, XWave.medium.dvdx, XWave.medium.dvdy,
-		XWave.work.dNdx, XWave.work.dNdy, XWave.work.Fx, XWave.work.Fy };
+		XWave.medium.dhdx, XWave.medium.dhdy, XWave.medium.dudx, XWave.medium.dudy, XWave.medium.dvdx, XWave.medium.dvdy };
 	for (int ia = 0; ia < arr2D.size(); ia++)
 	{
 		FillCPU(nblkmem, blksize, T(0.0), arr2D[ia]);
 	}
+	std::vector<T*> arrchunk = { XWave.work.dNdx, XWave.work.dNdy, XWave.work.Fx, XWave.work.Fy };
+	for (int ia = 0; ia < arrchunk.size(); ia++)
+	{
+		FillCPU(nblkmem * XWaveParam.nchunk, blksize, T(0.0), arrchunk[ia]);
+	}
 	FillCPU(nblkmem * XWaveParam.nfreq, blksize, T(0.0), XWave.kin.k);
 	FillCPU(nblkmem * XWaveParam.nfreq, blksize, T(0.0), XWave.kin.cg);
+	FillCPU(nblkmem * XWaveParam.nfreq, blksize, T(0.0), XWave.kin.dsdd);
 
 	//==============================
 	// Medium (depth, currents) and kinematics: dh/dt = 0 at the start

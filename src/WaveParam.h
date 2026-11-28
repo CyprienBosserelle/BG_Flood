@@ -38,6 +38,9 @@ public:
 	double wavetheta = 1.0; // Slope limiter parameter for the second order upwind scheme, wavetheta in [1,2] (1: minmod, the most diffusive but most robust [Default], 2: superbee, the least diffusive)
 	bool refraction = true; // Switch for depth and current induced refraction (propagation in theta-space, SWAN REFRAC)
 	bool freqshift = true; // Switch for the frequency shift due to time varying depth and currents (propagation in sigma-space, SWAN FSHIFT)
+	int wavebinchunk = 0; // Number of spectral bins propagated together in one batch (one kernel launch) in geographic space. 0 (default): ndir bins (one frequency). Larger values are faster on the GPU but need 4*wavebinchunk extra 2D arrays of memory (wavebinchunk = nspec is the fastest)
+	int nchunk = 0; // Calculated in sanity check from wavebinchunk (number of bins per batch)
+	bool staticmedium = false; // Calculated in sanity check: true when the depth and currents seen by the wave model do not change (no flow model, or no water level and current coupling) so k, cg, the medium gradients and the time step are only calculated once
 	double ctmax = 0.5; // Maximum Courant number allowed for the refraction and frequency shift (cth*dt/dtheta and csig*dt/dsigma are clipped to this value, similar to the WW3 CTMAX refraction limiter)
 
 	//*Spectral grid

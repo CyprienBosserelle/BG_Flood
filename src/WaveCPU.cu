@@ -157,9 +157,11 @@ template <class T> __host__ __device__ void CalcWaveBulkCell(const Param& XParam
 			T sig = XWave.spec.sigma[ifreq];
 			T dsig = XWave.spec.dsigma[ifreq];
 
-			T k = WaveDispersion(sig, h, g);
+			// k and cg are cached in XWave.kin (recalculated only when the medium changes), n = cg/c = cg k / sigma
+			size_t ik = specloc(stride, ifreq, i);
+			T k = XWave.kin.k[ik];
 			T kh = k * h;
-			T n = (kh > T(20.0)) ? T(0.5) : T(0.5) * (T(1.0) + T(2.0) * kh / sinh(T(2.0) * kh));
+			T n = (k > T(0.0)) ? XWave.kin.cg[ik] * k / sig : T(0.5);
 
 			T Ef = T(0.0);
 			T Exf = T(0.0), Eyf = T(0.0);
@@ -438,7 +440,8 @@ template __host__ __device__ void WaveMediumCell<double>(const Param& XParam, co
 
 
 /**
- * @brief Wave number and group velocity of each frequency in one cell (from the wave depth medium.h).
+ * @brief Wave number, group velocity and dsigma/dh of each frequency in one cell (from the wave depth medium.h).
+ * These are only recalculated when the medium changes (see WavePrep).
  */
 template <class T> __host__ __device__ void WaveKinCell(const Param& XParam, const WaveParam& XWaveParam, int i, const WaveModel<T>& XWave)
 {
@@ -449,8 +452,10 @@ template <class T> __host__ __device__ void WaveKinCell(const Param& XParam, con
 		size_t ik = specloc(XWaveParam.specstride, ifreq, i);
 		T sig = XWave.spec.sigma[ifreq];
 		T k = WaveDispersion(sig, h, g);
+		T kh = k * h;
 		XWave.kin.k[ik] = k;
 		XWave.kin.cg[ik] = WaveGroupVelocity(sig, k, h);
+		XWave.kin.dsdd[ik] = (kh < T(20.0) && k > T(0.0)) ? k * sig / sinh(T(2.0) * kh) : T(0.0);
 	}
 }
 template __host__ __device__ void WaveKinCell<float>(const Param& XParam, const WaveParam& XWaveParam, int i, const WaveModel<float>& XWave);
@@ -491,7 +496,7 @@ template __host__ __device__ double WaveUpwindFaceFlux<double>(double cm, double
  * @brief Action density flux through the left face of cell (ix,iy) of block ib for spectral bin ispec.
  * ix goes from 0 to blkwidth (the face at ix=blkwidth is the right face of the block, stored in the right halo).
  */
-template <class T> __host__ __device__ void WaveFluxXCell(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, const BlockP<T>& XBlock, const WaveModel<T>& XWave)
+template <class T> __host__ __device__ void WaveFluxXCell(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, int woff, const BlockP<T>& XBlock, const WaveModel<T>& XWave)
 {
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
@@ -519,21 +524,21 @@ template <class T> __host__ __device__ void WaveFluxXCell(const Param& XParam, c
 	T sm = T(0.0), sp = T(0.0);
 	if (XWaveParam.wavesolver == 2)
 	{
-		sm = T(0.5) * delta * XWave.work.dNdx[il];
-		sp = T(0.5) * delta * XWave.work.dNdx[i];
+		sm = T(0.5) * delta * XWave.work.dNdx[il + woff];
+		sp = T(0.5) * delta * XWave.work.dNdx[i + woff];
 	}
 
-	XWave.work.Fx[i] = WaveUpwindFaceFlux(cm, cp, Nm, Np, sm, sp, wetm, wetp);
+	XWave.work.Fx[i + woff] = WaveUpwindFaceFlux(cm, cp, Nm, Np, sm, sp, wetm, wetp);
 }
-template __host__ __device__ void WaveFluxXCell<float>(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, const BlockP<float>& XBlock, const WaveModel<float>& XWave);
-template __host__ __device__ void WaveFluxXCell<double>(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, const BlockP<double>& XBlock, const WaveModel<double>& XWave);
+template __host__ __device__ void WaveFluxXCell<float>(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, int woff, const BlockP<float>& XBlock, const WaveModel<float>& XWave);
+template __host__ __device__ void WaveFluxXCell<double>(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, int woff, const BlockP<double>& XBlock, const WaveModel<double>& XWave);
 
 
 /**
  * @brief Action density flux through the bottom face of cell (ix,iy) of block ib for spectral bin ispec.
  * iy goes from 0 to blkwidth (the face at iy=blkwidth is the top face of the block, stored in the top halo).
  */
-template <class T> __host__ __device__ void WaveFluxYCell(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, const BlockP<T>& XBlock, const WaveModel<T>& XWave)
+template <class T> __host__ __device__ void WaveFluxYCell(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, int woff, const BlockP<T>& XBlock, const WaveModel<T>& XWave)
 {
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
@@ -561,21 +566,21 @@ template <class T> __host__ __device__ void WaveFluxYCell(const Param& XParam, c
 	T sm = T(0.0), sp = T(0.0);
 	if (XWaveParam.wavesolver == 2)
 	{
-		sm = T(0.5) * delta * XWave.work.dNdy[ibot];
-		sp = T(0.5) * delta * XWave.work.dNdy[i];
+		sm = T(0.5) * delta * XWave.work.dNdy[ibot + woff];
+		sp = T(0.5) * delta * XWave.work.dNdy[i + woff];
 	}
 
-	XWave.work.Fy[i] = WaveUpwindFaceFlux(cm, cp, Nm, Np, sm, sp, wetm, wetp);
+	XWave.work.Fy[i + woff] = WaveUpwindFaceFlux(cm, cp, Nm, Np, sm, sp, wetm, wetp);
 }
-template __host__ __device__ void WaveFluxYCell<float>(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, const BlockP<float>& XBlock, const WaveModel<float>& XWave);
-template __host__ __device__ void WaveFluxYCell<double>(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, const BlockP<double>& XBlock, const WaveModel<double>& XWave);
+template __host__ __device__ void WaveFluxYCell<float>(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, int woff, const BlockP<float>& XBlock, const WaveModel<float>& XWave);
+template __host__ __device__ void WaveFluxYCell<double>(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, int woff, const BlockP<double>& XBlock, const WaveModel<double>& XWave);
 
 
 /**
  * @brief Add the divergence of the geographic fluxes of spectral bin ispec to the tendency dN (interior cell).
  * Same convention as updateEVCPU for the flow: dN = -(Fx[right] - Fx[i] + Fy[top] - Fy[i]) / delta.
  */
-template <class T> __host__ __device__ void WaveGeoDivCell(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, const BlockP<T>& XBlock, const WaveModel<T>& XWave)
+template <class T> __host__ __device__ void WaveGeoDivCell(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, int woff, const BlockP<T>& XBlock, const WaveModel<T>& XWave)
 {
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
@@ -586,10 +591,10 @@ template <class T> __host__ __device__ void WaveGeoDivCell(const Param& XParam, 
 
 	T delta = calcres(T(XParam.delta), XBlock.level[ib]);
 
-	XWave.adv.dN[specloc(XWaveParam.specstride, ispec, i)] -= (XWave.work.Fx[iright] - XWave.work.Fx[i] + XWave.work.Fy[itop] - XWave.work.Fy[i]) / delta;
+	XWave.adv.dN[specloc(XWaveParam.specstride, ispec, i)] -= (XWave.work.Fx[iright + woff] - XWave.work.Fx[i + woff] + XWave.work.Fy[itop + woff] - XWave.work.Fy[i + woff]) / delta;
 }
-template __host__ __device__ void WaveGeoDivCell<float>(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, const BlockP<float>& XBlock, const WaveModel<float>& XWave);
-template __host__ __device__ void WaveGeoDivCell<double>(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, const BlockP<double>& XBlock, const WaveModel<double>& XWave);
+template __host__ __device__ void WaveGeoDivCell<float>(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, int woff, const BlockP<float>& XBlock, const WaveModel<float>& XWave);
+template __host__ __device__ void WaveGeoDivCell<double>(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, int ispec, int woff, const BlockP<double>& XBlock, const WaveModel<double>& XWave);
 
 
 /**
@@ -696,22 +701,25 @@ template <class T> __host__ __device__ void WaveSpecPropCell(const Param& XParam
 			{
 				continue;
 			}
-			T sig = XWave.spec.sigma[ifreq];
-			T kh = k * h;
-			T sdh = (kh < T(20.0)) ? sig / sinh(T(2.0) * kh) : T(0.0); // (dsigma/dh)/k
+			T sdh = XWave.kin.dsdd[ik] / k; // (dsigma/dh)/k = sigma/sinh(2kh)
 
 			int base = ifreq * nd;
+			// ctheta of the first bin (the value of bin b is carried over to the next face)
+			T c0 = XWave.spec.costh[0], s0 = XWave.spec.sinth[0];
+			T cth0 = sdh * (s0 * dhdx - c0 * dhdy) + c0 * (s0 * dudx - c0 * dudy) + s0 * (s0 * dvdx - c0 * dvdy);
+			T ctha = cth0;
 			for (int ia = 0; ia < nd; ia++)
 			{
 				int ib = (ia + 1) % nd;
 				int iam = (ia - 1 + nd) % nd;
 				int ibp = (ib + 1) % nd;
 
-				T ca = XWave.spec.costh[ia], sa = XWave.spec.sinth[ia];
-				T cb = XWave.spec.costh[ib], sb = XWave.spec.sinth[ib];
-
-				T ctha = sdh * (sa * dhdx - ca * dhdy) + ca * (sa * dudx - ca * dudy) + sa * (sa * dvdx - ca * dvdy);
-				T cthb = sdh * (sb * dhdx - cb * dhdy) + cb * (sb * dudx - cb * dudy) + sb * (sb * dvdx - cb * dvdy);
+				T cthb = cth0;
+				if (ib != 0)
+				{
+					T cb = XWave.spec.costh[ib], sb = XWave.spec.sinth[ib];
+					cthb = sdh * (sb * dhdx - cb * dhdy) + cb * (sb * dudx - cb * dudy) + sb * (sb * dvdx - cb * dvdy);
+				}
 
 				T cf = WaveClip(T(0.5) * (ctha + cthb), cthmax);
 
@@ -722,6 +730,8 @@ template <class T> __host__ __device__ void WaveSpecPropCell(const Param& XParam
 
 				dN[sa_i] -= G / dth;
 				dN[sb_i] += G / dth;
+
+				ctha = cthb;
 			}
 		}
 	}
@@ -741,10 +751,7 @@ template <class T> __host__ __device__ void WaveSpecPropCell(const Param& XParam
 			// lower boundary (below the first frequency): only outgoing flux
 			{
 				size_t ik = specloc(stride, 0, i);
-				T k = XWave.kin.k[ik];
-				T kh = k * h;
-				T dsdd = (kh < T(20.0) && k > T(0.0)) ? k * XWave.spec.sigma[0] / sinh(T(2.0) * kh) : T(0.0);
-				T cs = dsdd * depterm - XWave.kin.cg[ik] * k * curterm;
+				T cs = XWave.kin.dsdd[ik] * depterm - XWave.kin.cg[ik] * XWave.kin.k[ik] * curterm;
 				T dsig = XWave.spec.dsigma[0];
 				if (cs < T(0.0))
 				{
@@ -754,17 +761,12 @@ template <class T> __host__ __device__ void WaveSpecPropCell(const Param& XParam
 				}
 			}
 
+			T csa = XWave.kin.dsdd[specloc(stride, 0, i)] * depterm - XWave.kin.cg[specloc(stride, 0, i)] * XWave.kin.k[specloc(stride, 0, i)] * curterm;
 			for (int ja = 0; ja < nf - 1; ja++)
 			{
 				int jb = ja + 1;
-				size_t ika = specloc(stride, ja, i);
 				size_t ikb = specloc(stride, jb, i);
-				T ka = XWave.kin.k[ika], kb = XWave.kin.k[ikb];
-				T kha = ka * h, khb = kb * h;
-				T dsdda = (kha < T(20.0) && ka > T(0.0)) ? ka * XWave.spec.sigma[ja] / sinh(T(2.0) * kha) : T(0.0);
-				T dsddb = (khb < T(20.0) && kb > T(0.0)) ? kb * XWave.spec.sigma[jb] / sinh(T(2.0) * khb) : T(0.0);
-				T csa = dsdda * depterm - XWave.kin.cg[ika] * ka * curterm;
-				T csb = dsddb * depterm - XWave.kin.cg[ikb] * kb * curterm;
+				T csb = XWave.kin.dsdd[ikb] * depterm - XWave.kin.cg[ikb] * XWave.kin.k[ikb] * curterm;
 
 				T dsiga = XWave.spec.dsigma[ja];
 				T dsigb = XWave.spec.dsigma[jb];
@@ -779,16 +781,15 @@ template <class T> __host__ __device__ void WaveSpecPropCell(const Param& XParam
 
 				dN[sa_i] -= F / dsiga;
 				dN[sb_i] += F / dsigb;
+
+				csa = csb;
 			}
 
 			// upper boundary (above the last frequency): only outgoing flux
 			{
 				int jl = nf - 1;
 				size_t ik = specloc(stride, jl, i);
-				T k = XWave.kin.k[ik];
-				T kh = k * h;
-				T dsdd = (kh < T(20.0) && k > T(0.0)) ? k * XWave.spec.sigma[jl] / sinh(T(2.0) * kh) : T(0.0);
-				T cs = dsdd * depterm - XWave.kin.cg[ik] * k * curterm;
+				T cs = XWave.kin.dsdd[ik] * depterm - XWave.kin.cg[ik] * XWave.kin.k[ik] * curterm;
 				T dsig = XWave.spec.dsigma[jl];
 				if (cs > T(0.0))
 				{
@@ -852,72 +853,80 @@ double WaveBndTaper(Param XParam, WaveParam XWaveParam, double time)
  * @param gamma JONSWAP peak enhancement factor
  * @return Action density N of the bin
  */
+template <class T> __host__ __device__ T WaveJonswapEf(int nfreq, T sigma, T fp, T gamma)
+{
+	// Unscaled JONSWAP frequency distribution E(sigma)
+	if (nfreq == 1)
+	{
+		return T(1.0); // single representative frequency: all the energy in the only bin
+	}
+	const T twopi = T(2.0 * pi);
+	T f = sigma / twopi;
+	T sj = (f <= fp) ? T(0.07) : T(0.09);
+	T r = exp(T(-1.0) * (f - fp) * (f - fp) / (T(2.0) * sj * sj * fp * fp));
+	T fpf = fp / f;
+	return pow(f, T(-5.0)) * exp(T(-1.25) * fpf * fpf * fpf * fpf) * pow(gamma, r) / twopi;
+}
+
+template <class T> __host__ __device__ void WaveJonswapShape(T Dir, T Dspr, T& thm, T& spow)
+{
+	thm = (T(270.0) - Dir) * T(pi) / T(180.0);
+	T dsprrad = Dspr * T(pi) / T(180.0);
+	spow = utils::max(T(2.0) / (dsprrad * dsprrad) - T(1.0), T(0.0));
+}
+
+/**
+ * @brief Normalisation integrals of the discrete JONSWAP spectrum: m0 = sum(E(sigma) dsigma) and Dsum = sum(D(theta) dtheta).
+ * They only depend on Tp, gamma, Dir and Dspr, so for a spatially uniform boundary they are calculated once per time on the host.
+ */
+template <class T> __host__ __device__ void WaveJonswapNorm(const WaveParam& XWaveParam, const WaveSpecGridP<T>& XSpec, T Tp, T Dir, T Dspr, T gamma, T& m0, T& Dsum)
+{
+	m0 = T(0.0);
+	Dsum = T(0.0);
+	if (Tp <= T(0.0))
+	{
+		return;
+	}
+	T fp = T(1.0) / Tp;
+	for (int jf = 0; jf < XWaveParam.nfreq; jf++)
+	{
+		m0 += WaveJonswapEf(XWaveParam.nfreq, XSpec.sigma[jf], fp, gamma) * XSpec.dsigma[jf];
+	}
+	T thm, spow;
+	WaveJonswapShape(Dir, Dspr, thm, spow);
+	for (int jd = 0; jd < XWaveParam.ndir; jd++)
+	{
+		Dsum += pow(fabs(cos(T(0.5) * (XSpec.theta[jd] - thm))), T(2.0) * spow) * T(XWaveParam.dtheta);
+	}
+}
+template __host__ __device__ void WaveJonswapNorm<float>(const WaveParam& XWaveParam, const WaveSpecGridP<float>& XSpec, float Tp, float Dir, float Dspr, float gamma, float& m0, float& Dsum);
+template __host__ __device__ void WaveJonswapNorm<double>(const WaveParam& XWaveParam, const WaveSpecGridP<double>& XSpec, double Tp, double Dir, double Dspr, double gamma, double& m0, double& Dsum);
+
+/**
+ * @brief Action density of one spectral bin of a discrete JONSWAP spectrum with known normalisation integrals (see WaveJonswapNorm).
+ */
+template <class T> __host__ __device__ T WaveJonswapNbin(const WaveParam& XWaveParam, const WaveSpecGridP<T>& XSpec, int ispec, T Hs, T Tp, T Dir, T Dspr, T gamma, T m0, T Dsum)
+{
+	if (Hs <= T(0.0) || Tp <= T(0.0) || m0 <= T(0.0) || Dsum <= T(0.0))
+	{
+		return T(0.0);
+	}
+	int ifreq = ispec / XWaveParam.ndir;
+	int idir = ispec - ifreq * XWaveParam.ndir;
+	T thm, spow;
+	WaveJonswapShape(Dir, Dspr, thm, spow);
+	T Ebin = WaveJonswapEf(XWaveParam.nfreq, XSpec.sigma[ifreq], T(1.0) / Tp, gamma);
+	T Dbin = pow(fabs(cos(T(0.5) * (XSpec.theta[idir] - thm))), T(2.0) * spow);
+	return (Hs * Hs / T(16.0)) / m0 * Ebin * Dbin / Dsum / XSpec.sigma[ifreq];
+}
+template __host__ __device__ float WaveJonswapNbin<float>(const WaveParam& XWaveParam, const WaveSpecGridP<float>& XSpec, int ispec, float Hs, float Tp, float Dir, float Dspr, float gamma, float m0, float Dsum);
+template __host__ __device__ double WaveJonswapNbin<double>(const WaveParam& XWaveParam, const WaveSpecGridP<double>& XSpec, int ispec, double Hs, double Tp, double Dir, double Dspr, double gamma, double m0, double Dsum);
+
 template <class T> __host__ __device__ T WaveJonswapN(const WaveParam& XWaveParam, const WaveSpecGridP<T>& XSpec, int ispec, T Hs, T Tp, T Dir, T Dspr, T gamma)
 {
-	const int nfreq = XWaveParam.nfreq;
-	const int ndir = XWaveParam.ndir;
-	const T dth = T(XWaveParam.dtheta);
-	const T twopi = T(2.0 * pi);
-
-	if (Hs <= T(0.0) || Tp <= T(0.0))
-	{
-		return T(0.0);
-	}
-
-	int ifreq = ispec / ndir;
-	int idir = ispec - ifreq * ndir;
-
-	// Frequency distribution (unscaled) and its integral
-	T fp = T(1.0) / Tp;
-	T m0 = T(0.0);
-	T Ebin = T(0.0);
-	for (int jf = 0; jf < nfreq; jf++)
-	{
-		T E;
-		if (nfreq == 1)
-		{
-			E = T(1.0); // single representative frequency: all the energy in the only bin
-		}
-		else
-		{
-			T f = XSpec.sigma[jf] / twopi;
-			T sj = (f <= fp) ? T(0.07) : T(0.09);
-			T r = exp(T(-1.0) * (f - fp) * (f - fp) / (T(2.0) * sj * sj * fp * fp));
-			T fpf = fp / f;
-			E = pow(f, T(-5.0)) * exp(T(-1.25) * fpf * fpf * fpf * fpf) * pow(gamma, r) / twopi;
-		}
-		m0 += E * XSpec.dsigma[jf];
-		if (jf == ifreq)
-		{
-			Ebin = E;
-		}
-	}
-	if (m0 <= T(0.0))
-	{
-		return T(0.0);
-	}
-
-	// Directional distribution and its integral
-	T thm = (T(270.0) - Dir) * T(pi) / T(180.0);
-	T dsprrad = Dspr * T(pi) / T(180.0);
-	T spow = utils::max(T(2.0) / (dsprrad * dsprrad) - T(1.0), T(0.0));
-	T Dsum = T(0.0);
-	T Dbin = T(0.0);
-	for (int jd = 0; jd < ndir; jd++)
-	{
-		T D = pow(fabs(cos(T(0.5) * (XSpec.theta[jd] - thm))), T(2.0) * spow);
-		Dsum += D * dth;
-		if (jd == idir)
-		{
-			Dbin = D;
-		}
-	}
-	if (Dsum <= T(0.0))
-	{
-		return T(0.0);
-	}
-
-	return (Hs * Hs / T(16.0)) / m0 * Ebin * Dbin / Dsum / XSpec.sigma[ifreq];
+	T m0, Dsum;
+	WaveJonswapNorm(XWaveParam, XSpec, Tp, Dir, Dspr, gamma, m0, Dsum);
+	return WaveJonswapNbin(XWaveParam, XSpec, ispec, Hs, Tp, Dir, Dspr, gamma, m0, Dsum);
 }
 template __host__ __device__ float WaveJonswapN<float>(const WaveParam& XWaveParam, const WaveSpecGridP<float>& XSpec, int ispec, float Hs, float Tp, float Dir, float Dspr, float gamma);
 template __host__ __device__ double WaveJonswapN<double>(const WaveParam& XWaveParam, const WaveSpecGridP<double>& XSpec, int ispec, double Hs, double Tp, double Dir, double Dspr, double gamma);
@@ -931,8 +940,9 @@ template __host__ __device__ double WaveJonswapN<double>(const WaveParam& XWaveP
  * - incoming waves: type 0 (absorbing): no flux; type 1 (Neumann): flux of the interior action density (zero gradient);
  *   type 2 (JONSWAP): flux of the JONSWAP spectrum given by Hs, Tp, Dir, Dspr, gamma (tapered by bndfac)
  * Faces of half-boundary blocks that are not on the boundary are left untouched.
+ * woff is the offset of the bin in the batch work arrays (j*specstride for the j-th bin of the batch).
  */
-template <class T> __host__ __device__ void WavebndFaceCell(const Param& XParam, const WaveParam& XWaveParam, int isright, int istop, int ib, int tx, int ispec, int type, T Hs, T Tp, T Dir, T Dspr, T gamma, T bndfac, const BlockP<T>& XBlock, const WaveModel<T>& XWave)
+template <class T> __host__ __device__ void WavebndFaceCell(const Param& XParam, const WaveParam& XWaveParam, int isright, int istop, int ib, int tx, int ispec, int woff, int type, T Hs, T Tp, T Dir, T Dspr, T gamma, T m0n, T Dsumn, T bndfac, const BlockP<T>& XBlock, const WaveModel<T>& XWave)
 {
 	int halowidth = XParam.halowidth;
 	int blkmemwidth = XParam.blkmemwidth;
@@ -1000,7 +1010,12 @@ template <class T> __host__ __device__ void WavebndFaceCell(const Param& XParam,
 			}
 			else if (type == 2)
 			{
-				Nbnd = bndfac * WaveJonswapN(XWaveParam, XWave.spec, ispec, Hs, Tp, Dir, Dspr, gamma);
+				// m0n, Dsumn: JONSWAP normalisation integrals (precalculated for uniform segments, <=0 to calculate them here)
+				if (m0n <= T(0.0))
+				{
+					WaveJonswapNorm(XWaveParam, XWave.spec, Tp, Dir, Dspr, gamma, m0n, Dsumn);
+				}
+				Nbnd = bndfac * WaveJonswapNbin(XWaveParam, XWave.spec, ispec, Hs, Tp, Dir, Dspr, gamma, m0n, Dsumn);
 			}
 			F = c * Nbnd;
 		}
@@ -1012,15 +1027,15 @@ template <class T> __host__ __device__ void WavebndFaceCell(const Param& XParam,
 
 	if (isright == 0)
 	{
-		XWave.work.Fy[i] = F;
+		XWave.work.Fy[i + woff] = F;
 	}
 	else
 	{
-		XWave.work.Fx[i] = F;
+		XWave.work.Fx[i + woff] = F;
 	}
 }
-template __host__ __device__ void WavebndFaceCell<float>(const Param& XParam, const WaveParam& XWaveParam, int isright, int istop, int ib, int tx, int ispec, int type, float Hs, float Tp, float Dir, float Dspr, float gamma, float bndfac, const BlockP<float>& XBlock, const WaveModel<float>& XWave);
-template __host__ __device__ void WavebndFaceCell<double>(const Param& XParam, const WaveParam& XWaveParam, int isright, int istop, int ib, int tx, int ispec, int type, double Hs, double Tp, double Dir, double Dspr, double gamma, double bndfac, const BlockP<double>& XBlock, const WaveModel<double>& XWave);
+template __host__ __device__ void WavebndFaceCell<float>(const Param& XParam, const WaveParam& XWaveParam, int isright, int istop, int ib, int tx, int ispec, int woff, int type, float Hs, float Tp, float Dir, float Dspr, float gamma, float m0n, float Dsumn, float bndfac, const BlockP<float>& XBlock, const WaveModel<float>& XWave);
+template __host__ __device__ void WavebndFaceCell<double>(const Param& XParam, const WaveParam& XWaveParam, int isright, int istop, int ib, int tx, int ispec, int woff, int type, double Hs, double Tp, double Dir, double Dspr, double gamma, double m0n, double Dsumn, double bndfac, const BlockP<double>& XBlock, const WaveModel<double>& XWave);
 
 
 /**
@@ -1171,11 +1186,12 @@ template void ResetWaveAdvCPU<double>(Param XParam, WaveParam XWaveParam, BlockP
 
 
 /**
- * @brief Geographic propagation (CPU): add -d(cx N)/dx - d(cy N)/dy to dN, one spectral bin at a time.
+ * @brief Geographic propagation (CPU): add -d(cx N)/dx - d(cy N)/dy to dN, by batches of nchunk spectral bins.
  *
- * For each bin:
- * 1. fill the halo of the bin (fillHaloC, as for any flow variable)
- * 2. second order: limited gradients of the bin and their halo (gradientC / gradientHalo, as for the flow)
+ * For each batch, using the virtual blocks (XWave.vblocks, see InitWaveVirtualBlocks) so the flow block functions
+ * process all the bins of the batch in a single call:
+ * 1. fill the halo of the bins (fillHaloC, as for any flow variable)
+ * 2. second order: limited gradients of the bins and their halo (gradientC / gradientHalo, as for the flow)
  * 3. upwind fluxes through the left (ix = 0..blkwidth) and bottom (iy = 0..blkwidth) faces of the cells
  * 3b. boundary conditions: the fluxes through the faces on the domain boundary are overwritten for each wave boundary segment (WavebndFluxCPU)
  * 4. coarse/fine flux correction in the halo (fillHaloLRFluxC / fillHaloBTFluxC, as for the flow fluxes) so the scheme is conservative across resolution changes
@@ -1185,35 +1201,47 @@ template void ResetWaveAdvCPU<double>(Param XParam, WaveParam XWaveParam, BlockP
  */
 template <class T> void WaveGeoPropCPU(Param XParam, Param XParamN, WaveParam XWaveParam, const std::vector<wavebndsegment>& segs, double time, T bndfac, BlockP<T> XBlock, WaveModel<T> XWave)
 {
-	int ib;
 	int bw = XParam.blkwidth;
-	for (int ispec = 0; ispec < XWaveParam.nspec; ispec++)
-	{
-		T* Nbin = XWave.action.N + specloc(XWaveParam.specstride, ispec, 0);
+	int nb = XParam.nblkmem;
+	int stride = XWaveParam.specstride;
 
-		fillHaloC(XParam, XBlock, Nbin);
+	Param XParamV = XParam;
+	Param XParamNV = XParamN;
+
+	for (int ispec0 = 0; ispec0 < XWaveParam.nspec; ispec0 += XWaveParam.nchunk)
+	{
+		int nbins = utils::min(XWaveParam.nchunk, XWaveParam.nspec - ispec0);
+		T* Nchunk = XWave.action.N + specloc(stride, ispec0, 0);
+		XParamV.nblk = XParam.nblk * nbins;
+		XParamNV.nblk = XParam.nblk * nbins;
+
+		fillHaloC(XParamV, XWave.vblocks, Nchunk);
 
 		if (XWaveParam.wavesolver == 2)
 		{
-			gradientC(XParamN, XBlock, Nbin, XWave.work.dNdx, XWave.work.dNdy);
-			gradientHalo(XParamN, XBlock, Nbin, XWave.work.dNdx, XWave.work.dNdy);
+			gradientC(XParamNV, XWave.vblocks, Nchunk, XWave.work.dNdx, XWave.work.dNdy);
+			gradientHalo(XParamNV, XWave.vblocks, Nchunk, XWave.work.dNdx, XWave.work.dNdy);
 		}
 
-		for (int ibl = 0; ibl < XParam.nblk; ibl++)
+		for (int ibl = 0; ibl < XParamV.nblk; ibl++)
 		{
-			ib = XBlock.active[ibl];
+			int ibv = XWave.vblocks.active[ibl];
+			int ib = ibv % nb;
+			int j = ibv / nb;
+			int ispec = ispec0 + j;
+			int woff = j * stride;
 			for (int iy = 0; iy < bw; iy++)
 			{
 				for (int ix = 0; ix < (bw + XParam.halowidth); ix++)
 				{
-					WaveFluxXCell(XParam, XWaveParam, ix, iy, ib, ispec, XBlock, XWave);
+					WaveFluxXCell(XParam, XWaveParam, ix, iy, ib, ispec, woff, XBlock, XWave);
 				}
 			}
 			for (int iy = 0; iy < (bw + XParam.halowidth); iy++)
 			{
 				for (int ix = 0; ix < bw; ix++)
 				{
-					WaveFluxYCell(XParam, XWaveParam, ix, iy, ib, ispec, XBlock, XWave);
+					WaveFluxYCell(XParam, XWaveParam, ix, iy, ib, ispec, woff, XBlock, XWave);
 				}
 			}
 		}
@@ -1221,20 +1249,22 @@ template <class T> void WaveGeoPropCPU(Param XParam, Param XParamN, WaveParam XW
 		// Boundary conditions: overwrite the fluxes through the faces on the domain boundary (as FlowbndFlux for the flow)
 		for (int iseg = 0; iseg < segs.size(); iseg++)
 		{
-			WavebndFluxCPU(XParam, XWaveParam, segs[iseg], time, bndfac, ispec, XBlock, XWave);
+			WavebndFluxCPU(XParam, XWaveParam, segs[iseg], time, bndfac, ispec0, nbins, XBlock, XWave);
 		}
 
-		fillHaloLRFluxC(XParam, XBlock, XWave.work.Fx);
-		fillHaloBTFluxC(XParam, XBlock, XWave.work.Fy);
+		fillHaloLRFluxC(XParamV, XWave.vblocks, XWave.work.Fx);
+		fillHaloBTFluxC(XParamV, XWave.vblocks, XWave.work.Fy);
 
-		for (int ibl = 0; ibl < XParam.nblk; ibl++)
+		for (int ibl = 0; ibl < XParamV.nblk; ibl++)
 		{
-			ib = XBlock.active[ibl];
+			int ibv = XWave.vblocks.active[ibl];
+			int ib = ibv % nb;
+			int j = ibv / nb;
 			for (int iy = 0; iy < bw; iy++)
 			{
 				for (int ix = 0; ix < bw; ix++)
 				{
-					WaveGeoDivCell(XParam, XWaveParam, ix, iy, ib, ispec, XBlock, XWave);
+					WaveGeoDivCell(XParam, XWaveParam, ix, iy, ib, ispec0 + j, j * stride, XBlock, XWave);
 				}
 			}
 		}
@@ -1245,12 +1275,16 @@ template void WaveGeoPropCPU<double>(Param XParam, Param XParamN, WaveParam XWav
 
 
 /**
- * @brief Wave boundary conditions for one segment and one spectral bin (CPU). Wave equivalent of FlowbndFlux.
+ * @brief Wave boundary conditions for one segment and a batch of spectral bins (CPU). Wave equivalent of FlowbndFlux.
  *
  * Uniform segments (text file): the bulk parameters are interpolated in time (WaveBndValues).
- * Spatially varying segments (netcdf file): the bulk parameters are interpolated from the forcing maps at each face (interp2BUQ).
+ * Spatially varying segments (netcdf file): the bulk parameters are interpolated from the forcing maps at each face (interp2BUQ),
+ * once per face for the whole batch.
+ *
+ * @param ispec0 First spectral bin of the batch
+ * @param nbins Number of bins in the batch
  */
-template <class T> void WavebndFluxCPU(Param XParam, WaveParam XWaveParam, const wavebndsegment& seg, double time, T bndfac, int ispec, BlockP<T> XBlock, WaveModel<T> XWave)
+template <class T> void WavebndFluxCPU(Param XParam, WaveParam XWaveParam, const wavebndsegment& seg, double time, T bndfac, int ispec0, int nbins, BlockP<T> XBlock, WaveModel<T> XWave)
 {
 	double Hs = 0.0, Tp = 10.0, Dir = 0.0, Dspr = 30.0, gamma = XWaveParam.gammajsp;
 	if (seg.type == 2 && seg.on && seg.uniform)
@@ -1258,6 +1292,13 @@ template <class T> void WavebndFluxCPU(Param XParam, WaveParam XWaveParam, const
 		WaveBndValues(seg, time, XWaveParam.gammajsp, Hs, Tp, Dir, Dspr, gamma);
 	}
 	bool interpmaps = (seg.type == 2 && seg.on && !seg.uniform);
+
+	// JONSWAP normalisation: once per call for a uniform segment, at each face for maps
+	T m0n = T(-1.0), Dsumn = T(-1.0);
+	if (seg.type == 2 && !interpmaps)
+	{
+		WaveJonswapNorm(XWaveParam, XWave.spec, T(Tp), T(Dir), T(Dspr), T(gamma), m0n, Dsumn);
+	}
 
 	const bndsegmentside* sides[4] = { &seg.left, &seg.right, &seg.top, &seg.bot };
 	for (int is = 0; is < 4; is++)
@@ -1279,14 +1320,22 @@ template <class T> void WavebndFluxCPU(Param XParam, WaveParam XWaveParam, const
 					Tp = interp2BUQ(xx, yy, seg.Tp);
 					Dir = interp2BUQ(xx, yy, seg.Dir);
 					Dspr = interp2BUQ(xx, yy, seg.Dspr);
-					}
-				WavebndFaceCell(XParam, XWaveParam, side.isright, side.istop, ib, tx, ispec, seg.type, T(Hs), T(Tp), T(Dir), T(Dspr), T(gamma), bndfac, XBlock, XWave);
+				}
+				T m0f = m0n, Dsumf = Dsumn;
+				if (interpmaps)
+				{
+					WaveJonswapNorm(XWaveParam, XWave.spec, T(Tp), T(Dir), T(Dspr), T(gamma), m0f, Dsumf);
+				}
+				for (int j = 0; j < nbins; j++)
+				{
+					WavebndFaceCell(XParam, XWaveParam, side.isright, side.istop, ib, tx, ispec0 + j, j * XWaveParam.specstride, seg.type, T(Hs), T(Tp), T(Dir), T(Dspr), T(gamma), m0f, Dsumf, bndfac, XBlock, XWave);
+				}
 			}
 		}
 	}
 }
-template void WavebndFluxCPU<float>(Param XParam, WaveParam XWaveParam, const wavebndsegment& seg, double time, float bndfac, int ispec, BlockP<float> XBlock, WaveModel<float> XWave);
-template void WavebndFluxCPU<double>(Param XParam, WaveParam XWaveParam, const wavebndsegment& seg, double time, double bndfac, int ispec, BlockP<double> XBlock, WaveModel<double> XWave);
+template void WavebndFluxCPU<float>(Param XParam, WaveParam XWaveParam, const wavebndsegment& seg, double time, float bndfac, int ispec0, int nbins, BlockP<float> XBlock, WaveModel<float> XWave);
+template void WavebndFluxCPU<double>(Param XParam, WaveParam XWaveParam, const wavebndsegment& seg, double time, double bndfac, int ispec0, int nbins, BlockP<double> XBlock, WaveModel<double> XWave);
 
 
 /**
@@ -1395,11 +1444,12 @@ template void WaveRHSCPU<double>(Param XParam, Param XParamN, WaveParam XWavePar
  * @param XWaveParam Wave model parameters
  * @param dt Wave time step (s)
  * @param time Wave model time at the start of the step (s), used for the boundary conditions
+ * @param dobulk Calculate the bulk parameters at the end of the step
  * @param XForcing Forcing (wind is used by the wave model)
  * @param XModel Flow model (mesh, bathy, water depth and currents)
  * @param XWave Wave model
  */
-template <class T> void WaveCPU(Param XParam, WaveParam XWaveParam, T dt, double time, Forcing<float> XForcing, Model<T> XModel, WaveModel<T> XWave)
+template <class T> void WaveCPU(Param XParam, WaveParam XWaveParam, T dt, double time, bool dobulk, Forcing<float> XForcing, Model<T> XModel, WaveModel<T> XWave)
 {
 	Param XParamN = WaveLightParam(XParam, XWaveParam.wavetheta);
 
@@ -1421,12 +1471,15 @@ template <class T> void WaveCPU(Param XParam, WaveParam XWaveParam, T dt, double
 	}
 
 	//============================================
-	// Bulk parameters and radiation stresses
-	CalcWaveBulkCPU(XParam, XWaveParam, XModel, XWave);
+	// Bulk parameters and radiation stresses (only when needed: output or coupling)
+	if (dobulk)
+	{
+		CalcWaveBulkCPU(XParam, XWaveParam, XModel, XWave);
+	}
 
 	//============================================
 	// Wave forces on the flow (Fx, Fy) from radiation stress gradients
 	// TODO (only needed when XWaveParam.waveflowcoupling)
 }
-template void WaveCPU<float>(Param XParam, WaveParam XWaveParam, float dt, double time, Forcing<float> XForcing, Model<float> XModel, WaveModel<float> XWave);
-template void WaveCPU<double>(Param XParam, WaveParam XWaveParam, double dt, double time, Forcing<float> XForcing, Model<double> XModel, WaveModel<double> XWave);
+template void WaveCPU<float>(Param XParam, WaveParam XWaveParam, float dt, double time, bool dobulk, Forcing<float> XForcing, Model<float> XModel, WaveModel<float> XWave);
+template void WaveCPU<double>(Param XParam, WaveParam XWaveParam, double dt, double time, bool dobulk, Forcing<float> XForcing, Model<double> XModel, WaveModel<double> XWave);

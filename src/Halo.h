@@ -40,10 +40,10 @@ template <class T> void fillHaloTopRightGPU(Param XParam, bool doprolong, BlockP
 
 template <class T> void bndmaskGPU(Param XParam, BlockP<T> XBlock, EvolvingP<T> Xev, FluxP<T> Flux);
 
-template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T*& z);
-template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z);
-template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z);
-template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z);
+template <class T> void fillLeft(const Param& XParam, int ib, const BlockP<T>& XBlock, T*& z);
+template <class T> void fillRight(const Param& XParam, int ib, const BlockP<T>& XBlock, T*& z);
+template <class T> void fillBot(const Param& XParam, int ib, const BlockP<T>& XBlock, T*& z);
+template <class T> void fillTop(const Param& XParam, int ib, const BlockP<T>& XBlock, T*& z);
 
 
 

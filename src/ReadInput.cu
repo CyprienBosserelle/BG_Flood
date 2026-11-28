@@ -991,6 +991,13 @@ WaveParam readparamstr(std::string line, WaveParam wparam)
 		wparam.freqshift = readparambool(parametervalue, wparam.freqshift);
 	}
 
+	paramvec = { "wavebinchunk", "wavechunk" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavebinchunk = std::stoi(parametervalue);
+	}
+
 	paramvec = { "ctmax", "wavectmax" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
@@ -2196,6 +2203,13 @@ void checkwaveparamsanity(Param& XParam, WaveParam& XWaveParam, Forcing<float>& 
 
 	XWaveParam.nspec = XWaveParam.nfreq * XWaveParam.ndir;
 	XWaveParam.dtheta = 2.0 * pi / double(XWaveParam.ndir);
+
+	// Number of spectral bins propagated together (one batch / kernel launch)
+	XWaveParam.nchunk = (XWaveParam.wavebinchunk > 0) ? XWaveParam.wavebinchunk : XWaveParam.ndir;
+	XWaveParam.nchunk = utils::min(utils::max(XWaveParam.nchunk, 1), XWaveParam.nspec);
+
+	// The medium seen by the waves only changes if the flow model runs and the waves feel its water level or currents
+	XWaveParam.staticmedium = !XParam.flowmodel || (!XWaveParam.wavewaterlevel && !XWaveParam.wavecurrent);
 
 	if (XWaveParam.nfreq > 1)
 	{

@@ -413,16 +413,20 @@ void AllocateCPU(int nblk, int blksize, WaveParam XWaveParam, WaveModel<T>& XWav
 	// Medium
 	AllocateCPU(nblk, blksize, XWave.medium.h, XWave.medium.ho, XWave.medium.dhdt, XWave.medium.u);
 	AllocateCPU(nblk, blksize, XWave.medium.v, XWave.medium.dhdx, XWave.medium.dhdy, XWave.medium.dudx);
-	AllocateCPU(nblk, blksize, XWave.medium.dudy, XWave.medium.dvdx, XWave.medium.dvdy, XWave.work.dNdx);
+	AllocateCPU(nblk, blksize, XWave.medium.dudy);
+	AllocateCPU(nblk, blksize, XWave.medium.dvdx);
+	AllocateCPU(nblk, blksize, XWave.medium.dvdy);
 
-	// Propagation work arrays
-	AllocateCPU(nblk, blksize, XWave.work.dNdy);
-	AllocateCPU(nblk, blksize, XWave.work.Fx);
-	AllocateCPU(nblk, blksize, XWave.work.Fy);
+	// Propagation work arrays for a batch of nchunk bins
+	AllocateCPU(nblk * XWaveParam.nchunk, blksize, XWave.work.dNdx);
+	AllocateCPU(nblk * XWaveParam.nchunk, blksize, XWave.work.dNdy);
+	AllocateCPU(nblk * XWaveParam.nchunk, blksize, XWave.work.Fx);
+	AllocateCPU(nblk * XWaveParam.nchunk, blksize, XWave.work.Fy);
 
 	// Kinematics (per frequency)
 	AllocateCPU(nblk * XWaveParam.nfreq, blksize, XWave.kin.k);
 	AllocateCPU(nblk * XWaveParam.nfreq, blksize, XWave.kin.cg);
+	AllocateCPU(nblk * XWaveParam.nfreq, blksize, XWave.kin.dsdd);
 }
 template void AllocateCPU<float>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<float>& XWave);
 template void AllocateCPU<double>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<double>& XWave);
@@ -1055,16 +1059,20 @@ void AllocateGPU(int nblk, int blksize, WaveParam XWaveParam, WaveModel<T>& XWav
 	// Medium
 	AllocateGPU(nblk, blksize, XWave.medium.h, XWave.medium.ho, XWave.medium.dhdt, XWave.medium.u);
 	AllocateGPU(nblk, blksize, XWave.medium.v, XWave.medium.dhdx, XWave.medium.dhdy, XWave.medium.dudx);
-	AllocateGPU(nblk, blksize, XWave.medium.dudy, XWave.medium.dvdx, XWave.medium.dvdy, XWave.work.dNdx);
+	AllocateGPU(nblk, blksize, XWave.medium.dudy);
+	AllocateGPU(nblk, blksize, XWave.medium.dvdx);
+	AllocateGPU(nblk, blksize, XWave.medium.dvdy);
 
-	// Propagation work arrays
-	AllocateGPU(nblk, blksize, XWave.work.dNdy);
-	AllocateGPU(nblk, blksize, XWave.work.Fx);
-	AllocateGPU(nblk, blksize, XWave.work.Fy);
+	// Propagation work arrays for a batch of nchunk bins
+	AllocateGPU(nblk * XWaveParam.nchunk, blksize, XWave.work.dNdx);
+	AllocateGPU(nblk * XWaveParam.nchunk, blksize, XWave.work.dNdy);
+	AllocateGPU(nblk * XWaveParam.nchunk, blksize, XWave.work.Fx);
+	AllocateGPU(nblk * XWaveParam.nchunk, blksize, XWave.work.Fy);
 
 	// Kinematics (per frequency)
 	AllocateGPU(nblk * XWaveParam.nfreq, blksize, XWave.kin.k);
 	AllocateGPU(nblk * XWaveParam.nfreq, blksize, XWave.kin.cg);
+	AllocateGPU(nblk * XWaveParam.nfreq, blksize, XWave.kin.dsdd);
 }
 template void AllocateGPU<float>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<float>& XWave);
 template void AllocateGPU<double>(int nblk, int blksize, WaveParam XWaveParam, WaveModel<double>& XWave);

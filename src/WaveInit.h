@@ -18,6 +18,7 @@
 template <class T> void InitWaveModel(Param XParam, WaveParam& XWaveParam, Forcing<float>& XForcing, Model<T>& XModel, WaveModel<T>& XWave);
 template <class T> void SetupWaveGPU(Param XParam, WaveParam XWaveParam, Forcing<float>& XForcing, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g);
 
+template <class T> void InitWaveVirtualBlocks(Param XParam, WaveParam XWaveParam, BlockP<T> XBlock, BlockP<T>& vblocks);
 template <class T> void InitWaveSpecGrid(WaveParam XWaveParam, WaveSpecGridP<T>& XSpec);
 template <class T> void JonswapSpectrum(WaveParam XWaveParam, WaveSpecGridP<T> XSpec, double Hs, double Tp, double Dir, double Dspr, double gamma, std::vector<T>& Nspec);
 template <class T> void InitWaveConditions(Param XParam, WaveParam XWaveParam, Model<T> XModel, WaveModel<T>& XWave);

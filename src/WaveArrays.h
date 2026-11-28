@@ -171,11 +171,14 @@ struct WaveKinP
 	T* k;
 	/** Group velocity (m/s) */
 	T* cg;
+	/** Derivative of the radian frequency with respect to the depth, dsigma/dh = k sigma / sinh(2kh) (1/s/m) (used by refraction and frequency shift) */
+	T* dsdd;
 };
 
 /**
- * @brief Work arrays (2D) used for the geographic propagation of one spectral bin at a time.
- * Same layout and convention as the flow FluxP: Fx[i] is the flux through the left face of cell i
+ * @brief Work arrays used for the geographic propagation of a batch (chunk) of nchunk spectral bins at a time.
+ * Size nchunk*specstride: the batch of bins uses the "virtual block" layout (see WaveModel::vblocks).
+ * Same convention as the flow FluxP: Fx[i] is the flux through the left face of cell i
  * and Fy[i] the flux through the bottom face of cell i.
  * @tparam T Data type
  */
@@ -203,6 +206,8 @@ struct WaveTimeP
 	double nextcoupletime = 0.0;
 	/** Number of wave steps done */
 	int nstep = 0;
+	/** True once the medium (depth, currents, gradients, k, cg) and the wave time step have been calculated (used when the medium is static) */
+	bool mediumready = false;
 };
 
 
@@ -217,6 +222,7 @@ struct WaveModel
 {
 	// Spectral grid
 	WaveSpecGridP<T> spec;
+	WaveSpecGridP<T> spec_h; // host (CPU) copy of the spectral grid pointers, also available in the GPU structure for host side calculations
 
 	// Spectral arrays
 	WaveSpectrumP<T> action;
@@ -228,6 +234,13 @@ struct WaveModel
 	WaveMediumP<T> medium;
 	WaveKinP<T> kin;
 	WaveWorkP<T> work;
+
+	// Virtual block topology for batches of spectral bins.
+	// Each spectral bin has the same layout as a flow variable so the bin j of block ib is equivalent to the
+	// "virtual block" ib + j*nblkmem (relative to the first bin of the batch). vblocks replicates the block
+	// topology (neighbours shifted by j*nblkmem) nchunk times so the existing flow block functions
+	// (halo, gradients, flux halo...) process a whole batch of bins in a single call / kernel launch.
+	BlockP<T> vblocks;
 
 	// 2D arrays
 	WaveBulkP<T> bulk;

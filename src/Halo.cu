@@ -13,7 +13,7 @@
  * @param XBlock The block structure containing the block information
  * @param z The variable to work on
  */
-template <class T> void fillHaloD(Param XParam, int ib, BlockP<T> XBlock, T* z)
+template <class T> void fillHaloD(const Param& XParam, int ib, const BlockP<T>& XBlock, T* z)
 {
 	
 
@@ -26,8 +26,8 @@ template <class T> void fillHaloD(Param XParam, int ib, BlockP<T> XBlock, T* z)
 	
 
 }
-template void fillHaloD<double>(Param XParam, int ib, BlockP<double> XBlock, double* z);
-template void fillHaloD<float>(Param XParam, int ib, BlockP<float> XBlock, float* z);
+template void fillHaloD<double>(const Param& XParam, int ib, const BlockP<double>& XBlock, double* z);
+template void fillHaloD<float>(const Param& XParam, int ib, const BlockP<float>& XBlock, float* z);
 
 /**! \fn void fillHaloC(Param XParam, BlockP<T> XBlock, T* z)
  * @brief Wrapping function for calculating halos for each block of a single variable on CPU.
@@ -1632,7 +1632,7 @@ template void refine_bilinearGPU<double>(Param XParam, BlockP<double> XBlock, do
  * @param XBlock The block structure containing the block information
  * @param z The variable to be refined
  */
-template <class T> void HaloFluxCPULR(Param XParam, int ib, BlockP<T> XBlock, T *z)
+template <class T> void HaloFluxCPULR(const Param& XParam, int ib, const BlockP<T>& XBlock, T *z)
 {
 	int jj, i,il,itl;
 	if (XBlock.level[XBlock.LeftBot[ib]] > XBlock.level[ib])//The lower half is a boundary 
@@ -2174,7 +2174,7 @@ template __global__  void HaloFluxGPUTMLnew<double>(Param XParam, BlockP<double>
  * @param z The variable to be refined
  * @tparam T The data type (float or double)
  */
-template <class T> void HaloFluxCPUBT(Param XParam, int ib, BlockP<T> XBlock, T* z)
+template <class T> void HaloFluxCPUBT(const Param& XParam, int ib, const BlockP<T>& XBlock, T* z)
 {
 	int jj, i, il, itl;
 	if (XBlock.level[XBlock.BotLeft[ib]] > XBlock.level[ib])//The lower half is a boundary 
@@ -2491,7 +2491,7 @@ template <class T> __global__ void HaloFluxGPUBTnew(Param XParam, BlockP<T> XBlo
  * @param z The variable to be refined
  * @tparam T The data type (float or double)
  */
-template <class T> void fillLeft(Param XParam, int ib, BlockP<T> XBlock, T* &z)
+template <class T> void fillLeft(const Param& XParam, int ib, const BlockP<T>& XBlock, T* &z)
 {
 	int jj,bb;
 	int read, write;
@@ -3570,7 +3570,7 @@ template <class T> void fillLeftFlux(Param XParam, bool doProlongation, int ib, 
  * @param XBlock The block structure containing neighbor information
  * @param z The variable to be refined
  */
-template <class T> void fillRight(Param XParam, int ib, BlockP<T> XBlock, T*& z)
+template <class T> void fillRight(const Param& XParam, int ib, const BlockP<T>& XBlock, T*& z)
 {
 	int jj, bb;
 	int read, write;
@@ -4437,7 +4437,7 @@ template __global__ void fillRightFlux<double>(int halowidth, bool doProlongatio
  * @param T The data type of the variable (e.g., float, double)
  * 
  */
-template <class T> void fillBot(Param XParam, int ib, BlockP<T> XBlock, T*& z)
+template <class T> void fillBot(const Param& XParam, int ib, const BlockP<T>& XBlock, T*& z)
 {
 	int jj, bb;
 	int read, write;
@@ -5146,7 +5146,7 @@ template <class T> void fillBotFlux(Param XParam, bool doProlongation, int ib, B
  * @param z The variable to be refined
  * @param T The data type of the variable (e.g., float, double)
  */
-template <class T> void fillTop(Param XParam, int ib, BlockP<T> XBlock, T*& z)
+template <class T> void fillTop(const Param& XParam, int ib, const BlockP<T>& XBlock, T*& z)
 {
 	int jj, bb;
 	int read, write;
