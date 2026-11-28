@@ -50,6 +50,16 @@ template <class T> void MainLoop(Param &XParam, WaveParam& XWaveParam, Forcing<f
 	//Define some useful variables 
 	Initmeanmax(XParam, XLoop, XModel, XModel_g);
 
+	// Implicit wave model: first wave update at the start of the simulation (before the initial output) for a
+	// stationary run or a warm start (stationary first update, the following updates are nonstationary)
+	if (XWaveParam.wavemodel == 1 && (XWaveParam.wavestationary || XWaveParam.wavewarmstart))
+	{
+		double dtsave = XLoop.dt;
+		XLoop.dt = 0.0;
+		WaveStep(XParam, XWaveParam, XLoop, XForcing, XModel, XModel_g, XWave, XWave_g);
+		XLoop.dt = dtsave;
+	}
+
 	// Check for map output (output initialisation if needed)
 	mapoutput(XParam, XLoop, XModel, XModel_g);
 	
@@ -269,12 +279,21 @@ template <class T> void WaveStep(Param XParam, WaveParam XWaveParam, Loop<T>& XL
 
 		Param XParamW = WaveLightParam(XParam, XParam.theta);
 		WaveUpdateWind(XParamW, XWaveParam, XForcing, XModel, XModel_g, XWave, XWave_g);
+
+		// Warm start: the first update is stationary, the following ones nonstationary
+		bool firstupdate = (XWave.clock.nstep == 0);
+		WaveParam XWaveParamS = XWaveParam;
+		if (XWaveParam.wavewarmstart && firstupdate)
+		{
+			XWaveParamS.wavestationary = true;
+		}
+
 		double convpct = 0.0;
 		int niter;
 		if (XParam.GPUDEVICE >= 0)
 		{
 			Model<T> XModelW_g = WaveLightModel(XModel_g);
-			niter = WaveImplicitGPU(XParamW, XWaveParam, tadv, tend, XForcing, XModelW_g, XWave_g, convpct);
+			niter = WaveImplicitGPU(XParamW, XWaveParamS, tadv, tend, XForcing, XModelW_g, XWave_g, convpct);
 			dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
 			dim3 gridDim(XParam.nblk, 1, 1);
 			CalcWaveBulkGPU <<< gridDim, blockDim, 0 >>> (XParamW, XWaveParam, XModelW_g.blocks, XModelW_g.evolv, XModelW_g.zb, XWave_g);
@@ -283,13 +302,13 @@ template <class T> void WaveStep(Param XParam, WaveParam XWaveParam, Loop<T>& XL
 		else
 		{
 			Model<T> XModelW = WaveLightModel(XModel);
-			niter = WaveImplicitCPU(XParamW, XWaveParam, tadv, tend, XForcing, XModelW, XWave, convpct);
+			niter = WaveImplicitCPU(XParamW, XWaveParamS, tadv, tend, XForcing, XModelW, XWave, convpct);
 			CalcWaveBulkCPU(XParamW, XWaveParam, XModelW, XWave);
 		}
 		XWave.clock.dt = tadv;
 		XWave.clock.totaltime = tend;
 		XWave.clock.nstep++;
-		log("\nWave model (implicit, " + std::string(XWaveParam.wavestationary ? "stationary" : "nonstationary") + ") at t=" + std::to_string(tend) + " s: " + std::to_string(niter) + " iterations, " + std::to_string(convpct) + "% of the wet cells converged");
+		log("\nWave model (implicit, " + std::string(XWaveParamS.wavestationary ? "stationary" : "nonstationary") + std::string((XWaveParam.wavewarmstart && firstupdate) ? ", warm start" : "") + ") at t=" + std::to_string(tend) + " s: " + std::to_string(niter) + " iterations, " + std::to_string(convpct) + "% of the wet cells converged");
 		return;
 	}
 

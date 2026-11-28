@@ -64,6 +64,7 @@ public:
 	bool wavestationary = true; // (wavemodel = 1 only) true: stationary solution at each coupling time (SWAN MODE STATIONARY) [Default], false: nonstationary solution with an implicit (backward Euler) time step equal to the coupling interval (SWAN MODE NONSTATIONARY)
 	double wavecdd = 1.0; // (wavemodel = 1 only) Blending of central (0) and first order upwind (1) differences for the refraction (SWAN CDD). 1 (first order upwind) [Default] is the most robust, the SWAN default is 0.5 (less diffusive but not suited to very narrow directional spectra)
 	double wavecss = 1.0; // (wavemodel = 1 only) Blending of central (0) and first order upwind (1) differences for the frequency shift (SWAN CSS). 1 (first order upwind) [Default] is the most robust, the SWAN default is 0.5 (can slow down the convergence with strong currents)
+	bool wavewarmstart = false; // (wavemodel = 1 only) Warm start: the first wave update (at the start of the simulation) is a stationary solution and all the following updates are nonstationary (implies wavestationary = false)
 	int wavemaxiter = 50; // (wavemodel = 1 only) Maximum number of iterations (each iteration is 4 sweeps) of the implicit solver per coupling (SWAN MXITST)
 	double wavedrel = 0.01; // (wavemodel = 1 only) Convergence criterion: relative change of Hs between 2 iterations (SWAN DREL)
 	double wavedhabs = 0.005; // (wavemodel = 1 only) Convergence criterion: absolute change of Hs (m) between 2 iterations (SWAN DHABS)

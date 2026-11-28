@@ -1028,6 +1028,13 @@ WaveParam readparamstr(std::string line, WaveParam wparam)
 		wparam.wavecss = std::stod(parametervalue);
 	}
 
+	paramvec = { "wavewarmstart", "wavestatinit", "warmstart" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavewarmstart = readparambool(parametervalue, wparam.wavewarmstart);
+	}
+
 	paramvec = { "wavemaxiter", "mxitst", "wavemaxiteration" };
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
@@ -2304,9 +2311,14 @@ void checkwaveparamsanity(Param& XParam, WaveParam& XWaveParam, Forcing<float>& 
 			exit(1);
 		}
 		XWaveParam.wavemaxiter = utils::max(XWaveParam.wavemaxiter, 1);
+		if (XWaveParam.wavewarmstart)
+		{
+			// warm start: stationary first update then nonstationary updates
+			XWaveParam.wavestationary = false;
+		}
 		XWaveParam.wavecdd = utils::min(utils::max(XWaveParam.wavecdd, 0.0), 1.0);
 		XWaveParam.wavecss = utils::min(utils::max(XWaveParam.wavecss, 0.0), 1.0);
-		log("Implicit wave model (" + std::string(XWaveParam.wavestationary ? "stationary" : "nonstationary") + "), updated every " + std::to_string(XWaveParam.dtcouple) + " s");
+		log("Implicit wave model (" + std::string(XWaveParam.wavewarmstart ? "stationary warm start then nonstationary" : (XWaveParam.wavestationary ? "stationary" : "nonstationary")) + "), updated every " + std::to_string(XWaveParam.dtcouple) + " s");
 	}
 
 	// The medium seen by the waves only changes if the flow model runs and the waves feel its water level or currents
