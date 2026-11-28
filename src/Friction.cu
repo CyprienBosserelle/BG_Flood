@@ -73,6 +73,82 @@ template __global__ void bottomfrictionGPU<float>(Param XParam, BlockP<float> XB
 template __global__ void bottomfrictionGPU<double>(Param XParam, BlockP<double> XBlock,double dt, double* cf, EvolvingP<double> XEvolv);
 
 
+/**
+ * @brief Bottom friction and wave force on one cell: simple semi-implicit step (shared CPU/GPU).
+ *
+ * u^{n+1} = (u* + dt Fx/(rho h)) / (1 + dt cf |u*| / h)   (same for v with Fy)
+ *
+ * The wave force (radiation stress gradient, from the wave model) is added as an acceleration Fx/(rho h) in the
+ * implicit bottom friction step. Both terms scale with 1/h so the velocity stays bounded in very shallow water
+ * (u tends to the balance between the wave force and the bottom friction).
+ */
+template <class T> __host__ __device__ void bottomfrictionWaveCell(const Param& XParam, int i, T dt, T* cf, T* Fx, T* Fy, const EvolvingP<T>& XEvolv)
+{
+	T eps = T(XParam.eps);
+	T g = T(XParam.g);
+	T hi = XEvolv.h[i];
+	if (hi > eps)
+	{
+		T ui = XEvolv.u[i];
+		T vi = XEvolv.v[i];
+		T normu = sqrt(ui * ui + vi * vi);
+		T cfi;
+		if (XParam.frictionmodel == 1)
+		{
+			cfi = smartfriction(hi, cf[i]);
+		}
+		else if (XParam.frictionmodel == -1)
+		{
+			cfi = manningfriction(g, hi, cf[i]);
+		}
+		else
+		{
+			cfi = cf[i];
+		}
+		T tb = cfi * normu / hi * dt;
+		T acc = dt / (T(XParam.rho) * hi);
+		XEvolv.u[i] = (ui + acc * Fx[i]) / (T(1.0) + tb);
+		XEvolv.v[i] = (vi + acc * Fy[i]) / (T(1.0) + tb);
+	}
+}
+template __host__ __device__ void bottomfrictionWaveCell<float>(const Param& XParam, int i, float dt, float* cf, float* Fx, float* Fy, const EvolvingP<float>& XEvolv);
+template __host__ __device__ void bottomfrictionWaveCell<double>(const Param& XParam, int i, double dt, double* cf, double* Fx, double* Fy, const EvolvingP<double>& XEvolv);
+
+/**
+ * @brief Bottom friction with the wave force (GPU). See bottomfrictionWaveCell.
+ */
+template <class T> __global__ void bottomfrictionWaveGPU(Param XParam, BlockP<T> XBlock, T dt, T* cf, T* Fx, T* Fy, EvolvingP<T> XEvolv)
+{
+	unsigned int halowidth = XParam.halowidth;
+	unsigned int blkmemwidth = blockDim.x + halowidth * 2;
+	unsigned int ib = XBlock.active[blockIdx.x];
+	int i = memloc(halowidth, blkmemwidth, threadIdx.x, threadIdx.y, ib);
+	bottomfrictionWaveCell(XParam, i, dt, cf, Fx, Fy, XEvolv);
+}
+template __global__ void bottomfrictionWaveGPU<float>(Param XParam, BlockP<float> XBlock, float dt, float* cf, float* Fx, float* Fy, EvolvingP<float> XEvolv);
+template __global__ void bottomfrictionWaveGPU<double>(Param XParam, BlockP<double> XBlock, double dt, double* cf, double* Fx, double* Fy, EvolvingP<double> XEvolv);
+
+/**
+ * @brief Bottom friction with the wave force (CPU). See bottomfrictionWaveCell.
+ */
+template <class T> __host__ void bottomfrictionWaveCPU(Param XParam, BlockP<T> XBlock, T dt, T* cf, T* Fx, T* Fy, EvolvingP<T> XEvolv)
+{
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				bottomfrictionWaveCell(XParam, memloc(XParam.halowidth, XParam.blkmemwidth, ix, iy, ib), dt, cf, Fx, Fy, XEvolv);
+			}
+		}
+	}
+}
+template __host__ void bottomfrictionWaveCPU<float>(Param XParam, BlockP<float> XBlock, float dt, float* cf, float* Fx, float* Fy, EvolvingP<float> XEvolv);
+template __host__ void bottomfrictionWaveCPU<double>(Param XParam, BlockP<double> XBlock, double dt, double* cf, double* Fx, double* Fy, EvolvingP<double> XEvolv);
+
+
 
 /**
  * @brief CPU routine for applying bottom friction to all active blocks.

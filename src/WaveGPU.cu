@@ -321,6 +321,34 @@ template double CalcWavedtmaxGPU<double>(Param XParam, WaveParam XWaveParam, Mod
 
 
 /**
+ * @brief Wave force on the flow (GPU kernel). See WaveForceCell.
+ */
+template <class T> __global__ void WaveForceKernelGPU(Param XParam, WaveParam XWaveParam, BlockP<T> XBlock, WaveModel<T> XWave)
+{
+	int ib = XBlock.active[blockIdx.x];
+	WaveForceCell(XParam, XWaveParam, threadIdx.x, threadIdx.y, ib, XBlock, XWave);
+}
+template __global__ void WaveForceKernelGPU<float>(Param XParam, WaveParam XWaveParam, BlockP<float> XBlock, WaveModel<float> XWave);
+template __global__ void WaveForceKernelGPU<double>(Param XParam, WaveParam XWaveParam, BlockP<double> XBlock, WaveModel<double> XWave);
+
+/**
+ * @brief Wave force on the flow from the radiation stresses (GPU). The radiation stresses must be up to date.
+ */
+template <class T> void WaveForceGPU(Param XParam, WaveParam XWaveParam, BlockP<T> XBlock, WaveModel<T> XWave)
+{
+	dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+	dim3 gridDim(XParam.nblk, 1, 1);
+	fillHaloGPU(XParam, XBlock, XWave.force.Sxx);
+	fillHaloGPU(XParam, XBlock, XWave.force.Sxy);
+	fillHaloGPU(XParam, XBlock, XWave.force.Syy);
+	WaveForceKernelGPU <<< gridDim, blockDim, 0 >>> (XParam, XWaveParam, XBlock, XWave);
+	CUDA_CHECK(cudaDeviceSynchronize());
+}
+template void WaveForceGPU<float>(Param XParam, WaveParam XWaveParam, BlockP<float> XBlock, WaveModel<float> XWave);
+template void WaveForceGPU<double>(Param XParam, WaveParam XWaveParam, BlockP<double> XBlock, WaveModel<double> XWave);
+
+
+/**
  * @brief Prepare the medium (depth, currents and gradients) and the kinematics (k, cg) for the wave model (GPU).
  * See WavePrepCPU.
  */
@@ -490,8 +518,11 @@ template <class T> void WaveGPU(Param XParam, WaveParam XWaveParam, T dt, double
 	}
 
 	//============================================
-	// Wave forces on the flow
-	// TODO
+	// Wave forces on the flow (Fx, Fy) from radiation stress gradients
+	if (dobulk && XParam.flowmodel && XWaveParam.waveflowcoupling)
+	{
+		WaveForceGPU(XParam, XWaveParam, XModel.blocks, XWave);
+	}
 }
 template void WaveGPU<float>(Param XParam, WaveParam XWaveParam, float dt, double time, bool dobulk, Forcing<float> XForcing, Model<float> XModel, WaveModel<float> XWave);
 template void WaveGPU<double>(Param XParam, WaveParam XWaveParam, double dt, double time, bool dobulk, Forcing<float> XForcing, Model<double> XModel, WaveModel<double> XWave);

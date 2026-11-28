@@ -20,6 +20,8 @@ template <class T> void WaveRHSGPU(Param XParam, Param XParamN, WaveParam XWaveP
 template <class T> void WaveGeoPropGPU(Param XParam, Param XParamN, WaveParam XWaveParam, const std::vector<wavebndsegment>& segs, double time, T bndfac, BlockP<T> XBlock, WaveModel<T> XWave);
 template <class T> void WavebndFluxGPUseg(Param XParam, WaveParam XWaveParam, const wavebndsegment& seg, double time, T bndfac, int ispec0, int nbins, BlockP<T> XBlock, WaveModel<T> XWave);
 template <class T> __global__ void WavebndFluxGPU(Param XParam, WaveParam XWaveParam, bndsegmentside side, int type, bool interpmaps, T Hs, T Tp, T Dir, T Dspr, T gamma, T m0n, T Dsumn, TexSetP texHs, TexSetP texTp, TexSetP texDir, TexSetP texDspr, T bndfac, int ispec0, BlockP<T> XBlock, WaveModel<T> XWave);
+template <class T> void WaveForceGPU(Param XParam, WaveParam XWaveParam, BlockP<T> XBlock, WaveModel<T> XWave);
+template <class T> __global__ void WaveForceKernelGPU(Param XParam, WaveParam XWaveParam, BlockP<T> XBlock, WaveModel<T> XWave);
 template <class T> double CalcWavedtmaxGPU(Param XParam, WaveParam XWaveParam, Model<T> XModel, WaveModel<T> XWave);
 
 template <class T> void fillHaloWaveGPU(Param XParam, WaveParam XWaveParam, BlockP<T> XBlock, WaveSpectrumP<T> XAction);

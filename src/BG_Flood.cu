@@ -179,6 +179,26 @@ template < class T > int mainwork(Param XParam, WaveParam XWaveParam, Forcing<fl
 	// Setup wave model on GPU (bypassed if no GPU or no wave model, needs to be after SetupGPU)
 	SetupWaveGPU(XParam, XWaveParam, XForcing, XModel_g, XWave, XWave_g);
 
+	// Wave forces on the flow (radiation stress gradients, added in the implicit bottom friction step of the flow)
+	if (XWaveParam.wavemodel && XParam.flowmodel && XWaveParam.waveflowcoupling)
+	{
+		if (XParam.engine == 5)
+		{
+			log("WARNING: the wave forces are not applied with the multilayer engine (engine = 5)");
+		}
+		else
+		{
+			XModel.wavefx = XWave.force.Fx;
+			XModel.wavefy = XWave.force.Fy;
+			if (XParam.GPUDEVICE >= 0)
+			{
+				XModel_g.wavefx = XWave_g.force.Fx;
+				XModel_g.wavefy = XWave_g.force.Fy;
+			}
+			log("Wave forces coupled to the flow");
+		}
+	}
+
 
 
 	//

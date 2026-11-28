@@ -1088,6 +1088,33 @@ void WaveBndValues(const wavebndsegment& seg, double time, double gammadefault, 
 }
 
 
+/**
+ * @brief Wave force on the flow in one cell (shared CPU/GPU): Fx = -(dSxx/dx + dSxy/dy), Fy = -(dSxy/dx + dSyy/dy) (N/m2).
+ * Central differences, the halo of the radiation stresses must be filled. Dry cells: no force.
+ */
+template <class T> __host__ __device__ void WaveForceCell(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, const BlockP<T>& XBlock, const WaveModel<T>& XWave)
+{
+	int halowidth = XParam.halowidth;
+	int blkmemwidth = XParam.blkmemwidth;
+	int i = memloc(halowidth, blkmemwidth, ix, iy, ib);
+	if (XWave.medium.h[i] <= T(XWaveParam.wavedepthmin))
+	{
+		XWave.force.Fx[i] = T(0.0);
+		XWave.force.Fy[i] = T(0.0);
+		return;
+	}
+	int il = memloc(halowidth, blkmemwidth, ix - 1, iy, ib);
+	int ir = memloc(halowidth, blkmemwidth, ix + 1, iy, ib);
+	int ibo = memloc(halowidth, blkmemwidth, ix, iy - 1, ib);
+	int it = memloc(halowidth, blkmemwidth, ix, iy + 1, ib);
+	T inv2d = T(0.5) / calcres(T(XParam.delta), XBlock.level[ib]);
+	XWave.force.Fx[i] = T(-1.0) * ((XWave.force.Sxx[ir] - XWave.force.Sxx[il]) + (XWave.force.Sxy[it] - XWave.force.Sxy[ibo])) * inv2d;
+	XWave.force.Fy[i] = T(-1.0) * ((XWave.force.Sxy[ir] - XWave.force.Sxy[il]) + (XWave.force.Syy[it] - XWave.force.Syy[ibo])) * inv2d;
+}
+template __host__ __device__ void WaveForceCell<float>(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, const BlockP<float>& XBlock, const WaveModel<float>& XWave);
+template __host__ __device__ void WaveForceCell<double>(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, const BlockP<double>& XBlock, const WaveModel<double>& XWave);
+
+
 //==============================================================================
 // CPU functions
 //==============================================================================
@@ -1416,6 +1443,30 @@ template void CalcWaveBulkCPU<double>(Param XParam, WaveParam XWaveParam, Model<
 
 
 /**
+ * @brief Wave force on the flow from the radiation stresses (CPU). The radiation stresses must be up to date (bulk parameters).
+ */
+template <class T> void WaveForceCPU(Param XParam, WaveParam XWaveParam, BlockP<T> XBlock, WaveModel<T> XWave)
+{
+	fillHaloC(XParam, XBlock, XWave.force.Sxx);
+	fillHaloC(XParam, XBlock, XWave.force.Sxy);
+	fillHaloC(XParam, XBlock, XWave.force.Syy);
+	for (int ibl = 0; ibl < XParam.nblk; ibl++)
+	{
+		int ib = XBlock.active[ibl];
+		for (int iy = 0; iy < XParam.blkwidth; iy++)
+		{
+			for (int ix = 0; ix < XParam.blkwidth; ix++)
+			{
+				WaveForceCell(XParam, XWaveParam, ix, iy, ib, XBlock, XWave);
+			}
+		}
+	}
+}
+template void WaveForceCPU<float>(Param XParam, WaveParam XWaveParam, BlockP<float> XBlock, WaveModel<float> XWave);
+template void WaveForceCPU<double>(Param XParam, WaveParam XWaveParam, BlockP<double> XBlock, WaveModel<double> XWave);
+
+
+/**
  * @brief Right hand side of the action balance equation dN = L(N) (CPU): propagation (+ sources, to be implemented).
  */
 template <class T> void WaveRHSCPU(Param XParam, Param XParamN, WaveParam XWaveParam, T dt, double time, Forcing<float> XForcing, Model<T> XModel, WaveModel<T> XWave)
@@ -1493,7 +1544,10 @@ template <class T> void WaveCPU(Param XParam, WaveParam XWaveParam, T dt, double
 
 	//============================================
 	// Wave forces on the flow (Fx, Fy) from radiation stress gradients
-	// TODO (only needed when XWaveParam.waveflowcoupling)
+	if (dobulk && XParam.flowmodel && XWaveParam.waveflowcoupling)
+	{
+		WaveForceCPU(XParam, XWaveParam, XModel.blocks, XWave);
+	}
 }
 template void WaveCPU<float>(Param XParam, WaveParam XWaveParam, float dt, double time, bool dobulk, Forcing<float> XForcing, Model<float> XModel, WaveModel<float> XWave);
 template void WaveCPU<double>(Param XParam, WaveParam XWaveParam, double dt, double time, bool dobulk, Forcing<float> XForcing, Model<double> XModel, WaveModel<double> XWave);

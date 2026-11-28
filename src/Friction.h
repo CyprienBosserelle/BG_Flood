@@ -9,6 +9,9 @@
 
 template <class T> __global__ void bottomfrictionGPU(Param XParam, BlockP<T> XBlock,T dt, T* cf, EvolvingP<T> XEvolv);
 template <class T> __host__ void bottomfrictionCPU(Param XParam, BlockP<T> XBlock,T dt, T* cf, EvolvingP<T> XEvolv);
+template <class T> __host__ __device__ void bottomfrictionWaveCell(const Param& XParam, int i, T dt, T* cf, T* Fx, T* Fy, const EvolvingP<T>& XEvolv);
+template <class T> __global__ void bottomfrictionWaveGPU(Param XParam, BlockP<T> XBlock, T dt, T* cf, T* Fx, T* Fy, EvolvingP<T> XEvolv);
+template <class T> __host__ void bottomfrictionWaveCPU(Param XParam, BlockP<T> XBlock, T dt, T* cf, T* Fx, T* Fy, EvolvingP<T> XEvolv);
 
 template <class T> __host__ void XiafrictionCPU(Param XParam, BlockP<T> XBlock, T dt, T* cf, EvolvingP<T> XEvolv, EvolvingP<T> XEvolv_o);
 template <class T> __global__ void XiafrictionGPU(Param XParam, BlockP<T> XBlock, T dt, T* cf, EvolvingP<T> XEvolv, EvolvingP<T> XEvolv_o);

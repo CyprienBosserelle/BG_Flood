@@ -61,6 +61,8 @@ template <class T> void WaveGeoPropCPU(Param XParam, Param XParamN, WaveParam XW
 template <class T> void WavebndFluxCPU(Param XParam, WaveParam XWaveParam, const wavebndsegment& seg, double time, T bndfac, int ispec0, int nbins, BlockP<T> XBlock, WaveModel<T> XWave);
 template <class T> void WaveSpecPropCPU(Param XParam, WaveParam XWaveParam, T dt, BlockP<T> XBlock, WaveModel<T> XWave);
 template <class T> void UpdateWaveActionCPU(Param XParam, WaveParam XWaveParam, BlockP<T> XBlock, T dt, T alpha, WaveModel<T> XWave);
+template <class T> __host__ __device__ void WaveForceCell(const Param& XParam, const WaveParam& XWaveParam, int ix, int iy, int ib, const BlockP<T>& XBlock, const WaveModel<T>& XWave);
+template <class T> void WaveForceCPU(Param XParam, WaveParam XWaveParam, BlockP<T> XBlock, WaveModel<T> XWave);
 template <class T> void CalcWaveBulkCPU(Param XParam, WaveParam XWaveParam, Model<T> XModel, WaveModel<T> XWave);
 
 // End of global definition

@@ -329,6 +329,10 @@ struct Model
 	//external forcing
 	T* zb;
 	T* cf;
+
+	// Wave forces (N/m2) from the wave model (radiation stress gradients), nullptr when the waves are not coupled to the flow
+	T* wavefx = nullptr;
+	T* wavefy = nullptr;
 	T* il;
 	T* cl;
 

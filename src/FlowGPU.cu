@@ -315,9 +315,15 @@ template <class T> void FlowGPU(Param XParam, Loop<T>& XLoop, Forcing<float> XFo
 	
 	
 	//============================================
-	// Add bottom friction
-
-	bottomfrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);
+	// Add bottom friction (and the wave force when the wave model is coupled to the flow)
+	if (XModel.wavefx != nullptr)
+	{
+		bottomfrictionWaveGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.wavefx, XModel.wavefy, XModel.evolv_o);
+	}
+	else
+	{
+		bottomfrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv_o);
+	}
 	//XiafrictionGPU <<< gridDim, blockDim, 0 >>> (XParam, XModel.blocks, XModel.time.dt, XModel.cf, XModel.evolv, XModel.evolv_o);
 
 

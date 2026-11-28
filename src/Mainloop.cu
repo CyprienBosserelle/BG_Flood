@@ -298,12 +298,20 @@ template <class T> void WaveStep(Param XParam, WaveParam XWaveParam, Loop<T>& XL
 			dim3 gridDim(XParam.nblk, 1, 1);
 			CalcWaveBulkGPU <<< gridDim, blockDim, 0 >>> (XParamW, XWaveParam, XModelW_g.blocks, XModelW_g.evolv, XModelW_g.zb, XWave_g);
 			CUDA_CHECK(cudaDeviceSynchronize());
+			if (XParam.flowmodel && XWaveParam.waveflowcoupling)
+			{
+				WaveForceGPU(XParamW, XWaveParam, XModelW_g.blocks, XWave_g);
+			}
 		}
 		else
 		{
 			Model<T> XModelW = WaveLightModel(XModel);
 			niter = WaveImplicitCPU(XParamW, XWaveParamS, tadv, tend, XForcing, XModelW, XWave, convpct);
 			CalcWaveBulkCPU(XParamW, XWaveParam, XModelW, XWave);
+			if (XParam.flowmodel && XWaveParam.waveflowcoupling)
+			{
+				WaveForceCPU(XParamW, XWaveParam, XModelW.blocks, XWave);
+			}
 		}
 		XWave.clock.dt = tadv;
 		XWave.clock.totaltime = tend;
