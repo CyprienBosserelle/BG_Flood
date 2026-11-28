@@ -14,6 +14,7 @@
 #include "WaveCPU.h"
 #include "WaveGPU.h"
 #include "InitialConditions.h"
+#include "WaveImplicit.h"
 
 template <class T> void InitWaveModel(Param XParam, WaveParam& XWaveParam, Forcing<float>& XForcing, Model<T>& XModel, WaveModel<T>& XWave);
 template <class T> void SetupWaveGPU(Param XParam, WaveParam XWaveParam, Forcing<float>& XForcing, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g);

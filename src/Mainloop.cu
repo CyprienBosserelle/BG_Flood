@@ -184,7 +184,8 @@ template <class T> void WaveUpdateMedium(Param XParam, WaveParam XWaveParam, dou
 	{
 		WavePrepCPU(XParamW, XWaveParam, tadv, WaveLightModel(XModel), XWave);
 	}
-	XWave.clock.dtmax = WaveDtmax(XParam, XWaveParam, XModel, XModel_g, XWave, XWave_g);
+	// The implicit solver is unconditionally stable: its time step is the coupling interval
+	XWave.clock.dtmax = (XWaveParam.wavemodel == 1) ? XWaveParam.dtcouple : WaveDtmax(XParam, XWaveParam, XModel, XModel_g, XWave, XWave_g);
 	XWave.clock.mediumready = true;
 }
 template void WaveUpdateMedium<float>(Param XParam, WaveParam XWaveParam, double tadv, Model<float>& XModel, Model<float>& XModel_g, WaveModel<float>& XWave, WaveModel<float>& XWave_g);
@@ -222,8 +223,47 @@ template <class T> void WaveStep(Param XParam, WaveParam XWaveParam, Loop<T>& XL
 	}
 
 	double tadv = tend - XWave.clock.totaltime;
-	if (tadv <= 0.0)
+	if (tadv <= 0.0 && !(XWaveParam.wavemodel == 1 && XWave.clock.nstep == 0))
 	{
+		return;
+	}
+
+	//============================================
+	// Implicit solver (wavemodel = 1): one implicit solution at the coupling time (loose coupling)
+	if (XWaveParam.wavemodel == 1)
+	{
+		WaveUpdateMedium(XParam, XWaveParam, XParam.flowmodel ? tadv : 0.0, XModel, XModel_g, XWave, XWave_g);
+
+		if (XWaveParam.dtcouple > 0.0)
+		{
+			while (XWave.clock.nextcoupletime <= (tend + XLoop.dt * tiny))
+			{
+				XWave.clock.nextcoupletime = XWave.clock.nextcoupletime + XWaveParam.dtcouple;
+			}
+		}
+
+		Param XParamW = WaveLightParam(XParam, XParam.theta);
+		double convpct = 0.0;
+		int niter;
+		if (XParam.GPUDEVICE >= 0)
+		{
+			Model<T> XModelW_g = WaveLightModel(XModel_g);
+			niter = WaveImplicitGPU(XParamW, XWaveParam, tadv, tend, XForcing, XModelW_g, XWave_g, convpct);
+			dim3 blockDim(XParam.blkwidth, XParam.blkwidth, 1);
+			dim3 gridDim(XParam.nblk, 1, 1);
+			CalcWaveBulkGPU <<< gridDim, blockDim, 0 >>> (XParamW, XWaveParam, XModelW_g.blocks, XModelW_g.evolv, XModelW_g.zb, XWave_g);
+			CUDA_CHECK(cudaDeviceSynchronize());
+		}
+		else
+		{
+			Model<T> XModelW = WaveLightModel(XModel);
+			niter = WaveImplicitCPU(XParamW, XWaveParam, tadv, tend, XForcing, XModelW, XWave, convpct);
+			CalcWaveBulkCPU(XParamW, XWaveParam, XModelW, XWave);
+		}
+		XWave.clock.dt = tadv;
+		XWave.clock.totaltime = tend;
+		XWave.clock.nstep++;
+		log("\nWave model (implicit, " + std::string(XWaveParam.wavestationary ? "stationary" : "nonstationary") + ") at t=" + std::to_string(tend) + " s: " + std::to_string(niter) + " iterations, " + std::to_string(convpct) + "% of the wet cells converged");
 		return;
 	}
 

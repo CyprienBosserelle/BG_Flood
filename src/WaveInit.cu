@@ -52,8 +52,8 @@ template <class T> void InitWaveModel(Param XParam, WaveParam& XWaveParam, Forci
 	}
 
 	// 3 spectral arrays + 3 frequency arrays (k, cg, dsdd) + 4 batch work arrays + 34 2D arrays
-	double memMB = double(3 * nspecmem + (3 * size_t(XWaveParam.nfreq) + 4 * size_t(XWaveParam.nchunk) + 34) * size_t(XWaveParam.specstride)) * sizeof(T) / 1024.0 / 1024.0;
-	log("\tSpectral grid: " + std::to_string(XWaveParam.nfreq) + " frequencies x " + std::to_string(XWaveParam.ndir) + " directions; " + std::to_string(XWaveParam.nchunk) + " bins propagated per batch; Wave model memory: " + std::to_string(memMB) + " MB");
+	double memMB = double(3 * nspecmem + (3 * size_t(XWaveParam.nfreq) + 4 * size_t(XWaveParam.wavemodel == 2 ? XWaveParam.nchunk : 1) + 36) * size_t(XWaveParam.specstride)) * sizeof(T) / 1024.0 / 1024.0;
+	log("\tSpectral grid: " + std::to_string(XWaveParam.nfreq) + " frequencies x " + std::to_string(XWaveParam.ndir) + " directions; " + std::string(XWaveParam.wavemodel == 1 ? "implicit solver" : "explicit solver, " + std::to_string(XWaveParam.nchunk) + " bins propagated per batch") + "; Wave model memory: " + std::to_string(memMB) + " MB");
 	if (XWaveParam.staticmedium)
 	{
 		log("\tStatic medium: the wave kinematics and time step are only calculated once");
@@ -83,15 +83,24 @@ template <class T> void InitWaveModel(Param XParam, WaveParam& XWaveParam, Forci
 	}
 
 	//==============================
+	// Implicit solver (sweep orders, boundary faces)
+	if (XWaveParam.wavemodel == 1)
+	{
+		InitWaveImplicit(XParam, XWaveParam, XForcing, XModel, XWave);
+	}
+
+	//==============================
 	// Initial conditions
 	InitWaveConditions(XParam, XWaveParam, XModel, XWave);
 
 	//==============================
 	// Time keeping
 	XWave.clock.totaltime = XParam.totaltime;
-	XWave.clock.nextcoupletime = XParam.totaltime + XWaveParam.dtcouple;
+	// The implicit solver is first run at the first step (stationary solution at the start), then every dtcouple
+	XWave.clock.nextcoupletime = (XWaveParam.wavemodel == 1) ? XParam.totaltime : XParam.totaltime + XWaveParam.dtcouple;
 	XWave.clock.nstep = 0;
-	XWave.clock.dtmax = CalcWavedtmaxCPU(XParam, XWaveParam, XModel, XWave);
+	// The implicit solver is unconditionally stable: its time step is the coupling interval
+	XWave.clock.dtmax = (XWaveParam.wavemodel == 1) ? XWaveParam.dtcouple : CalcWavedtmaxCPU(XParam, XWaveParam, XModel, XWave);
 	XWave.clock.dt = XWave.clock.dtmax;
 
 	log("\tWave model initial (max) time step: " + std::to_string(XWave.clock.dtmax) + " s");
@@ -180,6 +189,11 @@ template <class T> void SetupWaveGPU(Param XParam, WaveParam XWaveParam, Forcing
 
 	XWave_g.clock = XWave.clock;
 	XWave_g.spec_h = XWave.spec;
+
+	if (XWaveParam.wavemodel == 1)
+	{
+		SetupWaveImplicitGPU(XParam, XWaveParam, XWave, XWave_g);
+	}
 
 	// Virtual blocks for the batches of spectral bins
 	int nv = XParam.nblkmem * XWaveParam.nchunk;
@@ -319,9 +333,10 @@ template <class T> void InitWaveConditions(Param XParam, WaveParam XWaveParam, M
 		FillCPU(nblkmem, blksize, T(0.0), arr2D[ia]);
 	}
 	std::vector<T*> arrchunk = { XWave.work.dNdx, XWave.work.dNdy, XWave.work.Fx, XWave.work.Fy };
+	int nwork = (XWaveParam.wavemodel == 2) ? XWaveParam.nchunk : 1;
 	for (int ia = 0; ia < arrchunk.size(); ia++)
 	{
-		FillCPU(nblkmem * XWaveParam.nchunk, blksize, T(0.0), arrchunk[ia]);
+		FillCPU(nblkmem * nwork, blksize, T(0.0), arrchunk[ia]);
 	}
 	FillCPU(nblkmem * XWaveParam.nfreq, blksize, T(0.0), XWave.kin.k);
 	FillCPU(nblkmem * XWaveParam.nfreq, blksize, T(0.0), XWave.kin.cg);

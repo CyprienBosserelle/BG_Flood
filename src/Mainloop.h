@@ -19,6 +19,7 @@
 #include "WaveArrays.h"
 #include "WaveCPU.h"
 #include "WaveGPU.h"
+#include "WaveImplicit.h"
 
 template <class T> void MainLoop(Param& XParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g);
 template <class T> void MainLoop(Param& XParam, WaveParam& XWaveParam, Forcing<float> XForcing, Model<T>& XModel, Model<T>& XModel_g, WaveModel<T>& XWave, WaveModel<T>& XWave_g);

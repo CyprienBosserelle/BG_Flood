@@ -192,6 +192,44 @@ struct WaveWorkP
 };
 
 /**
+ * @brief Arrays of the implicit (SWAN-like four-sweep Gauss-Seidel) solver.
+ *
+ * Sweep s (0: +x+y, 1: -x+y, 2: -x-y, 3: +x-y) processes the blocks by "levels": a block only depends on its
+ * upwind neighbours (left/right and bottom/top depending on the sweep) so all the blocks of a level are independent
+ * and are processed in parallel; inside a block the cells are processed in upwind order (diagonal wavefront on the GPU).
+ */
+template <class T>
+struct WaveImplicitP
+{
+	/** Active blocks ordered by level for each sweep, size(nblk) */
+	int* order[4];
+	/** Same order for the virtual blocks of all the spectral bins (for the halo filling of one level), size(nblk*nspec):
+	 * for a level starting at levelstart, the entries levelstart*nspec ... are ib + j*nblkmem for all bins j and all blocks of the level */
+	int* vorder[4];
+	/** First entry of each level in order (host memory), size(nlevels+1) */
+	int* levelstart[4];
+	int nlevels[4];
+
+	/** Boundary faces: slot of each block side on the domain boundary (side 0: left, 1: right, 2: bottom, 3: top; -1 if none), size(4*nblkmem) */
+	int* bslot;
+	/** Boundary type of each slot (0: absorbing, 1: Neumann, 2: JONSWAP), size(nslot) */
+	int* slottype;
+	/** Block and side of each slot, size(nslot) */
+	int* slotblk;
+	int* slotside;
+	/** First slot of each wave boundary segment (host memory), size(nseg+1) */
+	int* segslot;
+	int nslot;
+	/** Incoming action density on each boundary face, size(nslot*blkwidth*nspec) */
+	T* Nbf;
+
+	/** Hs at the previous iteration and convergence flag of each cell (2D arrays) */
+	T* Hsold;
+	T* conv;
+};
+
+
+/**
  * @brief Wave time keeping (scalar only, kept on the CPU structure).
  */
 struct WaveTimeP
@@ -241,6 +279,9 @@ struct WaveModel
 	// topology (neighbours shifted by j*nblkmem) nchunk times so the existing flow block functions
 	// (halo, gradients, flux halo...) process a whole batch of bins in a single call / kernel launch.
 	BlockP<T> vblocks;
+
+	// Implicit solver (wavemodel = 1)
+	WaveImplicitP<T> imp;
 
 	// 2D arrays
 	WaveBulkP<T> bulk;

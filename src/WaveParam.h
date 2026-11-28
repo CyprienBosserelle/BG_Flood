@@ -3,6 +3,9 @@
 
 #include "General.h"
 
+// Maximum number of direction bins in one sweep quadrant of the implicit solver (local arrays size)
+#define WAVE_MAXQDIR 130
+
 /**
  *  A class. A class for holding the wave (spectral action balance) model parameters.
  *
@@ -30,18 +33,18 @@ class WaveParam {
 public:
 
 	//*Wave model switches
-	bool wavemodel = false; // Switch to run the spectral wave model (false: flow only [Default], true: run the wave model). Flow model can be turned off using "flowmodel = false"
+	int wavemodel = 0; // Spectral wave model (0: off, flow only [Default], 1: implicit SWAN-like solver (four-sweep Gauss-Seidel, unconditionally stable) run every dtcouple seconds (loose coupling, e.g. every 10 min to 1 h of model time), 2: explicit solver run every flow time step or every dtcouple (tight coupling)). "wavemodel = true" is the same as 1. The flow model can be turned off using "flowmodel = false"
 	bool wavecurrent = true; // Include wave-current interaction (Doppler shift and current refraction) using the flow model velocities u,v
 	bool wavewaterlevel = true; // Use the flow model water depth (h) for wave propagation. If false the depth is calculated using zsinit (or 0.0) and zb
 	bool waveflowcoupling = true; // Feed the wave forces (radiation stress gradient) back to the flow model (only relevant when both models are running)
-	int wavesolver = 2; // Explicit propagation scheme for the action balance equation (1: first order upwind with forward Euler time stepping, 2: second order upwind (MUSCL reconstruction with a limiter) with second order (Heun / SSP-RK2) time stepping [Default])
+	int wavesolver = 2; // (wavemodel = 2 only) Explicit propagation scheme for the action balance equation (1: first order upwind with forward Euler time stepping, 2: second order upwind (MUSCL reconstruction with a limiter) with second order (Heun / SSP-RK2) time stepping [Default])
 	double wavetheta = 1.0; // Slope limiter parameter for the second order upwind scheme, wavetheta in [1,2] (1: minmod, the most diffusive but most robust [Default], 2: superbee, the least diffusive)
 	bool refraction = true; // Switch for depth and current induced refraction (propagation in theta-space, SWAN REFRAC)
 	bool freqshift = true; // Switch for the frequency shift due to time varying depth and currents (propagation in sigma-space, SWAN FSHIFT)
 	int wavebinchunk = 0; // Number of spectral bins propagated together in one batch (one kernel launch) in geographic space. 0 (default): ndir bins (one frequency). Larger values are faster on the GPU but need 4*wavebinchunk extra 2D arrays of memory (wavebinchunk = nspec is the fastest)
 	int nchunk = 0; // Calculated in sanity check from wavebinchunk (number of bins per batch)
 	bool staticmedium = false; // Calculated in sanity check: true when the depth and currents seen by the wave model do not change (no flow model, or no water level and current coupling) so k, cg, the medium gradients and the time step are only calculated once
-	double ctmax = 0.5; // Maximum Courant number allowed for the refraction and frequency shift (cth*dt/dtheta and csig*dt/dsigma are clipped to this value, similar to the WW3 CTMAX refraction limiter)
+	double ctmax = 0.5; // (wavemodel = 2 only) Maximum Courant number allowed for the refraction and frequency shift (cth*dt/dtheta and csig*dt/dsigma are clipped to this value, similar to the WW3 CTMAX refraction limiter)
 
 	//*Spectral grid
 	int nfreq = 25; // Number of (logarithmically distributed) frequency bins
@@ -57,7 +60,16 @@ public:
 	//*Time stepping
 	double wavedt = 0.0; // Wave model time step in s. If 0.0 (default) the time step is calculated based on waveCFL
 	double waveCFL = 0.5; // Courant-Friedrichs-Lewy criterium for the explicit wave propagation (between 0 and 1)
-	double dtcouple = 0.0; // Coupling interval (s) between the wave and the flow model. 0.0 (default) means the wave model is updated every flow time step
+	double dtcouple = 0.0; // Coupling interval (s) between the wave and the flow model: the wave model is updated every dtcouple seconds of model time (with the flow depth and currents at that time) and the wave field is kept until the next update. For wavemodel = 2, 0.0 (default) means every flow time step. For wavemodel = 1, 0.0 means 600 s (10 min). In wave only simulations this is the wave time step of the implicit solver
+	bool wavestationary = true; // (wavemodel = 1 only) true: stationary solution at each coupling time (SWAN MODE STATIONARY) [Default], false: nonstationary solution with an implicit (backward Euler) time step equal to the coupling interval (SWAN MODE NONSTATIONARY)
+	double wavecdd = 1.0; // (wavemodel = 1 only) Blending of central (0) and first order upwind (1) differences for the refraction (SWAN CDD). 1 (first order upwind) [Default] is the most robust, the SWAN default is 0.5 (less diffusive but not suited to very narrow directional spectra)
+	double wavecss = 1.0; // (wavemodel = 1 only) Blending of central (0) and first order upwind (1) differences for the frequency shift (SWAN CSS). 1 (first order upwind) [Default] is the most robust, the SWAN default is 0.5 (can slow down the convergence with strong currents)
+	int wavemaxiter = 50; // (wavemodel = 1 only) Maximum number of iterations (each iteration is 4 sweeps) of the implicit solver per coupling (SWAN MXITST)
+	double wavedrel = 0.01; // (wavemodel = 1 only) Convergence criterion: relative change of Hs between 2 iterations (SWAN DREL)
+	double wavedhabs = 0.005; // (wavemodel = 1 only) Convergence criterion: absolute change of Hs (m) between 2 iterations (SWAN DHABS)
+	double wavenpnts = 99.5; // (wavemodel = 1 only) Convergence criterion: percentage of wet cells where the Hs criteria must be met to stop the iterations (SWAN NPNTS)
+	int qstart[4] = { 0, 0, 0, 0 }; // Calculated at initialisation: first direction bin of each sweep quadrant (implicit solver)
+	int qlen[4] = { 0, 0, 0, 0 }; // Calculated at initialisation: number of direction bins in each sweep quadrant (implicit solver)
 	double wavedepthmin = 0.05; // Minimum water depth (m) for the wave model. Cells with h < wavedepthmin are considered dry for the wave model (SWAN DEPMIN)
 
 	//*Physics (source terms)

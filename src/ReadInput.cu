@@ -939,7 +939,23 @@ WaveParam readparamstr(std::string line, WaveParam wparam)
 	parametervalue = findparameter(paramvec, line);
 	if (!parametervalue.empty())
 	{
-		wparam.wavemodel = readparambool(parametervalue, wparam.wavemodel);
+		// 0: off, 1: implicit (loose coupling), 2: explicit. true/yes/on is the implicit solver
+		if (case_insensitive_compare(parametervalue, std::vector<std::string>({ "true", "yes", "on", "implicit", "swan" })) == 0)
+		{
+			wparam.wavemodel = 1;
+		}
+		else if (case_insensitive_compare(parametervalue, std::vector<std::string>({ "false", "no", "off" })) == 0)
+		{
+			wparam.wavemodel = 0;
+		}
+		else if (case_insensitive_compare(parametervalue, std::vector<std::string>({ "explicit" })) == 0)
+		{
+			wparam.wavemodel = 2;
+		}
+		else
+		{
+			wparam.wavemodel = std::stoi(parametervalue);
+		}
 	}
 
 	paramvec = { "wavecurrent", "wavecurrentinteraction" };
@@ -989,6 +1005,55 @@ WaveParam readparamstr(std::string line, WaveParam wparam)
 	if (!parametervalue.empty())
 	{
 		wparam.freqshift = readparambool(parametervalue, wparam.freqshift);
+	}
+
+	paramvec = { "wavestationary", "wavestat", "stationary" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavestationary = readparambool(parametervalue, wparam.wavestationary);
+	}
+
+	paramvec = { "wavecdd", "cdd" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavecdd = std::stod(parametervalue);
+	}
+
+	paramvec = { "wavecss", "css" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavecss = std::stod(parametervalue);
+	}
+
+	paramvec = { "wavemaxiter", "mxitst", "wavemaxiteration" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavemaxiter = std::stoi(parametervalue);
+	}
+
+	paramvec = { "wavedrel", "drel" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavedrel = std::stod(parametervalue);
+	}
+
+	paramvec = { "wavedhabs", "dhabs" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavedhabs = std::stod(parametervalue);
+	}
+
+	paramvec = { "wavenpnts", "npnts" };
+	parametervalue = findparameter(paramvec, line);
+	if (!parametervalue.empty())
+	{
+		wparam.wavenpnts = std::stod(parametervalue);
 	}
 
 	paramvec = { "wavebinchunk", "wavechunk" };
@@ -2204,9 +2269,38 @@ void checkwaveparamsanity(Param& XParam, WaveParam& XWaveParam, Forcing<float>& 
 	XWaveParam.nspec = XWaveParam.nfreq * XWaveParam.ndir;
 	XWaveParam.dtheta = 2.0 * pi / double(XWaveParam.ndir);
 
+	if (XWaveParam.wavemodel != 1 && XWaveParam.wavemodel != 2)
+	{
+		log("WARNING: wavemodel must be 0 (off), 1 (implicit) or 2 (explicit). wavemodel set to 1");
+		XWaveParam.wavemodel = 1;
+	}
+
 	// Number of spectral bins propagated together (one batch / kernel launch)
+	// The implicit solver processes all the bins of a block at once
 	XWaveParam.nchunk = (XWaveParam.wavebinchunk > 0) ? XWaveParam.wavebinchunk : XWaveParam.ndir;
+	if (XWaveParam.wavemodel == 1)
+	{
+		XWaveParam.nchunk = XWaveParam.nspec;
+	}
 	XWaveParam.nchunk = utils::min(utils::max(XWaveParam.nchunk, 1), XWaveParam.nspec);
+
+	if (XWaveParam.wavemodel == 1)
+	{
+		if (XWaveParam.dtcouple <= 0.0)
+		{
+			XWaveParam.dtcouple = 600.0;
+			log("Implicit wave model: no coupling interval given (dtcouple), the wave model is updated every 600 s");
+		}
+		if (XWaveParam.ndir / 4 + 2 > WAVE_MAXQDIR)
+		{
+			log("ERROR: the implicit wave solver supports up to " + std::to_string(4 * (WAVE_MAXQDIR - 2)) + " directions (ndir)");
+			exit(1);
+		}
+		XWaveParam.wavemaxiter = utils::max(XWaveParam.wavemaxiter, 1);
+		XWaveParam.wavecdd = utils::min(utils::max(XWaveParam.wavecdd, 0.0), 1.0);
+		XWaveParam.wavecss = utils::min(utils::max(XWaveParam.wavecss, 0.0), 1.0);
+		log("Implicit wave model (" + std::string(XWaveParam.wavestationary ? "stationary" : "nonstationary") + "), updated every " + std::to_string(XWaveParam.dtcouple) + " s");
+	}
 
 	// The medium seen by the waves only changes if the flow model runs and the waves feel its water level or currents
 	XWaveParam.staticmedium = !XParam.flowmodel || (!XWaveParam.wavewaterlevel && !XWaveParam.wavecurrent);
