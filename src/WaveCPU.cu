@@ -117,8 +117,9 @@ template __host__ __device__ double WaveDepth<double>(const Param& XParam, const
  * This function is shared between the CPU (CalcWaveBulkCPU) and the GPU (CalcWaveBulkGPU) versions.
  * With E(sigma,theta) = sigma*N(sigma,theta) and the moments m_n = sum(sigma^n E dsigma dtheta):
  * - Hs = 4 sqrt(m0)
- * - Tm01 = 2pi m0/m1 ; Tm02 = 2pi sqrt(m0/m2)
+ * - Tm01 = 2pi m0/m1 ; Tm02 = 2pi sqrt(m0/m2) ; Tm-1,0 = 2pi m-1/m0
  * - Tp = 2pi/sigma_p where sigma_p is the frequency of the peak of the 1D frequency spectrum
+ * - Dp: peak direction, mean direction of the peak frequency band (as WW3 dp)
  * - Dir: mean direction (Kuik et al. 1988) in nautical convention (coming from)
  * - Dspr: directional spreading (Kuik et al. 1988)
  * - Urms = sqrt(sum(sigma^2/sinh^2(kh) E dsigma dtheta))
@@ -142,7 +143,8 @@ template <class T> __host__ __device__ void CalcWaveBulkCell(const Param& XParam
 	const T dth = T(XWaveParam.dtheta);
 	const T twopi = T(2.0 * pi);
 
-	T m0 = T(0.0), m1 = T(0.0), m2 = T(0.0);
+	T m0 = T(0.0), m1 = T(0.0), m2 = T(0.0), mm1 = T(0.0);
+	T Exp = T(0.0), Eyp = T(0.0); // directional moments of the peak frequency band
 	T Ex = T(0.0), Ey = T(0.0);
 	T Efmax = T(0.0), sigp = T(0.0);
 	T Uorb2 = T(0.0);
@@ -160,6 +162,7 @@ template <class T> __host__ __device__ void CalcWaveBulkCell(const Param& XParam
 			T n = (kh > T(20.0)) ? T(0.5) : T(0.5) * (T(1.0) + T(2.0) * kh / sinh(T(2.0) * kh));
 
 			T Ef = T(0.0);
+			T Exf = T(0.0), Eyf = T(0.0);
 			for (int idir = 0; idir < ndir; idir++)
 			{
 				int ispec = ifreq * ndir + idir;
@@ -168,17 +171,20 @@ template <class T> __host__ __device__ void CalcWaveBulkCell(const Param& XParam
 				T s = XWave.spec.sinth[idir];
 
 				Ef += E;
-				Ex += E * c;
-				Ey += E * s;
+				Exf += E * c;
+				Eyf += E * s;
 
 				Sxx += E * (n * (c * c + T(1.0)) - T(0.5));
 				Sxy += E * (n * c * s);
 				Syy += E * (n * (s * s + T(1.0)) - T(0.5));
 			}
 
+			Ex += Exf;
+			Ey += Eyf;
 			m0 += Ef;
 			m1 += Ef * sig;
 			m2 += Ef * sig * sig;
+			mm1 += Ef / sig;
 
 			if (kh < T(20.0))
 			{
@@ -191,6 +197,8 @@ template <class T> __host__ __device__ void CalcWaveBulkCell(const Param& XParam
 			{
 				Efmax = Ef / dsig;
 				sigp = sig;
+				Exp = Exf;
+				Eyp = Eyf;
 			}
 		}
 	}
@@ -199,14 +207,19 @@ template <class T> __host__ __device__ void CalcWaveBulkCell(const Param& XParam
 	T Tm01 = (m1 > T(0.0)) ? twopi * m0 / m1 : T(0.0);
 	T Tm02 = (m2 > T(0.0)) ? twopi * sqrt(m0 / m2) : T(0.0);
 	T Tp = (sigp > T(0.0)) ? twopi / sigp : T(0.0);
+	T Tmm10 = (m0 > T(0.0)) ? twopi * mm1 / m0 : T(0.0);
 
-	T Dir = T(0.0), Dspr = T(0.0);
+	T Dir = T(0.0), Dspr = T(0.0), Dp = T(0.0);
 	if (m0 > T(0.0))
 	{
 		// Cartesian "going to" direction to nautical "coming from" direction
 		T thm = atan2(Ey, Ex) * T(180.0) / T(pi);
 		Dir = T(270.0) - thm;
 		Dir = Dir - T(360.0) * floor(Dir / T(360.0));
+
+		T thp = atan2(Eyp, Exp) * T(180.0) / T(pi);
+		Dp = T(270.0) - thp;
+		Dp = Dp - T(360.0) * floor(Dp / T(360.0));
 
 		T R = sqrt(Ex * Ex + Ey * Ey) / m0;
 		Dspr = sqrt(utils::max(T(2.0) * (T(1.0) - R), T(0.0))) * T(180.0) / T(pi);
@@ -216,6 +229,8 @@ template <class T> __host__ __device__ void CalcWaveBulkCell(const Param& XParam
 	XWave.bulk.Tm01[i] = Tm01;
 	XWave.bulk.Tm02[i] = Tm02;
 	XWave.bulk.Tp[i] = Tp;
+	XWave.bulk.Tmm10[i] = Tmm10;
+	XWave.bulk.Dp[i] = Dp;
 	XWave.bulk.Dir[i] = Dir;
 	XWave.bulk.Dspr[i] = Dspr;
 	XWave.bulk.km[i] = (Tm01 > T(0.0)) ? WaveDispersion(twopi / Tm01, h, g) : T(0.0);

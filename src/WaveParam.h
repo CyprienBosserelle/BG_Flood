@@ -113,14 +113,15 @@ public:
 
 /**
  * @brief List of the (2D) wave output variables that can be requested with the "outvars" keyword.
- * Hs: significant wave height; Tm01, Tm02: mean periods; Tp: peak period; Dir: mean direction (nautical);
+ * Hs: significant wave height; Tm01, Tm02: mean periods; Tmm10: energy period Tm-1,0; Tp: peak period; Dir: mean direction (nautical); Dp: peak direction;
  * Dspr: directional spreading; km: mean wave number; Urms: rms bottom orbital velocity; Qb: fraction of breaking waves;
  * Dbr, Dfr, Dwc: dissipation by breaking, bottom friction and whitecapping; Sxx, Sxy, Syy: radiation stresses;
  * Fwx, Fwy: wave forces.
+ * Keep in sync with the supported output names in readparamstr (ReadInput.cu).
  */
 inline std::vector<std::string> WaveOutputVarNames()
 {
-	return { "Hs","Tm01","Tm02","Tp","Dir","Dspr","km","Urms","Qb","Dbr","Dfr","Dwc","Sxx","Sxy","Syy","Fwx","Fwy" };
+	return { "Hs","Tm01","Tm02","Tmm10","Tp","Dir","Dp","Dspr","km","Urms","Qb","Dbr","Dfr","Dwc","Sxx","Sxy","Syy","Fwx","Fwy" };
 }
 
 

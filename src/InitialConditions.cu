@@ -1073,6 +1073,123 @@ template void Initmaparray<double>(Model<double>& XModel);
 
 
 /**
+ * @brief Initializes the output variable maps for the flow and the wave model.
+ *
+ * Registers the flow variables (Initmaparray(XModel)) and the wave (2D) bulk parameters in the flow output maps
+ * so the existing netcdf output machinery is used for the wave outputs.
+ * The wave arrays only exist once the wave model is initialised, so this is called by InitWaveModel (CPU) and SetupWaveGPU (GPU).
+ * Must be called again if the flow or wave arrays are reallocated.
+ *
+ * @tparam T Data type (float or double)
+ * @param XModel Flow model (CPU or GPU) holding the output maps
+ * @param XWave Wave model (CPU or GPU)
+ */
+template <class T> void Initmaparray(Model<T>& XModel, WaveModel<T> XWave)
+{
+	// Flow variables
+	Initmaparray(XModel);
+
+	// Wave variables (bulk parameters calculated from the action density in CalcWaveBulkCell)
+	XModel.OutputVarMap["Hs"] = XWave.bulk.Hs;
+	XModel.Outvarlongname["Hs"] = "Significant wave height";
+	XModel.Outvarstdname["Hs"] = "sea_surface_wave_significant_height";
+	XModel.Outvarunits["Hs"] = "m";
+
+	XModel.OutputVarMap["Tm01"] = XWave.bulk.Tm01;
+	XModel.Outvarlongname["Tm01"] = "Mean wave period Tm01";
+	XModel.Outvarstdname["Tm01"] = "sea_surface_wave_mean_period_from_variance_spectral_density_first_frequency_moment";
+	XModel.Outvarunits["Tm01"] = "s";
+
+	XModel.OutputVarMap["Tm02"] = XWave.bulk.Tm02;
+	XModel.Outvarlongname["Tm02"] = "Mean wave period Tm02";
+	XModel.Outvarstdname["Tm02"] = "sea_surface_wave_mean_period_from_variance_spectral_density_second_frequency_moment";
+	XModel.Outvarunits["Tm02"] = "s";
+
+	XModel.OutputVarMap["Tp"] = XWave.bulk.Tp;
+	XModel.Outvarlongname["Tp"] = "Peak wave period";
+	XModel.Outvarstdname["Tp"] = "sea_surface_wave_period_at_variance_spectral_density_maximum";
+	XModel.Outvarunits["Tp"] = "s";
+
+	XModel.OutputVarMap["Tmm10"] = XWave.bulk.Tmm10;
+	XModel.Outvarlongname["Tmm10"] = "Energy wave period Tm-1,0";
+	XModel.Outvarstdname["Tmm10"] = "sea_surface_wave_mean_period_from_variance_spectral_density_inverse_frequency_moment";
+	XModel.Outvarunits["Tmm10"] = "s";
+
+	XModel.OutputVarMap["Dir"] = XWave.bulk.Dir;
+	XModel.Outvarlongname["Dir"] = "Mean wave direction (nautical, coming from)";
+	XModel.Outvarstdname["Dir"] = "sea_surface_wave_from_direction";
+	XModel.Outvarunits["Dir"] = "degree";
+
+	XModel.OutputVarMap["Dspr"] = XWave.bulk.Dspr;
+	XModel.Outvarlongname["Dspr"] = "Directional spreading";
+	XModel.Outvarstdname["Dspr"] = "sea_surface_wave_directional_spread";
+	XModel.Outvarunits["Dspr"] = "degree";
+
+	XModel.OutputVarMap["Dp"] = XWave.bulk.Dp;
+	XModel.Outvarlongname["Dp"] = "Peak wave direction (nautical, coming from)";
+	XModel.Outvarstdname["Dp"] = "sea_surface_wave_from_direction_at_variance_spectral_density_maximum";
+	XModel.Outvarunits["Dp"] = "degree";
+
+	XModel.OutputVarMap["km"] = XWave.bulk.km;
+	XModel.Outvarlongname["km"] = "Mean wave number (based on Tm01)";
+	XModel.Outvarstdname["km"] = "mean_wave_number";
+	XModel.Outvarunits["km"] = "rad/m";
+
+	XModel.OutputVarMap["Urms"] = XWave.bulk.Urms;
+	XModel.Outvarlongname["Urms"] = "Root mean square near bottom orbital velocity";
+	XModel.Outvarstdname["Urms"] = "rms_bottom_orbital_velocity";
+	XModel.Outvarunits["Urms"] = "m/s";
+
+	XModel.OutputVarMap["Qb"] = XWave.bulk.Qb;
+	XModel.Outvarlongname["Qb"] = "Fraction of breaking waves";
+	XModel.Outvarstdname["Qb"] = "fraction_of_breaking_waves";
+	XModel.Outvarunits["Qb"] = "-";
+
+	XModel.OutputVarMap["Dbr"] = XWave.dissip.Dbr;
+	XModel.Outvarlongname["Dbr"] = "Wave energy dissipation by depth induced breaking";
+	XModel.Outvarstdname["Dbr"] = "wave_dissipation_breaking";
+	XModel.Outvarunits["Dbr"] = "W/m2";
+
+	XModel.OutputVarMap["Dfr"] = XWave.dissip.Dfr;
+	XModel.Outvarlongname["Dfr"] = "Wave energy dissipation by bottom friction";
+	XModel.Outvarstdname["Dfr"] = "wave_dissipation_bottom_friction";
+	XModel.Outvarunits["Dfr"] = "W/m2";
+
+	XModel.OutputVarMap["Dwc"] = XWave.dissip.Dwc;
+	XModel.Outvarlongname["Dwc"] = "Wave energy dissipation by whitecapping";
+	XModel.Outvarstdname["Dwc"] = "wave_dissipation_whitecapping";
+	XModel.Outvarunits["Dwc"] = "W/m2";
+
+	XModel.OutputVarMap["Sxx"] = XWave.force.Sxx;
+	XModel.Outvarlongname["Sxx"] = "Radiation stress component Sxx";
+	XModel.Outvarstdname["Sxx"] = "radiation_stress_xx";
+	XModel.Outvarunits["Sxx"] = "N/m";
+
+	XModel.OutputVarMap["Sxy"] = XWave.force.Sxy;
+	XModel.Outvarlongname["Sxy"] = "Radiation stress component Sxy";
+	XModel.Outvarstdname["Sxy"] = "radiation_stress_xy";
+	XModel.Outvarunits["Sxy"] = "N/m";
+
+	XModel.OutputVarMap["Syy"] = XWave.force.Syy;
+	XModel.Outvarlongname["Syy"] = "Radiation stress component Syy";
+	XModel.Outvarstdname["Syy"] = "radiation_stress_yy";
+	XModel.Outvarunits["Syy"] = "N/m";
+
+	XModel.OutputVarMap["Fwx"] = XWave.force.Fx;
+	XModel.Outvarlongname["Fwx"] = "Wave force in x-direction";
+	XModel.Outvarstdname["Fwx"] = "wave_force_x";
+	XModel.Outvarunits["Fwx"] = "N/m2";
+
+	XModel.OutputVarMap["Fwy"] = XWave.force.Fy;
+	XModel.Outvarlongname["Fwy"] = "Wave force in y-direction";
+	XModel.Outvarstdname["Fwy"] = "wave_force_y";
+	XModel.Outvarunits["Fwy"] = "N/m2";
+}
+template void Initmaparray<float>(Model<float>& XModel, WaveModel<float> XWave);
+template void Initmaparray<double>(Model<double>& XModel, WaveModel<double> XWave);
+
+
+/**
  * @brief Finds and assigns blocks to output zones based on user-defined rectangular areas.
  *
  * Determines which blocks belong to each output zone, computes zone boundaries, and updates the block structure.

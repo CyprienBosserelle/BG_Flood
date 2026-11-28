@@ -439,6 +439,8 @@ template <class T> void CopytoGPU(int nblk, int blksize, WaveParam XWaveParam, W
 	CopytoGPU(nblk, blksize, XWave_cpu.bulk.km, XWave_gpu.bulk.km);
 	CopytoGPU(nblk, blksize, XWave_cpu.bulk.Urms, XWave_gpu.bulk.Urms);
 	CopytoGPU(nblk, blksize, XWave_cpu.bulk.Qb, XWave_gpu.bulk.Qb);
+	CopytoGPU(nblk, blksize, XWave_cpu.bulk.Tmm10, XWave_gpu.bulk.Tmm10);
+	CopytoGPU(nblk, blksize, XWave_cpu.bulk.Dp, XWave_gpu.bulk.Dp);
 
 	// Dissipation
 	CopytoGPU(nblk, blksize, XWave_cpu.dissip.Dbr, XWave_gpu.dissip.Dbr);

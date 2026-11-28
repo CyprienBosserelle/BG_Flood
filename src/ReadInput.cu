@@ -554,10 +554,9 @@ Param readparamstr(std::string line, Param param)
 			//Need to add more here
 
 
-			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","zso","uo","vo","ho","hmean","zsmean","umean","vmean","hUmean","Umean","hmax","zsmax","umax","vmax","hUmax","Umax","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw","hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy" };
-			// Wave model outputs (see WaveParam.h)
-			std::vector<std::string> WaveVarNames = WaveOutputVarNames();
-			SupportedVarNames.insert(SupportedVarNames.end(), WaveVarNames.begin(), WaveVarNames.end());
+			std::vector<std::string> SupportedVarNames = { "zb","zs","u","v","h","zso","uo","vo","ho","hmean","zsmean","umean","vmean","hUmean","Umean","hmax","zsmax","umax","vmax","hUmax","Umax","twet","dhdx","dhdy","dzsdx","dzsdy","dzbdx","dzbdy","dudx","dudy","dvdx","dvdy","Fhu","Fhv","Fqux","Fqvy","Fquy","Fqvx","Su","Sv","dh","dhu","dhv","cf","Patm","datmpdx","datmpdy","il","cl","hgw","hu","hv","hfu" ,"hfv","hau","hav","Fux","Fvx","Fuy","Fvy",
+				// Wave model outputs (bulk parameters, keep in sync with WaveOutputVarNames in WaveParam.h)
+				"Hs","Tm01","Tm02","Tmm10","Tp","Dir","Dp","Dspr","km","Urms","Qb","Dbr","Dfr","Dwc","Sxx","Sxy","Syy","Fwx","Fwy" };
 
 
 

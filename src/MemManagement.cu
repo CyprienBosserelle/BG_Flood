@@ -394,6 +394,8 @@ void AllocateCPU(int nblk, int blksize, WaveParam XWaveParam, WaveModel<T>& XWav
 	AllocateCPU(nblk, blksize, XWave.bulk.Hs, XWave.bulk.Tm01, XWave.bulk.Tm02, XWave.bulk.Tp);
 	AllocateCPU(nblk, blksize, XWave.bulk.Dir, XWave.bulk.Dspr, XWave.bulk.km, XWave.bulk.Urms);
 	AllocateCPU(nblk, blksize, XWave.bulk.Qb);
+	AllocateCPU(nblk, blksize, XWave.bulk.Tmm10);
+	AllocateCPU(nblk, blksize, XWave.bulk.Dp);
 
 	// Dissipation
 	AllocateCPU(nblk, blksize, XWave.dissip.Dbr);
@@ -1034,6 +1036,8 @@ void AllocateGPU(int nblk, int blksize, WaveParam XWaveParam, WaveModel<T>& XWav
 	AllocateGPU(nblk, blksize, XWave.bulk.Hs, XWave.bulk.Tm01, XWave.bulk.Tm02, XWave.bulk.Tp);
 	AllocateGPU(nblk, blksize, XWave.bulk.Dir, XWave.bulk.Dspr, XWave.bulk.km, XWave.bulk.Urms);
 	AllocateGPU(nblk, blksize, XWave.bulk.Qb);
+	AllocateGPU(nblk, blksize, XWave.bulk.Tmm10);
+	AllocateGPU(nblk, blksize, XWave.bulk.Dp);
 
 	// Dissipation
 	AllocateGPU(nblk, blksize, XWave.dissip.Dbr);

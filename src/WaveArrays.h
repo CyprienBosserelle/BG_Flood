@@ -87,10 +87,14 @@ struct WaveBulkP
 	T* Tm02;
 	/** Peak period (s) */
 	T* Tp;
+	/** Energy period Tm-1,0 = 2pi m-1/m0 (s) */
+	T* Tmm10;
 	/** Mean wave direction (degrees nautical, coming from) */
 	T* Dir;
 	/** Directional spreading (degrees) */
 	T* Dspr;
+	/** Peak direction: mean direction of the peak frequency (degrees nautical, coming from) */
+	T* Dp;
 	/** Mean wave number based on Tm01 (rad/m) */
 	T* km;
 	/** Root mean square near bottom orbital velocity (m/s) (SWAN URMS; SWAN UBOT = sqrt(2)*Urms) */

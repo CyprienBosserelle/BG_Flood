@@ -51,8 +51,8 @@ template <class T> void InitWaveModel(Param XParam, WaveParam& XWaveParam, Forci
 		exit(1);
 	}
 
-	// 3 spectral arrays + 2 frequency arrays (k, cg) + 36 2D arrays
-	double memMB = double(3 * nspecmem + 2 * size_t(XWaveParam.nfreq) * size_t(XWaveParam.specstride) + 36 * size_t(XWaveParam.specstride)) * sizeof(T) / 1024.0 / 1024.0;
+	// 3 spectral arrays + 2 frequency arrays (k, cg) + 38 2D arrays
+	double memMB = double(3 * nspecmem + 2 * size_t(XWaveParam.nfreq) * size_t(XWaveParam.specstride) + 38 * size_t(XWaveParam.specstride)) * sizeof(T) / 1024.0 / 1024.0;
 	log("\tSpectral grid: " + std::to_string(XWaveParam.nfreq) + " frequencies x " + std::to_string(XWaveParam.ndir) + " directions; Wave model memory: " + std::to_string(memMB) + " MB");
 
 	//==============================
@@ -88,8 +88,8 @@ template <class T> void InitWaveModel(Param XParam, WaveParam& XWaveParam, Forci
 	log("\tWave model initial (max) time step: " + std::to_string(XWave.clock.dtmax) + " s");
 
 	//==============================
-	// Register the wave variables for map outputs
-	InitWavemaparray(XModel, XWave);
+	// Register the wave variables for map outputs (see Initmaparray in InitialConditions.cu)
+	Initmaparray(XModel, XWave);
 
 }
 template void InitWaveModel<float>(Param XParam, WaveParam& XWaveParam, Forcing<float>& XForcing, Model<float>& XModel, WaveModel<float>& XWave);
@@ -136,7 +136,7 @@ template <class T> void SetupWaveGPU(Param XParam, WaveParam XWaveParam, Forcing
 		}
 	}
 
-	InitWavemaparray(XModel_g, XWave_g);
+	Initmaparray(XModel_g, XWave_g);
 }
 template void SetupWaveGPU<float>(Param XParam, WaveParam XWaveParam, Forcing<float>& XForcing, Model<float>& XModel_g, WaveModel<float>& XWave, WaveModel<float>& XWave_g);
 template void SetupWaveGPU<double>(Param XParam, WaveParam XWaveParam, Forcing<float>& XForcing, Model<double>& XModel_g, WaveModel<double>& XWave, WaveModel<double>& XWave_g);
@@ -231,7 +231,7 @@ template <class T> void InitWaveConditions(Param XParam, WaveParam XWaveParam, M
 	FillCPU(nblkmem * nspec, blksize, T(0.0), XWave.action.N);
 	FillCPU(nblkmem * nspec, blksize, T(0.0), XWave.adv.dN);
 
-	std::vector<T*> arr2D = { XWave.bulk.Hs, XWave.bulk.Tm01, XWave.bulk.Tm02, XWave.bulk.Tp, XWave.bulk.Dir, XWave.bulk.Dspr, XWave.bulk.km, XWave.bulk.Urms, XWave.bulk.Qb,
+	std::vector<T*> arr2D = { XWave.bulk.Hs, XWave.bulk.Tm01, XWave.bulk.Tm02, XWave.bulk.Tp, XWave.bulk.Dir, XWave.bulk.Dspr, XWave.bulk.km, XWave.bulk.Urms, XWave.bulk.Qb, XWave.bulk.Tmm10, XWave.bulk.Dp,
 		XWave.dissip.Dbr, XWave.dissip.Dfr, XWave.dissip.Dwc,
 		XWave.force.Sxx, XWave.force.Sxy, XWave.force.Syy, XWave.force.Fx, XWave.force.Fy,
 		XWave.time.dtmax, XWave.time.arrmin,
@@ -297,101 +297,3 @@ template void InitWaveConditions<float>(Param XParam, WaveParam XWaveParam, Mode
 template void InitWaveConditions<double>(Param XParam, WaveParam XWaveParam, Model<double> XModel, WaveModel<double>& XWave);
 
 
-/**
- * @brief Register the wave (2D) variables in the flow output maps so the existing netcdf output machinery can be used.
- *
- * Wave equivalent of Initmaparray. Must be called again if the wave arrays are reallocated.
- *
- * @tparam T Data type (float or double)
- * @param XModel Flow model (CPU or GPU) holding the output maps
- * @param XWave Wave model (CPU or GPU)
- */
-template <class T> void InitWavemaparray(Model<T>& XModel, WaveModel<T> XWave)
-{
-	XModel.OutputVarMap["Hs"] = XWave.bulk.Hs;
-	XModel.Outvarlongname["Hs"] = "Significant wave height";
-	XModel.Outvarstdname["Hs"] = "sea_surface_wave_significant_height";
-	XModel.Outvarunits["Hs"] = "m";
-
-	XModel.OutputVarMap["Tm01"] = XWave.bulk.Tm01;
-	XModel.Outvarlongname["Tm01"] = "Mean wave period Tm01";
-	XModel.Outvarstdname["Tm01"] = "sea_surface_wave_mean_period_from_variance_spectral_density_first_frequency_moment";
-	XModel.Outvarunits["Tm01"] = "s";
-
-	XModel.OutputVarMap["Tm02"] = XWave.bulk.Tm02;
-	XModel.Outvarlongname["Tm02"] = "Mean wave period Tm02";
-	XModel.Outvarstdname["Tm02"] = "sea_surface_wave_mean_period_from_variance_spectral_density_second_frequency_moment";
-	XModel.Outvarunits["Tm02"] = "s";
-
-	XModel.OutputVarMap["Tp"] = XWave.bulk.Tp;
-	XModel.Outvarlongname["Tp"] = "Peak wave period";
-	XModel.Outvarstdname["Tp"] = "sea_surface_wave_period_at_variance_spectral_density_maximum";
-	XModel.Outvarunits["Tp"] = "s";
-
-	XModel.OutputVarMap["Dir"] = XWave.bulk.Dir;
-	XModel.Outvarlongname["Dir"] = "Mean wave direction (nautical, coming from)";
-	XModel.Outvarstdname["Dir"] = "sea_surface_wave_from_direction";
-	XModel.Outvarunits["Dir"] = "degree";
-
-	XModel.OutputVarMap["Dspr"] = XWave.bulk.Dspr;
-	XModel.Outvarlongname["Dspr"] = "Directional spreading";
-	XModel.Outvarstdname["Dspr"] = "sea_surface_wave_directional_spread";
-	XModel.Outvarunits["Dspr"] = "degree";
-
-	XModel.OutputVarMap["km"] = XWave.bulk.km;
-	XModel.Outvarlongname["km"] = "Mean wave number (based on Tm01)";
-	XModel.Outvarstdname["km"] = "mean_wave_number";
-	XModel.Outvarunits["km"] = "rad/m";
-
-	XModel.OutputVarMap["Urms"] = XWave.bulk.Urms;
-	XModel.Outvarlongname["Urms"] = "Root mean square near bottom orbital velocity";
-	XModel.Outvarstdname["Urms"] = "rms_bottom_orbital_velocity";
-	XModel.Outvarunits["Urms"] = "m/s";
-
-	XModel.OutputVarMap["Qb"] = XWave.bulk.Qb;
-	XModel.Outvarlongname["Qb"] = "Fraction of breaking waves";
-	XModel.Outvarstdname["Qb"] = "fraction_of_breaking_waves";
-	XModel.Outvarunits["Qb"] = "-";
-
-	XModel.OutputVarMap["Dbr"] = XWave.dissip.Dbr;
-	XModel.Outvarlongname["Dbr"] = "Wave energy dissipation by depth induced breaking";
-	XModel.Outvarstdname["Dbr"] = "wave_dissipation_breaking";
-	XModel.Outvarunits["Dbr"] = "W/m2";
-
-	XModel.OutputVarMap["Dfr"] = XWave.dissip.Dfr;
-	XModel.Outvarlongname["Dfr"] = "Wave energy dissipation by bottom friction";
-	XModel.Outvarstdname["Dfr"] = "wave_dissipation_bottom_friction";
-	XModel.Outvarunits["Dfr"] = "W/m2";
-
-	XModel.OutputVarMap["Dwc"] = XWave.dissip.Dwc;
-	XModel.Outvarlongname["Dwc"] = "Wave energy dissipation by whitecapping";
-	XModel.Outvarstdname["Dwc"] = "wave_dissipation_whitecapping";
-	XModel.Outvarunits["Dwc"] = "W/m2";
-
-	XModel.OutputVarMap["Sxx"] = XWave.force.Sxx;
-	XModel.Outvarlongname["Sxx"] = "Radiation stress component Sxx";
-	XModel.Outvarstdname["Sxx"] = "radiation_stress_xx";
-	XModel.Outvarunits["Sxx"] = "N/m";
-
-	XModel.OutputVarMap["Sxy"] = XWave.force.Sxy;
-	XModel.Outvarlongname["Sxy"] = "Radiation stress component Sxy";
-	XModel.Outvarstdname["Sxy"] = "radiation_stress_xy";
-	XModel.Outvarunits["Sxy"] = "N/m";
-
-	XModel.OutputVarMap["Syy"] = XWave.force.Syy;
-	XModel.Outvarlongname["Syy"] = "Radiation stress component Syy";
-	XModel.Outvarstdname["Syy"] = "radiation_stress_yy";
-	XModel.Outvarunits["Syy"] = "N/m";
-
-	XModel.OutputVarMap["Fwx"] = XWave.force.Fx;
-	XModel.Outvarlongname["Fwx"] = "Wave force in x-direction";
-	XModel.Outvarstdname["Fwx"] = "wave_force_x";
-	XModel.Outvarunits["Fwx"] = "N/m2";
-
-	XModel.OutputVarMap["Fwy"] = XWave.force.Fy;
-	XModel.Outvarlongname["Fwy"] = "Wave force in y-direction";
-	XModel.Outvarstdname["Fwy"] = "wave_force_y";
-	XModel.Outvarunits["Fwy"] = "N/m2";
-}
-template void InitWavemaparray<float>(Model<float>& XModel, WaveModel<float> XWave);
-template void InitWavemaparray<double>(Model<double>& XModel, WaveModel<double> XWave);
